@@ -167,6 +167,28 @@ svg { display: block; }
 .rig { position: relative; height: 300px; max-width: 100%; }
 .rig .shot { display: block; width: 100%; height: 100%; max-width: none; }
 .rig > i, .rig > svg, .rig > .shot-shade { position: absolute; left: 0; top: 0; width: 100%; height: 100%; max-width: none; display: block; pointer-events: none; }
+.walk { display: grid; gap: 14px; }
+.walk-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.walk-title { font-family: var(--display); font-weight: 800; font-size: 26px; letter-spacing: -.01em; }
+.walk-say { font-size: 18px; }
+.walk-eg { margin: 0; padding: 14px 16px; border-radius: 16px; background: var(--card-2); font-family: var(--display); font-weight: 700; font-size: 20px; }
+.walk-ask { font-weight: 600; font-size: 17px; }
+.walk-line { display: flex; flex-wrap: wrap; gap: 8px; font-size: 20px; }
+.walk-word { min-height: 48px; padding: 8px 12px; border: 0; border-radius: 12px; background: var(--card-2); color: var(--ink); font: inherit; font-weight: 600; cursor: pointer; }
+.walk-word.hit { background: var(--good-soft); color: var(--good); outline: 2px solid var(--good); }
+.walk-word.miss { background: var(--bad-soft); color: var(--bad); }
+.walk-said { padding: 10px 14px; border-radius: 14px; font-weight: 500; }
+.walk-said.good { background: var(--good-soft); color: var(--good); }
+.walk-said.bad { background: var(--bad-soft); color: var(--bad); }
+.walk-big { padding: 22px 16px; border-radius: 18px; background: var(--card-2); font-family: var(--display); font-weight: 700; font-size: 22px; text-align: center; }
+.walk-piles { display: grid; grid-auto-flow: column; grid-auto-columns: 1fr; gap: 10px; }
+.walk-piles .btn { padding-inline: 8px; font-size: 14px; }
+.walk-match { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.walk-match > div { display: grid; gap: 10px; align-content: start; }
+.walk-tile { min-height: 58px; padding: 8px 10px; border: 2px solid transparent; border-radius: 14px; background: var(--card-2); color: var(--ink); font: inherit; font-weight: 600; font-size: 15px; cursor: pointer; }
+.walk-tile.on { border-color: var(--accent); }
+.walk-tile.done { background: var(--good-soft); color: var(--good); }
+.walk-go { margin-top: 2px; }
 .rig > i.rainbow { transition: background-color 1.6s ease; }
 .rig > i { -webkit-mask-size: 100% 100%; mask-size: 100% 100%; -webkit-mask-repeat: no-repeat; mask-repeat: no-repeat; }
 .lock-need { font-weight: 600; }
@@ -4672,8 +4694,32 @@ details ol { margin: 6px 0 0; padding-left: 20px; }
   };
 
   // ---------- English, language test on 3 November: only similes and personification ----------
+  // What the words themselves mean, and why writers use them.
+  S.en_terms = bank([
+    { q: `What is a simile?`, a: `Comparing two different things using "like" or "as"`, w: [`Giving a thing human actions or feelings`, `Using two words that mean the opposite`, `Repeating a sound at the start of each word`], why: `A simile compares two things with "like" or "as".` },
+    { q: `What is personification?`, a: `Giving a thing human actions or feelings`, w: [`Comparing two different things using "like" or "as"`, `Writing the story of a real person's life`, `Using a word that sounds like its noise`], why: `We write about a thing as if it were a person.` },
+    { q: `Finish the sentence: A simile compares two things using the words ___.`, a: `"like" or "as"`, w: [`"and" or "but"`, `"very" or "too"`, `"the" or "a"`], why: `"Like" and "as" are the words that give a simile away.` },
+    { q: `Finish the sentence: Personification makes a thing seem like a ___.`, a: `person`, w: [`simile`, `noise`, `bigger thing`], why: `The word "person" is hiding inside "personification".` },
+    { q: `What do we call it when we compare two things using "like" or "as"?`, strict: true, t: [`simile`, `a simile`], why: `That's a simile.`, h: `It starts with s, and it isn't "smile".` },
+    { q: `What do we call it when a thing is given human actions or feelings?`, t: [`personification`], why: `That's personification.`, h: `The word "person" is hiding inside it.` },
+    { q: `Why do writers use similes?`, a: `To help you picture something clearly`, w: [`To make their sentences shorter`, `To show you how to spell a word`, `To give you exact facts and numbers`], why: `"As thick as porridge" helps you picture just how thick the mud is.` },
+    { q: `Why do writers use personification?`, a: `To make a thing feel alive and interesting`, w: [`To give you exact facts about it`, `To make their sentences shorter`, `To compare it to an animal using "like"`], why: `"The wind whispered" feels more alive than "the wind blew".` },
+    { q: `What is the difference between a simile and personification?`, a: `A simile compares using "like" or "as"; personification makes a thing act human`, w: [`A simile makes a thing act human; personification compares using "like" or "as"`, `There is no difference between them`, `A simile is about animals; personification is about the weather`], why: `Compare with "like" or "as": simile. A thing acting human: personification.` },
+    { q: `What do you look for to find a simile?`, a: `"Like" or "as" comparing two things`, w: [`A thing doing something human`, `A person's name with a capital letter`, `A very long and difficult word`], why: `Look for "like" or "as", then check that two things are being compared.` },
+    { q: `What do you look for to find personification?`, a: `A thing doing something only a person can do`, w: [`"Like" or "as" comparing two things`, `A person doing something ordinary`, `A very long and difficult word`], why: `Find the thing, then ask whether it could really do that.` },
+    { q: `Who or what is personification used on?`, a: `Things that aren't people, like the wind or a bike`, w: [`Real people, like your teacher`, `Only animals that can talk`, `Only numbers and dates`], why: `A person shouting is normal. A wind shouting is personification.` },
+    { q: `"The wind whispered." Is the wind really whispering?`, a: `No, it's only written as if it were a person`, w: [`Yes, the wind can talk quietly`, `Yes, but only at night`, `No, because this is a simile`], why: `Writers use personification to paint a picture. It isn't really true.` },
+    { q: `Similes and personification are both kinds of ___.`, a: `figures of speech`, w: [`verbs`, `full stops`, `question words`], why: `A figure of speech uses words to paint a picture, not to be exactly true.` },
+    { tf: true, q: `True or false: a simile uses "like" or "as".`, why: `Those are the words that do the comparing.` },
+    { tf: false, q: `True or false: personification needs the word "like" or "as".`, why: `The thing just acts like a person. "The sun smiled" has neither word.` },
+    { tf: false, q: `True or false: a simile gives a thing human feelings.`, why: `That's personification. A simile compares two things.` },
+    { tf: true, q: `True or false: personification is about things that aren't people.`, why: `It gives them human actions or feelings.` },
+    { tf: false, q: `True or false: every sentence with "like" in it is a simile.`, why: `"I like chips" compares nothing. There "like" means enjoy.` },
+    { tf: false, q: `True or false: "The boy shouted at his dog" is personification.`, why: `A boy is a person, so shouting is just what he did.` },
+  ]);
+
   S.en_simile = bank([
-    { q: `What is a simile?`, a: `A comparison using "like" or "as"`, w: [`A word that means the opposite`, `A sound that a thing makes`, `A very long and hard word`], why: `A simile says one thing is like another: as brave as a lion.` },
+    { q: `Which of these explains a simile?`, a: `A comparison using "like" or "as"`, w: [`A word that means the opposite`, `A sound that a thing makes`, `A very long and hard word`], why: `A simile says one thing is like another: as brave as a lion.` },
     { q: `Which two words tell you that a sentence might have a simile?`, a: `"like" and "as"`, w: [`"and" and "but"`, `"the" and "a"`, `"very" and "too"`], why: `A simile compares two things using like or as.` },
     { q: `Which sentence has a simile?`, a: `The bike flew over the jump like a bird.`, w: [`The bike flew over the very big jump.`, `The bird flew over the very big jump.`, `The bike and the bird went over the jump.`], why: `"Like a bird" compares the bike to a bird.` },
     { q: `Which sentence has a simile?`, a: `Thabo is as fast as a cheetah.`, w: [`Thabo is very fast on his bike.`, `Thabo watched a cheetah on TV.`, `Thabo and his dog ran very fast.`], why: `"As fast as a cheetah" compares Thabo to a cheetah.` },
@@ -4724,7 +4770,7 @@ details ol { margin: 6px 0 0; padding-left: 20px; }
     { tf: false, q: `True or false: "The bike is red and fast" is a simile.`, why: `It describes the bike, but it doesn't compare it to anything.` },
   ]);
   S.en_person = bank([
-    { q: `What is personification?`, a: `Giving a thing human actions or feelings`, w: [`Comparing two things using "like" or "as"`, `Writing the name of a real person`, `Using a word that sounds like its noise`], why: `The wind can't really whisper, but a person can.` },
+    { q: `Which of these explains personification?`, a: `Giving a thing human actions or feelings`, w: [`Comparing two things using "like" or "as"`, `Writing the name of a real person`, `Using a word that sounds like its noise`], why: `The wind can't really whisper, but a person can.` },
     { q: `Which word is hiding inside "personification"?`, a: `Person`, w: [`Fiction`, `Nation`, `Perfect`], why: `We write about a thing as if it were a person.` },
     { q: `Which sentence uses personification?`, a: `The wind whispered through the trees.`, w: [`The wind blew hard through the trees.`, `The trees were tall and very green.`, `The rider rode between the trees.`], why: `Wind can't whisper. Only people can.` },
     { q: `Which sentence uses personification?`, a: `The sun smiled down on the riders.`, w: [`The sun was hot on the riders.`, `The riders smiled at the end.`, `The riders rode in the sun.`], why: `The sun can't smile. Only people can.` },
@@ -4786,11 +4832,35 @@ details ol { margin: 6px 0 0; padding-left: 20px; }
     scope: 'Similes and personification',
     note: 'Questions are new',
     examSize: 20,
-    startWith: ['en_simile', 'en_person', 'en_which'],
+    startWith: ['en_terms', 'en_simile', 'en_person'],
     topics: [
-      noted(RS.section('en_simile', 0, 'Similes', 'Comparing with "like" or "as"'), ['A simile compares two different things using "like" or "as".', 'The engine roared like a lion. The mud was as thick as glue.', 'Careful: "I like chips" isn\'t a simile. There "like" means enjoy.']),
-      noted(RS.section('en_person', 1, 'Personification', 'Things acting like people'), ['Personification gives a thing human actions or feelings.', 'The wind whispered. The old gate moaned.', 'Find the thing, then the word for what it is doing. Could a person do that? Can the thing really do it?']),
-      noted(RS.section('en_which', 2, 'Simile or personification?', 'Telling them apart'), ['"Like" or "as" comparing two things: simile.', 'A thing doing something only a person can do: personification.', 'Neither: the sentence just tells you something.']),
+      noted(RS.section('en_terms', 3, 'What the words mean', 'What is a simile? What is personification?'), ['A simile compares two different things using "like" or "as".', 'Personification gives a thing human actions or feelings.', 'Writers use them to paint a picture and make their writing more interesting.']),
+      noted(RS.section('en_simile', 0, 'Similes', 'Comparing with "like" or "as"'), ['A simile compares two different things using "like" or "as".', 'The engine roared like a lion. The mud was as thick as glue.', 'Careful: "I like chips" isn\'t a simile. There "like" means enjoy.'], {
+        walk: [
+          { card: 'What is a simile?', say: 'A simile compares two different things using "like" or "as".', eg: 'The engine roared like a lion.', more: "An engine isn't a lion. It just sounds like one, and now you can hear it." },
+          { tap: 'The engine roared like a lion.', find: 'like', ask: 'Tap the word that gives the simile away.', got: '"Like" joins the engine to the lion.' },
+          { tap: 'The mud was as thick as porridge.', find: 'porridge', ask: 'What is the mud being compared to? Tap it.', got: 'The mud is as thick as porridge. Now you can picture it.' },
+          { match: [['as brave as', 'a lion'], ['as cold as', 'ice'], ['as slow as', 'a snail'], ['as busy as', 'a bee']], ask: 'Tap a start, then tap its end.' },
+          { sort: ['Simile', 'Not a simile'], ask: 'Is it a simile?', items: [['My bike goes like the wind.', 0, 'It compares the bike to the wind, using "like".'], ['I like riding on Saturdays.', 1, 'Here "like" means enjoy. Nothing is compared.'], ['The jump looked as high as a house.', 0, 'It compares the jump to a house, using "as".'], ['The jump was very high.', 1, 'It tells you about the jump, but compares it to nothing.']] },
+        ],
+      }),
+      noted(RS.section('en_person', 1, 'Personification', 'Things acting like people'), ['Personification gives a thing human actions or feelings.', 'The wind whispered. The old gate moaned.', 'Find the thing, then the word for what it is doing. Could a person do that? Can the thing really do it?'], {
+        walk: [
+          { card: 'What is personification?', say: 'Personification gives a thing human actions or feelings.', eg: 'The wind whispered through the trees.', more: 'Spot the word "person" hiding inside "personification". The wind is written about as if it were a person.' },
+          { tap: 'The wind whispered through the trees.', find: 'whispered', ask: 'Tap what only a person can really do.', got: "Wind can't whisper. People whisper." },
+          { tap: 'The old gate moaned when we opened it.', find: 'moaned', ask: 'Tap what only a person can really do.', got: "A gate can't moan. People moan." },
+          { tap: 'The sun smiled down on the riders.', find: 'smiled', ask: 'Tap what only a person can really do.', got: "The sun can't smile. People smile." },
+          { match: [['The stars', 'winked at us'], ['The waves', 'danced on the beach'], ['My old bike', 'groaned up the hill'], ['The thunder', 'shouted at the hills']], ask: 'Tap a thing, then tap what it did like a person.' },
+          { sort: ['Personification', 'Not personification'], ask: 'Is it personification?', items: [['The sun hid behind a cloud.', 0, "The sun can't choose to hide. People hide."], ['The sun went behind a cloud.', 1, 'That is just what happens. Nothing acts like a person.'], ['The rider shouted at the crowd.', 1, 'A rider is a person, so shouting is normal.'], ['The mud grabbed my boots.', 0, "Mud can't grab. People grab."]] },
+        ],
+      }),
+      noted(RS.section('en_which', 2, 'Simile or personification?', 'Telling them apart'), ['"Like" or "as" comparing two things: simile.', 'A thing doing something only a person can do: personification.', 'Neither: the sentence just tells you something.'], {
+        walk: [
+          { card: 'Two questions to ask', say: 'Does it compare two things using "like" or "as"? Simile. Does a thing do something only a person can do? Personification.', eg: 'If neither, the sentence is just telling you something.', more: 'Ask both questions every time.' },
+          { match: [['Compares with "like" or "as"', 'Simile'], ['A thing acts like a person', 'Personification'], ['Just tells you something', 'Neither']], ask: 'Tap a clue, then tap its name.' },
+          { sort: ['Simile', 'Personification', 'Neither'], ask: 'Which one is it?', items: [['The engine roared like a lion.', 0, 'It compares the engine to a lion, using "like".'], ['The wind sang through the wires.', 1, "Wind can't sing. People sing."], ['The rider won the race.', 2, 'It just tells you what happened.'], ['The mud was as thick as glue.', 0, 'It compares the mud to glue, using "as".'], ['The hill laughed at my little bike.', 1, "A hill can't laugh. People laugh."], ['I like the red helmet.', 2, 'Here "like" means enjoy. Nothing is compared.']] },
+        ],
+      }),
     ],
   };
 
@@ -8175,12 +8245,12 @@ Jordy's Science test, Tuesday 10 November: Planet Earth and Beyond. Written from
   // ---------- staying up to date ----------
   // An open tab or a home screen app keeps running the page it first loaded, old prices and all. So it asks which version
   // is live when it comes back into view and every few minutes, and swaps over between races. build.mjs fills in BUILD.
-  const BUILD = '8e97d6dfbe';
+  const BUILD = '278642dd81';
   const BACK_KEY = 'holeshot.back.v1';
   const TRIED_KEY = 'holeshot.tried.v1';
   let liveBuild = null;
   function swapToLive() {
-    if (!liveBuild || ui.run || ui.result || ui.parents || ui.tryOn) return;
+    if (!liveBuild || ui.run || ui.result || ui.parents || ui.tryOn || ui.walk) return;
     // Right after a release the site can still hand out the old page, so each version only gets one try every five minutes.
     const [tried, when] = String(getKey(TRIED_KEY) || '').split(' ');
     if (tried === liveBuild && Date.now() - +when < 300000) return;
@@ -8616,7 +8686,7 @@ Jordy's Science test, Tuesday 10 November: Planet Earth and Beyond. Written from
             ${photo('main-event')}
             <div class="eyebrow" style="color:inherit;opacity:.75">${sub.label} practice test</div>
             <h2>Main event</h2>
-            <p>${sub.examSize} mixed questions with no hints. ${best != null ? `Your best is ${best}%.` : 'Marks come at the end, like the real thing.'}</p>
+            <p>${sub.examSize} mixed questions with no hints. ${best != null ? `Your best is ${best}%.` : 'You see right or wrong after each one, and your mark at the end.'}</p>
             <button class="btn full" data-act="start" data-mode="exam">Line up</button>
           </section>
           ${lapCard(p)}
@@ -8746,6 +8816,7 @@ Jordy's Science test, Tuesday 10 November: Planet Earth and Beyond. Written from
             <button class="btn ${here ? 'primary' : ''} small" data-act="start" data-mode="topic" data-topic="${t.id}">Ride</button>
           </div>
           <div class="stop-row"><div class="meter" style="flex:1" role="img" aria-label="${m} percent"><i style="width:${m}%"></i></div><span class="small-t num muted">${m}%</span>${stars(tp.stars || 0, 14)}</div>
+          ${t.walk ? `<button class="btn small full walk-go" data-act="walk" data-id="${t.id}">${ic('route', 16)} Track walk: learn it first</button>` : ''}
           ${ruleCard(t)}
         </div>
       </article>`;
@@ -8770,6 +8841,63 @@ Jordy's Science test, Tuesday 10 November: Planet Earth and Beyond. Written from
           </div>
         </article>
       </div>`);
+  }
+
+  // ---------- the track walk ----------
+  // Riders walk a track before they race it. A walk teaches one section with things to tap and sort, and nothing is marked.
+  const WALK_POINTS = 30;
+  const walkTopic = () => SUB().topics.find((t) => t.id === ui.walk.id);
+  const plainWord = (w) => w.replace(/[^\p{L}\p{N}'-]/gu, '').toLowerCase();
+  function walkStep(i) {
+    const step = walkTopic().walk[i];
+    Object.assign(ui.walk, { i, ok: false, miss: null, said: null });
+    if (step.sort) ui.walk.queue = RS.shuffle(step.items.map((_, n) => n));
+    if (step.match) Object.assign(ui.walk, { left: RS.shuffle(step.match.map((_, n) => n)), right: RS.shuffle(step.match.map((_, n) => n)), pick: null, joined: [] });
+  }
+  function finishWalk() {
+    const p = P();
+    const w = ui.walk;
+    w.i = walkTopic().walk.length;
+    p.walked = p.walked || {};
+    w.paid = !p.walked[w.id];
+    if (w.paid) {
+      p.walked[w.id] = dayKey();
+      p.points += WALK_POINTS;
+      p.earned += WALK_POINTS;
+      save();
+    }
+    sfx('combo');
+  }
+  function viewWalk() {
+    const w = ui.walk;
+    const t = walkTopic();
+    const steps = t.walk.length;
+    const said = w.said ? `<p class="walk-said ${w.said.ok ? 'good' : 'bad'}" role="status">${h(w.said.text)}</p>` : '';
+    const next = `<button class="btn primary full" data-act="walk-next">${w.i + 1 < steps ? 'Next' : 'Finish the walk'} ${ic('arrow')}</button>`;
+    const head = `<div class="walk-head"><div><div class="eyebrow">Track walk</div><div class="h-sec">${t.title}</div></div><button class="btn small" data-act="walk-off">Back</button></div>
+      <div class="meter" role="img" aria-label="Step ${Math.min(w.i + 1, steps)} of ${steps}"><i style="width:${Math.round((100 * w.i) / steps)}%"></i></div>`;
+    let body;
+    if (w.i >= steps) {
+      body = `<h2 class="walk-title">Track walked</h2><p>${w.paid ? `You earned <b class="num">${WALK_POINTS}</b> points for walking this section.` : 'You know this track. The points are for the first walk.'} Now ride it for real.</p>
+        <button class="btn primary full" data-act="start" data-mode="topic" data-topic="${t.id}">Ride this section ${ic('arrow')}</button>
+        <button class="btn full" data-act="walk-off">Back to the track</button>`;
+    } else {
+      const step = t.walk[w.i];
+      if (step.card) {
+        body = `<h2 class="walk-title">${h(step.card)}</h2><p class="walk-say">${h(step.say)}</p><blockquote class="walk-eg">${h(step.eg)}</blockquote><p class="muted">${h(step.more)}</p>${next}`;
+      } else if (step.tap) {
+        const words = step.tap.split(' ').map((word, n) => `<button class="walk-word ${w.ok && plainWord(word) === step.find ? 'hit' : w.miss === n ? 'miss' : ''}" data-act="walk-word" data-id="${n}" ${w.ok ? 'disabled' : ''}>${h(word)}</button>`).join(' ');
+        body = `<p class="walk-ask">${h(step.ask)}</p><p class="walk-line">${words}</p>${w.ok ? `<p class="walk-said good" role="status">${h(step.got)}</p>${next}` : w.miss !== null ? '<p class="walk-said bad" role="status">Not that one. Have another look.</p>' : ''}`;
+      } else if (step.sort) {
+        body = w.queue.length
+          ? `<p class="walk-ask">${h(step.ask)} <span class="small-t muted num">${w.queue.length} left</span></p>${said}<div class="walk-big">${h(step.items[w.queue[0]][0])}</div><div class="walk-piles">${step.sort.map((pile, n) => `<button class="btn" data-act="walk-pile" data-id="${n}">${h(pile)}</button>`).join('')}</div>`
+          : `${said}<p class="walk-said good" role="status">All sorted.</p>${next}`;
+      } else {
+        const tile = (side, n, text) => `<button class="walk-tile ${side === 'left' && w.pick === n ? 'on' : ''} ${w.joined.includes(n) ? 'done' : ''}" data-act="walk-${side}" data-id="${n}" ${w.joined.includes(n) ? 'disabled' : ''}>${h(text)}</button>`;
+        body = `<p class="walk-ask">${h(step.ask)}</p>${said}<div class="walk-match"><div>${w.left.map((n) => tile('left', n, step.match[n][0])).join('')}</div><div>${w.right.map((n) => tile('right', n, step.match[n][1])).join('')}</div></div>${w.ok ? next : ''}`;
+      }
+    }
+    return shell(`<section class="card walk">${head}${body}</section>`);
   }
 
   // ---------- the pits ----------
@@ -9184,13 +9312,13 @@ Jordy's Science test, Tuesday 10 November: Planet Earth and Beyond. Written from
     if (r.mode === 'exam') {
       settle(q, res.ok, true, given);
       if (res.ok) {
-        award(10);
         r.combo++;
         r.bestCombo = Math.max(r.bestCombo, r.combo);
       } else r.combo = 0;
-      sfx('tap');
-      r.i++;
-      return nextQuestion();
+      // No hints and no second try here, but a rider always sees whether it was right.
+      r.sheet = { type: 'marked', ok: res.ok, pts: res.ok ? award(10) : 0 };
+      sfx(res.ok ? 'right' : 'wrong');
+      return drawRun();
     }
     if (r.mode === 'lap') {
       settle(q, res.ok, true, given);
@@ -9477,6 +9605,11 @@ Jordy's Science test, Tuesday 10 November: Planet Earth and Beyond. Written from
     if (s.type === 'quit') {
       return `<div class="sheet" role="dialog" aria-label="Pull off the track?"><div class="sheet-head"><h2>Pull off the track?</h2></div><p class="muted">You keep the ${r.pts} points from this moto, but it won't count towards your streak${r.mode === 'lap' ? ' and your time goes in the bin' : ''}.</p><button class="btn primary full" data-act="unquit" data-primary>Keep riding</button><button class="btn full" data-act="quit-yes">Pull off</button></div>`;
     }
+    if (s.type === 'marked') {
+      return s.ok
+        ? `<div class="sheet good" role="status"><div class="sheet-head"><h2>Correct</h2><span class="pts num">+${s.pts}</span></div><button class="btn primary full" data-act="next" data-primary>Next ${ic('arrow')}</button></div>`
+        : `<div class="sheet bad" role="status"><div class="sheet-head"><h2>Not this time</h2></div><p style="font-size:17px">The answer is <b>${h(q.correct).replace(/.$/, '')}</b>.</p>${steps}<button class="btn primary full" data-act="next" data-primary>Next ${ic('arrow')}</button></div>`;
+    }
     if (s.type === 'right') {
       return `<div class="sheet good" role="status"><div class="sheet-head"><h2>${s.title}</h2><span class="pts num">+${s.pts}</span></div>
         ${s.holeshot ? '<p class="small-t">First into the first corner: +10 bonus.</p>' : ''}
@@ -9489,7 +9622,7 @@ Jordy's Science test, Tuesday 10 November: Planet Earth and Beyond. Written from
     if (s.type === 'retry') {
       return `<div class="sheet warn" role="status"><div class="sheet-head"><h2>Stalled it</h2></div><p style="font-size:17px">${h(q.hint)}</p>${ruleCard(topicOf(q.skill))}<button class="btn primary full" data-act="retry" data-primary>Kick it over</button></div>`;
     }
-    return `<div class="sheet bad" role="status"><div class="sheet-head"><h2>Here's the line</h2></div><p style="font-size:17px">The answer is <b>${h(q.correct)}</b>.</p>${steps}${ruleCard(topicOf(q.skill))}<p class="small-t muted">${q.bonus ? '' : "You'll get another one like this at the end. "}It stays on your fix list until you get it right ${FIX_NEED} times in a row.</p><button class="btn primary full" data-act="next" data-primary>Got it ${ic('arrow')}</button></div>`;
+    return `<div class="sheet bad" role="status"><div class="sheet-head"><h2>Here's the line</h2></div><p style="font-size:17px">The answer is <b>${h(q.correct).replace(/.$/, '')}</b>.</p>${steps}${ruleCard(topicOf(q.skill))}<p class="small-t muted">${q.bonus ? '' : "You'll get another one like this at the end. "}It stays on your fix list until you get it right ${FIX_NEED} times in a row.</p><button class="btn primary full" data-act="next" data-primary>Got it ${ic('arrow')}</button></div>`;
   }
 
   function viewRun() {
@@ -9954,6 +10087,7 @@ Jordy's Science test, Tuesday 10 November: Planet Earth and Beyond. Written from
     else if (!ui.who) app.innerHTML = viewPick();
     else if (ui.run) drawRun();
     else if (ui.result) app.innerHTML = viewResult();
+    else if (ui.walk) app.innerHTML = viewWalk();
     else app.innerHTML = { home: viewHome, route: viewRoute, garage: viewGarage, progress: viewProgress }[ui.tab]();
   }
 
@@ -9979,6 +10113,7 @@ Jordy's Science test, Tuesday 10 November: Planet Earth and Beyond. Written from
     if (!el) return;
     const act = el.dataset.act;
     const id = el.dataset.id;
+    if (act === 'tab' || act === 'switch' || act === 'start') ui.walk = null;
     const p = ui.who ? P() : null;
     switch (act) {
       case 'who':
@@ -10144,6 +10279,62 @@ Jordy's Science test, Tuesday 10 November: Planet Earth and Beyond. Written from
             render();
           }
         });
+        break;
+      }
+      case 'walk':
+        ui.walk = { id };
+        walkStep(0);
+        render();
+        window.scrollTo(0, 0);
+        break;
+      case 'walk-off':
+        ui.walk = null;
+        render();
+        break;
+      case 'walk-next':
+        if (ui.walk.i + 1 < walkTopic().walk.length) walkStep(ui.walk.i + 1);
+        else finishWalk();
+        render();
+        window.scrollTo(0, 0);
+        break;
+      case 'walk-word': {
+        const step = walkTopic().walk[ui.walk.i];
+        if (plainWord(step.tap.split(' ')[+id]) === step.find) ui.walk.ok = true;
+        else ui.walk.miss = +id;
+        render();
+        break;
+      }
+      case 'walk-pile': {
+        const w = ui.walk;
+        const step = walkTopic().walk[w.i];
+        const item = step.items[w.queue[0]];
+        const first = w.queue.shift();
+        if (item[1] === +id) w.said = { ok: true, text: item[2] };
+        else {
+          w.said = { ok: false, text: `It's "${step.sort[item[1]]}". ${item[2]}` };
+          w.queue.push(first);
+        }
+        render();
+        break;
+      }
+      case 'walk-left':
+        ui.walk.pick = +id;
+        ui.walk.said = null;
+        render();
+        break;
+      case 'walk-right': {
+        const w = ui.walk;
+        if (w.pick === null) w.said = { ok: false, text: 'Tap one on the left first.' };
+        else if (w.pick === +id) {
+          w.joined.push(+id);
+          w.pick = null;
+          w.said = null;
+          w.ok = w.joined.length === walkTopic().walk[w.i].match.length;
+        } else {
+          w.said = { ok: false, text: "Those two don't go together. Try again." };
+          w.pick = null;
+        }
+        render();
         break;
       }
       case 'try-off':
