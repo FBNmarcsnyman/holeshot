@@ -167,7 +167,11 @@ svg { display: block; }
 .rig { position: relative; width: 100%; max-width: 460px; }
 .rig .bike { max-width: none; }
 .rider { position: absolute; left: 0; bottom: 0; width: 100%; height: auto; overflow: visible; pointer-events: none; }
-.gear-list { display: grid; gap: 14px; }
+.rig-in { position: relative; }
+.rig-in .bike { display: block; width: 100%; }
+.rd { position: absolute; pointer-events: none; }
+.rd > i, .rd > img, .rd > svg { position: absolute; left: 0; top: 0; width: 100%; height: 100%; max-width: none; display: block; }
+.rd > i { -webkit-mask-size: 100% 100%; mask-size: 100% 100%; -webkit-mask-repeat: no-repeat; mask-repeat: no-repeat; }
 .lock-need { font-weight: 600; }
 .rank-line { display: flex; justify-content: space-between; gap: 8px; flex-wrap: wrap; }
 .photo { display: block; width: 100%; height: 100%; object-fit: cover; }
@@ -263,8 +267,30 @@ svg { display: block; }
 .ride .chip { justify-self: start; margin-inline: 4px; }
 .paints { display: flex; flex-wrap: wrap; gap: 10px; }
 .paint { display: grid; justify-items: center; gap: 4px; width: 68px; font-size: 11px; text-align: center; line-height: 1.2; }
-.swatch { width: 46px; height: 46px; border-radius: 50%; background: var(--c); display: grid; place-items: center; color: #fff; }
-.paint.on .swatch { outline: 3px solid var(--ink); outline-offset: 2px; }
+.swatch { position: relative; width: 46px; height: 46px; border-radius: 50%; background: var(--c); display: grid; place-items: center; color: #fff; overflow: hidden; box-shadow: inset 0 0 0 1px rgba(0, 0, 0, .16); }
+.swatch-art { position: absolute; inset: 0; width: 100%; height: 100%; }
+.swatch-mark { position: relative; display: grid; filter: drop-shadow(0 1px 1px rgba(0, 0, 0, .75)); }
+.paint.on .swatch { outline: 3px solid var(--ink); outline-offset: 2px; overflow: visible; }
+.paint.on .swatch-art { border-radius: 50%; }
+.parents-link { justify-self: center; min-height: 44px; padding: 8px 16px; text-decoration: underline; }
+.parent-input { -webkit-text-security: disc; }
+.lap-card { display: grid; gap: 10px; }
+.lap-clock { font-size: 24px; min-width: 76px; text-align: right; }
+.pit-left { position: sticky; top: 8px; z-index: 4; display: grid; gap: 8px; margin-bottom: 12px; padding: 10px 12px; }
+.pit-left .stage { padding: 6px 10px; }
+.pit-left .rig { max-width: 250px; margin-inline: auto; }
+.pit-right { display: grid; gap: 12px; min-width: 0; }
+.pit-tabs { display: flex; flex-wrap: wrap; gap: 6px; }
+.pit-tab { min-height: 42px; padding: 8px 13px; border-radius: 999px; background: var(--card); color: var(--ink-2); box-shadow: var(--shadow); font-size: 13px; font-weight: 600; }
+.pit-tab.on { background: var(--accent); color: var(--accent-ink); }
+.try-bar { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.try-bar > div { flex: 1 1 130px; min-width: 0; }
+.try-bar b { font-weight: 700; }
+@media (min-width: 900px) {
+  .pit { display: grid; grid-template-columns: minmax(0, 440px) minmax(0, 1fr); gap: 12px; align-items: start; }
+  .pit-left { margin-bottom: 0; }
+  .pit-left .rig { max-width: 400px; }
+}
 .plate-row { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; }
 .accents { display: flex; flex-wrap: wrap; gap: 6px; justify-content: center; }
 .accents .btn { min-width: 44px; min-height: 44px; font-size: 18px; }
@@ -6649,14 +6675,36 @@ Jordy's Science test, Tuesday 10 November: Planet Earth and Beyond. Written from
     pink: { label: 'Hot pink', hex: '#D81B7C', dark: '#A5125E', ink: '#FFFFFF', cost: 2500, rank: 2, filter: 'hue-rotate(-55deg) saturate(1.15)' },
     steel: { label: 'Stealth', hex: '#4A5568', dark: '#333B49', ink: '#FFFFFF', cost: 6000, rank: 3, filter: 'saturate(.08) brightness(.82)' },
     lime: { label: 'Neon lime', hex: '#B7E021', dark: '#8FB30F', ink: '#1C2400', cost: 6000, rank: 3, filter: 'hue-rotate(52deg) saturate(1.15) brightness(1.08)' },
+    yellow: { label: 'Sunshine', hex: '#F2C200', dark: '#B98F00', ink: '#1C1600', cost: 2000, filter: 'hue-rotate(32deg) saturate(1.2) brightness(1.12)' },
+    teal: { label: 'Teal rush', hex: '#0E9AA7', dark: '#0A7480', ink: '#FFFFFF', cost: 2000, filter: 'hue-rotate(160deg) saturate(1.05)' },
+    sky: { label: 'Sky blue', hex: '#2FA8E8', dark: '#1C7FB6', ink: '#FFFFFF', cost: 3000, rank: 2, filter: 'hue-rotate(178deg) saturate(1.05) brightness(1.1)' },
+    maroon: { label: 'Deep maroon', hex: '#7A1530', dark: '#5A0E22', ink: '#FFFFFF', cost: 3000, rank: 2, filter: 'hue-rotate(-30deg) saturate(1.1) brightness(.62)' },
+    white: { label: 'Arctic white', hex: '#E8EAEE', dark: '#7C8594', ink: '#FFFFFF', accent: '#4A5568', cost: 5000, rank: 2, coat: '#F5F6F8', filter: 'saturate(0) brightness(1.08)' },
+    black: { label: 'Midnight', hex: '#17181D', dark: '#000000', ink: '#FFFFFF', accent: '#4A5568', cost: 8000, rank: 3, coat: '#15161B', filter: 'saturate(0) brightness(.85)' },
+    gold: { label: 'Champion gold', hex: '#D9A514', dark: '#A77E0B', ink: '#1C1600', cost: 15000, rank: 4, filter: 'hue-rotate(24deg) saturate(.95) brightness(1.02)' },
+  };
+  // A sticker kit is a repeating tile, drawn over the bike's plastics on the panels traced in SEATS.
+  const STICKERS = {
+    plain: { label: 'No stickers', cost: 0 },
+    stripes: { label: 'Race stripes', cost: 2000, w: 48, h: 48, turn: -35, art: '<rect width="48" height="14" fill="#fff"/><rect y="20" width="48" height="5" fill="#15161B"/>' },
+    waves: { label: 'Waves', cost: 2500, w: 60, h: 30, turn: -12, art: '<path d="M-2 15C13 0 15 30 30 15S47 0 62 15" fill="none" stroke="#fff" stroke-width="7"/>' },
+    check: { label: 'Chequered', cost: 3000, rank: 2, w: 36, h: 36, turn: -12, art: '<rect width="18" height="18" fill="#fff"/><rect x="18" y="18" width="18" height="18" fill="#fff"/><rect x="18" width="18" height="18" fill="#15161B"/><rect y="18" width="18" height="18" fill="#15161B"/>' },
+    bolt: { label: 'Lightning', cost: 4000, rank: 2, w: 70, h: 66, turn: -18, art: '<path d="M26 1h20L34 25h14L18 65l8-28H12z" fill="#F2C200" stroke="#15161B" stroke-width="2"/>' },
+    pixel: { label: 'Digital', cost: 5000, rank: 2, w: 40, h: 40, art: '<g fill="#15161B"><rect width="10" height="10"/><rect x="20" y="10" width="10" height="10"/><rect x="10" y="30" width="10" height="10"/><rect x="30" y="30" width="10" height="10"/></g><g fill="#fff"><rect x="10" y="10" width="10" height="10"/><rect x="30" width="10" height="10"/><rect y="20" width="10" height="10"/><rect x="20" y="30" width="10" height="10"/></g>' },
+    camo: { label: 'Camo', cost: 6000, rank: 3, w: 120, h: 90, art: '<rect width="120" height="90" fill="#59683F"/><path d="M0 20C20 5 45 8 55 25S40 55 20 50-10 35 0 20Z" fill="#2F3A24"/><path d="M70 0C90-6 115 5 118 22S95 48 78 38 60 8 70 0Z" fill="#8A8458"/><path d="M60 58C78 48 105 55 112 70S90 96 72 88 48 68 60 58Z" fill="#2F3A24"/><path d="M8 62C20 54 38 62 38 74S22 92 10 86 0 70 8 62Z" fill="#8A8458"/>' },
+    mud: { label: 'Mud splat', cost: 7000, rank: 3, w: 100, h: 80, art: '<g fill="#5B3A1E"><path d="M18 14C30 4 46 10 44 24S24 38 14 30 8 20 18 14Z"/><circle cx="56" cy="12" r="5"/><circle cx="8" cy="46" r="4"/><path d="M62 44C74 36 92 42 90 56S70 72 60 64 52 50 62 44Z"/><circle cx="38" cy="58" r="7"/><circle cx="86" cy="24" r="3"/></g>' },
+    flame: { label: 'Flames', cost: 8000, rank: 3, w: 130, h: 80, turn: -10, art: '<rect width="130" height="80" fill="#15161B"/><path d="M0 80C16 70 14 52 6 40C20 46 26 44 26 28C36 38 42 34 44 14C56 30 60 44 56 58C64 52 68 52 72 62C80 56 84 62 86 80Z" fill="#F97316"/><path d="M16 80C26 72 26 60 22 52C30 58 36 54 36 44C44 52 48 62 44 80Z" fill="#FDE047"/>' },
+    tiger: { label: 'Tiger', cost: 10000, rank: 4, w: 70, h: 60, turn: 20, art: '<path d="M0 0L40 8L0 16ZM70 20L26 28L70 38ZM0 40L44 46L0 56Z" fill="#15161B"/>' },
+    carbon: { label: 'Carbon', cost: 14000, rank: 4, w: 12, h: 12, art: '<rect width="12" height="12" fill="#2B2F36"/><path d="M0 0L6 6L0 12M6 0L12 6L6 12" stroke="#596273" stroke-width="2" fill="none"/>' },
+    goldline: { label: 'Gold pinstripe', cost: 25000, rank: 5, w: 30, h: 30, turn: -30, art: '<rect width="30" height="30" fill="#15161B"/><rect y="4" width="30" height="4" fill="#E5B92B"/><rect y="13" width="30" height="1.5" fill="#FFF3C4"/>' },
   };
   // A bike takes points, a rank, and proof of learning: a share of all the sections cleared, and main events passed at 80%.
   const BIKES = {
     mini: { label: 'Mini MX', cost: 0 },
     mx: { label: 'Motocross', cost: 2500 },
-    enduro: { label: 'Enduro', cost: 8000, rank: 2, cleared: 0.1 },
-    hard: { label: 'Hard enduro', cost: 18000, rank: 3, cleared: 0.3 },
-    factory: { label: 'Factory racer', cost: 40000, rank: 5, cleared: 0.5, exams: 3 },
+    enduro: { label: 'Enduro', cost: 6000, rank: 2, cleared: 0.1 },
+    hard: { label: 'Hard enduro', cost: 14000, rank: 3, cleared: 0.3 },
+    factory: { label: 'Factory racer', cost: 30000, rank: 5, cleared: 0.5, exams: 3 },
   };
   // Earned points never go down when you spend, so a rank can't be lost.
   const RANKS = [['Rookie', 0], ['Club rider', 2000], ['Regional rider', 6000], ['National rider', 15000], ['Pro rider', 30000], ['Factory rider', 60000], ['World champion', 100000]];
@@ -6664,43 +6712,77 @@ Jordy's Science test, Tuesday 10 November: Planet Earth and Beyond. Written from
   const GEAR = {
     helmet: { title: 'Helmet', items: {
       hStock: { label: 'Stock white', cost: 0, c: '#E8EAEE', c2: '#9AA3AF' },
+      hBlue: { label: 'Blue', cost: 1000, c: '#1F5FE0', c2: '#FFFFFF' },
       hBlack: { label: 'Matt black', cost: 1500, c: '#23262C', c2: '#596273' },
+      hOrange: { label: 'Orange', cost: 1500, c: '#E9501C', c2: '#FFFFFF' },
+      hTeam: { label: 'Team match', cost: 3500, rank: 2, team: true, c: '#E9501C', c2: '#15161B' },
       hRace: { label: 'Race stripe', cost: 4000, rank: 2, c: '#D4262F', c2: '#FFFFFF', look: 'stripe' },
+      hCheck: { label: 'Chequered', cost: 5000, rank: 2, c: '#F2F3F5', c2: '#15161B', look: 'check' },
+      hBolt: { label: 'Lightning', cost: 7000, rank: 3, c: '#15161B', c2: '#F2C200', look: 'bolt' },
+      hCamo: { label: 'Camo', cost: 7500, rank: 3, c: '#59683F', c2: '#2F3A24', look: 'camo' },
       hFlame: { label: 'Hot flames', cost: 9000, rank: 3, c: '#17181D', c2: '#F97316', look: 'flame' },
       hCarbon: { label: 'Carbon', cost: 16000, rank: 4, c: '#2B2F36', c2: '#7C8594', look: 'carbon' },
+      hChrome: { label: 'Chrome', cost: 22000, rank: 5, c: '#C9CED6', c2: '#FFFFFF', look: 'stripe' },
       hGold: { label: 'Champion gold', cost: 30000, rank: 6, c: '#D9A514', c2: '#FFF3C4', look: 'stripe' },
     } },
     goggles: { title: 'Goggles', items: {
       oStock: { label: 'Clear lens', cost: 0, c: '#CFE6F2', c2: '#23262C' },
       oSmoke: { label: 'Smoke', cost: 1000, c: '#3B4250', c2: '#23262C' },
+      oOrange: { label: 'Fire orange', cost: 1200, c: '#F97316', c2: '#23262C' },
+      oPink: { label: 'Hot pink', cost: 1500, c: '#EC4899', c2: '#23262C' },
+      oGreen: { label: 'Mirror green', cost: 2500, rank: 2, c: '#22C55E', c2: '#23262C' },
       oBlue: { label: 'Mirror blue', cost: 3000, rank: 2, c: '#2F8FE8', c2: '#FFFFFF' },
+      oRed: { label: 'Mirror red', cost: 3500, rank: 2, c: '#EF4444', c2: '#FFFFFF' },
+      oPurple: { label: 'Purple haze', cost: 5000, rank: 3, c: '#8B5CF6', c2: '#FFFFFF' },
+      oRainbow: { label: 'Rainbow', cost: 8000, rank: 3, c: '#F2C200', c2: '#23262C', look: 'rainbow' },
       oGold: { label: 'Gold mirror', cost: 10000, rank: 4, c: '#F2B705', c2: '#23262C' },
     } },
     kit: { title: 'Race kit', items: {
       kStock: { label: 'Club grey', cost: 0, c: '#8A93A1', c2: '#D5D9E0', p: '#4B5361' },
       kBlue: { label: 'Club blue', cost: 2000, c: '#1F5FE0', c2: '#FFFFFF', p: '#16264D' },
+      kGreen: { label: 'Club green', cost: 2000, c: '#0B8457', c2: '#FFFFFF', p: '#0B2E22' },
+      kOrange: { label: 'Orange crush', cost: 2500, c: '#E9501C', c2: '#FFFFFF', p: '#23262C' },
       kRed: { label: 'Race red', cost: 4000, rank: 2, c: '#D4262F', c2: '#FFFFFF', p: '#23262C' },
+      kPink: { label: 'Hot pink', cost: 4000, rank: 2, c: '#D81B7C', c2: '#FFFFFF', p: '#23262C' },
+      kWhite: { label: 'Clean white', cost: 5000, rank: 2, c: '#F2F3F5', c2: '#15161B', p: '#9AA3AF' },
       kTeam: { label: 'Team match', cost: 7000, rank: 3, team: true, c: '#E9501C', c2: '#FFFFFF', p: '#23262C' },
+      kBand: { label: 'Race bands', cost: 8000, rank: 3, c: '#1F5FE0', c2: '#F2C200', p: '#16264D', look: 'band' },
+      kChev: { label: 'Chevron', cost: 9000, rank: 3, c: '#15161B', c2: '#E9501C', p: '#15161B', look: 'chev' },
+      kCamo: { label: 'Camo', cost: 11000, rank: 3, c: '#59683F', c2: '#2F3A24', p: '#2F3A24', look: 'camo' },
       kNight: { label: 'Night rider', cost: 14000, rank: 4, c: '#17181D', c2: '#B7E021', p: '#17181D' },
+      kFlame: { label: 'Flame suit', cost: 18000, rank: 4, c: '#15161B', c2: '#F97316', p: '#15161B', look: 'flame' },
       kGold: { label: 'Champion', cost: 30000, rank: 6, c: '#D9A514', c2: '#17181D', p: '#17181D' },
     } },
     gloves: { title: 'Gloves', items: {
       gStock: { label: 'Stock grey', cost: 0, c: '#6B7280', c2: '#3B4250' },
       gBlack: { label: 'Black', cost: 800, c: '#17181D', c2: '#596273' },
+      gBlue: { label: 'Blue', cost: 800, c: '#1F5FE0', c2: '#FFFFFF' },
+      gOrange: { label: 'Orange', cost: 900, c: '#E9501C', c2: '#17181D' },
+      gWhite: { label: 'White', cost: 1000, c: '#F2F3F5', c2: '#15161B' },
+      gGreen: { label: 'Green', cost: 1000, c: '#0B8457', c2: '#FFFFFF' },
       gRed: { label: 'Red', cost: 2500, rank: 2, c: '#D4262F', c2: '#17181D' },
+      gPink: { label: 'Pink', cost: 2500, rank: 2, c: '#D81B7C', c2: '#FFFFFF' },
+      gCamo: { label: 'Camo', cost: 4000, rank: 2, c: '#59683F', c2: '#2F3A24' },
       gNeon: { label: 'Neon', cost: 6000, rank: 3, c: '#B7E021', c2: '#17181D' },
+      gCarbon: { label: 'Carbon', cost: 10000, rank: 4, c: '#2B2F36', c2: '#7C8594' },
       gGold: { label: 'Gold', cost: 20000, rank: 5, c: '#D9A514', c2: '#17181D' },
     } },
     boots: { title: 'Boots', items: {
       bStock: { label: 'Stock black', cost: 0, c: '#23262C', c2: '#7C8594' },
       bWhite: { label: 'White', cost: 1200, c: '#EEF0F3', c2: '#23262C' },
+      bBlue: { label: 'Blue', cost: 1500, c: '#1F5FE0', c2: '#FFFFFF' },
+      bGreen: { label: 'Green', cost: 1500, c: '#0B8457', c2: '#FFFFFF' },
       bRed: { label: 'Red', cost: 3000, rank: 2, c: '#D4262F', c2: '#17181D' },
+      bPink: { label: 'Pink', cost: 3000, rank: 2, c: '#D81B7C', c2: '#FFFFFF' },
       bOrange: { label: 'Factory orange', cost: 8000, rank: 3, c: '#E9501C', c2: '#17181D' },
+      bNeon: { label: 'Neon', cost: 8000, rank: 3, c: '#B7E021', c2: '#17181D' },
+      bCarbon: { label: 'Carbon', cost: 12000, rank: 4, c: '#2B2F36', c2: '#7C8594' },
       bGold: { label: 'Gold', cost: 22000, rank: 5, c: '#D9A514', c2: '#17181D' },
     } },
   };
   const BADGES = [
     { id: 'first', label: 'First moto', desc: 'Finish your first moto', test: (p) => p.runsDone >= 1 },
+    { id: 'lap', label: 'Lap record', desc: 'Beat your own hot lap time', test: (p, x) => x && x.lap && x.lap.record },
     { id: 'perfect', label: 'Clean run', desc: 'Get every question right', test: (p, x) => x && x.pct === 100 },
     { id: 'turbo', label: 'Full gas', desc: '6 right in a row', test: (p, x) => x && x.bestCombo >= 6 },
     { id: 'streak3', label: '3-day streak', desc: 'Ride 3 days in a row', test: (p) => p.best >= 3 },
@@ -6714,8 +6796,9 @@ Jordy's Science test, Tuesday 10 November: Planet Earth and Beyond. Written from
   // ---------- saved progress ----------
   const blankPlayer = (pack) => ({
     points: 0, earned: 0, streak: 0, best: 0, lastDay: null, runsDone: 0, totalQ: 0, totalOk: 0,
-    days: {}, skills: {}, topics: {}, runs: [], missed: [], badges: [], fix: {},
+    days: {}, skills: {}, topics: {}, runs: [], missed: [], badges: [], fix: {}, laps: {},
     paint: pack.defaultPaint, bike: 'mini', plate: pack.plate, ownedP: [pack.defaultPaint], ownedB: ['mini'], dailyBy: {}, examBy: {},
+    sticker: 'plain', ownedS: ['plain'],
     gear: { helmet: 'hStock', goggles: 'oStock', kit: 'kStock', gloves: 'gStock', boots: 'bStock' }, ownedG: ['hStock', 'oStock', 'kStock', 'gStock', 'bStock'],
   });
   function load() {
@@ -6887,7 +6970,7 @@ Jordy's Science test, Tuesday 10 November: Planet Earth and Beyond. Written from
     }
   }
 
-  const ui = { who: null, subject: null, tab: 'home', run: null, result: null, confirmReset: false, chartPick: null, voiceBlocked: false };
+  const ui = { who: null, subject: null, tab: 'home', run: null, result: null, confirmReset: false, chartPick: null, voiceBlocked: false, pit: 'helmet', tryOn: null, parents: null };
   const P = () => state.players[ui.who];
   const PK = () => RS.packs[ui.who];
   const SUB = () => PK().subjects[ui.subject];
@@ -6960,27 +7043,91 @@ Jordy's Science test, Tuesday 10 November: Planet Earth and Beyond. Written from
   const bike = (id, paintKey, label) => {
     const p = PAINTS[paintKey] || PAINTS.orange;
     const alt = label === undefined ? `${BIKES[id].label} bike in ${p.label}` : label;
-    return `<img class="bike" src="img/bike-${id}.webp" alt="${alt}" style="filter:${p.filter}" decoding="async">`;
+    return `<img class="bike" src="img/bike-${id}.webp" alt="${alt}" style="filter:${p.filter}" decoding="sync">`;
   };
-  // The rider is drawn over the bike photo. Each bike has its own seat, peg and handlebar position, in the photo's own pixels.
+  // Each bike's footpeg and grip, in the photo's own pixels, which is where the rider's boot and hand go.
+  // side places the side number board: x, y, turn, width, height. front is the corners of the front board. panels traces the plastics that take stickers.
   const SEATS = {
-    mini: { w: 640, h: 423, head: 24, hip: [212, 82], foot: [268, 288], hand: [392, 24] },
-    mx: { w: 640, h: 443, head: 24, hip: [205, 84], foot: [238, 292], hand: [322, 22] },
-    enduro: { w: 640, h: 475, head: 0, hip: [195, 202], foot: [232, 360], hand: [322, 158] },
-    hard: { w: 640, h: 387, head: 24, hip: [218, 72], foot: [252, 268], hand: [388, 18] },
-    factory: { w: 640, h: 383, head: 24, hip: [240, 70], foot: [262, 276], hand: [392, 18] },
+    mini: { w: 640, h: 423, peg: [262, 295], grip: [385, 22], side: [186, 163, 13, 74, 52], front: [[428, 47], [466, 53], [500, 119], [462, 113]],
+      panels: 'M263 147L310 124L352 133L388 146L358 105L378 105L442 148L442 156L415 186L400 208L378 198L372 170ZM34 93L140 95L157 112L152 125L85 102ZM120 125L152 127L200 145L262 152L222 167L240 205L200 203L165 175L135 155ZM470 148L480 122L540 122L560 135L609 166L550 142L500 137ZM502 208L512 215L545 302L525 318L505 250Z' },
+    mx: { w: 640, h: 443, peg: [215, 295], grip: [320, 18], side: [168, 158, 14, 74, 52], front: [[385, 29], [431, 34], [452, 96], [417, 90]],
+      panels: 'M220 132L290 113L325 100L350 102L385 128L395 145L375 155L372 172L350 208L335 205L330 178L345 160L320 150L280 145L205 160ZM36 92L120 97L160 125L118 118L65 102ZM108 124L160 128L220 132L205 160L217 200L175 190L135 165ZM432 118L437 100L520 103L545 118L590 149L530 125L505 120L440 122ZM455 215L462 200L508 302L488 318L458 250Z' },
+    enduro: { w: 640, h: 475, peg: [230, 362], grip: [330, 160], side: [176, 268, 10, 74, 52], front: [[352, 160], [384, 163], [406, 208], [374, 205]],
+      panels: 'M198 249L265 225L320 240L320 228L296 213L315 215L345 228L367 255L352 268L335 300L320 300L317 265L250 252ZM42 210L120 215L165 240L200 250L150 237L120 232L60 218ZM122 235L152 238L200 250L235 252L220 300L207 300L172 295L140 262ZM385 228L395 220L440 222L455 230L500 258L445 235L385 240ZM407 292L417 300L447 370L435 375L410 310ZM352 160L365 158L385 182L392 212L385 220L365 198L355 172Z' },
+    hard: { w: 640, h: 387, peg: [235, 270], grip: [388, 15], side: [190, 140, 18, 74, 52], front: [[424, 20], [462, 30], [492, 90], [456, 84]],
+      panels: 'M240 135L260 125L360 88L385 88L443 128L435 133L415 148L400 188L385 183L378 140L280 128ZM35 83L130 85L240 135L240 150L265 188L210 172L165 145L130 118L112 95L60 90ZM453 112L465 89L525 90L545 102L598 132L535 108L470 112ZM487 172L497 178L532 265L515 275L487 200Z' },
+    factory: { w: 640, h: 383, peg: [245, 272], grip: [390, 15], side: [195, 138, 14, 74, 52], front: [[426, 24], [462, 32], [492, 92], [458, 86]],
+      panels: 'M245 120L315 102L355 89L385 89L442 120L445 131L415 143L400 180L385 180L380 140L320 125L250 130ZM37 80L140 83L170 97L210 115L165 102L125 97L75 90ZM130 103L170 105L200 115L245 120L243 138L258 172L225 165L200 160L160 135ZM457 112L465 89L530 90L547 102L602 131L542 107L465 112ZM492 172L500 180L535 265L515 274L492 200Z' },
   };
-  const bend = ([ax, ay], [bx, by], d) => {
-    const len = Math.hypot(bx - ax, by - ay) || 1;
-    return [(ax + bx) / 2 + ((by - ay) / len) * d, (ay + by) / 2 - ((bx - ax) / len) * d];
+  let svgNo = 0;
+  const stickerFill = (s, scale = 1) => {
+    const id = `st${++svgNo}`;
+    return { id, def: `<pattern id="${id}" width="${s.w}" height="${s.h}" patternUnits="userSpaceOnUse" patternTransform="rotate(${s.turn || 0}) scale(${scale})">${s.art}</pattern>` };
   };
-  const helmetLook = (g) => {
-    if (g.look === 'stripe') return `<path d="M-44 -18C-30 -46 -6 -56 18 -54L24 -40C2 -42 -20 -34 -34 -8Z" fill="${g.c2}"/>`;
-    if (g.look === 'flame') return `<path d="M-46 22C-30 18 -24 8 -30 -6C-20 2 -14 2 -14 -12C-8 -4 -2 -6 -2 -20C6 -8 10 -2 8 10C14 6 18 8 20 18L-12 34C-28 34 -40 30 -46 22Z" fill="${g.c2}"/>`;
-    if (g.look === 'carbon') return `<path d="M-36 -24L-6 -48M-44 -6L10 -50M-46 12L26 -46M-40 28L6 -6M-22 34L-4 18" stroke="${g.c2}" stroke-width="3" fill="none"/>`;
-    return '';
+  const numberBoard = (num, [x, y, turn, wide, tall], paint) => {
+    const size = Math.min(tall * 0.8, (wide * 0.86) / (num.length * 0.62));
+    return `<g transform="translate(${x} ${y}) rotate(${turn})">
+      <rect x="${-wide / 2}" y="${-tall / 2}" width="${wide}" height="${tall}" rx="${Math.round(Math.min(wide, tall) * 0.2)}" fill="#fff" stroke="${paint.dark}" stroke-width="3"/>
+      <text y="${(size * 0.36).toFixed(1)}" font-size="${size.toFixed(1)}" font-weight="800" text-anchor="middle" fill="#111318" style="font-family:var(--display)">${num}</text>
+    </g>`;
   };
-  function riderSvg(p, spot) {
+  // The front board leans with the fork and faces a little towards you, like a real one seen from this angle.
+  // Its corners run top back, top front, bottom front, bottom back, and the number is printed in the same perspective.
+  const frontBoard = (num, [a, b, c, d], paint) => {
+    const across = [(b[0] - a[0] + c[0] - d[0]) / 200, (b[1] - a[1] + c[1] - d[1]) / 200];
+    const down = [(d[0] - a[0] + c[0] - b[0]) / 200, (d[1] - a[1] + c[1] - b[1]) / 200];
+    const mid = [(a[0] + b[0] + c[0] + d[0]) / 4, (a[1] + b[1] + c[1] + d[1]) / 4];
+    const size = num.length > 2 ? 46 : num.length > 1 ? 66 : 84;
+    return `<path d="M${a}L${b}L${c}L${d}Z" fill="#fff" stroke="${paint.dark}" stroke-width="3" stroke-linejoin="round"/>
+      <text transform="matrix(${across} ${down} ${mid})" y="${(size * 0.36).toFixed(1)}" font-size="${size}" font-weight="800" text-anchor="middle" fill="#111318" style="font-family:var(--display)">${num}</text>`;
+  };
+  // What goes on the bike itself: a special colour, the sticker kit, and the race number on the side panel and the front plate.
+  function decals(p, spot) {
+    const paint = PAINTS[p.paint] || PAINTS.orange;
+    const sticker = STICKERS[p.sticker];
+    const num = h(String(p.plate));
+    let out = paint.coat ? `<path d="${spot.panels}" fill="${paint.coat}" opacity=".86"/>` : '';
+    if (sticker && sticker.art) {
+      const fill = stickerFill(sticker);
+      out += `<defs>${fill.def}</defs><path d="${spot.panels}" fill="url(#${fill.id})" opacity=".92"/>`;
+    }
+    return out + numberBoard(num, spot.side, paint) + frontBoard(num, spot.front, paint);
+  }
+  // The rider is one photo cut into parts (assets/rider.mjs). Each part is a mask over a plain colour, with the photo's shadows and shine on top.
+  // RIDER is in the picture's own pixels. It gets lined up with each bike's grip and peg in SEATS, so the hand and boot land in the right place.
+  const RIDER = { w: 387, h: 735, grip: [355, 328], peg: [188, 708], number: [86, 272] };
+  const RIDER_PARTS = ['base', 'shade', 'helmet', 'peak', 'lens', 'jersey', 'jersey2', 'pants', 'pants2', 'gloves', 'gloves2', 'boots', 'boots2'];
+  // Loaded up front so changing gear doesn't flash.
+  RIDER_PARTS.forEach((part) => {
+    new Image().src = `img/rider-${part}.webp`;
+  });
+  const riderFit = (spot) => {
+    const [gx, gy] = spot.grip;
+    const [px, py] = spot.peg;
+    const scale = Math.hypot(gx - px, gy - py) / Math.hypot(RIDER.grip[0] - RIDER.peg[0], RIDER.grip[1] - RIDER.peg[1]);
+    const turn = ((Math.atan2(gy - py, gx - px) - Math.atan2(RIDER.grip[1] - RIDER.peg[1], RIDER.grip[0] - RIDER.peg[0])) * 180) / Math.PI;
+    const left = px - RIDER.peg[0] * scale;
+    const top = py - RIDER.peg[1] * scale;
+    return { scale, turn, left, top };
+  };
+  const lookArt = {
+    stripe: [64, 64, 26, (c) => `<path d="M-16 16L16-16M0 64L64 0M48 80L80 48" stroke="${c}" stroke-width="14" fill="none"/>`],
+    check: [40, 40, 13, (c) => `<path d="M0 0h20v20H0zM20 20h20v20H20z" fill="${c}"/>`],
+    bolt: [70, 66, 26, (c) => `<path d="M26 1h20L34 25h14L18 65l8-28H12z" fill="${c}"/>`],
+    camo: [120, 90, 42, (c) => `<path d="M0 20C20 5 45 8 55 25S40 55 20 50-10 35 0 20ZM60 58C78 48 105 55 112 70S90 96 72 88 48 68 60 58Z" fill="${c}"/>`],
+    flame: [130, 80, 30, (c) => `<path d="M0 80C16 70 14 52 6 40C20 46 26 44 26 28C36 38 42 34 44 14C56 30 60 44 56 58C64 52 68 52 72 62C80 56 84 62 86 80Z" fill="${c}"/>`],
+    carbon: [12, 12, 5, (c) => `<path d="M0 0L6 6L0 12M6 0L12 6L6 12" stroke="${c}" stroke-width="2" fill="none"/>`],
+    band: [60, 60, 34, (c) => `<path d="M0 8h60v14H0zM0 30h60v5H0z" fill="${c}"/>`],
+    chev: [60, 40, 24, (c) => `<path d="M0 34L30 8L60 34" stroke="${c}" stroke-width="9" fill="none"/>`],
+  };
+  const lookFill = (look, c) => {
+    const art = lookArt[look];
+    if (!art) return '';
+    const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${art[0]}" height="${art[1]}" viewBox="0 0 ${art[0]} ${art[1]}">${art[3](c)}</svg>`;
+    return `url('data:image/svg+xml,${encodeURIComponent(svg)}') 0 0 / ${art[2]}% auto`;
+  };
+  const coat = (part, fill) => (fill ? `<i style="-webkit-mask-image:url(img/rider-${part}.webp);mask-image:url(img/rider-${part}.webp);background:${fill}"></i>` : '');
+  function riderHtml(p, spot) {
     const pickG = (slot) => GEAR[slot].items[p.gear[slot]] || Object.values(GEAR[slot].items)[0];
     const kit = pickG('kit');
     const jersey = kit.team ? PAINTS[p.paint].hex : kit.c;
@@ -6988,47 +7135,35 @@ Jordy's Science test, Tuesday 10 November: Planet Earth and Beyond. Written from
     const goggles = pickG('goggles');
     const gloves = pickG('gloves');
     const boots = pickG('boots');
-    const hip = spot.hip;
-    const foot = spot.foot;
-    const hand = spot.hand;
-    const shoulder = [hip[0] + 58, hip[1] - 116];
-    const ankle = [foot[0] - 8, foot[1] - 42];
-    const knee = bend(hip, ankle, 58);
-    const elbow = bend(shoulder, hand, -26);
-    const head = [shoulder[0] + 26, shoulder[1] - 44];
-    const seg = (a, b, w, c) => `<line x1="${a[0]}" y1="${a[1]}" x2="${b[0]}" y2="${b[1]}" stroke="${c}" stroke-width="${w}" stroke-linecap="round"/>`;
-    const plateNo = h(String(p.plate));
-    return `<svg class="rider" viewBox="0 0 ${spot.w} ${spot.h}" aria-hidden="true">
-      ${seg(hip, knee, 50, kit.p)}${seg(knee, ankle, 40, kit.p)}
-      <ellipse cx="${knee[0]}" cy="${knee[1]}" rx="17" ry="21" fill="${kit.c2}"/>
-      <g transform="translate(${foot[0]} ${foot[1]})"><path d="M-30 -58L18 -58L22 -20L52 -8Q62 2 52 10L-28 10Q-34 10 -34 2Z" fill="${boots.c}" stroke="#15161B" stroke-width="3" stroke-linejoin="round"/><path d="M-30 -44L20 -44M-31 -28L21 -28" stroke="${boots.c2}" stroke-width="5"/><path d="M-28 10L52 10" stroke="${boots.c2}" stroke-width="6" stroke-linecap="round"/></g>
-      ${seg(hip, shoulder, 68, jersey)}
-      <line x1="${hip[0] - 22}" y1="${hip[1] + 4}" x2="${shoulder[0] - 22}" y2="${shoulder[1] + 2}" stroke="${kit.c2}" stroke-width="7" stroke-linecap="round"/>
-      <text x="${(hip[0] + shoulder[0]) / 2 + 6}" y="${(hip[1] + shoulder[1]) / 2 + 12}" font-size="34" font-weight="800" text-anchor="middle" fill="${kit.c2}" font-family="var(--display)">${plateNo}</text>
-      ${seg(shoulder, elbow, 30, jersey)}${seg(elbow, hand, 26, jersey)}
-      ${seg(bend(elbow, hand, 0), [(elbow[0] + hand[0] * 3) / 4, (elbow[1] + hand[1] * 3) / 4], 26, kit.c2)}
-      <circle cx="${hand[0]}" cy="${hand[1]}" r="17" fill="${gloves.c}"/><path d="M${hand[0] - 11} ${hand[1] + 2}h22" stroke="${gloves.c2}" stroke-width="4" stroke-linecap="round"/>
-      <g transform="translate(${head[0]} ${head[1]})">
-        <path d="M-50 12C-54 -40 -10 -60 22 -54C42 -50 54 -34 56 -14L64 6C70 12 70 30 54 36C40 42 16 42 -8 40C-36 38 -48 30 -50 12Z" fill="${helmet.c}" stroke="#15161B" stroke-width="3" stroke-linejoin="round"/>
-        ${helmetLook(helmet)}
-        <path d="M8 -54L84 -42C92 -40 92 -30 82 -30L26 -24Z" fill="${helmet.c2}" stroke="#15161B" stroke-width="3" stroke-linejoin="round"/>
-        <rect x="14" y="-16" width="46" height="26" rx="9" fill="${goggles.c2}"/><rect x="19" y="-12" width="37" height="18" rx="6" fill="${goggles.c}"/>
-        <path d="M-48 -2L14 -4" stroke="${goggles.c2}" stroke-width="7"/>
-        <path d="M30 20L60 20M34 28L56 28" stroke="${helmet.c2}" stroke-width="4" stroke-linecap="round"/>
-      </g>
-    </svg>`;
+    const fit = riderFit(spot);
+    const box = [`left:${((100 * fit.left) / spot.w).toFixed(2)}%`, `top:${((100 * fit.top) / spot.h).toFixed(2)}%`, `width:${((100 * RIDER.w * fit.scale) / spot.w).toFixed(2)}%`, `height:${((100 * RIDER.h * fit.scale) / spot.h).toFixed(2)}%`, `transform-origin:${((100 * RIDER.peg[0]) / RIDER.w).toFixed(2)}% ${((100 * RIDER.peg[1]) / RIDER.h).toFixed(2)}%`, `transform:rotate(${fit.turn.toFixed(2)}deg)`].join(';');
+    return `<div class="rd" style="${box}" aria-hidden="true">
+      <img src="img/rider-base.webp" alt="" decoding="sync">
+      ${coat('pants', kit.p)}${coat('pants2', kit.c2)}${coat('boots', boots.c)}${coat('boots2', boots.c2)}
+      ${coat('jersey', jersey)}${coat('jersey2', kit.c2)}${coat('jersey', lookFill(kit.look, kit.c2))}
+      ${coat('gloves', gloves.c)}${coat('gloves2', gloves.c2)}
+      ${coat('helmet', helmet.team ? PAINTS[p.paint].hex : helmet.c)}${coat('helmet', lookFill(helmet.look, helmet.c2))}${coat('peak', helmet.c2)}
+      ${coat('lens', goggles.look === 'rainbow' ? 'linear-gradient(90deg,#EF4444,#F2C200,#2F8FE8)' : goggles.c)}
+      <img src="img/rider-shade.webp" alt="" decoding="sync">
+      <svg viewBox="0 0 ${RIDER.w} ${RIDER.h}"><text x="${RIDER.number[0]}" y="${RIDER.number[1]}" transform="rotate(-8 ${RIDER.number[0]} ${RIDER.number[1]})" font-size="58" font-weight="800" text-anchor="middle" fill="${kit.c2}" stroke="${jersey}" stroke-width="6" style="font-family:var(--display);paint-order:stroke">${h(String(p.plate))}</text></svg>
+    </div>`;
   }
+  const decalSvg = (p, spot) => `<svg class="rider" viewBox="0 0 ${spot.w} ${spot.h}" aria-hidden="true">${decals(p, spot)}</svg>`;
   const rig = (p, label) => {
     const spot = SEATS[p.bike] || SEATS.mini;
-    return `<div class="rig" style="padding-top:${spot.head}%">${bike(p.bike, p.paint, label)}${riderSvg(p, spot)}</div>`;
+    // Room above the bike for the rider's head, whatever the bike's size.
+    const room = Math.max(0, (-riderFit(spot).top / spot.w) * 100 + 2);
+    return `<div class="rig" style="padding-top:${room.toFixed(1)}%"><div class="rig-in">${bike(p.bike, p.paint, label)}${decalSvg(p, spot)}${riderHtml(p, spot)}</div></div>`;
   };
+  // A bike on its own, with its number and stickers but no rider.
+  const dressedBike = (p, id) => `<div class="rig"><div class="rig-in">${bike(id, p.paint)}${decalSvg(p, SEATS[id])}</div></div>`;
   const photo = (name, alt = '') => `<img class="photo" src="img/${name}.webp" alt="${alt}" decoding="async">`;
   const plate = (num) => `<span class="plate" aria-label="Race number ${h(String(num))}">${h(String(num))}</span>`;
 
   function applyAccent() {
     const root = document.documentElement;
     const p = ui.who ? PAINTS[P().paint] : PAINTS.orange;
-    root.style.setProperty('--accent', p.hex);
+    root.style.setProperty('--accent', p.accent || p.hex);
     root.style.setProperty('--accent-dark', p.dark);
     root.style.setProperty('--accent-ink', p.ink);
   }
@@ -7054,6 +7189,8 @@ Jordy's Science test, Tuesday 10 November: Planet Earth and Beyond. Written from
       <div class="pick-hero">${photo('hero-jump', 'A rider whipping a dirt bike over a jump')}<div class="brand">Holeshot</div></div>
       <p class="muted" style="font-size:17px;padding-inline:4px">First to the first corner, one right answer at a time. Who's riding?</p>
       <div class="pick-grid">${cards.join('')}</div>
+      ${leagueCard()}
+      ${SYNC_ON ? '<button class="parents-link small-t muted" data-act="parents">Parents</button>' : ''}
     </main>`;
   }
 
@@ -7159,8 +7296,89 @@ Jordy's Science test, Tuesday 10 November: Planet Earth and Beyond. Written from
             <p>${sub.examSize} mixed questions with no hints. ${best != null ? `Your best is ${best}%.` : 'Marks come at the end, like the real thing.'}</p>
             <button class="btn full" data-act="start" data-mode="exam">Line up</button>
           </section>
+          ${lapCard(p)}
         </div>
       </div>`);
+  }
+  // ---------- hot lap ----------
+  // Maths only: 10 quick questions against the clock, racing your own best time. It pays little, so it can't replace the revision.
+  const LAP_PENALTY = 10;
+  const LAP_KEEP = 8;
+  const LAP_CHARS = 120;
+  const lapText = (ms) => {
+    const t = Math.max(0, Math.round(ms / 100));
+    return `${Math.floor(t / 600)}:${String(Math.floor(t / 10) % 60).padStart(2, '0')},${t % 10}`;
+  };
+  let lapTimer = null;
+  function tickLap() {
+    const r = ui.run;
+    if (!r || r.mode !== 'lap') {
+      clearInterval(lapTimer);
+      lapTimer = null;
+      return;
+    }
+    const clock = $('#lap-clock');
+    if (clock) clock.textContent = lapText(Date.now() - r.started + r.penalty * 1000);
+  }
+  function lapCard(p) {
+    if (ui.subject !== 'maths') return '';
+    const log = p.laps.maths;
+    return `<section class="card lap-card" aria-label="Hot lap">
+      <div class="hero-head">
+        <div><div class="eyebrow">Beat your own time</div><div class="h-sec">Hot lap</div></div>
+        <div class="run-score"><b>${log && log.best ? lapText(log.best) : '–'}</b><small class="small-t muted">Best lap</small></div>
+      </div>
+      <p class="small-t muted">10 quick questions against the clock. A wrong answer adds ${LAP_PENALTY} seconds. Get at least ${LAP_KEEP} right for your time to count.</p>
+      <button class="btn dark full" data-act="start" data-mode="lap">Start the clock ${ic('arrow')}</button>
+    </section>`;
+  }
+
+  // ---------- brothers' league ----------
+  // Each rider has a weekly target of answers right first try, and the score is the share of it reached.
+  // Kash's target is lower for being two years younger, so the week is a fair race.
+  const LEAGUE = { jordy: 80, kash: 50 };
+  const mondayOf = (day) => {
+    const d = new Date(day);
+    d.setDate(d.getDate() - ((d.getDay() + 6) % 7));
+    d.setHours(0, 0, 0, 0);
+    return d;
+  };
+  const addDays = (day, n) => {
+    const d = new Date(day);
+    d.setDate(d.getDate() + n);
+    return d;
+  };
+  function leagueWeek(monday) {
+    return Object.keys(RS.packs).map((id) => {
+      const p = state.players[id];
+      let right = 0;
+      for (let i = 0; i < 7; i++) right += (p.days[dayKey(addDays(monday, i))] || {}).ok || 0;
+      return { id, name: RS.packs[id].name, right, target: LEAGUE[id] || 60, score: Math.round((100 * right) / (LEAGUE[id] || 60)) };
+    }).sort((a, b) => b.score - a.score);
+  }
+  function leagueWins() {
+    const wins = {};
+    const monday = mondayOf(new Date());
+    for (let i = 1; i <= 26; i++) {
+      const rows = leagueWeek(addDays(monday, -7 * i));
+      if (rows[0].score > rows[1].score) wins[rows[0].id] = (wins[rows[0].id] || 0) + 1;
+    }
+    return wins;
+  }
+  function leagueCard() {
+    const rows = leagueWeek(mondayOf(new Date()));
+    const wins = leagueWins();
+    const left = 7 - ((new Date().getDay() + 6) % 7);
+    const front = !rows[0].score ? 'Nobody has scored yet this week.' : rows[0].score === rows[1].score ? "It's level." : `${rows[0].name} is in front.`;
+    return `<section class="card" aria-label="Brothers' league">
+      <div class="hero-head"><div class="h-sec">Brothers' league</div><span class="chip num">${left} ${left === 1 ? 'day' : 'days'} left</span></div>
+      <p class="small-t muted" style="margin-block:2px 10px">${front} Each rider has a target of their own, so it's a fair race. Only answers right first try count.</p>
+      <div class="rows">${rows.map((x) => `<div class="row">
+        <div class="row-top"><b>${x.name}</b><span class="num">${x.score}%</span></div>
+        <div class="meter" role="img" aria-label="${x.score} percent of the weekly target"><i style="width:${Math.min(100, x.score)}%"></i></div>
+        <div class="small-t muted num">${x.right} of ${x.target} this week · ${wins[x.id] || 0} ${wins[x.id] === 1 ? 'week' : 'weeks'} won</div>
+      </div>`).join('')}</div>
+    </section>`;
   }
   function fixCard(p, sub) {
     const n = fixList(p, sub).length;
@@ -7263,20 +7481,56 @@ Jordy's Science test, Tuesday 10 November: Planet Earth and Beyond. Written from
     const need = stillNeeds(p, item);
     return need || `${RS.fmt(item.cost)} points`;
   };
-  function gearPanel(p) {
-    return Object.entries(GEAR).map(([slot, group]) => {
-      const items = Object.entries(group.items).map(([id, g]) => {
-        const own = p.ownedG.includes(id);
-        const on = p.gear[slot] === id;
-        const colour = g.team ? PAINTS[p.paint].hex : g.c;
-        const need = !own && stillNeeds(p, g);
-        return `<button class="paint ${on ? 'on' : ''}" data-act="gear" data-slot="${slot}" data-id="${id}" aria-label="${g.label}${own ? '' : `, ${priceTag(p, g)}`}">
-          <span class="swatch" style="--c:linear-gradient(135deg,${colour} 62%,${g.c2} 62%)">${own ? (on ? ic('check', 20) : '') : ic('lock', 16)}</span>
-          <span>${g.label}${own ? '' : `<br><b class="${need ? 'lock-need' : 'num'}">${need ? `Rank ${g.rank}` : RS.fmt(g.cost)}</b>`}</span>
-        </button>`;
-      });
-      return `<div class="gear-group"><div class="small-t" style="font-weight:600;margin-bottom:6px">${group.title}</div><div class="paints">${items.join('')}</div></div>`;
+  const PIT_TABS = [['helmet', 'Helmet'], ['goggles', 'Goggles'], ['kit', 'Race kit'], ['gloves', 'Gloves'], ['boots', 'Boots'], ['paint', 'Bike colour'], ['sticker', 'Stickers'], ['number', 'Number'], ['bike', 'Bikes'], ['badges', 'Badges']];
+  const shopOf = (tab) => (tab === 'paint' ? PAINTS : tab === 'sticker' ? STICKERS : tab === 'bike' ? BIKES : GEAR[tab].items);
+  const ownedOf = (p, tab) => (tab === 'paint' ? p.ownedP : tab === 'sticker' ? p.ownedS : tab === 'bike' ? p.ownedB : p.ownedG);
+  const wearing = (p, tab) => (tab === 'paint' ? p.paint : tab === 'sticker' ? p.sticker : tab === 'bike' ? p.bike : p.gear[tab]);
+  function wear(p, tab, id) {
+    if (tab === 'paint') p.paint = id;
+    else if (tab === 'sticker') p.sticker = id;
+    else if (tab === 'bike') p.bike = id;
+    else p.gear[tab] = id;
+  }
+  // Tapping something not yet owned shows it on the rider, so nothing gets bought by accident.
+  function tried(p) {
+    if (!ui.tryOn) return p;
+    const copy = { ...p, gear: { ...p.gear } };
+    wear(copy, ui.tryOn.tab, ui.tryOn.id);
+    return copy;
+  }
+  function swatchFor(p, tab, item, mark) {
+    if (tab === 'sticker' && item.art) {
+      const fill = stickerFill(item, 0.5);
+      return `<span class="swatch"><svg class="swatch-art" viewBox="0 0 46 46" aria-hidden="true"><defs>${fill.def}</defs><rect width="46" height="46" fill="${PAINTS[p.paint].hex}"/><rect width="46" height="46" fill="url(#${fill.id})"/></svg><span class="swatch-mark">${mark}</span></span>`;
+    }
+    if (tab === 'sticker') return `<span class="swatch" style="--c:${PAINTS[p.paint].hex}"><span class="swatch-mark">${mark}</span></span>`;
+    const colour = item.team ? PAINTS[p.paint].hex : tab === 'paint' ? item.hex : item.c;
+    const look = tab === 'paint' ? colour : item.look === 'rainbow' ? 'linear-gradient(90deg,#EF4444,#F2C200,#2F8FE8)' : `linear-gradient(135deg,${colour} 62%,${item.c2} 62%)`;
+    return `<span class="swatch" style="--c:${look}"><span class="swatch-mark">${mark}</span></span>`;
+  }
+  function pitItems(p, tab) {
+    return Object.entries(shopOf(tab)).map(([id, item]) => {
+      const own = ownedOf(p, tab).includes(id);
+      const on = ui.tryOn ? ui.tryOn.id === id : wearing(p, tab) === id;
+      const need = !own && stillNeeds(p, item);
+      const mark = own ? (wearing(p, tab) === id ? ic('check', 20) : '') : ic('lock', 16);
+      return `<button class="paint ${on ? 'on' : ''}" data-act="wear" data-tab="${tab}" data-id="${id}" aria-label="${item.label}${own ? '' : `, ${priceTag(p, item)}`}">
+        ${swatchFor(p, tab, item, mark)}
+        <span>${item.label}${own ? '' : `<br><b class="${need ? 'lock-need' : 'num'}">${need && item.rank && rankOf(p.earned) < item.rank ? `Rank ${item.rank}` : RS.fmt(item.cost)}</b>`}</span>
+      </button>`;
     }).join('');
+  }
+  function tryBar(p) {
+    if (!ui.tryOn) return '';
+    const item = shopOf(ui.tryOn.tab)[ui.tryOn.id];
+    const need = stillNeeds(p, item);
+    const short = item.cost - p.points;
+    const note = need ? `${need}, then ${RS.fmt(item.cost)} points` : short > 0 ? `${RS.fmt(item.cost)} points. You need ${RS.fmt(short)} more.` : `${RS.fmt(item.cost)} points`;
+    return `<div class="try-bar" role="status">
+      <div><b>${item.label}</b><div class="small-t muted num">${note}</div></div>
+      ${need || short > 0 ? '' : '<button class="btn primary small" data-act="buy-try">Buy</button>'}
+      <button class="btn small" data-act="try-off">Take off</button>
+    </div>`;
   }
   function rankCard(p) {
     const n = rankOf(p.earned);
@@ -7288,39 +7542,47 @@ Jordy's Science test, Tuesday 10 November: Planet Earth and Beyond. Written from
   }
   function viewGarage() {
     const p = P();
-    const bikes = Object.entries(BIKES).map(([id, r]) => {
-      const own = p.ownedB.includes(id);
-      const on = p.bike === id;
-      const short = r.cost - p.points;
-      const need = !own && stillNeeds(p, r);
-      return `<button class="ride ${on ? 'on' : ''}" data-act="bike" data-id="${id}" ${!own && (short > 0 || need) ? 'aria-disabled="true"' : ''}>
-        <div class="stage">${bike(id, p.paint)}</div>
-        <b>${r.label}</b>
-        <span class="chip ${on ? 'good' : own ? '' : short > 0 || need ? '' : 'lime'} num">${on ? 'Riding' : own ? 'Yours' : short > 0 ? `${RS.fmt(r.cost)} points` : need ? 'Locked' : `Buy for ${RS.fmt(r.cost)}`}</span>
-        ${need ? `<small class="small-t muted" style="padding-inline:4px">${need}</small>` : ''}
-      </button>`;
-    });
-    const paints = Object.entries(PAINTS).map(([id, c]) => {
-      const own = p.ownedP.includes(id);
-      return `<button class="paint ${p.paint === id ? 'on' : ''}" data-act="paint" data-id="${id}" aria-label="${c.label}">
-        <span class="swatch" style="--c:${c.hex};color:${c.ink}">${own ? (p.paint === id ? ic('check', 20) : '') : ic('lock', 16)}</span>
-        <span>${c.label}${own ? '' : `<br><b class="${stillNeeds(p, c) ? 'lock-need' : 'num'}">${stillNeeds(p, c) ? `Rank ${c.rank}` : RS.fmt(c.cost)}</b>`}</span>
-      </button>`;
-    });
-    const badges = BADGES.map((b) => `<div class="badge ${p.badges.includes(b.id) ? 'got' : ''}"><b>${b.label}</b><small>${b.desc}</small></div>`);
+    const tab = ui.pit;
+    const show = tried(p);
+    const tabs = PIT_TABS.map(([id, label]) => `<button class="pit-tab ${tab === id ? 'on' : ''}" data-act="pit" data-id="${id}" aria-pressed="${tab === id}">${label}</button>`).join('');
+    let body;
+    if (tab === 'number') {
+      body = `<div class="h-sec" style="margin-bottom:10px">Race number</div>
+        <div class="plate-row"><input id="plate-input" class="plate-input" type="text" inputmode="numeric" maxlength="3" value="${h(String(p.plate))}" aria-label="Your race number" autocomplete="off"><p class="small-t muted" style="flex:1;min-width:150px">Pick your number. It goes on the front of your bike, on the side panel, on your jersey and at the top of every screen.</p></div>`;
+    } else if (tab === 'badges') {
+      body = `<div class="h-sec" style="margin-bottom:10px">Badges</div><div class="badges">${BADGES.map((b) => `<div class="badge ${p.badges.includes(b.id) ? 'got' : ''}"><b>${b.label}</b><small>${b.desc}</small></div>`).join('')}</div>`;
+    } else if (tab === 'bike') {
+      const rides = Object.entries(BIKES).map(([id, r]) => {
+        const own = p.ownedB.includes(id);
+        const short = r.cost - p.points;
+        const need = !own && stillNeeds(p, r);
+        const on = ui.tryOn ? ui.tryOn.id === id : p.bike === id;
+        return `<button class="ride ${on ? 'on' : ''}" data-act="wear" data-tab="bike" data-id="${id}">
+          <div class="stage">${dressedBike(p, id)}</div>
+          <b>${r.label}</b>
+          <span class="chip ${p.bike === id ? 'good' : own || short > 0 || need ? '' : 'lime'} num">${p.bike === id ? 'Riding' : own ? 'Yours' : need ? 'Locked' : `${RS.fmt(r.cost)} points`}</span>
+          ${need ? `<small class="small-t muted" style="padding-inline:4px">${need}</small>` : ''}
+        </button>`;
+      }).join('');
+      body = `<div class="h-sec" style="margin-bottom:10px">Bikes</div><div class="rides">${rides}</div>`;
+    } else {
+      const group = PIT_TABS.find(([id]) => id === tab)[1];
+      const note = tab === 'paint' ? 'Your colour paints the bike and the whole app.' : tab === 'sticker' ? 'Sticker kits go on over your bike colour.' : 'Tap to try it on. Top gear needs a higher rank, and it isn\'t cheap.';
+      body = `<div class="h-sec" style="margin-bottom:4px">${group}</div><p class="small-t muted" style="margin-bottom:10px">${note}</p><div class="paints">${pitItems(p, tab)}</div>`;
+    }
     return shell(`
-      <section class="card" style="display:grid;gap:10px">
-        <div class="hero-head"><div><div class="eyebrow">Your rider</div><div class="h-sec" style="font-size:24px">${BIKES[p.bike].label}</div></div><span class="chip lime num">${RS.fmt(p.points)} points</span></div>
-        <div class="stage">${rig(p)}</div>
-        ${rankCard(p)}
-      </section>
-      <section class="card"><div class="h-sec" style="margin-bottom:4px">Rider gear</div><p class="small-t muted" style="margin-bottom:10px">Tap to wear it. Top gear needs a higher rank, and it isn't cheap.</p><div class="gear-list">${gearPanel(p)}</div></section>
-      <section class="card"><div class="h-sec" style="margin-bottom:10px">Race number</div>
-        <div class="plate-row"><input id="plate-input" class="plate-input" type="text" inputmode="numeric" maxlength="3" value="${h(String(p.plate))}" aria-label="Your race number" autocomplete="off"><p class="small-t muted" style="flex:1;min-width:150px">Pick your number. It goes on your plate at the top of every screen.</p></div>
-      </section>
-      <section class="card"><div class="h-sec" style="margin-bottom:4px">Graphics kit</div><p class="small-t muted" style="margin-bottom:10px">Your kit colours the bike and the whole app.</p><div class="paints">${paints.join('')}</div></section>
-      <section class="card"><div class="h-sec" style="margin-bottom:10px">Bikes</div><div class="rides">${bikes.join('')}</div></section>
-      <section class="card"><div class="h-sec" style="margin-bottom:10px">Badges</div><div class="badges">${badges.join('')}</div></section>`);
+      <div class="pit">
+        <section class="card pit-left">
+          <div class="hero-head"><div class="h-sec">${BIKES[show.bike].label}</div><span class="chip lime num">${RS.fmt(p.points)} points</span></div>
+          <div class="stage" id="pit-rig">${rig(show)}</div>
+          ${tryBar(p)}
+        </section>
+        <div class="pit-right">
+          <section class="card">${rankCard(p)}</section>
+          <div class="pit-tabs" role="group" aria-label="What to change">${tabs}</div>
+          <section class="card">${body}</section>
+        </div>
+      </div>`);
   }
 
   // ---------- progress ----------
@@ -7367,6 +7629,7 @@ Jordy's Science test, Tuesday 10 November: Planet Earth and Beyond. Written from
     const missed = p.missed.slice(0, 10).map((m) => `<div class="log-item"><div>${h(m.q)}</div><div class="small-t" style="margin-top:2px"><b>Answer:</b> ${h(m.correct)}${m.given ? ` <span class="muted">(answered ${h(String(m.given))})</span>` : ''}</div><details><summary>Show the working</summary><ol>${m.steps.map((s) => `<li>${h(s)}</li>`).join('')}</ol></details></div>`);
     const toggle = (key, label, sub) => `<button class="toggle" role="switch" aria-checked="${!!state[key]}" data-act="toggle" data-id="${key}"><span><b style="font-weight:600">${label}</b><br><span class="small-t muted">${sub}</span></span><span class="switch"></span></button>`;
     return shell(`
+      ${leagueCard()}
       <section class="card"><div class="h-sec">Points per day</div><div class="small-t muted" style="margin-bottom:8px">Last 14 days</div>${dayChart(p)}</section>
       <section class="card"><div class="h-sec" style="margin-bottom:10px">${sub.label}: how strong is each topic?</div><div class="rows">${rows.join('')}</div></section>
       <section class="card"><div class="h-sec" style="margin-bottom:10px">Recent motos</div><div class="log">${runs.join('') || '<p class="small-t muted">Your motos will show here after your first one.</p>'}</div></section>
@@ -7382,8 +7645,8 @@ Jordy's Science test, Tuesday 10 November: Planet Earth and Beyond. Written from
       <section class="card">
         <div class="h-sec" style="margin-bottom:4px">About the questions</div>
         <p class="small-t muted">${pack.id === 'jordy'
-          ? 'Written for this app from the school’s test list and the Grade 6 curriculum, without the textbooks themselves, so check anything that disagrees with the book: the book wins. Nothing is copied from the books, and NumberSense has no link to this app.'
-          : 'A starter set of general Grade 4 topics. These will change once Kash’s own books are loaded.'} Progress saves on this device only.</p>
+          ? 'Written for this app from the pages on the test list. If anything disagrees with the book, the book wins. Nothing is copied from the books, and NumberSense has no link to this app.'
+          : 'A starter set of general Grade 4 topics. These will change once Kash’s own books are loaded.'} On a device that has the family code, progress follows you to your other devices.</p>
       </section>`);
   }
 
@@ -7405,6 +7668,17 @@ Jordy's Science test, Tuesday 10 November: Planet Earth and Beyond. Written from
   }
   function buildQueue(p, sub, mode, topicId, n) {
     if (mode === 'fix') return fixSlots(p, sub, n);
+    if (mode === 'lap') {
+      // Graphs and long stories would be a reading race, so only the quick kinds go in.
+      const all = [...new Set(racing(sub).flatMap((t) => t.skills))];
+      const quick = all.filter((id) => {
+        const q = PK().skills[id](2);
+        return !q.visual && RS.plain(q.q).length <= LAP_CHARS;
+      });
+      const out = [];
+      while (out.length < n) out.push(...RS.shuffle(quick.length ? quick : all));
+      return out.slice(0, n);
+    }
     if (mode === 'exam') {
       const out = [];
       const topics = RS.shuffle(racing(sub));
@@ -7435,7 +7709,7 @@ Jordy's Science test, Tuesday 10 November: Planet Earth and Beyond. Written from
     return out;
   }
   const levelFor = (p, id, mode) => {
-    if (mode === 'exam') return 2;
+    if (mode === 'exam' || mode === 'lap') return 2;
     const m = (p.skills[id] && p.skills[id].m) || 0;
     return m < 0.45 ? 1 : m < 0.8 ? 2 : 3;
   };
@@ -7446,9 +7720,13 @@ Jordy's Science test, Tuesday 10 November: Planet Earth and Beyond. Written from
     if (mode === 'fix' && !fixList(P(), sub).length) mode = 'daily';
     const n = mode === 'exam' ? sub.examSize : 10;
     ui.result = null;
-    ui.run = { id: uuid(), mode, topicId, queue: buildQueue(P(), sub, mode, topicId, n).map((slot) => (typeof slot === 'string' ? { skill: slot } : slot)), i: 0, total: n, q: null, typed: '', tries: 0, combo: 0, bestCombo: 0, pts: 0, score: 0, right: 0, log: [], extras: 0, asked: new Set(), sheet: null, heard: '', listening: false, started: Date.now(), halfPay: mode === 'topic' && ((P().topics[topicId] || {}).stars || 0) >= 3, fixed: [], fixNote: '', firstGiven: null, qStart: Date.now() };
+    ui.run = { id: uuid(), mode, topicId, queue: buildQueue(P(), sub, mode, topicId, n).map((slot) => (typeof slot === 'string' ? { skill: slot } : slot)), i: 0, total: n, q: null, typed: '', tries: 0, combo: 0, bestCombo: 0, pts: 0, score: 0, right: 0, log: [], extras: 0, asked: new Set(), sheet: null, heard: '', listening: false, started: Date.now(), halfPay: mode === 'topic' && ((P().topics[topicId] || {}).stars || 0) >= 3, fixed: [], fixNote: '', firstGiven: null, qStart: Date.now(), penalty: 0 };
     audio();
     nextQuestion();
+    if (mode === 'lap') {
+      clearInterval(lapTimer);
+      lapTimer = setInterval(tickLap, 100);
+    }
   }
   function nextQuestion() {
     const r = ui.run;
@@ -7472,7 +7750,7 @@ Jordy's Science test, Tuesday 10 November: Planet Earth and Beyond. Written from
         q = fn(lvl);
         key = q.q + (q.options || []).join();
         guard++;
-      } while (r.asked.has(key) && guard < 40);
+      } while ((r.asked.has(key) || (r.mode === 'lap' && (q.visual || RS.plain(q.q).length > LAP_CHARS))) && guard < 40);
     }
     r.asked.add(key);
     q.skill = slot.skill;
@@ -7587,6 +7865,22 @@ Jordy's Science test, Tuesday 10 November: Planet Earth and Beyond. Written from
       r.i++;
       return nextQuestion();
     }
+    if (r.mode === 'lap') {
+      settle(q, res.ok, true, given);
+      if (res.ok) {
+        award(5);
+        r.combo++;
+        r.bestCombo = Math.max(r.bestCombo, r.combo);
+        sfx('right');
+      } else {
+        r.penalty += LAP_PENALTY;
+        r.combo = 0;
+        toast(`+${LAP_PENALTY} seconds. It was ${RS.plain(q.correct)}.`);
+        sfx('wrong');
+      }
+      r.i++;
+      return nextQuestion();
+    }
     if (res.ok) {
       const first = r.tries === 0;
       if (first) r.combo++;
@@ -7627,8 +7921,20 @@ Jordy's Science test, Tuesday 10 November: Planet Earth and Beyond. Written from
     if (r.mode === 'fix') r.total = Math.max(1, r.log.filter((l) => !l.bonus).length);
     const pct = Math.round((100 * r.score) / r.total);
     const earnedStars = pct >= 90 ? 3 : pct >= 70 ? 2 : pct >= 50 ? 1 : 0;
-    let bonus = 20;
-    if (pct === 100) bonus += 50;
+    // A time only counts with enough right, so mashing wrong answers can't set a record.
+    let lap = null;
+    if (r.mode === 'lap') {
+      const ms = Date.now() - r.started + r.penalty * 1000;
+      const log = p.laps[ui.subject] || (p.laps[ui.subject] = {});
+      const counts = r.right >= LAP_KEEP;
+      const record = counts && log.best != null && ms < log.best;
+      const first = counts && log.best == null;
+      if (record || first) log.best = ms;
+      log.last = ms;
+      lap = { ms, penalty: r.penalty, best: log.best, record, first, counts };
+    }
+    let bonus = lap ? (lap.record ? 25 : 0) : 20;
+    if (!lap && pct === 100) bonus += 50;
     if (r.mode === 'exam' && pct >= 80) bonus += 50;
     const rankBefore = rankOf(p.earned - r.pts);
     bonus = award(bonus);
@@ -7653,12 +7959,14 @@ Jordy's Science test, Tuesday 10 November: Planet Earth and Beyond. Written from
       p.examBy[ui.subject] = Math.max(p.examBy[ui.subject] || 0, pct);
     } else if (r.mode === 'fix') {
       label = 'Fix-it lap';
+    } else if (lap) {
+      label = `Hot lap ${lapText(lap.ms)}`;
     } else {
       p.dailyBy[ui.subject] = today;
     }
     p.runs.unshift({ label: `${sub.label}: ${label}`, pct, right: r.right, total: r.total, pts: r.pts, when: today, mode: r.mode });
     p.runs = p.runs.slice(0, 30);
-    const x = { label, pct, stars: earnedStars, pts: r.pts, bonus, bestCombo: r.bestCombo, right: r.right, total: r.total, mode: r.mode, topicId: r.topicId, missed: r.log.filter((l) => !l.ok), newBadges: [], streak: p.streak, halfPay: r.halfPay, newRank: rankNow > rankBefore ? RANKS[rankNow - 1][0] : '', fixed: new Set(r.fixed.filter((id) => !p.fix[id])).size, fixLeft: fixList(p, sub).length };
+    const x = { lap, label, pct, stars: earnedStars, pts: r.pts, bonus, bestCombo: r.bestCombo, right: r.right, total: r.total, mode: r.mode, topicId: r.topicId, missed: r.log.filter((l) => !l.ok), newBadges: [], streak: p.streak, halfPay: r.halfPay, newRank: rankNow > rankBefore ? RANKS[rankNow - 1][0] : '', fixed: new Set(r.fixed.filter((id) => !p.fix[id])).size, fixLeft: fixList(p, sub).length };
     for (const b of BADGES) {
       if (!p.badges.includes(b.id) && b.test(p, x, sub)) {
         p.badges.push(b.id);
@@ -7687,7 +7995,7 @@ Jordy's Science test, Tuesday 10 November: Planet Earth and Beyond. Written from
     render();
     window.scrollTo(0, 0);
     sfx('fanfare');
-    if (earnedStars >= 2) confetti();
+    if (lap ? lap.record || lap.first : earnedStars >= 2) confetti();
   }
 
   // ---------- drawing the moto ----------
@@ -7793,7 +8101,7 @@ Jordy's Science test, Tuesday 10 November: Planet Earth and Beyond. Written from
         ${digit(1)}${digit(2)}${digit(3)}${key('del', 'Delete', 'alt')}
         ${digit(4)}${digit(5)}${digit(6)}${fraction ? key(' ', 'Space', 'alt') : key(',', ',', 'alt')}
         ${digit(7)}${digit(8)}${digit(9)}${fraction ? key('/', '/', 'alt') : key('000', '000', 'alt')}
-        ${key('0', '0', 'zero')}<button class="key check" data-act="check">${exam ? 'Next' : 'Check'}</button>
+        ${key('0', '0', 'zero')}<button class="key check" data-act="check">${exam || r.mode === 'lap' ? 'Next' : 'Check'}</button>
       </div>${skip}`;
   }
 
@@ -7804,7 +8112,7 @@ Jordy's Science test, Tuesday 10 November: Planet Earth and Beyond. Written from
     if (!s) return '';
     const steps = `<ol class="steps">${q.steps.map((x) => `<li>${h(x)}</li>`).join('')}</ol>`;
     if (s.type === 'quit') {
-      return `<div class="sheet" role="dialog" aria-label="Pull off the track?"><div class="sheet-head"><h2>Pull off the track?</h2></div><p class="muted">You keep the ${r.pts} points from this moto, but it won't count towards your streak.</p><button class="btn primary full" data-act="unquit" data-primary>Keep riding</button><button class="btn full" data-act="quit-yes">Pull off</button></div>`;
+      return `<div class="sheet" role="dialog" aria-label="Pull off the track?"><div class="sheet-head"><h2>Pull off the track?</h2></div><p class="muted">You keep the ${r.pts} points from this moto, but it won't count towards your streak${r.mode === 'lap' ? ' and your time goes in the bin' : ''}.</p><button class="btn primary full" data-act="unquit" data-primary>Keep riding</button><button class="btn full" data-act="quit-yes">Pull off</button></div>`;
     }
     if (s.type === 'right') {
       return `<div class="sheet good" role="status"><div class="sheet-head"><h2>${s.title}</h2><span class="pts num">+${s.pts}</span></div>
@@ -7831,7 +8139,9 @@ Jordy's Science test, Tuesday 10 November: Planet Earth and Beyond. Written from
       <header class="run-top">
         <button class="round" data-act="quit" aria-label="Pull off the track">${ic('x')}</button>
         ${roadBar(pct, true)}
-        <div class="run-score"><b>${RS.fmt(r.pts)}</b>${mult > 1 ? `<span class="combo">${ic('bolt', 11, true)} ×${mult}</span>` : `<small class="small-t muted">points</small>`}</div>
+        ${r.mode === 'lap'
+          ? `<div class="run-score"><b id="lap-clock" class="lap-clock">${lapText(Date.now() - r.started + r.penalty * 1000)}</b><small class="small-t muted">${r.penalty ? `+${r.penalty} s penalty` : 'clean so far'}</small></div>`
+          : `<div class="run-score"><b>${RS.fmt(r.pts)}</b>${mult > 1 ? `<span class="combo">${ic('bolt', 11, true)} ×${mult}</span>` : `<small class="small-t muted">points</small>`}</div>`}
       </header>
       <div class="run-body">
         <article class="q-card ${!q.visual && RS.plain(q.q).length <= 30 ? 'bare' : ''}">
@@ -7878,7 +8188,9 @@ Jordy's Science test, Tuesday 10 November: Planet Earth and Beyond. Written from
   // ---------- results ----------
   function viewResult() {
     const x = ui.result;
-    const title = x.stars === 3 ? '1st place' : x.stars === 2 ? '2nd place' : x.stars === 1 ? '3rd place' : 'Back to the gate';
+    const place = x.stars === 3 ? '1st place' : x.stars === 2 ? '2nd place' : x.stars === 1 ? '3rd place' : 'Back to the gate';
+    const lap = x.lap;
+    const title = !lap ? place : lap.record ? 'New lap record!' : lap.first ? 'First lap on the board' : lap.counts ? 'Lap done' : "Time didn't count";
     const again = `data-act="start" data-mode="${x.mode}" ${x.topicId ? `data-topic="${x.topicId}"` : ''}`;
     return `<div class="wrap" style="padding-bottom:32px;padding-left:max(16px,env(safe-area-inset-left,0px));max-width:720px">
       <section class="card result-head">
@@ -7888,11 +8200,14 @@ Jordy's Science test, Tuesday 10 November: Planet Earth and Beyond. Written from
         <div class="result-stars">${[1, 2, 3].map((i) => `<span class="${i <= x.stars ? 'on' : ''}" style="animation-delay:${i * 0.12}s">${ic('star', 40, true)}</span>`).join('')}</div>
       </section>
       <section class="tiles" style="grid-template-columns:repeat(2,minmax(0,1fr))">
+        ${lap ? `${tile('flag', 'Lap time', lapText(lap.ms), `<span class="chip num">${lap.penalty ? `Includes +${lap.penalty} s` : 'No penalties'}</span>`)}
+        ${tile('bolt', 'Best lap', lap.best ? lapText(lap.best) : '–', `<span class="chip ${lap.record ? 'good' : ''}">${lap.record ? 'New record' : 'Time to beat'}</span>`)}` : ''}
         ${tile('target', 'Score', x.pct + '%', `<span class="chip num">${x.right} of ${x.total} right</span>`)}
-        ${tile('star', 'Points won', '+' + RS.fmt(x.pts), `<span class="chip lime num">Includes +${x.bonus} bonus</span>`)}
-        ${tile('bolt', 'Best in a row', x.bestCombo, `<span class="chip">${x.bestCombo >= 6 ? 'Full gas' : x.bestCombo >= 3 ? 'Nice combo' : 'Keep building'}</span>`)}
-        ${tile('flame', 'Day streak', x.streak, `<span class="chip good">Ride again tomorrow</span>`)}
+        ${tile('star', 'Points won', '+' + RS.fmt(x.pts), `<span class="chip lime num">${lap ? `${lap.record ? 'Includes +25 for the record' : '+5 for each right'}` : `Includes +${x.bonus} bonus`}</span>`)}
+        ${lap ? '' : tile('bolt', 'Best in a row', x.bestCombo, `<span class="chip">${x.bestCombo >= 6 ? 'Full gas' : x.bestCombo >= 3 ? 'Nice combo' : 'Keep building'}</span>`)}
+        ${lap ? '' : tile('flame', 'Day streak', x.streak, `<span class="chip good">Ride again tomorrow</span>`)}
       </section>
+      ${lap && !lap.counts ? `<p class="small-t muted" style="padding-inline:4px">Get at least ${LAP_KEEP} right for your time to count.</p>` : ''}
       ${x.newRank ? `<section class="card"><div class="eyebrow">New rank</div><div class="h-sec" style="font-size:24px">${x.newRank}</div><p class="small-t muted">New gear is open in the pits.</p></section>` : ''}
       ${x.halfPay ? '<p class="small-t muted" style="padding-inline:4px">You already have 3 stars here, so this section paid half points. A section that needs work pays in full.</p>' : ''}
       ${x.newBadges.length ? `<section class="card"><div class="h-sec" style="margin-bottom:8px">New badge${x.newBadges.length > 1 ? 's' : ''}</div><div class="badges">${x.newBadges.map((b) => `<div class="badge got"><b>${b.label}</b><small>${b.desc}</small></div>`).join('')}</div></section>` : ''}
@@ -8159,10 +8474,119 @@ Jordy's Science test, Tuesday 10 November: Planet Earth and Beyond. Written from
     msg.textContent = !res ? "Couldn't check the code. Check the internet and try again." : res.reason === 'wait' ? 'Too many wrong tries. Wait an hour, then try again.' : "That's not the code. Try again.";
     input.focus();
   });
+  // ---------- results for a parent ----------
+  // Nothing about the riders' marks is in this page. A separate parent code fetches the report from the server,
+  // and it stays only while this screen is open.
+  const timeText = (secs) => {
+    const m = Math.round(secs / 60);
+    return m >= 60 ? `${Math.floor(m / 60)} h ${m % 60} min` : `${m} min`;
+  };
+  const shareOf = (a, b) => (b ? Math.round((100 * a) / b) : 0);
+  const stamp = (at) => new Date(at).toLocaleDateString('en-ZA', { weekday: 'short', day: 'numeric', month: 'short' });
+  function weakSpots(pack, d) {
+    const groups = {};
+    for (const s of d.skills) {
+      const key = `${s.subject}/${s.topic || s.skill}`;
+      const g = groups[key] || (groups[key] = { subject: s.subject, topic: s.topic || s.skill, n: 0, ok: 0 });
+      g.n += s.n;
+      g.ok += s.first_try;
+    }
+    return Object.values(groups).filter((g) => g.n >= 4 && g.ok / g.n < 0.8).sort((a, b) => a.ok / a.n - b.ok / b.n).slice(0, 8).map((g) => {
+      const sub = pack.subjects[g.subject];
+      const topic = sub && sub.topics.find((t) => t.id === g.topic);
+      return { ...g, subject: sub ? sub.label : g.subject, title: topic ? topic.title : g.topic };
+    });
+  }
+  function viewParents() {
+    const v = ui.parents;
+    if (!v.data) {
+      return `<main class="pick">
+        <form id="parent-form" class="card lock" autocomplete="off">
+          <label class="h-sec" for="parent-input">Parent code</label>
+          <input id="parent-input" class="lock-input parent-input" type="text" inputmode="numeric" maxlength="12" autocomplete="off" spellcheck="false" aria-describedby="parent-msg">
+          <p id="parent-msg" class="small-t muted" role="status">${v.msg || 'Type the parent code to see the results.'}</p>
+          <button class="btn primary full" type="submit">Open ${ic('arrow')}</button>
+          <button class="btn full" type="button" data-act="parents-off">Back</button>
+        </form>
+      </main>`;
+    }
+    const pack = RS.packs[v.who];
+    const d = v.data[v.who];
+    const t = d.totals;
+    const prog = d.progress || {};
+    const subName = (id) => (pack.subjects[id] ? pack.subjects[id].label : id);
+    const whoTabs = Object.values(RS.packs).map((x) => `<button class="pit-tab ${v.who === x.id ? 'on' : ''}" data-act="parents-who" data-id="${x.id}" aria-pressed="${v.who === x.id}">${x.name}</button>`).join('');
+    const dayTabs = [7, 30].map((n) => `<button class="pit-tab ${v.days === n ? 'on' : ''}" data-act="parents-days" data-id="${n}" aria-pressed="${v.days === n}">${n} days</button>`).join('');
+    const weak = weakSpots(pack, d);
+    const next = nextExam(pack);
+    const nextRow = next && d.subjects.find((s) => s.subject === next.subject);
+    const peak = Math.max(1, ...d.daily.map((x) => x.n));
+    return `<div class="wrap" style="padding-bottom:32px;max-width:720px">
+      <header class="top"><div class="top-who"><h1>Results</h1><div class="small-t muted">${v.busy ? 'Fetching...' : `Last ${v.days} days`}</div></div><button class="round" data-act="parents-off" aria-label="Close the results">${ic('x')}</button></header>
+      <div class="pit-tabs" role="group" aria-label="Rider and period">${whoTabs}<span style="flex:1"></span>${dayTabs}</div>
+      <section class="tiles">
+        ${tile('flag', 'Time spent', timeText(t.secs), `<span class="chip num">${t.days} ${t.days === 1 ? 'day' : 'days'} active</span>`)}
+        ${tile('target', 'Right first try', t.questions ? `${shareOf(t.first_try, t.questions)}%` : '–', `<span class="chip num">${RS.fmt(t.first_try)} of ${RS.fmt(t.questions)}</span>`)}
+        ${tile('star', 'Rank', `${rankOf(prog.earned || 0)}`, `<span class="chip">${RANKS[rankOf(prog.earned || 0) - 1][0]}</span>`)}
+        ${tile('wrench', 'On the fix list', `${prog.fix || 0}`, `<span class="chip num">${RS.fmt(prog.points || 0)} points</span>`)}
+      </section>
+      ${next ? `<section class="card"><div class="eyebrow">Next test</div><div class="h-sec">${next.label}: ${shortDay(next.date)}</div><p class="small-t muted">${whenText(daysUntil(next.date))}. ${nextRow ? `${RS.fmt(nextRow.n)} questions in this period, ${shareOf(nextRow.first_try, nextRow.n)}% right first try.` : 'No practice in this subject in this period.'}</p></section>` : ''}
+      <section class="card"><div class="h-sec" style="margin-bottom:4px">Needs work</div><p class="small-t muted" style="margin-bottom:10px">Sections with at least 4 answers, weakest first.</p>
+        <div class="rows">${weak.map((g) => `<div class="row"><div class="row-top"><b>${h(g.title)}</b><span class="num muted">${shareOf(g.ok, g.n)}%</span></div><div class="meter" role="img" aria-label="${shareOf(g.ok, g.n)} percent right first try"><i style="width:${shareOf(g.ok, g.n)}%"></i></div><div class="small-t muted num">${h(g.subject)} · ${g.ok} of ${g.n} right first try</div></div>`).join('') || '<p class="small-t muted">Nothing stands out yet.</p>'}</div>
+      </section>
+      <section class="card"><div class="h-sec" style="margin-bottom:10px">By subject</div>
+        <div class="rows">${d.subjects.map((s) => `<div class="row"><div class="row-top"><b>${h(subName(s.subject))}</b><span class="num muted">${shareOf(s.first_try, s.n)}%</span></div><div class="meter" role="img" aria-label="${shareOf(s.first_try, s.n)} percent right first try"><i style="width:${shareOf(s.first_try, s.n)}%"></i></div><div class="small-t muted num">${RS.fmt(s.n)} questions · ${timeText(s.secs)}</div></div>`).join('') || '<p class="small-t muted">No answers in this period.</p>'}</div>
+      </section>
+      <section class="card"><div class="h-sec" style="margin-bottom:10px">Day by day</div>
+        <div class="rows">${d.daily.slice().reverse().map((x) => `<div class="row"><div class="row-top"><b>${stamp(`${x.day}T12:00:00`)}</b><span class="num muted">${timeText(x.secs)}</span></div><div class="meter" role="img" aria-label="${x.n} questions"><i style="width:${shareOf(x.n, peak)}%"></i></div><div class="small-t muted num">${x.n} questions · ${shareOf(x.first_try, x.n)}% right first try</div></div>`).join('') || '<p class="small-t muted">No answers in this period.</p>'}</div>
+      </section>
+      <section class="card"><div class="h-sec" style="margin-bottom:10px">Latest mistakes</div>
+        <div class="log">${d.mistakes.map((m) => `<div class="log-item"><div>${h(m.q)}</div><div class="small-t" style="margin-top:2px"><b>Answer:</b> ${h(m.correct || '')}${m.first_given || m.given ? ` <span class="muted">(said ${h(String(m.first_given || m.given))})</span>` : ' <span class="muted">(skipped)</span>'}</div><div class="small-t muted">${h(subName(m.subject))} · ${stamp(m.at)}${m.ok ? ' · right on the second try' : ''}</div></div>`).join('') || '<p class="small-t muted">No mistakes in this period.</p>'}</div>
+      </section>
+      <section class="card"><div class="h-sec" style="margin-bottom:10px">Latest races</div>
+        <div class="log">${d.runs.map((r) => `<div class="log-item"><div class="row-top"><b>${h(subName(r.subject))}: ${h(r.label || r.mode)}</b><span class="num">${r.pct}%</span></div><div class="small-t muted num">${stamp(r.at)} · ${r.right} of ${r.total} right · ${timeText(r.secs || 0)}</div></div>`).join('') || '<p class="small-t muted">No races in this period.</p>'}</div>
+      </section>
+    </div>`;
+  }
+  async function fetchReport() {
+    const v = ui.parents;
+    v.busy = true;
+    const res = await syncCall({ action: 'report', code: v.code, days: v.days });
+    v.busy = false;
+    if (ui.parents !== v) return;
+    if (res && res.ok) {
+      v.data = res.report;
+      v.msg = '';
+    } else {
+      // A failed refresh keeps what's on screen. A wrong code asks again.
+      v.msg = !res ? "Couldn't fetch the results. Check the internet and try again." : res.reason === 'wait' ? 'Too many wrong tries. Wait an hour, then try again.' : "That's not the code. Try again.";
+      if (res) v.data = null;
+    }
+    render();
+    if (v.msg && v.data) toast(v.msg);
+  }
+  document.addEventListener('submit', (e) => {
+    if (e.target.id !== 'parent-form') return;
+    e.preventDefault();
+    const v = ui.parents;
+    if (!v || v.busy) return;
+    v.code = $('#parent-input').value;
+    $('#parent-msg').textContent = 'Checking...';
+    fetchReport();
+  });
+  // Results close as soon as the app is put away, so nobody picks up a device with them open.
+  document.addEventListener('visibilitychange', () => {
+    if (document.visibilityState === 'hidden' && ui.parents) {
+      ui.parents = null;
+      render();
+    }
+  });
+
   function render() {
     applyAccent();
     const app = $('#app');
     if (locked || askLink) app.innerHTML = viewLock();
+    else if (ui.parents) app.innerHTML = viewParents();
     else if (!ui.who) app.innerHTML = viewPick();
     else if (ui.run) drawRun();
     else if (ui.result) app.innerHTML = viewResult();
@@ -8180,6 +8604,8 @@ Jordy's Science test, Tuesday 10 November: Planet Earth and Beyond. Written from
     document.querySelectorAll('.top .plate').forEach((el) => {
       el.textContent = digits;
     });
+    const stage = $('#pit-rig');
+    if (stage) stage.innerHTML = rig(tried(P()));
   });
 
   // ---------- taps ----------
@@ -8207,12 +8633,14 @@ Jordy's Science test, Tuesday 10 November: Planet Earth and Beyond. Written from
         ui.who = null;
         ui.result = null;
         ui.confirmReset = false;
+        ui.tryOn = null;
         render();
         window.scrollTo(0, 0);
         break;
       case 'tab':
         ui.tab = id;
         ui.confirmReset = false;
+        ui.tryOn = null;
         render();
         window.scrollTo(0, 0);
         break;
@@ -8290,28 +8718,57 @@ Jordy's Science test, Tuesday 10 November: Planet Earth and Beyond. Written from
         render();
         window.scrollTo(0, 0);
         break;
-      case 'bike': {
-        if (!p.ownedB.includes(id) && !buy(p, { ...BIKES[id], id }, p.ownedB)) break;
-        p.bike = id;
+      case 'parents':
+        ui.parents = { days: 7, who: Object.keys(RS.packs)[0], code: '', data: null, busy: false, msg: '' };
+        render();
+        window.scrollTo(0, 0);
+        break;
+      case 'parents-off':
+        ui.parents = null;
+        render();
+        window.scrollTo(0, 0);
+        break;
+      case 'parents-who':
+        ui.parents.who = id;
+        render();
+        window.scrollTo(0, 0);
+        break;
+      case 'parents-days':
+        if (ui.parents.busy) break;
+        ui.parents.days = +id;
+        ui.parents.busy = true;
+        render();
+        fetchReport();
+        break;
+      case 'pit':
+        ui.pit = id;
+        ui.tryOn = null;
+        render();
+        break;
+      case 'wear': {
+        const tab = el.dataset.tab;
+        if (ownedOf(p, tab).includes(id)) {
+          wear(p, tab, id);
+          ui.tryOn = null;
+          save();
+        } else ui.tryOn = { tab, id };
+        render();
+        break;
+      }
+      case 'buy-try': {
+        const { tab, id: item } = ui.tryOn;
+        if (!buy(p, { ...shopOf(tab)[item], id: item }, ownedOf(p, tab))) break;
+        wear(p, tab, item);
+        ui.tryOn = null;
+        toast(`${shopOf(tab)[item].label} is yours.`);
         save();
         render();
         break;
       }
-      case 'paint': {
-        if (!p.ownedP.includes(id) && !buy(p, { ...PAINTS[id], id }, p.ownedP)) break;
-        p.paint = id;
-        save();
+      case 'try-off':
+        ui.tryOn = null;
         render();
         break;
-      }
-      case 'gear': {
-        const slot = el.dataset.slot;
-        if (!p.ownedG.includes(id) && !buy(p, { ...GEAR[slot].items[id], id }, p.ownedG)) break;
-        p.gear[slot] = id;
-        save();
-        render();
-        break;
-      }
       case 'toggle':
         state[id] = !state[id];
         save();
