@@ -1,7 +1,7 @@
 /* Lets Holeshot open with no internet once it has been opened online.
    Pages come from the network when it answers quickly, so updates reach the boys straight away.
    build.mjs fills in the version and the file list. */
-const CACHE = 'holeshot-9782d452a2';
+const CACHE = 'holeshot-2dda9fb24e';
 const FILES = ["./","manifest.webmanifest","img/bike-enduro.webp","img/bike-factory.webp","img/bike-hard.webp","img/bike-mini.webp","img/bike-mx.webp","img/finish.webp","img/hero-jump.webp","img/icon-180.png","img/icon-192.png","img/icon-512.png","img/main-event.webp","img/stop-bends.webp","img/stop-berm.webp","img/stop-climb.webp","img/stop-gate.webp","img/stop-log.webp","img/stop-mud.webp","img/stop-river.webp","img/stop-rocks.webp","img/stop-table.webp","img/stop-whoops.webp"];
 
 self.addEventListener('install', (e) => {

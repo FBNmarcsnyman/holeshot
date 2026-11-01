@@ -164,6 +164,12 @@ svg { display: block; }
 
 /* pictures */
 .bike { display: block; width: 100%; height: auto; }
+.rig { position: relative; width: 100%; max-width: 460px; }
+.rig .bike { max-width: none; }
+.rider { position: absolute; left: 0; bottom: 0; width: 100%; height: auto; overflow: visible; pointer-events: none; }
+.gear-list { display: grid; gap: 14px; }
+.lock-need { font-weight: 600; }
+.rank-line { display: flex; justify-content: space-between; gap: 8px; flex-wrap: wrap; }
 .photo { display: block; width: 100%; height: 100%; object-fit: cover; }
 .stage { background: var(--stage); border-radius: 20px; padding: 10px 14px; display: grid; place-items: center; min-width: 0; }
 .stage .bike { max-width: 460px; }
@@ -2310,9 +2316,9 @@ details ol { margin: 6px 0 0; padding-left: 20px; }
   };
 })(typeof window !== 'undefined' ? window : globalThis);
 
-/* Jordy's Afrikaans test, Wednesday 11 November. Written from the school's topic list and general
-   Grade 6 knowledge, without the textbook. The list limits some topics to numbered rules in his book,
-   and those numbers can't be matched without it. */
+/* Jordy's Afrikaans test, Wednesday 11 November. The racing sections follow the book's numbered rules,
+   as limited by the school's list, with new sentences. Verkleining (pages 48 to 51) was written without
+   those pages. The other first lists came before the pages arrived, so they are extra practice only. */
 (function (root) {
   'use strict';
   const RS = root.RS;
@@ -2463,7 +2469,7 @@ details ol { margin: 6px 0 0; padding-left: 20px; }
     { q: `Wat is die meervoud van "seun"?`, t: [`seuns`], why: `seun → seuns`, h: `It takes -s.` },
     { q: `Wat is die meervoud van "meisie"?`, t: [`meisies`], why: `Words ending in -ie take -s: meisies.`, h: `Words ending in -ie take -s.` },
     { q: `Wat is die meervoud van "foto"?`, t: [`foto's`], why: `Words ending in a vowel like this take 's: foto's.`, h: `It needs an apostrophe.` },
-    { q: `Wat is die meervoud van "ouma"?`, t: [`ouma's`], why: `Words ending in -a like this take 's: ouma's.`, h: `It needs an apostrophe.` },
+    { q: `Wat is die meervoud van "ouma"?`, t: [`oumas`], why: `Your book puts ouma with the words that take no apostrophe: oumas.`, h: `It takes no apostrophe.` },
     { q: `Wat is die meervoud van "dag"?`, t: [`dae`], why: `The g drops away: dag → dae.`, h: `The "g" drops away.` },
     { q: `Wat is die meervoud van "oog"?`, a: `oë`, w: [`ooge`, `oogs`, `ooë`], why: `oog → oë` },
     { q: `Wat is die meervoud van "kind"?`, a: `kinders`, w: [`kinde`, `kinds`, `kindere`], why: `kind → kinders. Learn this one by heart.` },
@@ -2519,22 +2525,443 @@ details ol { margin: 6px 0 0; padding-left: 20px; }
     { q: `Vertaal: here`, t: [`hier`], why: `here = hier`, h: `It starts with "h".` },
   ], AF);
 
+  // ---------- the book's rules: fresh sentences each time ----------
+  const { mc, pick, shuffle } = RS;
+  const cap = (s) => s.charAt(0).toUpperCase() + s.slice(1);
+  const join = (...parts) => parts.filter(Boolean).join(' ');
+  const line = (...parts) => `${cap(join(...parts))}.`;
+  const typed = (q, right, hint, steps, also = []) => ({ kind: 'word', q, accept: [right, ...also], correct: right, strict: true, lang: 'af-ZA', hint, steps });
+  const withGe = (v) => (v === 'eet' ? 'geëet' : `ge${v}`);
+  const choose = (q, right, wrongs, hint, steps) => mc(q, right, wrongs, { lang: 'af-ZA', hint, steps });
+
+  // Sentences for the tense rules, as parts so each can be built forwards and backwards.
+  const ONE_VERB_PAST = [['was', 'gewas', 'die ryer', 'sy motorfiets'], ['koop', 'gekoop', 'Thabo', `'n nuwe helm`], ['skryf', 'geskryf', 'die meisie', `'n brief aan haar oupa`], ['drink', 'gedrink', 'oupa', 'koffie op die stoep'], ['vang', 'gevang', 'die seun', `'n groot vis`], ['eet', 'geëet', 'die ryer', `'n groot bord pap`], ['bou', 'gebou', 'die boer', `'n nuwe heining`], ['hoor', 'gehoor', 'ons', 'die enjins op die baan'], ['sing', 'gesing', 'die koor', `'n nuwe lied`]];
+  const JOINING = [['maak', 'reg', 'reggemaak', 'die werktuigkundige', 'die enjin'], ['trek', 'aan', 'aangetrek', 'Lerato', 'haar stewels'], ['tel', 'op', 'opgetel', 'die ryer', 'sy helm'], ['gooi', 'weg', 'weggegooi', 'pa', 'die ou bande'], ['maak', 'toe', 'toegemaak', 'die kinders', 'die hek'], ['skakel', 'af', 'afgeskakel', 'die ryer', 'die enjin'], ['laai', 'af', 'afgelaai', 'oom Piet', 'die fietse by die baan'], ['maak', 'skoon', 'skoongemaak', 'Sipho', 'die ketting']];
+  const NO_GE = [['verloor', 'die span', 'die wedren'], ['bestel', 'ma', `'n nuwe ketting`], ['herstel', 'die werktuigkundige', 'die fiets'], ['onthou', 'ek', 'die hele baan'], ['geniet', 'die ryers', 'die modder'], ['gebruik', 'die ryer', `'n nuwe helm`], ['erken', 'die seun', 'sy fout'], ['begin', 'die oefening', ''], ['misluk', 'die plan', ''], ['betaal', 'oupa', 'vir die petrol']];
+  const TWO_VERBS = [['sien', 'spring', 'ek', 'die ryer oor die bult'], ['hoor', 'brul', 'ons', 'die enjins op die baan'], ['begin', 'was', 'hy', 'sy fiets'], ['probeer', 'wen', 'sy', 'die wedren'], ['laat', 'loop', 'die ryer', 'die enjin'], ['voel', 'val', 'ek', 'die reën op my arm'], ['sien', 'ry', 'die kinders', 'die ryers deur die modder'], ['hoor', 'blaf', 'ons', 'die bure se hond']];
+  const HELPERS_PAST = [['kan', 'kon', 'Thabo', 'vinnig ry'], ['wil', 'wou', 'die ryers', 'op die baan oefen'], ['moet', 'moes', 'ons', 'die fietse was'], ['sal', 'sou', 'sy', 'die wedren wen'], ['mag', 'mag', 'ons', 'op die baan ry'], ['kan', 'kon', 'jy', 'die bult klim'], ['wil', 'wou', 'Lerato', `'n nuwe helm koop`], ['moet', 'moes', 'die span', 'hard oefen'], ['sal', 'sou', 'pa', 'die ketting olie']];
+  const WITH_IS = [['die baan', 'baie modderig'], ['ek', 'baie moeg'], ['dit', `'n lekker wedren`], ['daar', 'baie ryers by die baan'], ['die ryer', 'kwaad vir sy broer'], ['die ryers', 'baie opgewonde'], ['die fiets', 'stukkend'], ['ons', 'by die baan']];
+  const WITH_HET = [['die ryer', `'n nuwe helm`], ['ons', 'baie petrol'], ['Thabo', 'twee fietse'], ['ek', `'n seer been`], ['die span', 'die beste ryers'], ['oupa', `'n ou motorfiets`], ['my oom', `'n groot plaas`], ['die bure', `'n groot bakkie`]];
+  const ONE_VERB_FUTURE = [['oefen', 'die ryer', 'sy spronge'], ['eet', 'ek', 'pap vir ontbyt'], ['koop', 'Thabo', `'n nuwe ketting`], ['sing', 'die koor', `'n nuwe lied`], ['lees', 'ouma', 'haar boek op die stoep'], ['bestuur', 'ons', 'die bakkie'], ['was', 'Sipho', 'sy fiets'], ['bou', 'die boer', `'n nuwe heining`]];
+  const JOINING_FUTURE = [['tel', 'op', 'Lerato', 'haar handskoene'], ['maak', 'reg', 'pa', 'die fiets'], ['trek', 'aan', 'Lerato', 'haar stewels'], ['gooi', 'weg', 'ons', 'die ou olie'], ['skakel', 'af', 'die ryer', 'die enjin'], ['maak', 'skoon', 'Sipho', 'die ketting'], ['hou', 'stil', 'die bakkie', 'by die winkel'], ['laai', 'af', 'oom Piet', 'die fietse by die baan']];
+  const HELPERS_FUTURE = [['kan', 'sien', 'ons', 'die bult'], ['moet', 'skoonmaak', 'die ryer', 'die ketting'], ['mag', 'ry', 'ons', 'op die baan'], ['wil', 'wen', 'hy', 'die wedren'], ['kan', 'help', 'die werktuigkundige', 'die ryer'], ['moet', 'oefen', 'die span', 'hard'], ['wil', 'koop', 'Lerato', `'n nuwe helm`], ['mag', 'eet', 'ons', 'na die wedren roomys']];
+
+  const PAST_RULES = {
+    1: (T) => {
+      const [v, pv, S, rest] = pick(ONE_VERB_PAST);
+      return { base: line(S, v, rest), right: line(T, 'het', S, rest, pv), wrongs: [line(T, 'het', S, pv, rest), line(T, S, 'het', rest, pv), line(T, 'het', S, rest, v)], gap: [line(T, 'het', S, rest, '___'), v, pv], rule: 'Rule 1: "het" comes after the time word. The verb moves to the end and gets "ge-".' };
+    },
+    2: (T) => {
+      const [v, part, pv, S, rest] = pick(JOINING);
+      return { base: line(S, v, rest, part), right: line(T, 'het', S, rest, pv), wrongs: [line(T, 'het', S, rest, `ge${v}`, part), line(T, 'het', S, rest, part, v), line(T, S, 'het', rest, pv)], gap: [line(T, 'het', S, rest, '___'), `${v} ... ${part}`, pv], rule: 'Rule 2: the two parts of this verb join up at the end, with "ge" in the middle.' };
+    },
+    3: (T) => {
+      const [v, S, rest] = pick(NO_GE);
+      return { base: line(S, v, rest), right: line(T, 'het', S, rest, v), wrongs: [line(T, 'het', S, rest, `ge${v}`), line(T, S, 'het', rest, v), line(T, 'het', S, `ge${v}`, rest), line(T, S, 'het', `ge${v}`)], gap: [line(T, 'het', S, rest, '___'), v, v], rule: 'Rule 3: a verb that starts with be-, ge-, her-, er-, ont-, ver- or mis- gets no "ge-".' };
+    },
+    6: (T) => {
+      const [v1, v2, S, rest] = pick(TWO_VERBS);
+      const ge = ['sien', 'hoor'].includes(v1) ? `ge${v1}` : '';
+      return { base: line(S, v1, rest, v2), right: line(T, 'het', S, rest, v1, v2), wrongs: [line(T, 'het', S, rest, v1, `ge${v2}`), line(T, 'het', S, v1, rest, v2), line(T, S, 'het', rest, v1, v2)], gap: [line(T, 'het', S, rest, '___', v2), v1, v1], gapAlso: ge ? [ge] : [], writeAlso: ge ? [line(T, 'het', S, rest, ge, v2)] : [], rule: 'Rule 6: with a second verb at the end, the first verb goes right before it. Neither verb gets "ge-".' };
+    },
+    7: (T) => {
+      const [now, then, S, rest] = pick(HELPERS_PAST);
+      return { base: line(S, now, rest), right: line(T, then, S, rest), wrongs: [line(T, 'het', S, then, rest), now === then ? line(T, S, then, rest) : line(T, now, S, rest), line(T, 'het', S, rest), line(T, S, then, rest)], gap: [line(T, '___', S, rest), now, then], gapAlso: now === 'mag' ? ['mog'] : [], writeAlso: now === 'mag' ? [line(T, 'mog', S, rest)] : [], rule: 'Rule 7: helping verbs change form (kan to kon, wil to wou, sal to sou, moet to moes, and mag stays mag). No "het" and no "ge-".' };
+    },
+    8: (T) => {
+      const [S, rest] = pick(WITH_IS);
+      return { base: line(S, 'is', rest), right: line(T, 'was', S, rest), wrongs: [line(T, S, 'was', rest), line(T, 'is', S, rest), line(T, 'het', S, 'was', rest)], gap: [line(T, '___', S, rest), 'is', 'was'], rule: 'Rule 8: "is" changes to "was". No "het" and no "ge-".' };
+    },
+    9: (T) => {
+      const [S, rest] = pick(WITH_HET);
+      return { base: line(S, 'het', rest), right: line(T, 'het', S, rest, 'gehad'), wrongs: [line(T, 'het', S, rest), line(T, 'het', S, 'gehad', rest), line(T, S, 'het', rest, 'gehad')], gap: [line(T, 'het', S, rest, '___'), 'het', 'gehad'], rule: 'Rule 9: when "het" means have or has, add "gehad" at the end.' };
+    },
+  };
+  const FUTURE_RULES = {
+    1: (T) => {
+      const [v, S, rest] = pick(ONE_VERB_FUTURE);
+      return { base: line(S, v, rest), right: line(T, 'sal', S, rest, v), wrongs: [line(T, 'sal', S, v, rest), line(T, S, 'sal', rest, v), line(T, 'het', S, rest, withGe(v))], gap: null, rule: 'Rule 1: "sal" comes after the time word, and the verb moves to the end.' };
+    },
+    2: (T) => {
+      const [v, part, S, rest] = pick(JOINING_FUTURE);
+      return { base: line(S, v, rest, part), right: line(T, 'sal', S, rest, `${part}${v}`), wrongs: [line(T, 'sal', S, rest, v, part), line(T, 'sal', S, v, rest, part), line(T, 'sal', S, rest, `${v}${part}`)], gap: [line(T, 'sal', S, rest, '___'), `${v} ... ${part}`, `${part}${v}`], rule: 'Rule 2: the two parts of this verb join up at the end, with no "ge".' };
+    },
+    3: (T) => {
+      const [v1, v2, S, rest] = pick(TWO_VERBS);
+      return { base: line(S, v1, rest, v2), right: line(T, 'sal', S, rest, v1, v2), wrongs: [line(T, 'sal', S, v1, rest, v2), line(T, 'sal', S, rest, v2, v1), line(T, 'het', S, rest, v1, v2)], gap: null, rule: 'Rule 3: with another verb at the end, the first verb can\'t move past it. It goes right before it.' };
+    },
+    4: (T) => {
+      const [h, v, S, rest] = pick(HELPERS_FUTURE);
+      return { base: line(S, h, rest, v), right: line(T, 'sal', S, rest, h, v), wrongs: [line(T, S, 'sal', rest, h, v), line(T, 'sal', S, h, rest, v), line(T, 'sal', S, rest, v, h)], gap: null, rule: 'Rule 4: "sal" takes the helping verb\'s place, and the helping verb moves right before the verb at the end.' };
+    },
+    5: (T) => {
+      const [S, rest] = pick(WITH_IS);
+      return { base: line(S, 'is', rest), right: line(T, 'sal', S, rest, 'wees'), wrongs: [line(T, 'sal', S, rest, 'is'), line(T, S, 'sal', rest, 'wees'), line(T, 'sal', S, 'wees', rest)], gap: [line(T, 'sal', S, rest, '___'), 'is', 'wees'], rule: 'Rule 5: "is" is replaced by "sal", and "wees" goes at the end.' };
+    },
+    6: (T) => {
+      const [S, rest] = pick(WITH_HET);
+      return { base: line(S, 'het', rest), right: line(T, 'sal', S, rest, 'hê'), wrongs: [line(T, 'sal', S, rest, 'het'), line(T, S, 'sal', rest, 'hê'), line(T, 'sal', S, 'hê', rest)], gap: [line(T, 'sal', S, rest, '___'), 'het', 'hê'], rule: 'Rule 6: when "het" means have or has, it is replaced by "sal", and "hê" goes at the end.' };
+    },
+  };
+  const tenseQuestion = (rules, times, name) => {
+    const T = pick(times);
+    const r = rules(T);
+    const steps = [r.rule, `Antwoord: ${r.right}`];
+    const kind = pick(r.gap ? ['pick', 'pick', 'pick', 'gap', 'gap', 'write'] : ['pick', 'pick', 'pick', 'write']);
+    if (kind === 'pick') return choose(`Skryf in die ${name} tyd: ${r.base}`, r.right, r.wrongs, r.rule, steps);
+    if (kind === 'gap') return typed(`Vul die regte woord in vir die ${name} tyd. ${r.gap[0]} (${r.gap[1]})`, r.gap[2], r.rule, steps, r.gapAlso);
+    return typed(`Skryf oor in die ${name} tyd. Begin met "${T}": ${r.base}`, r.right, r.rule, steps, r.writeAlso);
+  };
+  const PAST_TIMES = ['Gister', 'Verlede week', 'Vroeër', 'Gisteraand', 'Verlede jaar', 'Verlede naweek'];
+  const FUTURE_TIMES = ['Môre', 'Volgende week', 'Later', 'Volgende jaar', 'Oormôre', 'Later vandag'];
+  S.afr_vt = () => tenseQuestion((T) => PAST_RULES[pick([1, 2, 3, 6])](T), PAST_TIMES, 'verlede');
+  S.afr_vt_help = () => tenseQuestion((T) => PAST_RULES[pick([7, 8, 9])](T), PAST_TIMES, 'verlede');
+  S.afr_tt = () => tenseQuestion((T) => FUTURE_RULES[pick([1, 2, 3, 4, 5, 6])](T), FUTURE_TIMES, 'toekomende');
+
+  S.afr_tyd_reels = bank([
+    { q: `In the past tense, what does "kan" become?`, a: `kon`, w: [`kan`, `gekan`, `wou`], why: `kan changes to kon, with no "het" and no "ge-".` },
+    { q: `In the past tense, what does "wil" become?`, a: `wou`, w: [`wil`, `gewil`, `kon`], why: `wil changes to wou.` },
+    { q: `In the past tense, what does "sal" become?`, a: `sou`, w: [`sal`, `gesal`, `moes`], why: `sal changes to sou.` },
+    { q: `In the past tense, what does "moet" become?`, a: `moes`, w: [`moet`, `gemoet`, `sou`], why: `moet changes to moes.` },
+    { q: `In the past tense, what does "mag" become?`, a: `mag`, w: [`moes`, `gemag`, `wou`], why: `In your book, mag is the one helping verb that doesn't change.` },
+    { q: `Do you use "het" with a helping verb in the past tense?`, a: `No: "Gister kon hy ry"`, w: [`Yes: "Gister het hy kon ry"`, `Yes: "Gister het hy gekan ry"`, `Only with "moes": "Gister het hy moes ry"`], why: `A helping verb changes form, so no "het" or "ge-" is needed.` },
+    { q: `Which group of verb beginnings gets no "ge-" in the past tense?`, a: `be-, ge-, her-, er-, ont-, ver-, mis-`, w: [`op-, af-, aan-, weg-, toe-, uit-, in-`, `sk-, sp-, st-, br-, kr-, tr-, vl-`, `na-, by-, oor-, om-, teen-, voor-, deur-`], why: `That's why "vertel" and "begin" stay as they are.` },
+    { q: `Where does "ge" go in a verb that joins up, such as "maak ... skoon"?`, a: `In the middle: skoongemaak`, w: [`At the front: geskoonmaak`, `At the end: skoonmaakge`, `Nowhere at all: skoonmaak`], why: `The two parts join around the "ge".` },
+    { q: `What goes at the end of the sentence when "het" means have or has, in the past tense?`, a: `gehad`, w: [`gehet`, `was`, `hê`], why: `"Ek het 'n fiets" becomes "Gister het ek 'n fiets gehad".` },
+    { q: `What goes at the end of the sentence when "het" means have or has, in the future tense?`, a: `hê`, w: [`gehad`, `wees`, `het`], why: `"Ek het 'n fiets" becomes "Môre sal ek 'n fiets hê".` },
+    { q: `What goes at the end of the sentence when "is" is the first verb, in the future tense?`, a: `wees`, w: [`was`, `hê`, `is`], why: `"Ek is moeg" becomes "Môre sal ek moeg wees".` },
+    { q: `Which word do we use to make the future tense?`, a: `sal`, w: [`het`, `was`, `ge`], why: `"het" is for the past tense.` },
+    { q: `Which word order is right after a time word at the start?`, a: `Time word, then verb, then subject`, w: [`Time word, then subject, then verb`, `Subject, then time word, then verb`, `Verb, then time word, then subject`], why: `"Gister het die ryer ..." and "Môre sal die ryer ...".` },
+    { q: `Write it in the past tense: Hulle sal die wedren kan wen.`, a: `Verlede week sou hulle die wedren kon wen.`, w: [`Verlede week het hulle die wedren sou kan wen.`, `Verlede week sal hulle die wedren kan wen.`, `Verlede week het hulle die wedren gewen.`], why: `Both helping verbs change: sal to sou, and kan to kon. No "het".` },
+    { q: `Write it in the past tense: Ons moet begin oefen.`, a: `Gister moes ons begin oefen.`, w: [`Gister het ons moes begin oefen.`, `Gister moet ons begin oefen.`, `Gister het ons begin geoefen.`], why: `moet changes to moes, and there is no "het".` },
+    { q: `Write it in the past tense: Thabo onthou niks van die wedren nie.`, a: `Gister het Thabo niks van die wedren onthou nie.`, w: [`Gister het Thabo niks van die wedren nie onthou.`, `Gister het Thabo niks van die wedren geonthou nie.`, `Gister het Thabo onthou niks van die wedren nie.`], why: `The verb goes right before the last "nie", and "ont-" gets no "ge-".` },
+    { tf: true, q: `True or false: "Gister kon almal oefen" is right.`, why: `"kon" needs no "het".` },
+    { tf: false, q: `True or false: "Gister het almal kon oefen" is right.`, why: `A helping verb in the past tense takes no "het".` },
+    { tf: false, q: `True or false: "Môre het die ryer die gras begin sny" is in the future tense.`, why: `"het" is the past tense. The future tense uses "sal".` },
+    { tf: true, q: `True or false: "vertel" stays "vertel" in the past tense.`, why: `It starts with ver-, so it gets no "ge-".` },
+    { q: `Vul in: Gister ___ ek moeg. (is)`, t: [`was`], why: `is changes to was.`, h: `It has three letters.` },
+    { q: `Vul in: Môre sal ek moeg ___. (is)`, t: [`wees`], why: `In the future, "wees" goes at the end.`, h: `It has four letters.` },
+    { q: `Vul in: Môre sal ek 'n fiets ___. (het)`, t: [`hê`], why: `In the future, "hê" goes at the end, with its kappie.`, h: `It has a kappie.` },
+    { q: `Vul in: Gister het ek 'n fiets ___. (het)`, t: [`gehad`], why: `In the past, "gehad" goes at the end.`, h: `It starts with "ge".` },
+  ], AF);
+
+  // ---------- plurals, pages 42 to 46 ----------
+  const PLURALS = {
+    3: [['mou', 'moue'], ['tree', 'treë'], ['vlei', 'vleie'], ['drie', 'drieë'], ['knie', 'knieë'], ['vrou', 'vroue'], ['koei', 'koeie'], ['tou', 'toue'], ['see', 'seë']],
+    4: [['luis', 'luise'], ['voet', 'voete'], ['neus', 'neuse'], ['mier', 'miere'], ['duim', 'duime'], ['skoen', 'skoene'], ['lemoen', 'lemoene'], ['spioen', 'spioene'], ['wiel', 'wiele'], ['muis', 'muise'], ['boer', 'boere'], ['tuin', 'tuine']],
+    8: [['rif', 'riwwe'], ['straf', 'strawwe'], ['sif', 'siwwe'], ['gif', 'giwwe'], ['stof', 'stowwe']],
+    9: [['graaf', 'grawe'], ['brief', 'briewe'], ['gleuf', 'gleuwe'], ['duif', 'duiwe'], ['kreef', 'krewe'], ['kloof', 'klowe'], ['stoof', 'stowe'], ['roof', 'rowe'], ['golf', 'golwe'], ['verf', 'verwe'], ['erf', 'erwe'], ['skroef', 'skroewe'], ['hoef', 'hoewe']],
+    10: [['pa', `pa's`], ['ma', `ma's`], ['bikini', `bikini's`], ['skadu', `skadu's`], ['saldo', `saldo's`], ['foto', `foto's`], ['ouma', 'oumas'], ['oupa', 'oupas'], ['baba', 'babas'], ['kafee', 'kafees'], ['kamera', 'kameras'], ['padda', 'paddas']],
+    12: [['land', 'lande'], ['soort', 'soorte'], ['prent', 'prente'], ['rant', 'rante'], ['dwerg', 'dwerge'], ['vark', 'varke'], ['volk', 'volke'], ['tent', 'tente'], ['bult', 'bulte'], ['berg', 'berge'], ['tand', 'tande']],
+  };
+  const PLURAL_RULES = {
+    3: 'Rule 3: words ending in a double vowel such as oe, ei, ou get an "e". Words ending in ie or ee take "ë".',
+    4: 'Rule 4: words with a double vowel in the middle just get an "e".',
+    8: 'Rule 8: a short vowel before a final "f": drop the "f" and add "-wwe".',
+    9: 'Rule 9: a repeated or double vowel before a final "f": drop the "f" and add "-we". If the vowel is repeated, drop one of them. Take note: golf, verf and erf also take -we.',
+    10: `Rule 10: words ending in i, o, u or a get -'s, but some just get an "s": ouma, oupa, baba, kafee, kamera, padda.`,
+    12: 'Rule 12: words ending in two consonants just get an "e".',
+  };
+  const PLURAL_WRONGS = {
+    3: (s, p) => [`${s}s`, p.endsWith('ë') ? `${s}e` : `${s}ë`, `${s}ne`],
+    4: (s) => [`${s}s`, `${s}${s.slice(-1)}e`, `${s.replace(/([aeiou])[aeiou]/, '$1')}e`],
+    8: (s) => [`${s.slice(0, -1)}we`, `${s}fe`, `${s}s`],
+    9: (s) => [/(aa|ee|oo)/.test(s) ? `${s.slice(0, -1)}we` : `${s.slice(0, -1)}wwe`, `${s}e`, `${s}s`],
+    10: (s, p) => (p.includes(`'`) ? [`${s}s`, `${s}e`, `${s}'se`] : [`${s}'s`, `${s}e`, `${s}se`]),
+    12: (s) => [`${s}s`, `${s}te`, `${s}${s.slice(-1)}e`, `${s}ne`],
+  };
+  S.afr_mv = () => {
+    const r = pick([3, 4, 8, 9, 10, 12]);
+    const [s, p] = pick(PLURALS[r]);
+    const steps = [PLURAL_RULES[r], `${s} word ${p}`];
+    if (Math.random() < 0.65) return typed(`Wat is die meervoud van "${s}"?`, p, PLURAL_RULES[r], steps, s === 'vrou' ? ['vrouens'] : []);
+    return choose(`Wat is die meervoud van "${s}"?`, p, PLURAL_WRONGS[r](s, p), PLURAL_RULES[r], steps);
+  };
+  const OTHER_PLURALS = [['rek', 'rekke'], ['trap', 'trappe'], ['hek', 'hekke'], ['kar', 'karre'], ['rit', 'ritte'], ['bus', 'busse'], ['ton', 'tonne'], ['bom', 'bomme'], ['muur', 'mure'], ['boot', 'bote'], ['skaap', 'skape'], ['plaas', 'plase'], ['kameel', 'kamele'], ['toon', 'tone'], ['gevaar', 'gevare'], ['lig', 'ligte'], ['kas', 'kaste'], ['nag', 'nagte'], ['nes', 'neste'], ['vrag', 'vragte'], ['vrug', 'vrugte'], ['vlug', 'vlugte'], ['laag', 'lae'], ['oog', 'oë'], ['dag', 'dae'], ['brug', 'brûe'], ['sog', 'sôe'], ['rug', 'rûe'], ['saag', 'sae'], ['ploeg', 'ploeë'], ['vlieg', 'vlieë'], ['kroeg', 'kroeë'], ['voertuig', 'voertuie'], ['vliegtuig', 'vliegtuie'], ['koper', 'kopers'], ['appel', 'appels'], ['koning', 'konings'], ['ketting', 'kettings'], ['deksel', 'deksels'], ['vader', 'vaders']];
+  S.afr_mv_ander = () => {
+    const [s, p] = pick(OTHER_PLURALS);
+    const steps = [`${s} word ${p}`];
+    const hint = 'Which plural rule fits this word? Look at how it ends.';
+    if (Math.random() < 0.6) return typed(`Wat is die meervoud van "${s}"?`, p, hint, steps);
+    return choose(`Wat is die meervoud van "${s}"?`, p, [`${s}s`, `${s}e`, `${s}${s.slice(-1)}e`, `${s}te`, `${s}ne`], hint, steps);
+  };
+  S.afr_mv_reels = bank([
+    { q: `Why is the plural of "kreef" written "krewe", not "kreewe"?`, a: `A repeated vowel loses one vowel`, w: [`The word comes from English`, `It ends in two consonants`, `A short vowel doubles the "f"`], why: `Rule 9: drop the "f", add "-we", and drop one of the two vowels.` },
+    { q: `Why does "gif" become "giwwe", but "duif" becomes "duiwe"?`, a: `"gif" has a short vowel, "duif" a double one`, w: [`"gif" is longer than "duif"`, `"duif" ends in two consonants`, `"gif" is a word from English`], why: `A short vowel takes "-wwe". A double vowel takes "-we".` },
+    { q: `Which plurals are spelt correctly?`, a: `foto's, oumas`, w: [`fotos, ouma's`, `foto's, ouma's`, `fotos, oumas`], why: `Your book lists ouma with the words that take no apostrophe.` },
+    { q: `Which word has a plural ending in "ë"?`, a: `knie`, w: [`mou`, `vlei`, `vrou`], why: `knie becomes knieë. The others just take "e".` },
+    { q: `What happens to a word ending in two consonants, such as "volk"?`, a: `It just gets an "e"`, w: [`It gets "'s"`, `It loses a consonant`, `It gets "-we"`], why: `volk becomes volke.` },
+    { tf: true, q: `True or false: "golf" becomes "golwe".`, why: `Your book lists golf, verf and erf together.` },
+    { tf: false, q: `True or false: "kloof" becomes "kloowe".`, why: `The repeated vowel loses one "o": klowe.` },
+    { tf: false, q: `True or false: "kamera" becomes "kamera's".`, why: `It is one of the words with no apostrophe: kameras.` },
+  ], AF);
+
+  // ---------- Stompi, pages 63 to 65: S v1 T O M P v2 I ----------
+  const STOMPI = [
+    { S: 'Die ryer', v1: 'oefen', T: 'elke dag', O: 'sy spronge', M: 'hard', P: 'op die baan', I: 'om te wen' },
+    { S: 'Die seun', v1: 'was', T: 'elke Saterdag', O: 'sy fiets', M: 'vinnig', P: 'by die huis', I: 'om dit skoon te hou' },
+    { S: 'Die meisie', v1: 'lees', T: 'elke aand', O: 'haar boek', M: 'stil', P: 'in haar kamer', I: 'om te ontspan' },
+    { S: 'Die boer', v1: 'voer', T: 'elke oggend', O: 'die beeste', M: 'vinnig', P: 'op die plaas', I: 'om tyd te spaar' },
+    { S: 'Die doelwagter', v1: 'vang', T: 'elke middag', O: 'die bal', M: 'veilig', P: 'op die veld', I: 'om te oefen' },
+    { S: 'Die leeu', v1: 'jag', T: 'elke nag', O: 'die bokke', M: 'stil', P: 'in die bos', I: 'om kos te kry' },
+    { S: 'Pa', v1: 'olie', T: 'elke week', O: 'die ketting', M: 'versigtig', P: 'in die motorhuis', I: 'om dit te beskerm' },
+    { S: 'Die kinders', v1: 'eet', T: 'elke Sondag', O: 'vleis', M: 'lekker', P: 'by die swembad', I: 'om saam te kuier' },
+    { S: 'Die ryer', v1: 'sal', T: 'môre', O: 'die wedren', M: 'maklik', P: 'op die baan', v2: 'wen' },
+    { S: 'Thabo', v1: 'moet', T: 'vandag', O: 'sy fiets', M: 'gou', P: 'in die motorhuis', v2: 'regmaak' },
+    { S: 'Die ryer', v1: 'moet', T: 'elke dag', O: 'sy fiets', M: 'versigtig', P: 'by die huis', v2: 'was', I: 'om dit skoon te hou' },
+  ];
+  const small = (s) => (/^(Die|Pa)\b/.test(s) ? s.charAt(0).toLowerCase() + s.slice(1) : s);
+  const NAMES = { S: 'the subject, who does it', T: 'the time, when', O: 'the object, what it is done to', M: 'the manner, how', P: 'the place, where', I: 'the infinitive, the om ... te part' };
+  S.afr_st2 = () => {
+    const x = pick(STOMPI);
+    const { S: who, v1, T, O, M, P, v2, I } = x;
+    const right = line(who, v1, T, O, M, P, v2, I);
+    const timeFirst = line(T, v1, small(who), O, M, P, v2, I);
+    const mode = pick(['order', 'order', 'parts', 'parts', 'time', 'timeWrite', 'write']);
+    const rule = 'The order is S v1 T O M P v2 I. Time comes before the object.';
+    if (mode === 'parts') {
+      const key = pick(['S', 'T', 'O', 'M', 'P', ...(I ? ['I'] : [])]);
+      const others = ['S', 'T', 'O', 'M', 'P', 'I'].filter((k) => k !== key && x[k]).map((k) => x[k]);
+      return choose(`Wat is die ${key} in hierdie sin? ${right}`, x[key], shuffle(others), `${key} is ${NAMES[key]}.`, [`${key} is ${NAMES[key]}: "${x[key]}".`]);
+    }
+    if (mode === 'time') {
+      return choose(`Begin met "${cap(T)}". Watter sin is reg?`, timeFirst, [line(T, small(who), v1, O, M, P, v2, I), line(T, small(who), O, v1, M, P, v2, I), line(T, v1, O, small(who), M, P, v2, I)], 'With the time first, the order is T v1 S O M P v2 I.', [`T v1 S O M P v2 I: ${timeFirst}`]);
+    }
+    if (mode === 'timeWrite') {
+      const words = shuffle([small(who), v1, O, M, P, v2, I].filter(Boolean)).join(', ');
+      return typed(`Rangskik die woorde. Begin met "${cap(T)}": ${words}.`, timeFirst, 'With the time first, the order is T v1 S O M P v2 I.', [`T v1 S O M P v2 I: ${timeFirst}`], [line(T, v1, small(who), M, O, P, v2, I)]);
+    }
+    const shuffled = shuffle([v1, T, O, M, P, v2, I].filter(Boolean)).join(', ');
+    if (mode === 'write') return typed(`Rangskik die woorde. Begin met "${who}": ${shuffled}.`, right, rule, [`S v1 T O M P v2 I: ${right}`], [line(who, v1, T, M, O, P, v2, I)]);
+    return choose(`Rangskik die woorde. Begin met "${who}": ${shuffled}.`, right, [line(who, v1, O, T, M, P, v2, I), line(who, T, v1, O, M, P, v2, I), line(who, v1, P, T, O, M, v2, I)], rule, [`S v1 T O M P v2 I: ${right}`]);
+  };
+  S.afr_st_reels = bank([
+    { q: `What is the Stompi order?`, a: `S v1 T O M P v2 I`, w: [`S T v1 O M P I v2`, `T S O M P v1 v2 I`, `S O T M P v1 v2 I`], why: `Subject, first verb, time, object, manner, place, second verb, infinitive.` },
+    { q: `If the sentence starts with the time, what is the order?`, a: `T v1 S O M P v2 I`, w: [`T S v1 O M P v2 I`, `T O S v1 M P v2 I`, `T v1 O S M P v2 I`], why: `The first verb stays second, straight after the time.` },
+    { q: `Which of these is a Stompi rule?`, a: `Time comes before the object`, w: [`The object comes before the time`, `Place comes before the time`, `Place comes before the manner`], why: `The order is S v1 T O M P v2 I.` },
+    { q: `Which is the "I" in this sentence? Hy oefen elke dag om fiks te word.`, a: `om fiks te word`, w: [`elke dag`, `oefen`, `Hy`], why: `The "I" is the "om ... te" part, and it goes last.` },
+    { q: `Which is the "M" in this sentence? Sy hardloop vinnig deur die strate.`, a: `vinnig`, w: [`Sy`, `hardloop`, `deur die strate`], why: `The manner tells you how.` },
+    { q: `Which is the "P" in this sentence? Ons braai elke Sondag langs die dam.`, a: `langs die dam`, w: [`Ons`, `braai`, `elke Sondag`], why: `The place tells you where.` },
+    { tf: true, q: `True or false: a sentence doesn't have to have all the Stompi parts.`, why: `Use the parts it has, in the same order.` },
+    { tf: false, q: `True or false: "Die ryer was sy fiets elke dag" follows the Stompi order.`, why: `Time comes before the object: "Die ryer was elke dag sy fiets".` },
+  ], AF);
+
+  // ---------- conjunctions, pages 66 to 72 ----------
+  // Each joins a first sentence to a second, whose parts can move.
+  const clause = (S, verb, rest, end) => ({ S, verb, rest, end });
+  const JOINS = {
+    1: [['maar', 'Die ryer wil wen', clause('sy fiets', 'is', 'stukkend')], ['want', 'Die ryer is moeg', clause('hy', 'het', 'die hele dag', 'geoefen')], ['en', 'Thabo was sy fiets', clause('hy', 'olie', 'die ketting')], ['of', 'Ons ry na die baan', clause('ons', 'bly', 'by die huis')], ['dog', 'Dit reën baie', clause('die wedren', 'gaan', 'voort')], ['maar', 'Sipho oefen hard', clause('hy', 'wen', 'nie')], ['want', 'Die span is bly', clause('hulle', 'het', 'die wedren', 'gewen')], ['en', 'Lerato soek haar helm', clause('sy', 'soek', 'haar stewels')]],
+    2: [['dus', 'Die ryer is moeg', clause('hy', 'gaan', 'vroeg', 'slaap')], ['daarom', 'Die baan is modderig', clause('ons', 'moet', 'stadig', 'ry')], ['derhalwe', 'Thabo se enjin is stukkend', clause('hy', 'ry', 'nie vandag nie')], ['anders', 'Jy moet oefen', clause('jy', 'gaan', 'die wedren', 'verloor')], ['daarna', 'Ons was die fietse', clause('ons', 'eet', 'middagete')], ['dan', 'Pa maak die fiets reg', clause('hy', 'ry', 'na die baan')], ['nou', 'Die wedren is verby', clause('die ryers', 'rus', 'by die bakkie')], ['tog', 'Die ryer val twee keer', clause('hy', 'wen', 'die wedren')], ['nietemin', `Lerato se been is seer`, clause('sy', 'sal', 'die wedren', 'ry')]],
+    3: [['omdat', 'Sipho is honger', clause('hy', 'eet', 'min')], ['omdat', 'Die span was bly', clause('hulle', 'het', 'die beker', 'gewen')], ['sodat', 'Hy oefen elke dag', clause('hy', 'kan', 'die wedren', 'wen')], ['voordat', 'Ek was my fiets', clause('ek', 'ry', 'die wedren')], ['totdat', 'Ons wag by die hek', clause('die wedren', 'begin', 'om nege uur')], ['nadat', 'Thabo het gaan slaap', clause('hy', 'het', 'sy fiets', 'gewas')], ['as', 'Ons ry môre', clause('die baan', 'is', 'droog')], ['aangesien', 'Ons bly tuis', clause('dit', 'reën', 'baie')], ['terwyl', 'Pa olie die ketting', clause('ek', 'was', 'die fiets')], ['alhoewel', 'Hy ry vinnig', clause('sy been', 'is', 'seer')], ['wanneer', 'Die ryers ry weg', clause('die hek', 'val', 'voor hulle')], ['indien', 'Jy sal beter ry', clause('jy', 'oefen', 'elke dag')], ['omdat', 'Lerato staan vroeg op', clause('sy', 'wil', 'haar fiets', 'was')], ['omdat', 'Ons het stadig gery', clause('die baan', 'was', 'baie modderig')], ['wanneer', 'Ons kyk altyd', clause('die wedren', 'word', 'op Saterdag', 'gehou')]],
+  };
+  const inGroup = {
+    1: (c) => join(c.S, c.verb, c.rest, c.end),
+    2: (c) => join(c.verb, c.S, c.rest, c.end),
+    3: (c) => (c.end ? (['het', 'word', 'is', 'was'].includes(c.verb) ? join(c.S, c.rest, c.end, c.verb) : join(c.S, c.rest, c.verb, c.end)) : join(c.S, c.rest, c.verb)),
+  };
+  const GROUP_RULES = {
+    1: 'Group 1 (MOWED): no change in the word order of the second sentence.',
+    2: 'Group 2: the first verb of the second sentence moves next to the conjunction.',
+    3: 'Group 3: the first verb moves to the end. A helping verb goes right before the main verb at the end. "het", "word" and "is/was" go right at the end.',
+  };
+  S.afr_voeg = () => {
+    const g = pick([1, 2, 3, 2, 3]);
+    const [word, first, c] = pick(JOINS[g]);
+    const comma = word === 'maar' || word === 'want' ? ',' : '';
+    const asGroup = (n) => `${first}${comma} ${word} ${inGroup[n](c)}.`;
+    const right = asGroup(g);
+    const second = `${cap(inGroup[1](c))}.`;
+    const q = `Verbind die sinne met "${word}": ${first}. ${second}`;
+    const steps = [GROUP_RULES[g], right];
+    if (Math.random() < 0.3) return typed(q, right, GROUP_RULES[g], steps);
+    const order = (...parts) => `${first}${comma} ${word} ${join(...parts)}.`;
+    return choose(q, right, [asGroup(1), asGroup(2), asGroup(3), order(c.S, c.end, c.rest, c.verb), order(c.rest, c.S, c.verb, c.end), order(c.end, c.verb, c.S, c.rest), order(c.rest, c.verb, c.S, c.end)], GROUP_RULES[g], steps);
+  };
+  const MEANINGS = [['omdat', 'because', 3], ['as', 'if', 3], ['daarom', 'therefore', 2], ['derhalwe', 'therefore', 2], ['tog', 'yet', 2], ['al', 'although', 2], ['maar', 'but', 1], ['of', 'or', 1], ['want', 'because', 1], ['en', 'and', 1], ['dog', 'yet', 1], ['dus', 'therefore', 2], ['anders', 'otherwise', 2], ['daarna', 'thereafter', 2], ['dan', 'then', 2], ['nou', 'now', 2], ['nietemin', 'nevertheless', 2], ['sodat', 'so that', 3], ['voordat', 'before', 3], ['totdat', 'until', 3], ['nadat', 'after', 3], ['aangesien', 'seeing that', 3], ['terwyl', 'while', 3], ['alhoewel', 'although', 3], ['wanneer', 'when', 3], ['indien', 'if', 3]];
+  S.afr_voeg_woorde = () => {
+    const [af, en, g] = pick(MEANINGS);
+    if (Math.random() < 0.5) {
+      const options = ['Group 1', 'Group 2', 'Group 3'];
+      return { kind: 'mc', keepOrder: true, q: `In which group is "${af}"?`, options, answer: g - 1, correct: options[g - 1], lang: 'af-ZA', hint: 'Group 1 is MOWED. Group 3 sends the verb to the end.', steps: [GROUP_RULES[g]] };
+    }
+    const close = [['but', 'yet', 'nevertheless', 'although'], ['then', 'thereafter', 'after'], ['because', 'seeing that', 'therefore'], ['if', 'when']].find((set) => set.includes(en)) || [en];
+    return choose(`What does "${af}" mean?`, en, shuffle(MEANINGS.filter((m) => !close.includes(m[1]))).map((m) => m[1]), 'Try it in a sentence about your bike.', [`${af} = ${en}`]);
+  };
+  S.afr_voeg_reels = bank([
+    { q: `What does MOWED help you remember?`, a: `Maar, Of, Want, En, Dog`, w: [`Moet, Omdat, Wanneer, En, Dus`, `Maar, Omdat, Want, En, Daarom`, `Moet, Of, Wil, En, Dan`], why: `These are the Group 1 conjunctions.` },
+    { q: `Where do you use a comma with Group 1 conjunctions?`, a: `In front of maar and want, not en`, w: [`In front of en, not maar or want`, `In front of all of the Group 1 words`, `After all of the Group 1 words`], why: `There's no comma in front of "en".` },
+    { q: `What are "het", "word" and "is/was" called in Group 3?`, a: `TURBO verbs`, w: [`MOWED verbs`, `STOMPI verbs`, `Helping verbs`], why: `They must move right to the end of the sentence.` },
+    { q: `Which are helping verbs?`, a: `moet, wil, kan, sal, mag`, w: [`het, word, is, was, gehad`, `maar, of, want, en, dog`, `dus, nou, tog, dan, al`], why: `In Group 3, they go right before the main verb at the end.` },
+    { q: `What happens to the verb after a Group 2 conjunction?`, a: `It moves next to the conjunction`, w: [`It moves to the end of the sentence`, `It stays exactly where it was`, `It is left out of the sentence`], why: `"... dus gaan hy slaap."` },
+    { q: `What happens to the verb after a Group 3 conjunction?`, a: `It moves to the end of the sentence`, w: [`It moves next to the conjunction`, `It stays exactly where it was`, `It is left out of the sentence`], why: `"... omdat hy te min slaap."` },
+    { q: `Which sentence is right?`, a: `Hy is bly nadat hy gewen het.`, w: [`Hy is bly nadat hy het gewen.`, `Hy is bly nadat het hy gewen.`, `Hy is bly nadat gewen hy het.`], why: `"het" is a TURBO verb, so it goes right at the end.` },
+    { q: `Which sentence is right?`, a: `Ons gaan baan toe omdat ons wil oefen.`, w: [`Ons gaan baan toe omdat ons oefen wil.`, `Ons gaan baan toe omdat wil ons oefen.`, `Ons gaan baan toe omdat ons wil oefen het.`], why: `A helping verb goes right before the main verb at the end.` },
+    { q: `Which is punctuated correctly?`, a: `Die ryer is moeg, want hy het hard geoefen.`, w: [`Die ryer is moeg want, hy het hard geoefen.`, `Die ryer, is moeg want hy het hard geoefen.`, `Die ryer is moeg want hy, het hard geoefen.`], why: `Use a comma in front of "want" and "maar".` },
+    { q: `Which is punctuated correctly?`, a: `Thabo wil ry en hy wil oefen.`, w: [`Thabo wil ry, en hy wil oefen.`, `Thabo, wil ry en hy wil oefen.`, `Thabo wil ry en, hy wil oefen.`], why: `Your book says no comma in front of "en".` },
+    { tf: true, q: `True or false: "en" doesn't change the word order.`, why: `It is a Group 1 conjunction.` },
+    { tf: false, q: `True or false: "omdat" is a Group 1 conjunction.`, why: `It is Group 3, even though "want" means the same.` },
+  ], AF);
+
+  // ---------- pronouns, pages 93 to 95 ----------
+  S.afr_pn = bank([
+    { q: `Liam het ___ arm seergemaak.`, a: `sy`, w: [`hy`, `hom`, `syne`], why: `"sy" here means his.` },
+    { q: `Liam het sy arm seergemaak en nou kan ___ nie ry nie.`, a: `hy`, w: [`sy`, `hom`, `syne`], why: `Liam is doing the action, so it's "hy". "sy" before a noun means his, and "sy" alone means she.` },
+    { q: `Sipho het ___ pols gebreek en nou moet ___ 'n gips dra.`, a: `sy ... hy`, w: [`hy ... sy`, `hy ... hy`, `sy ... sy`], why: `His wrist is "sy pols". He must wear a cast is "hy moet dra".` },
+    { q: `Lerato wil ___ fiets was.`, a: `haar`, w: [`sy`, `hare`, `hom`], why: `"haar" means her.` },
+    { q: `Lerato wil haar fiets was en dan kan ___ ry.`, a: `sy`, w: [`haar`, `hare`, `hy`], why: `She is doing it, so it's "sy".` },
+    { q: `Die ryer is vinnig en almal hou van ___.`, a: `hom`, w: [`hy`, `sy`, `syne`], why: `"hom" means him.` },
+    { q: `Die meisie is vriendelik en ons praat met ___.`, a: `haar`, w: [`sy`, `hare`, `hom`], why: `"haar" means her.` },
+    { q: `Ek het hierdie stewels met my eie geld gekoop, so hulle is ___.`, a: `myne`, w: [`my`, `joune`, `syne`], why: `"myne" means mine.` },
+    { q: `Dit is ___ helm. (my)`, a: `my`, w: [`myne`, `ek`, `joune`], why: `Before a noun, it's "my".` },
+    { q: `Die onderwyser praat met ___. (me)`, a: `my`, w: [`ek`, `myne`, `hom`], why: `"my" means both me and my.` },
+    { q: `___ ry elke dag. (I)`, a: `Ek`, w: [`My`, `Myne`, `Hom`], why: `"Ek" is the one doing it.` },
+    { q: `Sipho het daardie bakkie gewen, so dit is ___.`, a: `syne`, w: [`sy`, `hom`, `hare`], why: `"syne" means his, when it stands alone.` },
+    { q: `Die stewels behoort aan Lerato, dus is dit ___.`, a: `hare`, w: [`haar`, `syne`, `sy`], why: `"hare" means hers.` },
+    { q: `___ kamer is baie netjies. (your, one person)`, a: `Jou`, w: [`Jy`, `Joune`, `Hom`], why: `Before a noun, it's "jou".` },
+    { q: `___ ry baie vinnig. (you, one person)`, a: `Jy`, w: [`Jou`, `Joune`, `Julle s'n`], why: `"Jy" is the one doing it.` },
+    { q: `Dit is nie myne nie, dit is ___. (yours, one person)`, a: `joune`, w: [`jou`, `jy`, `myne`], why: `"joune" means yours.` },
+    { q: `Die afrigter praat met ___. (you, more than one)`, a: `julle`, w: [`hulle`, `jou`, `ons`], why: `"julle" is for more than one person.` },
+    { q: `Dit is ___ bakkie. (your, more than one)`, a: `julle`, w: [`hulle`, `jou`, `joune`], why: `"julle" also means your, for more than one person.` },
+    { q: `Die baan behoort aan julle. Dit is ___.`, a: `julle s'n`, w: [`julle`, `joune`, `hulle s'n`], why: `Yours, for more than one person, is "julle s'n".` },
+    { q: `Dit is ___ baan. (our)`, a: `ons`, w: [`hulle`, `julle`, `my`], why: `"ons" means we, us and our.` },
+    { q: `Die baan behoort aan ons. Dit is ___.`, a: `ons s'n`, w: [`ons`, `myne`, `hulle s'n`], why: `Ours is "ons s'n".` },
+    { q: `Die ryers praat met ___ afrigter. (their)`, a: `hulle`, w: [`julle`, `ons`, `haar`], why: `"hulle" means they, them and their.` },
+    { q: `Die fietse behoort aan die ryers. Dit is ___.`, a: `hulle s'n`, w: [`hulle`, `julle s'n`, `syne`], why: `Theirs is "hulle s'n".` },
+    { q: `Die helm is nie myne nie, dit is ___. (Thabo's)`, a: `Thabo s'n`, w: [`Thabo se`, `Thabo sy`, `Thabo hom`], why: `After a name, standing alone, use s'n.` },
+    { q: `'n Mens moet altyd ___ huiswerk betyds doen.`, a: `jou`, w: [`jy`, `joune`, `hom`], why: `After "'n mens", your own is "jou".` },
+    { q: `Ek en Thabo vra of ___ sy bakkie mag leen.`, a: `ons`, w: [`julle`, `hulle`, `hom`], why: `Ek en Thabo together are "ons".` },
+    { q: `Die afrigter roep ___. (us)`, a: `ons`, w: [`julle`, `hulle`, `my`], why: `"ons" also means us.` },
+    { q: `Die afrigter roep ___. (them)`, a: `hulle`, w: [`julle`, `ons`, `hom`], why: `"hulle" also means them.` },
+    { q: `Die helm behoort aan Lerato. Dit is Lerato ___.`, t: [`s'n`], why: `After a name, standing alone, use s'n.`, h: `It has an apostrophe.` },
+    { q: `Vertaal: It is his. Dit is ___.`, t: [`syne`], why: `"syne" stands alone. "sy" needs a noun after it.`, h: `It ends in "-ne".` },
+    { q: `Vertaal: It is hers. Dit is ___.`, t: [`hare`], why: `"hare" stands alone. "haar" needs a noun after it.`, h: `It ends in "-re".` },
+    { q: `Vertaal: It is mine. Dit is ___.`, t: [`myne`], why: `"myne" stands alone. "my" needs a noun after it.`, h: `It ends in "-ne".` },
+    { q: `Vertaal: It is yours. Dit is ___. (one person)`, t: [`joune`], why: `"joune" stands alone.`, h: `It ends in "-ne".` },
+    { q: `Vertaal: It is ours. Dit is ___.`, t: [`ons s'n`], why: `Use "ons s'n", not "onse".`, h: `It has two words.` },
+    { q: `Vertaal: It is theirs. Dit is ___.`, t: [`hulle s'n`], why: `Use "hulle s'n".`, h: `It has two words.` },
+    { q: `Vertaal: She rides fast. ___ ry vinnig.`, t: [`sy`], why: `"Sy" means she.`, h: `It has two letters.` },
+    { q: `Vertaal: He rides fast. ___ ry vinnig.`, t: [`hy`], why: `"Hy" means he.`, h: `It has two letters.` },
+    { q: `Vertaal: Lerato talks to him. Lerato praat met ___.`, t: [`hom`], why: `"hom" means him.`, h: `It has three letters.` },
+  ], AF);
+
+  // ---------- prepositions, pages 97 to 99 ----------
+  const PREP = (sentence, right, wrongs, why) => ({ q: `Kies die regte voorsetsel: ${sentence}`, a: right, w: wrongs, why });
+  S.afr_vs = bank([
+    PREP(`Die ryer klop ___ die hek. (knocks on)`, `aan`, [`oor`, `onder`, `om`], `In Afrikaans you knock "aan" a door or gate.`),
+    PREP(`My suster is verloof ___ 'n werktuigkundige. (engaged to)`, `aan`, [`met`, `op`, `by`], `verloof aan, but getroud met.`),
+    PREP(`Ek dink ___ my maats. (think about)`, `aan`, [`van`, `op`, `by`], `dink aan.`),
+    PREP(`Oupa ly ___ griep. (suffers from)`, `aan`, [`op`, `by`, `in`], `ly aan.`),
+    PREP(`Hy skryf 'n brief ___ sy oupa. (to)`, `aan`, [`op`, `by`, `in`], `'n brief aan iemand.`),
+    PREP(`Die ryer wag ___ die hek. (behind)`, `agter`, [`voor`, `onder`, `op`], `agter means behind.`),
+    PREP(`Ons kry 'n werktuigkundige ___ oorsee. (from)`, `van`, [`aan`, `op`, `by`], `van oorsee.`),
+    PREP(`Die hond bewe ___ die koue. (shivers from)`, `van`, [`aan`, `op`, `by`], `bewe van.`),
+    PREP(`___ môre af begin ons oefen. (from tomorrow)`, `Van`, [`Aan`, `Op`, `By`], `van môre af.`),
+    PREP(`Ek hou ___ motorfietse. (like)`, `van`, [`aan`, `op`, `vir`], `hou van.`),
+    PREP(`Die voël sit ___ die fiets. (on)`, `op`, [`aan`, `onder`, `agter`], `op means on.`),
+    PREP(`Die ryers is ___ pad Durban toe. (on their way)`, `op`, [`aan`, `in`, `met`], `op pad.`),
+    PREP(`Thabo is verlief ___ sy buurmeisie. (in love with)`, `op`, [`aan`, `met`, `in`], `verlief op.`),
+    PREP(`Ek is lief ___ my hond. (love)`, `vir`, [`op`, `met`, `aan`], `lief vir.`),
+    PREP(`Is die afrigter kwaad ___ ons? (angry with)`, `vir`, [`op`, `met`, `aan`], `kwaad vir.`),
+    PREP(`Die winkel is ___ die draai. (around the corner)`, `om`, [`aan`, `op`, `oor`], `om die draai.`),
+    PREP(`Die seun in die modder roep ___ hulp. (calls for)`, `om`, [`na`, `aan`, `op`], `roep om hulp.`),
+    PREP(`Die bakkie dra ___ veel fietse. (too many)`, `te`, [`aan`, `oor`, `om`], `te veel.`),
+    PREP(`Ons gaan ___ voet baan toe. (on foot)`, `te`, [`aan`, `oor`, `om`], `te voet.`),
+    PREP(`Die boer reis ___ perd. (by horse)`, `te`, [`aan`, `oor`, `om`], `te perd.`),
+    PREP(`Thabo het ___ ongeluk sy helm laat val. (by mistake)`, `per`, [`aan`, `om`, `oor`], `per ongeluk.`),
+    PREP(`Ons reis ___ vliegtuig na Kaapstad. (by plane)`, `per`, [`aan`, `om`, `oor`], `per vliegtuig.`),
+    PREP(`Die fiets staan ___ die muur. (against)`, `teen`, [`op`, `onder`, `oor`], `teen means against.`),
+    PREP(`Ek werk ___ 'n fietswinkel. (at)`, `by`, [`aan`, `op`, `om`], `werk by.`),
+    PREP(`Die kinders hardloop ___ die saal in. (into)`, `by`, [`aan`, `op`, `om`], `by die huis in.`),
+    PREP(`My oom gaan elke Julie ___ vakansie. (on holiday)`, `met`, [`aan`, `om`, `oor`], `met vakansie.`),
+    PREP(`Thabo gesels ___ sy broer. (speaks to)`, `met`, [`aan`, `op`, `by`], `gesels met.`),
+    PREP(`My suster is getroud ___ 'n ryer. (married to)`, `met`, [`aan`, `op`, `by`], `getroud met, but verloof aan.`),
+    PREP(`Lerato is gelukkig ___ haar nuwe fiets. (happy with)`, `met`, [`aan`, `op`, `by`], `gelukkig met.`),
+    PREP(`Sterkte ___ jou wedren môre! (good luck with)`, `met`, [`aan`, `op`, `by`], `sterkte met.`),
+    PREP(`Thabo gaan ___ die baan toe. (to)`, `na`, [`aan`, `op`, `om`], `na ... toe.`),
+    PREP(`Ons eet roomys ___ die wedren. (after)`, `na`, [`aan`, `om`, `in`], `na also means after.`),
+    PREP(`Oupa verlang ___ die ou dae. (misses)`, `na`, [`aan`, `op`, `om`], `verlang na.`),
+    PREP(`Oupa kyk elke aand ___ die nuus. (watches)`, `na`, [`aan`, `om`, `in`], `kyk na.`),
+    PREP(`Die honde spring ___ die rivier. (in)`, `in`, [`aan`, `op`, `vir`], `in means in.`),
+    PREP(`Ek glo ___ my span. (believe in)`, `in`, [`oor`, `op`, `vir`], `glo in.`),
+    PREP(`Lerato stel ___ motorfietse belang. (interested in)`, `in`, [`aan`, `op`, `vir`], `belangstel in: stel in ... belang.`),
+    PREP(`Die hond slaap ___ die bakkie. (under)`, `onder`, [`op`, `oor`, `agter`], `onder means under.`),
+    PREP(`Die ryer spring ___ die bult. (over)`, `oor`, [`aan`, `om`, `onder`], `oor means over.`),
+    PREP(`___ drie weke begin die seisoen. (in three weeks' time)`, `Oor`, [`Aan`, `Om`, `Op`], `oor drie weke.`),
+    PREP(`Die ryers kla ___ die modder. (complain about)`, `oor`, [`aan`, `om`, `op`], `kla oor.`),
+    PREP(`Die fiets staan ___ die huis. (in front of)`, `voor`, [`agter`, `onder`, `oor`], `voor means in front of.`),
+    PREP(`Die wenner kom ___ die ander ryers. (ahead of)`, `voor`, [`agter`, `onder`, `oor`], `voor also means before.`),
+    PREP(`Dit is tien ___ nege. (ten to nine)`, `voor`, [`oor`, `aan`, `om`], `Time: tien voor nege.`),
+    PREP(`Die ryer ry ___ die modder. (through)`, `deur`, [`oor`, `onder`, `aan`], `deur means through.`),
+    PREP(`Die ryer gee sy ou helm ___ die skool. (to)`, `aan`, [`op`, `by`, `om`], `gee aan.`),
+    PREP(`Ek sal ___ jou 'n helm koop. (for you)`, `vir`, [`op`, `oor`, `om`], `vir jou.`),
+    PREP(`Ek staan ___ my maats. (stand by, support)`, `by`, [`aan`, `om`, `oor`], `staan by.`),
+    PREP(`My boetie gaan skool ___ 'n klein skool. (at)`, `by`, [`aan`, `om`, `oor`], `skool by.`),
+    PREP(`Die ryers ry ___ die dam. (around)`, `om`, [`aan`, `onder`, `by`], `om means around.`),
+    { q: `Wat beteken "per ongeluk"?`, a: `by mistake`, w: [`by bus`, `on purpose`, `with luck`], why: `Ek het dit per ongeluk gedoen.` },
+    { q: `Wat beteken "te voet"?`, a: `on foot`, w: [`too slow`, `by car`, `too far`], why: `Ons loop te voet.` },
+    { q: `Wat beteken "oor twee dae"?`, a: `in two days' time`, w: [`for two days`, `two days ago`, `every two days`], why: `It looks ahead, not back.` },
+    { q: `Wat beteken "verlief op"?`, a: `in love with`, w: [`engaged to`, `married to`, `angry with`], why: `verloof aan is engaged to, and getroud met is married to.` },
+    { q: `Wat beteken "verlang na"?`, a: `miss or long for`, w: [`look at`, `go to`, `ask for`], why: `Ek verlang na my oupa.` },
+    { q: `Vul in: Ek hou ___ rugby.`, t: [`van`], why: `hou van.`, h: `It has three letters.` },
+    { q: `Vul in: Sy is verlief ___ hom.`, t: [`op`], why: `verlief op.`, h: `It has two letters.` },
+    { q: `Vul in: Hy is getroud ___ my suster.`, t: [`met`], why: `getroud met.`, h: `It has three letters.` },
+    { q: `Vul in: Ons gaan ___ vakansie.`, t: [`met`, `op`], why: `Your book uses met, and op is also right.`, h: `It has three letters.` },
+    { q: `Vul in: Die mense kla ___ die pad.`, t: [`oor`], why: `kla oor.`, h: `It has three letters.` },
+  ], AF);
+
+  // ---------- adverbs, pages 112 and 113 ----------
+  S.afr_bw = bank([
+    { q: `Wat doen 'n bywoord?`, a: `It says more about how, when, where, how much or why`, w: [`It names a person, an animal, a place or a thing`, `It replaces a noun, so that you don't repeat it`, `It joins two sentences together to make one`], why: `Bywoorde add that kind of information.` },
+    { q: `Watter vraag beantwoord 'n bywoord van wyse?`, a: `Hoe?`, w: [`Wanneer?`, `Waar?`, `Waarom?`], why: `Wyse is manner: how something happens.` },
+    { q: `Watter vraag beantwoord 'n bywoord van tyd?`, a: `Wanneer?`, w: [`Hoe?`, `Waar?`, `Hoeveel?`], why: `Tyd is time: when something happens.` },
+    { q: `Watter vraag beantwoord 'n bywoord van plek?`, a: `Waar?`, w: [`Hoe?`, `Wanneer?`, `Waarom?`], why: `Plek is place: where something happens.` },
+    { q: `Watter vraag beantwoord 'n bywoord van graad?`, a: `Hoeveel?`, w: [`Waar?`, `Wanneer?`, `Waarom?`], why: `Graad or mate is degree: how much.` },
+    { q: `Watter vraag beantwoord 'n bywoord van rede?`, a: `Waarom?`, w: [`Hoe?`, `Waar?`, `Hoeveel?`], why: `Rede is reason: why something happens.` },
+    { q: `Waar kan 'n bywoord in 'n sin staan?`, a: `Voor of na die werkwoord`, w: [`Net heel voor in die sin`, `Net heel aan die einde`, `Net na die onderwerp`], why: `It depends on the sentence.` },
+    { q: `Die ryer ry vinnig. Watter soort bywoord is "vinnig"?`, a: `Wyse`, w: [`Tyd`, `Plek`, `Rede`], why: `Hoe ry hy? Vinnig.` },
+    { q: `Die meisie praat sag. Watter soort bywoord is "sag"?`, a: `Wyse`, w: [`Tyd`, `Plek`, `Graad`], why: `Hoe praat sy? Sag.` },
+    { q: `Ons ry vandag. Watter soort bywoord is "vandag"?`, a: `Tyd`, w: [`Wyse`, `Plek`, `Rede`], why: `Wanneer ry ons? Vandag.` },
+    { q: `Hy het gister geoefen. Watter soort bywoord is "gister"?`, a: `Tyd`, w: [`Wyse`, `Plek`, `Graad`], why: `Wanneer het hy geoefen? Gister.` },
+    { q: `Die fietse staan buite. Watter soort bywoord is "buite"?`, a: `Plek`, w: [`Tyd`, `Wyse`, `Graad`], why: `Waar staan hulle? Buite.` },
+    { q: `Die ryer wag daar. Watter soort bywoord is "daar"?`, a: `Plek`, w: [`Tyd`, `Rede`, `Graad`], why: `Waar wag hy? Daar.` },
+    { q: `Thabo is baie moeg. Watter soort bywoord is "baie"?`, a: `Graad`, w: [`Tyd`, `Plek`, `Rede`], why: `Hoe moeg is hy? Baie.` },
+    { q: `Die wedren was te lank. Watter soort bywoord is "te"?`, a: `Graad`, w: [`Tyd`, `Plek`, `Wyse`], why: `Hoe lank was dit? Te lank.` },
+    { q: `Hy bewe van die koue. Watter soort bywoord is "van die koue"?`, a: `Rede`, w: [`Tyd`, `Plek`, `Graad`], why: `Waarom bewe hy? Van die koue.` },
+    { q: `Sy lag van vreugde. Watter soort bywoord is "van vreugde"?`, a: `Rede`, w: [`Tyd`, `Plek`, `Wyse`], why: `Waarom lag sy? Van vreugde.` },
+    { q: `Kies die bywoord van tyd: Ons ry ___ na die baan.`, a: `môre`, w: [`vinnig`, `baie`, `van pyn`], why: `Wanneer ry ons? Môre.` },
+    { q: `Kies die bywoord van plek: Die ryer oefen ___ op sy eie.`, a: `buite`, w: [`gister`, `baie`, `van pyn`], why: `Waar oefen hy? Buite.` },
+    { q: `Kies die bywoord van graad: Ek is ___ bly oor die wedren.`, a: `baie`, w: [`gister`, `buite`, `van pyn`], why: `Hoe bly is ek? Baie.` },
+    { q: `Kies die bywoord van rede: Hy skree ___ omdat sy been seer is.`, a: `van pyn`, w: [`gister`, `buite`, `baie`], why: `Waarom skree hy? Van pyn.` },
+    { q: `Kies die bywoord van wyse: Sy ry ___ om betyds te wees.`, a: `vinnig`, w: [`gister`, `buite`, `van pyn`], why: `Hoe ry sy? Vinnig.` },
+    { tf: true, q: `True or false: "môre" is a bywoord van tyd.`, why: `It tells you when.` },
+    { tf: false, q: `True or false: "buite" is a bywoord van wyse.`, why: `It tells you where, so it's plek.` },
+    { tf: true, q: `True or false: 'n bywoord kan voor of na die werkwoord kom.`, why: `It depends on the sentence.` },
+    { q: `'n Bywoord van wyse sê vir ons ___ iets gebeur.`, t: [`hoe`], why: `Wyse is how.`, h: `It has three letters.` },
+    { q: `'n Bywoord van tyd sê vir ons ___ iets gebeur.`, t: [`wanneer`], why: `Tyd is when.`, h: `It starts with "w".` },
+    { q: `'n Bywoord van plek sê vir ons ___ iets gebeur.`, t: [`waar`], why: `Plek is where.`, h: `It has four letters.` },
+    { q: `'n Bywoord van graad sê vir ons ___ iets gebeur.`, t: [`hoeveel`], why: `Graad is how much.`, h: `It starts with "h".` },
+    { q: `'n Bywoord van rede sê vir ons ___ iets gebeur.`, t: [`waarom`, `hoekom`], why: `Rede is why.`, h: `It starts with "w".` },
+  ], AF);
+
   pack.subjects.afrikaans = {
     label: 'Afrikaans',
-    source: 'School test list',
+    source: 'Afrikaans Made Simple',
     scope: 'Language rules',
-    note: 'Written without the textbook. The list names rule numbers in his book, so check against it',
-    examSize: 20,
+    note: 'Questions are new but follow the book',
+    examSize: 25,
+    // Rule 9 plurals, helping verbs in the past tense, and Stompi's time before object.
+    focus: ['afr_mv', 'afr_vt_help', 'afr_st2', 'afr_tt'],
     topics: [
-      RS.section('afr_past', 0, 'Verlede tyd', 'Pages 78 to 86, rules 1, 2, 3, 6, 7, 8, 9'),
-      RS.section('afr_future', 1, 'Toekomende tyd', 'Pages 88 to 92, rules 1 to 6'),
-      RS.section('afr_stompi', 2, 'Stompi', 'Pages 63 to 65'),
-      RS.section('afr_conj', 3, 'Voegwoorde', 'Pages 66 to 72, groups 1 to 3'),
-      RS.section('afr_prep', 4, 'Voorsetsels', 'Pages 97 to 99'),
-      RS.section('afr_pron', 5, 'Voornaamwoorde', 'Pages 93 to 95'),
-      RS.section('afr_plural', 6, 'Meervoude', 'Pages 42 to 46, rules 3, 4, 8, 9, 10, 12'),
-      RS.section('afr_dim', 7, 'Verkleining', 'Pages 48 to 51, rules 1, 2, 3, 5, 7, 10'),
-      RS.section('afr_adverb', 8, 'Bywoorde', 'Pages 112 to 113'),
+      RS.section('afr_past2', 0, 'Verlede tyd', 'Pages 78 to 86, rules 1, 2, 3, 6, 7, 8, 9', ['afr_vt', 'afr_vt_help', 'afr_tyd_reels']),
+      RS.section('afr_future2', 1, 'Toekomende tyd', 'Pages 88 to 92, rules 1 to 6', ['afr_tt', 'afr_tyd_reels']),
+      RS.section('afr_stompi2', 2, 'Stompi', 'Pages 63 to 65', ['afr_st2', 'afr_st_reels']),
+      RS.section('afr_conj2', 3, 'Voegwoorde', 'Pages 66 to 72, groups 1 to 3', ['afr_voeg', 'afr_voeg_woorde', 'afr_voeg_reels']),
+      RS.section('afr_prep2', 4, 'Voorsetsels', 'Pages 97 to 99', ['afr_vs']),
+      RS.section('afr_pron2', 5, 'Voornaamwoorde', 'Pages 93 to 95', ['afr_pn']),
+      RS.section('afr_plural2', 6, 'Meervoude', 'Pages 42 to 46, rules 3, 4, 8, 9, 10, 12', ['afr_mv', 'afr_mv_reels']),
+      RS.section('afr_dim', 7, 'Verkleining', 'Pages 48 to 51, rules 1, 2, 3, 5, 7, 10. Written without those pages'),
+      RS.section('afr_adverb2', 8, 'Bywoorde', 'Pages 112 and 113', ['afr_bw']),
+      Object.assign(RS.section('afr_extra', 9, 'Beyond the list', 'Extra practice: other plural rules and more', ['afr_mv_ander', 'afr_past', 'afr_future', 'afr_stompi', 'afr_conj', 'afr_prep', 'afr_pron', 'afr_plural', 'afr_adverb']), { warmup: true, stop: 'Pit lane' }),
     ],
   };
 })(typeof window !== 'undefined' ? window : globalThis);
@@ -5889,6 +6316,148 @@ Jordy's Science test, Tuesday 10 November: Planet Earth and Beyond. Written from
   };
 })(typeof window !== 'undefined' ? window : globalThis);
 
+/* Batch of 1 November 2026: fourteen new questions for every English language list. */
+(function (root) {
+  'use strict';
+  root.RS.addQuestions('jordy', '2026-11-01-english', {
+    eng_punct: [
+      { q: `What is the short form of "cannot"?`, t: [`can't`, `can’t`], why: `cannot → can't. The apostrophe replaces the letters "no".`, h: `One apostrophe takes the place of two missing letters.` },
+      { tf: true, q: `True or false: the apostrophe in "didn't" stands for a missing letter.`, why: `did not → didn't. The apostrophe takes the place of the "o".` },
+      { q: `Which sentence about the braai has its commas in the right places?`, a: `We brought chops, rolls, salad and ice.`, w: [`We brought chops rolls salad and ice.`, `We brought, chops, rolls, salad and ice.`, `We brought chops, rolls, salad, and, ice.`], why: `Commas separate the items in a list. In a simple list, "and" replaces the last comma.`, h: `Commas go between the items, not before the first one.` },
+      { q: `The helmet belongs to my sister. Which is correct?`, a: `my sister's helmet`, w: [`my sisters helmet`, `my sisters' helmet`, `my sister,s helmet`], why: `There is one owner, so the apostrophe goes before the s: sister's.`, h: `How many sisters own the helmet?` },
+      { tf: false, q: `True or false: "The rider's washed their bikes." is correct because there is more than one rider.`, why: `A plain plural takes no apostrophe: "The riders washed their bikes."` },
+      { q: `Use an apostrophe to shorten this: the tyres of the bike.`, t: [`the bike's tyres`, `the bike’s tyres`, `bike's tyres`, `bike’s tyres`], why: `One bike owns the tyres, so the apostrophe goes before the s: the bike's tyres.`, h: `How many bikes are there? That decides where the apostrophe goes.` },
+      { q: `Use an apostrophe to shorten this: the helmets of the riders.`, t: [`the riders' helmets`, `the riders’ helmets`, `riders' helmets`, `riders’ helmets`], why: `More than one rider owns the helmets, so the apostrophe goes after the s: the riders' helmets.`, h: `How many riders are there? That decides where the apostrophe goes.` },
+      { q: `The gloves belong to several children. Which is correct?`, a: `the children's gloves`, w: [`the childrens' gloves`, `the childrens gloves`, `the children gloves'`], why: `"Children" is already plural and doesn't end in s, so add 's: children's.`, h: `Does the word "children" end in s?` },
+      { q: `Choose the correct word: The bike lost ___ chain on the last lap.`, a: `its`, w: [`it's`, `its'`, `it is`], why: `"its" shows ownership, like "his" or "her". "it's" only means "it is" or "it has".`, h: `Try saying "it is" in the gap. Does it make sense?` },
+      { q: `You are talking to Sipho and inviting him to race with you. Which is correct?`, a: `Let's race, Sipho.`, w: [`Let's race Sipho.`, `Lets race, Sipho.`, `Lets race Sipho.`], why: `A comma separates the name of the person you are speaking to from the rest of the sentence. Without it, Sipho is the one you are racing against.`, h: `Check the apostrophe, then think about what a comma changes.` },
+      { tf: true, q: `True or false: when a different person starts speaking, the speech starts on a new line.`, why: `New speaker, new line. It shows the reader that someone else is now talking.` },
+      { q: `Which sentence has its speech marks and comma in the right places?`, a: `"My chain has snapped," said Liam.`, w: [`"My chain has snapped." said Liam.`, `"My chain has snapped", said Liam.`, `"My chain has snapped" said Liam.`], why: `When "said Liam" comes after the words, a comma ends the speech, inside the speech marks.`, h: `The sentence carries on after the speech, so a full stop won't do.` },
+      { q: `Which sentence about the missing spanner is punctuated correctly?`, a: `"Where is my spanner?" asked Zola.`, w: [`"Where is my spanner," asked Zola?`, `"Where is my spanner"? asked Zola.`, `"Where is my spanner?," asked Zola.`], why: `The question mark belongs to the spoken words, so it goes inside the speech marks. No comma is needed as well.`, h: `What is Zola actually saying? The question mark belongs to those words.` },
+      { q: `Which sentence about the rain is punctuated correctly?`, a: `"If it rains," said Dad, "we will stay home."`, w: [`"If it rains," said Dad, "We will stay home."`, `"If it rains, said Dad, we will stay home."`, `"If it rains" said Dad "we will stay home."`], why: `"said Dad" splits one spoken sentence. Each part gets its own speech marks, and "we" stays small because the sentence carries on.`, h: `Dad's sentence is split in two. Is the second part a new sentence?` },
+    ],
+
+    eng_parts: [
+      { q: `What part of speech is **helmet**? Her helmet has a crack.`, a: `Noun`, w: [`Verb`, `Adjective`, `Adverb`], why: `A noun names a person, place or thing. A helmet is a thing.` },
+      { q: `Type the indefinite article that fits: The rider ahead has ___ orange helmet.`, t: [`an`], why: `"orange" starts with a vowel sound, so it takes "an".`, h: `Listen to the first sound of the word after the gap.` },
+      { q: `Find the pronoun: The marshal waved at them.`, a: `them`, w: [`marshal`, `waved`, `at`], why: `A pronoun takes the place of a noun. "them" stands in for the people being waved at.` },
+      { q: `Find the compound noun: The mechanic cleaned the gearbox.`, a: `gearbox`, w: [`mechanic`, `cleaned`, `the`], why: `gear + box = gearbox. Two words join to make one noun.`, h: `Which noun is made of two smaller words?` },
+      { q: `Find the proper noun: Our mechanic drove the trailer to Upington.`, a: `Upington`, w: [`mechanic`, `trailer`, `drove`], why: `It names one particular place, so it takes a capital letter.` },
+      { q: `Find the proper adjective: A Japanese bike won the race in Cape Town.`, a: `Japanese`, w: [`Cape Town`, `bike`, `race`], why: `"Japanese" comes from Japan and describes the bike. Cape Town is a proper noun.`, h: `Look for a word made from a place name that describes a noun.` },
+      { q: `Choose the proper adjective from **Kenya**: a ___ runner.`, a: `Kenyan`, w: [`Kenya`, `kenyan`, `Kenyish`], why: `A proper adjective comes from a proper noun and keeps its capital letter: Kenya → Kenyan.`, h: `It describes the runner, and it still needs a capital letter.` },
+      { q: `Find the auxiliary verb: The marshals did not see the crash.`, a: `did`, w: [`not`, `see`, `crash`], why: `"did" helps the main verb "see". "not" isn't a verb at all.`, h: `Which word helps the main verb?` },
+      { q: `Choose the correct word: That was ___ one-sided race.`, a: `a`, w: [`an`, `those`, `these`], why: `"one" starts with a "w" sound, which is a consonant sound, so it takes "a".`, h: `Say "one" out loud. What sound does it start with?` },
+      { tf: false, q: `True or false: in "We race on Sunday", the word "race" is a noun.`, why: `Here "race" is a verb, because it is what we do. In "The race starts at nine" it is a noun.` },
+      { q: `What part of speech is **hard**? She rides hard on the last lap.`, a: `Adverb`, w: [`Adjective`, `Noun`, `Verb`], why: `It tells you how she rides, so it is an adverb here. In "a hard climb" it would be an adjective.`, h: `Does it describe a noun, or tell you how something is done?` },
+      { q: `Type the main verb: The riders will start soon.`, t: [`start`], why: `"start" is the action. "will" is the auxiliary verb that helps it.`, h: `Two words here are verbs. Which one shows the action?` },
+      { tf: false, q: `True or false: in "She has a bike", the word "has" is an auxiliary verb.`, why: `Here "has" is the main verb, with no other verb to help. In "She has bought a bike" it is an auxiliary.` },
+      { q: `Make a compound adjective: a jump that is ten metres long is a ___ jump.`, t: [`ten-metre`, `10-metre`, `ten-metre-long`, `10-metre-long`], why: `A hyphen joins the words, and "metre" stays singular: a ten-metre jump.`, h: `Two words joined by a hyphen. Does "metres" keep its s?` },
+    ],
+
+    eng_figures: [
+      { q: `What figure of speech is this? The dust hung over the track like a blanket.`, a: `Simile`, w: [`Metaphor`, `Hyperbole`, `Onomatopoeia`], why: `It compares dust to a blanket using "like", so it is a simile.`, h: `Look for a comparing word.` },
+      { q: `What figure of speech is this? My brother is a rocket on the straights.`, a: `Metaphor`, w: [`Simile`, `Onomatopoeia`, `Alliteration`], why: `It says he IS a rocket, with no "like" or "as", so it is a metaphor.`, h: `Is there a "like" or an "as"?` },
+      { q: `What figure of speech is this? The mountain frowned down at the tired riders.`, a: `Personification`, w: [`Simile`, `Alliteration`, `Hyperbole`], why: `Frowning is a human action, and a mountain can't really do it.`, h: `Can a mountain really do that?` },
+      { q: `What figure of speech is this? Dirty dust drifted down the dam wall.`, a: `Alliteration`, w: [`Simile`, `Metaphor`, `Hyperbole`], why: `Several words close together start with the same "d" sound.`, h: `Look at how the words start.` },
+      { q: `What figure of speech is this? The mud went splat on my visor.`, a: `Onomatopoeia`, w: [`Personification`, `Alliteration`, `Simile`], why: `"splat" sounds like the noise it describes.`, h: `Does one word sound like the noise it makes?` },
+      { q: `Complete the simile: as busy as a ___.`, t: [`bee`, `beaver`], why: `"As busy as a bee" compares a busy person to a bee that never stops working.`, h: `Think of a creature that never stops working.` },
+      { tf: true, q: `True or false: hiss, bang and crash are all examples of onomatopoeia.`, why: `Each of these words sounds like the noise it describes.` },
+      { q: `Which word turns this into a simile? The bike flew ___ a rocket.`, t: [`like`], why: `A simile compares using "like" or "as". Here "like" fits: flew like a rocket.`, h: `Four letters.` },
+      { tf: false, q: `True or false: "The track is a snake" is a simile.`, why: `It says the track IS a snake, with no "like" or "as", so it is a metaphor.` },
+      { q: `Type the name of this figure of speech: After that climb my legs weighed a thousand kilograms.`, t: [`hyperbole`, `a hyperbole`], why: `Legs can't really weigh that much. It is a huge exaggeration, which is hyperbole.`, h: `Could it really be true? It starts with "h".` },
+      { q: `Which sentence has personification?`, a: `The tired bike begged for a rest.`, w: [`The bike was as loud as a drum.`, `The bike was a bullet on the straight.`, `Bright bikes bounced by the barn.`], why: `Begging is a human action, and a bike can't really do it.`, h: `Which sentence gives a thing a human action?` },
+      { q: `Which sentence has hyperbole?`, a: `We waited ten years for the gate to drop.`, w: [`We waited ten minutes for the gate to drop.`, `We waited like statues for the gate to drop.`, `The gate dropped with a bang.`], why: `Nobody really waits ten years at a gate. It is a huge exaggeration.`, h: `Which one can't possibly be true?` },
+      { q: `Change to a metaphor: The mud is like glue.`, a: `The mud is glue.`, w: [`The mud is as sticky as glue.`, `The mud sticks like glue.`, `The glue is like mud.`], why: `A metaphor drops "like" or "as" and says one thing IS another.`, h: `A metaphor has no comparing word.` },
+      { q: `Which two figures of speech are in this sentence? The wild wind wailed all night.`, a: `Alliteration and personification`, w: [`Alliteration and simile`, `Hyperbole and personification`, `Simile and onomatopoeia`], why: `"wild wind wailed" repeats the "w" sound, and wailing is a human action.`, h: `Look at how the words start, then ask whether wind can really wail.` },
+    ],
+
+    eng_speech: [
+      { q: `In indirect speech, "these" usually becomes ___.`, t: [`those`], why: `these → those, in the same way that this → that.`, h: `It also starts with "th".` },
+      { tf: true, q: `True or false: "Thabo said that his chain was loose." is indirect speech.`, why: `It reports what he said without speech marks. His exact words were "My chain is loose."` },
+      { q: `The riders said, "We are ready." Fill the gap in the indirect speech: The riders said that ___ were ready.`, t: [`they`], why: `"We" becomes "they", because someone else is now telling it.`, h: `Who does "we" mean when someone else is telling it?` },
+      { q: `Change to indirect speech: Naledi said, "My gloves are wet."`, a: `Naledi said that her gloves were wet.`, w: [`Naledi said that my gloves were wet.`, `Naledi said that my gloves are wet.`, `Naledi said that their gloves were wet.`], why: `"My" becomes "her" because Naledi owns the gloves, and "are" moves back to "were".`, h: `Whose gloves are they? Change the pronoun first.` },
+      { q: `Pieter said, "I have lost my key." Fill the gap in the indirect speech: Pieter said that he ___ lost his key.`, t: [`had`], why: `"have" moves back one tense to "had".`, h: `What is the past tense of "have"?` },
+      { q: `Change to indirect speech: Nomsa said, "I need this spanner now."`, a: `Nomsa said that she needed that spanner then.`, w: [`Nomsa said that I needed this spanner now.`, `Nomsa said that she needs that spanner then.`, `Nomsa said that she needed this spanner here.`], why: `"I" becomes "she" and "need" becomes "needed". "this" becomes "that" and "now" becomes "then".`, h: `Check the pronoun, the verb, "this" and "now".` },
+      { q: `Change to indirect speech: Bongani said, "I fell yesterday."`, a: `Bongani said that he had fallen the day before.`, w: [`Bongani said that I had fallen the day before.`, `Bongani said that he had fallen the next day.`, `Bongani said that he has fallen the day before.`], why: `"fell" moves back to "had fallen", and "yesterday" becomes "the day before".`, h: `The verb is already in the past, so it needs "had".` },
+      { q: `Chloe said, "I raced last week." Fill the gap in the indirect speech: Chloe said that she had raced ___.`, t: [`the week before`, `the previous week`, `the preceding week`, `the week prior`, `the prior week`], why: `"last week" becomes "the week before" or "the previous week".`, h: `"last week" has to change. Think of what happens to "yesterday".` },
+      { q: `Change to indirect speech: Themba said, "I will race next week."`, a: `Themba said that he would race the following week.`, w: [`Themba said that he would race the week before.`, `Themba said that I would race the following week.`, `Themba said that he would raced the following week.`], why: `"will" becomes "would", and "next week" becomes "the following week".`, h: `Was the race ahead of Themba or behind him when he spoke?` },
+      { tf: false, q: `True or false: "Sipho asked where the pits were?" is punctuated correctly.`, why: `An indirect question only reports the question, so it ends with a full stop: Sipho asked where the pits were.` },
+      { q: `Change to indirect speech: Liam asked, "Did you see the crash?"`, a: `Liam asked if I had seen the crash.`, w: [`Liam asked if did I see the crash.`, `Liam asked did I saw the crash?`, `Liam asked if you have seen the crash?`], why: `A yes-or-no question uses "if" or "whether". "Did you see" moves back to "I had seen", and the question mark falls away.`, h: `Use "if", and leave out the question mark.` },
+      { q: `Change to indirect speech: Mandla asked, "Why is the bike leaking?"`, a: `Mandla asked why the bike was leaking.`, w: [`Mandla asked why was the bike leaking.`, `Mandla asked why the bike is leaking?`, `Mandla asked, why was the bike leaking?`], why: `The word order becomes a statement: "the bike was leaking". There is no question mark.`, h: `After "asked why", the subject comes before the verb.` },
+      { q: `Change to direct speech: Kagiso said that he would ride the next day.`, a: `Kagiso said, "I will ride tomorrow."`, w: [`Kagiso said, "He will ride tomorrow."`, `Kagiso said, "I would ride yesterday."`, `"Kagiso said I will ride tomorrow."`], why: `Back to his exact words: "he" → "I", "would" → "will" and "the next day" → "tomorrow".`, h: `What would Kagiso actually have said out loud?` },
+      { q: `Change to indirect speech: The marshal said, "Don't pass here!"`, a: `The marshal told us not to pass there.`, w: [`The marshal told us don't pass there.`, `The marshal told us we don't pass there.`, `The marshal said us not to pass there.`], why: `A negative command becomes "told ... not to", and "here" becomes "there".`, h: `Start with "told us". How do you make "to pass" negative?` },
+    ],
+
+    eng_syn: [
+      { q: `Choose a synonym for **hurry**: We must hurry to the start line.`, a: `rush`, w: [`wait`, `walk`, `stop`], why: `hurry and rush both mean to move quickly.` },
+      { q: `Choose an antonym of **wide**: The track is wide at the first bend.`, a: `narrow`, w: [`broad`, `long`, `muddy`], why: `wide and narrow are opposites. "broad" is a synonym of wide.` },
+      { q: `Give an antonym of **forget**: I always forget my goggles.`, t: [`remember`, `recall`, `recollect`], why: `forget and remember are opposites.`, h: `It starts with "re".` },
+      { q: `Give an antonym of **shallow**: The river crossing was shallow.`, t: [`deep`], why: `shallow and deep are opposites.`, h: `It starts with "d".` },
+      { q: `Choose a synonym for **repair**: Dad will repair the clutch tonight.`, a: `fix`, w: [`break`, `test`, `clean`], why: `repair and fix mean the same thing. "break" is the opposite.` },
+      { q: `Which two words are synonyms?`, a: `silly and foolish`, w: [`wet and dry`, `above and below`, `wise and foolish`], why: `silly and foolish mean nearly the same thing. The others are opposites.`, h: `Synonyms have the same or a similar meaning.` },
+      { q: `Which two words are antonyms?`, a: `advance and retreat`, w: [`shout and yell`, `rapid and swift`, `enormous and gigantic`], why: `advance means move forward and retreat means move back. The others are synonyms.`, h: `Antonyms have opposite meanings.` },
+      { q: `Give a synonym for **sad** that starts with "u".`, t: [`unhappy`, `upset`], why: `unhappy and upset both mean sad.`, h: `Try a prefix on the opposite of "sad".` },
+      { tf: false, q: `True or false: **borrow** and **lend** are synonyms.`, why: `They are opposites. You borrow from someone, and you lend to someone.` },
+      { q: `Choose the antonym of **light** that fits: This toolbox is light enough to carry.`, a: `heavy`, w: [`dark`, `bright`, `pale`], why: `"dark" is the opposite of "light" only when it is about colour or brightness.`, h: `Is "light" about colour or weight here?` },
+      { q: `Choose a synonym for **dangerous**: This rocky section is dangerous.`, a: `risky`, w: [`safe`, `steep`, `bumpy`], why: `dangerous and risky mean the same thing. "safe" is the opposite.` },
+      { q: `Choose an antonym of **careful**: The rider was careful on the wet rocks.`, a: `reckless`, w: [`cautious`, `slow`, `tired`], why: `careful and reckless are opposites. "cautious" is a synonym of careful.` },
+      { q: `Which word is NOT a synonym for **shout**?`, a: `whisper`, w: [`yell`, `scream`, `bellow`], why: `To whisper is to speak very quietly, so it is an antonym of shout.`, h: `Three of these words are loud.` },
+      { tf: true, q: `True or false: **ascend** and **descend** are antonyms.`, why: `ascend means go up and descend means go down.` },
+    ],
+
+    eng_affix: [
+      { q: `What does the prefix **over-** mean in **overheat**?`, a: `Too much`, w: [`Under`, `Again`, `Without`], why: `overheat means to get too hot. Here over- means too much.`, h: `What happens to an engine that overheats?` },
+      { q: `What does the prefix **bi-** mean in **bicycle**?`, a: `Two`, w: [`One`, `Three`, `Many`], why: `A bicycle has two wheels, and bi- means two.`, h: `How many wheels does it have?` },
+      { q: `Add the suffix -ly to **easy**.`, t: [`easily`], why: `The y changes to i before -ly: easily.`, h: `What happens to the "y"?` },
+      { q: `Add the suffix -ing to **ride**.`, t: [`riding`], why: `Drop the silent e before -ing: riding.`, h: `What happens to the "e"?` },
+      { q: `Which word means "to heat something before you use it"?`, a: `preheat`, w: [`reheat`, `overheat`, `subheat`], why: `pre- means before, so preheat means heat before.`, h: `Which prefix means "before"?` },
+      { q: `Choose the word that makes the opposite of **obey**: Riders who ___ the marshals get a penalty.`, a: `disobey`, w: [`unobey`, `inobey`, `misobey`], why: `obey → disobey. Only dis- makes a real word here.`, h: `Say each one quietly. Which have you heard before?` },
+      { tf: false, q: `True or false: the "un" in **uncle** is a prefix.`, why: `Take away "un" and "cle" is not a word, and "un" doesn't mean "not" here. It is just part of the word.` },
+      { q: `Which suffix turns **move** into a noun?`, a: `-ment`, w: [`-ly`, `-ful`, `-able`], why: `move + ment = movement, which is a noun.`, h: `Try each suffix on "move". Which one names a thing?` },
+      { q: `Add the suffix -ing to **skid**.`, t: [`skidding`], why: `A short vowel and one final consonant: double the d, then add -ing.`, h: `Short vowel, one last consonant. What happens to that consonant?` },
+      { q: `Which suffix turns **danger** into an adjective?`, a: `-ous`, w: [`-ment`, `-ly`, `-ing`], why: `danger + ous = dangerous, which describes a noun: a dangerous jump.`, h: `Think of a word that means "full of danger".` },
+      { q: `Add a prefix to make the opposite of **responsible**. Type the whole word.`, t: [`irresponsible`], why: `responsible → irresponsible. Note the double r.`, h: `The prefix changes to match the first letter of "responsible".` },
+      { q: `Add the suffix -ful to **skill**. Use South African spelling.`, t: [`skilful`], why: `In South African spelling one l drops from "skill": skilful.`, h: `Watch how many l's are in the middle.` },
+      { tf: false, q: `True or false: the suffix -er in **faster** shows a person who does something.`, why: `In "faster" it compares: fast, faster. In "rider" it shows a person who rides.` },
+      { q: `Which word has both a prefix and a suffix?`, a: `unhelpful`, w: [`helpful`, `unhappy`, `helper`], why: `un + help + ful. "helpful" and "helper" only have a suffix, and "unhappy" only has a prefix.`, h: `Look for a word with something added at both ends.` },
+    ],
+
+    eng_subject: [
+      { q: `Find the subject: Mud flew everywhere.`, a: `Mud`, w: [`flew`, `everywhere`, `flew everywhere`], why: `Mud is what flew everywhere, so it is what the sentence is about.`, h: `Ask yourself: what flew?` },
+      { q: `Type the subject: The gate dropped.`, t: [`the gate`, `gate`], why: `The gate is what dropped, so it is the subject.`, h: `Ask yourself: what dropped?` },
+      { q: `Find the predicate: Two marshals waved yellow flags.`, a: `waved yellow flags`, w: [`Two marshals`, `Two marshals waved`, `yellow flags`], why: `It tells you what the marshals did. The predicate is everything except the subject.`, h: `What did the marshals do?` },
+      { tf: true, q: `True or false: the subject of "The bike and the trailer are clean." is "The bike and the trailer".`, why: `The sentence is about both things, so both are part of the subject.` },
+      { q: `Which group of words could be the subject of a sentence?`, a: `the tall marshal`, w: [`ran to the fence`, `is very muddy`, `waved a flag`], why: `A subject names who or what. The others say what someone does or is.`, h: `Which one names a person or thing?` },
+      { q: `Which group of words could be the predicate of a sentence?`, a: `jumped over the ditch`, w: [`the fastest rider`, `my old blue helmet`, `on the last lap`], why: `It says what someone did, and it has a verb. The others have no verb.`, h: `A predicate needs a verb.` },
+      { q: `Type the predicate: The engine stalled twice.`, t: [`stalled twice`], why: `It tells you what the engine did. The subject is "The engine".`, h: `First find the subject. What is left?` },
+      { q: `Which one is a complete sentence?`, a: `The riders lined up.`, w: [`The riders on the start line.`, `Lined up at the gate.`, `On the start line.`], why: `It has a subject (The riders) and a predicate (lined up). The others are missing one or both.`, h: `It needs someone or something, and a verb.` },
+      { tf: false, q: `True or false: "Riding through the thick mud." is a complete sentence.`, why: `It has no subject and no full verb. "We were riding through the thick mud" is complete.` },
+      { q: `Type the main verb in the predicate: The rider lost his chain on the hill.`, t: [`lost`], why: `"lost" tells you what the rider did. The verb is the heart of the predicate.`, h: `Which word shows the action?` },
+      { q: `Find the subject: In the pits, my uncle and his friend changed the tyre.`, a: `my uncle and his friend`, w: [`In the pits, my uncle`, `his friend changed the tyre`, `changed the tyre`], why: `Who changed the tyre? Both of them, so both are part of the subject.`, h: `Ask yourself: who changed the tyre?` },
+      { q: `Find the subject: Are the tyres flat?`, a: `the tyres`, w: [`Are`, `flat`, `Are the tyres`], why: `Turn it into a statement: The tyres are flat. The subject is "the tyres".`, h: `Turn the question into a statement first.` },
+      { q: `Find the subject: Where did Sipho leave his boots?`, a: `Sipho`, w: [`Where`, `his boots`, `did leave`], why: `Turn it into a statement: Sipho did leave his boots there. Sipho is the one doing the leaving.`, h: `Turn the question into a statement first.` },
+      { q: `Choose the correct word: The box of spanners ___ in the van.`, a: `is`, w: [`are`, `were`, `be`], why: `The subject is "box", and one box takes "is". "of spanners" only tells you which box.`, h: `What is in the van: the box, or the spanners?` },
+    ],
+
+    eng_abstract: [
+      { q: `Form an abstract noun from **dark**: We rode home in ___.`, t: [`darkness`], why: `dark + ness = darkness.`, h: `Add a suffix that turns a describing word into a naming word.` },
+      { q: `Find the abstract noun: The crowd cheered with joy at the track.`, a: `joy`, w: [`crowd`, `track`, `cheered`], why: `Joy is a feeling you can't touch. A crowd and a track are things you can see.`, h: `Which one is a feeling?` },
+      { q: `Form an abstract noun from **true**: Always tell the ___ to the marshal.`, t: [`truth`], why: `true → truth. The e falls away and -th is added.`, h: `It ends in -th.` },
+      { tf: false, q: `True or false: **bravely** is an abstract noun.`, why: `"bravely" is an adverb, because it tells you how someone acts. The abstract noun is "bravery".` },
+      { q: `Form an abstract noun from **bored**: ___ set in during the long wait.`, t: [`boredom`], why: `bored → boredom. It names the feeling.`, h: `It ends in -dom.` },
+      { q: `Form an abstract noun from **hungry**: His ___ grew after the long ride.`, t: [`hunger`, `hungriness`], why: `"hungry" is an adjective, and "hunger" is the noun that names the feeling.`, h: `It has 6 letters and ends in -er.` },
+      { tf: true, q: `True or false: **brotherhood** is the abstract noun formed from **brother**.`, why: `brother + hood = brotherhood, like child + hood. It names the idea of being brothers.` },
+      { q: `Which suffix turns **member** into an abstract noun?`, a: `-ship`, w: [`-ly`, `-ful`, `-ed`], why: `member + ship = membership, like friend + ship.`, h: `Try each suffix on "member". Which one makes a noun?` },
+      { q: `Complete with the abstract noun from **silent**: The ___ before the gate drops is scary.`, a: `silence`, w: [`silent`, `silently`, `silenced`], why: `silent → silence. The gap needs a noun, and "silent" is an adjective.`, h: `The gap needs a noun: the thing that "is scary".` },
+      { q: `Form an abstract noun from **wide**: Measure the ___ of the gate.`, t: [`width`, `wideness`], why: `wide → width, in the same way that long → length.`, h: `It ends in -th.` },
+      { q: `Form an abstract noun from **choose**: You have a ___ of two lines through the bend.`, t: [`choice`], why: `choose → choice. The spelling changes.`, h: `It ends in -ice.` },
+      { q: `Form an abstract noun from **able**: She has the ___ to win.`, t: [`ability`], why: `able → ability. The spelling changes before -ity.`, h: `It ends in -ity.` },
+      { q: `Complete with the abstract noun from **determined**: Her ___ got her to the finish.`, a: `determination`, w: [`determined`, `determine`, `determinedly`], why: `determined → determination. Only a noun fits after "Her" here.`, h: `The gap needs a noun. Which one names the quality?` },
+      { q: `Form an abstract noun from **explain**: The marshal gave an ___ for the penalty.`, t: [`explanation`], why: `explain → explanation. The i in "explain" falls away.`, h: `It ends in -ation.` },
+    ],
+  });
+})(typeof window !== 'undefined' ? window : globalThis);
+
 /* Batch of 1 November 2026: three new questions for every written list.
    Original questions, written without the textbooks. See ADDING-QUESTIONS.md. */
 (function (root) {
@@ -6072,21 +6641,63 @@ Jordy's Science test, Tuesday 10 November: Planet Earth and Beyond. Written from
 
   /* The bike photos have orange plastics. A colour filter turns them into each graphics kit. */
   const PAINTS = {
-    orange: { label: 'Factory orange', hex: '#E9501C', dark: '#B93A10', ink: '#FFFFFF', cost: 150, filter: 'none' },
-    blue: { label: 'Team blue', hex: '#1F5FE0', dark: '#1646AC', ink: '#FFFFFF', cost: 150, filter: 'hue-rotate(195deg) saturate(1.15)' },
-    green: { label: 'Team green', hex: '#0B8457', dark: '#07603F', ink: '#FFFFFF', cost: 150, filter: 'hue-rotate(115deg) saturate(1.1)' },
-    violet: { label: 'Purple haze', hex: '#5B3DF5', dark: '#4126C9', ink: '#FFFFFF', cost: 150, filter: 'hue-rotate(235deg) saturate(1.15)' },
-    red: { label: 'Race red', hex: '#D4262F', dark: '#A01A21', ink: '#FFFFFF', cost: 150, filter: 'hue-rotate(-22deg) saturate(1.2)' },
-    pink: { label: 'Hot pink', hex: '#D81B7C', dark: '#A5125E', ink: '#FFFFFF', cost: 200, filter: 'hue-rotate(-55deg) saturate(1.15)' },
-    steel: { label: 'Stealth', hex: '#4A5568', dark: '#333B49', ink: '#FFFFFF', cost: 300, filter: 'saturate(.08) brightness(.82)' },
-    lime: { label: 'Neon lime', hex: '#B7E021', dark: '#8FB30F', ink: '#1C2400', cost: 300, filter: 'hue-rotate(52deg) saturate(1.15) brightness(1.08)' },
+    orange: { label: 'Factory orange', hex: '#E9501C', dark: '#B93A10', ink: '#FFFFFF', cost: 1500, filter: 'none' },
+    blue: { label: 'Team blue', hex: '#1F5FE0', dark: '#1646AC', ink: '#FFFFFF', cost: 1500, filter: 'hue-rotate(195deg) saturate(1.15)' },
+    green: { label: 'Team green', hex: '#0B8457', dark: '#07603F', ink: '#FFFFFF', cost: 1500, filter: 'hue-rotate(115deg) saturate(1.1)' },
+    violet: { label: 'Purple haze', hex: '#5B3DF5', dark: '#4126C9', ink: '#FFFFFF', cost: 1500, filter: 'hue-rotate(235deg) saturate(1.15)' },
+    red: { label: 'Race red', hex: '#D4262F', dark: '#A01A21', ink: '#FFFFFF', cost: 1500, filter: 'hue-rotate(-22deg) saturate(1.2)' },
+    pink: { label: 'Hot pink', hex: '#D81B7C', dark: '#A5125E', ink: '#FFFFFF', cost: 2500, rank: 2, filter: 'hue-rotate(-55deg) saturate(1.15)' },
+    steel: { label: 'Stealth', hex: '#4A5568', dark: '#333B49', ink: '#FFFFFF', cost: 6000, rank: 3, filter: 'saturate(.08) brightness(.82)' },
+    lime: { label: 'Neon lime', hex: '#B7E021', dark: '#8FB30F', ink: '#1C2400', cost: 6000, rank: 3, filter: 'hue-rotate(52deg) saturate(1.15) brightness(1.08)' },
   };
+  // A bike takes points, a rank, and proof of learning: a share of all the sections cleared, and main events passed at 80%.
   const BIKES = {
     mini: { label: 'Mini MX', cost: 0 },
-    mx: { label: 'Motocross', cost: 300 },
-    enduro: { label: 'Enduro', cost: 600 },
-    hard: { label: 'Hard enduro', cost: 1000 },
-    factory: { label: 'Factory racer', cost: 1800 },
+    mx: { label: 'Motocross', cost: 2500 },
+    enduro: { label: 'Enduro', cost: 8000, rank: 2, cleared: 0.1 },
+    hard: { label: 'Hard enduro', cost: 18000, rank: 3, cleared: 0.3 },
+    factory: { label: 'Factory racer', cost: 40000, rank: 5, cleared: 0.5, exams: 3 },
+  };
+  // Earned points never go down when you spend, so a rank can't be lost.
+  const RANKS = [['Rookie', 0], ['Club rider', 2000], ['Regional rider', 6000], ['National rider', 15000], ['Pro rider', 30000], ['Factory rider', 60000], ['World champion', 100000]];
+  const rankOf = (earned) => RANKS.reduce((n, r, i) => (earned >= r[1] ? i + 1 : n), 1);
+  const GEAR = {
+    helmet: { title: 'Helmet', items: {
+      hStock: { label: 'Stock white', cost: 0, c: '#E8EAEE', c2: '#9AA3AF' },
+      hBlack: { label: 'Matt black', cost: 1500, c: '#23262C', c2: '#596273' },
+      hRace: { label: 'Race stripe', cost: 4000, rank: 2, c: '#D4262F', c2: '#FFFFFF', look: 'stripe' },
+      hFlame: { label: 'Hot flames', cost: 9000, rank: 3, c: '#17181D', c2: '#F97316', look: 'flame' },
+      hCarbon: { label: 'Carbon', cost: 16000, rank: 4, c: '#2B2F36', c2: '#7C8594', look: 'carbon' },
+      hGold: { label: 'Champion gold', cost: 30000, rank: 6, c: '#D9A514', c2: '#FFF3C4', look: 'stripe' },
+    } },
+    goggles: { title: 'Goggles', items: {
+      oStock: { label: 'Clear lens', cost: 0, c: '#CFE6F2', c2: '#23262C' },
+      oSmoke: { label: 'Smoke', cost: 1000, c: '#3B4250', c2: '#23262C' },
+      oBlue: { label: 'Mirror blue', cost: 3000, rank: 2, c: '#2F8FE8', c2: '#FFFFFF' },
+      oGold: { label: 'Gold mirror', cost: 10000, rank: 4, c: '#F2B705', c2: '#23262C' },
+    } },
+    kit: { title: 'Race kit', items: {
+      kStock: { label: 'Club grey', cost: 0, c: '#8A93A1', c2: '#D5D9E0', p: '#4B5361' },
+      kBlue: { label: 'Club blue', cost: 2000, c: '#1F5FE0', c2: '#FFFFFF', p: '#16264D' },
+      kRed: { label: 'Race red', cost: 4000, rank: 2, c: '#D4262F', c2: '#FFFFFF', p: '#23262C' },
+      kTeam: { label: 'Team match', cost: 7000, rank: 3, team: true, c: '#E9501C', c2: '#FFFFFF', p: '#23262C' },
+      kNight: { label: 'Night rider', cost: 14000, rank: 4, c: '#17181D', c2: '#B7E021', p: '#17181D' },
+      kGold: { label: 'Champion', cost: 30000, rank: 6, c: '#D9A514', c2: '#17181D', p: '#17181D' },
+    } },
+    gloves: { title: 'Gloves', items: {
+      gStock: { label: 'Stock grey', cost: 0, c: '#6B7280', c2: '#3B4250' },
+      gBlack: { label: 'Black', cost: 800, c: '#17181D', c2: '#596273' },
+      gRed: { label: 'Red', cost: 2500, rank: 2, c: '#D4262F', c2: '#17181D' },
+      gNeon: { label: 'Neon', cost: 6000, rank: 3, c: '#B7E021', c2: '#17181D' },
+      gGold: { label: 'Gold', cost: 20000, rank: 5, c: '#D9A514', c2: '#17181D' },
+    } },
+    boots: { title: 'Boots', items: {
+      bStock: { label: 'Stock black', cost: 0, c: '#23262C', c2: '#7C8594' },
+      bWhite: { label: 'White', cost: 1200, c: '#EEF0F3', c2: '#23262C' },
+      bRed: { label: 'Red', cost: 3000, rank: 2, c: '#D4262F', c2: '#17181D' },
+      bOrange: { label: 'Factory orange', cost: 8000, rank: 3, c: '#E9501C', c2: '#17181D' },
+      bGold: { label: 'Gold', cost: 22000, rank: 5, c: '#D9A514', c2: '#17181D' },
+    } },
   };
   const BADGES = [
     { id: 'first', label: 'First moto', desc: 'Finish your first moto', test: (p) => p.runsDone >= 1 },
@@ -6105,6 +6716,7 @@ Jordy's Science test, Tuesday 10 November: Planet Earth and Beyond. Written from
     points: 0, earned: 0, streak: 0, best: 0, lastDay: null, runsDone: 0, totalQ: 0, totalOk: 0,
     days: {}, skills: {}, topics: {}, runs: [], missed: [], badges: [], fix: {},
     paint: pack.defaultPaint, bike: 'mini', plate: pack.plate, ownedP: [pack.defaultPaint], ownedB: ['mini'], dailyBy: {}, examBy: {},
+    gear: { helmet: 'hStock', goggles: 'oStock', kit: 'kStock', gloves: 'gStock', boots: 'bStock' }, ownedG: ['hStock', 'oStock', 'kStock', 'gStock', 'bStock'],
   });
   function load() {
     let s = null;
@@ -6350,6 +6962,66 @@ Jordy's Science test, Tuesday 10 November: Planet Earth and Beyond. Written from
     const alt = label === undefined ? `${BIKES[id].label} bike in ${p.label}` : label;
     return `<img class="bike" src="img/bike-${id}.webp" alt="${alt}" style="filter:${p.filter}" decoding="async">`;
   };
+  // The rider is drawn over the bike photo. Each bike has its own seat, peg and handlebar position, in the photo's own pixels.
+  const SEATS = {
+    mini: { w: 640, h: 423, head: 24, hip: [212, 82], foot: [268, 288], hand: [392, 24] },
+    mx: { w: 640, h: 443, head: 24, hip: [205, 84], foot: [238, 292], hand: [322, 22] },
+    enduro: { w: 640, h: 475, head: 0, hip: [195, 202], foot: [232, 360], hand: [322, 158] },
+    hard: { w: 640, h: 387, head: 24, hip: [218, 72], foot: [252, 268], hand: [388, 18] },
+    factory: { w: 640, h: 383, head: 24, hip: [240, 70], foot: [262, 276], hand: [392, 18] },
+  };
+  const bend = ([ax, ay], [bx, by], d) => {
+    const len = Math.hypot(bx - ax, by - ay) || 1;
+    return [(ax + bx) / 2 + ((by - ay) / len) * d, (ay + by) / 2 - ((bx - ax) / len) * d];
+  };
+  const helmetLook = (g) => {
+    if (g.look === 'stripe') return `<path d="M-44 -18C-30 -46 -6 -56 18 -54L24 -40C2 -42 -20 -34 -34 -8Z" fill="${g.c2}"/>`;
+    if (g.look === 'flame') return `<path d="M-46 22C-30 18 -24 8 -30 -6C-20 2 -14 2 -14 -12C-8 -4 -2 -6 -2 -20C6 -8 10 -2 8 10C14 6 18 8 20 18L-12 34C-28 34 -40 30 -46 22Z" fill="${g.c2}"/>`;
+    if (g.look === 'carbon') return `<path d="M-36 -24L-6 -48M-44 -6L10 -50M-46 12L26 -46M-40 28L6 -6M-22 34L-4 18" stroke="${g.c2}" stroke-width="3" fill="none"/>`;
+    return '';
+  };
+  function riderSvg(p, spot) {
+    const pickG = (slot) => GEAR[slot].items[p.gear[slot]] || Object.values(GEAR[slot].items)[0];
+    const kit = pickG('kit');
+    const jersey = kit.team ? PAINTS[p.paint].hex : kit.c;
+    const helmet = pickG('helmet');
+    const goggles = pickG('goggles');
+    const gloves = pickG('gloves');
+    const boots = pickG('boots');
+    const hip = spot.hip;
+    const foot = spot.foot;
+    const hand = spot.hand;
+    const shoulder = [hip[0] + 58, hip[1] - 116];
+    const ankle = [foot[0] - 8, foot[1] - 42];
+    const knee = bend(hip, ankle, 58);
+    const elbow = bend(shoulder, hand, -26);
+    const head = [shoulder[0] + 26, shoulder[1] - 44];
+    const seg = (a, b, w, c) => `<line x1="${a[0]}" y1="${a[1]}" x2="${b[0]}" y2="${b[1]}" stroke="${c}" stroke-width="${w}" stroke-linecap="round"/>`;
+    const plateNo = h(String(p.plate));
+    return `<svg class="rider" viewBox="0 0 ${spot.w} ${spot.h}" aria-hidden="true">
+      ${seg(hip, knee, 50, kit.p)}${seg(knee, ankle, 40, kit.p)}
+      <ellipse cx="${knee[0]}" cy="${knee[1]}" rx="17" ry="21" fill="${kit.c2}"/>
+      <g transform="translate(${foot[0]} ${foot[1]})"><path d="M-30 -58L18 -58L22 -20L52 -8Q62 2 52 10L-28 10Q-34 10 -34 2Z" fill="${boots.c}" stroke="#15161B" stroke-width="3" stroke-linejoin="round"/><path d="M-30 -44L20 -44M-31 -28L21 -28" stroke="${boots.c2}" stroke-width="5"/><path d="M-28 10L52 10" stroke="${boots.c2}" stroke-width="6" stroke-linecap="round"/></g>
+      ${seg(hip, shoulder, 68, jersey)}
+      <line x1="${hip[0] - 22}" y1="${hip[1] + 4}" x2="${shoulder[0] - 22}" y2="${shoulder[1] + 2}" stroke="${kit.c2}" stroke-width="7" stroke-linecap="round"/>
+      <text x="${(hip[0] + shoulder[0]) / 2 + 6}" y="${(hip[1] + shoulder[1]) / 2 + 12}" font-size="34" font-weight="800" text-anchor="middle" fill="${kit.c2}" font-family="var(--display)">${plateNo}</text>
+      ${seg(shoulder, elbow, 30, jersey)}${seg(elbow, hand, 26, jersey)}
+      ${seg(bend(elbow, hand, 0), [(elbow[0] + hand[0] * 3) / 4, (elbow[1] + hand[1] * 3) / 4], 26, kit.c2)}
+      <circle cx="${hand[0]}" cy="${hand[1]}" r="17" fill="${gloves.c}"/><path d="M${hand[0] - 11} ${hand[1] + 2}h22" stroke="${gloves.c2}" stroke-width="4" stroke-linecap="round"/>
+      <g transform="translate(${head[0]} ${head[1]})">
+        <path d="M-50 12C-54 -40 -10 -60 22 -54C42 -50 54 -34 56 -14L64 6C70 12 70 30 54 36C40 42 16 42 -8 40C-36 38 -48 30 -50 12Z" fill="${helmet.c}" stroke="#15161B" stroke-width="3" stroke-linejoin="round"/>
+        ${helmetLook(helmet)}
+        <path d="M8 -54L84 -42C92 -40 92 -30 82 -30L26 -24Z" fill="${helmet.c2}" stroke="#15161B" stroke-width="3" stroke-linejoin="round"/>
+        <rect x="14" y="-16" width="46" height="26" rx="9" fill="${goggles.c2}"/><rect x="19" y="-12" width="37" height="18" rx="6" fill="${goggles.c}"/>
+        <path d="M-48 -2L14 -4" stroke="${goggles.c2}" stroke-width="7"/>
+        <path d="M30 20L60 20M34 28L56 28" stroke="${helmet.c2}" stroke-width="4" stroke-linecap="round"/>
+      </g>
+    </svg>`;
+  }
+  const rig = (p, label) => {
+    const spot = SEATS[p.bike] || SEATS.mini;
+    return `<div class="rig" style="padding-top:${spot.head}%">${bike(p.bike, p.paint, label)}${riderSvg(p, spot)}</div>`;
+  };
   const photo = (name, alt = '') => `<img class="photo" src="img/${name}.webp" alt="${alt}" decoding="async">`;
   const plate = (num) => `<span class="plate" aria-label="Race number ${h(String(num))}">${h(String(num))}</span>`;
 
@@ -6368,10 +7040,11 @@ Jordy's Science test, Tuesday 10 November: Planet Earth and Beyond. Written from
     const cards = Object.values(RS.packs).map((pack) => {
       const p = state.players[pack.id];
       return `<button class="pick-card" data-act="who" data-id="${pack.id}">
-        <div class="stage">${bike(p.bike, p.paint, `${pack.name}'s ${BIKES[p.bike].label} bike`)}</div>
+        <div class="stage">${rig(p, `${pack.name}'s ${BIKES[p.bike].label} bike`)}</div>
         <div class="pick-name">${plate(p.plate)}<h2>${pack.name}</h2></div>
         <div class="pick-stats">
           <span class="chip">${pack.grade}</span>
+          <span class="chip">${RANKS[rankOf(p.earned) - 1][0]}</span>
           <span class="chip lime num">${RS.fmt(p.points)} points</span>
           <span class="chip ${liveStreak(p) ? 'good' : ''} num">${liveStreak(p)} day streak</span>
         </div>
@@ -6559,31 +7232,89 @@ Jordy's Science test, Tuesday 10 November: Planet Earth and Beyond. Written from
   }
 
   // ---------- the pits ----------
+  const sectionsCleared = (p) => Object.values(PK().subjects).reduce((n, sub) => n + clearedCount(p, sub), 0);
+  const sectionsTotal = () => Object.values(PK().subjects).reduce((n, sub) => n + racing(sub).length, 0);
+  const examsPassed = (p) => Object.values(p.examBy).filter((v) => v >= 80).length;
+  // What still stands in the way, apart from the points. Fewer subjects means fewer main events to pass.
+  function stillNeeds(p, item) {
+    if (item.rank && rankOf(p.earned) < item.rank) return `Reach ${RANKS[item.rank - 1][0]}`;
+    const sections = item.cleared ? Math.ceil(item.cleared * sectionsTotal()) : 0;
+    if (sections && sectionsCleared(p) < sections) return `Clear ${sections} sections (${sectionsCleared(p)} so far)`;
+    const exams = item.exams ? Math.min(item.exams, Object.keys(PK().subjects).length) : 0;
+    if (exams && examsPassed(p) < exams) return `Score 80% in ${exams} main events (${examsPassed(p)} so far)`;
+    return '';
+  }
+  function buy(p, item, owned) {
+    const need = stillNeeds(p, item);
+    if (need) {
+      toast(`${item.label}: ${need} first.`);
+      return false;
+    }
+    if (p.points < item.cost) {
+      toast(`You need ${RS.fmt(item.cost - p.points)} more points for ${item.label}.`);
+      return false;
+    }
+    p.points -= item.cost;
+    owned.push(item.id);
+    sfx('combo');
+    return true;
+  }
+  const priceTag = (p, item) => {
+    const need = stillNeeds(p, item);
+    return need || `${RS.fmt(item.cost)} points`;
+  };
+  function gearPanel(p) {
+    return Object.entries(GEAR).map(([slot, group]) => {
+      const items = Object.entries(group.items).map(([id, g]) => {
+        const own = p.ownedG.includes(id);
+        const on = p.gear[slot] === id;
+        const colour = g.team ? PAINTS[p.paint].hex : g.c;
+        const need = !own && stillNeeds(p, g);
+        return `<button class="paint ${on ? 'on' : ''}" data-act="gear" data-slot="${slot}" data-id="${id}" aria-label="${g.label}${own ? '' : `, ${priceTag(p, g)}`}">
+          <span class="swatch" style="--c:linear-gradient(135deg,${colour} 62%,${g.c2} 62%)">${own ? (on ? ic('check', 20) : '') : ic('lock', 16)}</span>
+          <span>${g.label}${own ? '' : `<br><b class="${need ? 'lock-need' : 'num'}">${need ? `Rank ${g.rank}` : RS.fmt(g.cost)}</b>`}</span>
+        </button>`;
+      });
+      return `<div class="gear-group"><div class="small-t" style="font-weight:600;margin-bottom:6px">${group.title}</div><div class="paints">${items.join('')}</div></div>`;
+    }).join('');
+  }
+  function rankCard(p) {
+    const n = rankOf(p.earned);
+    const next = RANKS[n];
+    const from = RANKS[n - 1][1];
+    const share = next ? Math.min(100, Math.round((100 * (p.earned - from)) / (next[1] - from))) : 100;
+    return `<div class="rank-line"><div class="small-t"><b>Rank ${n}: ${RANKS[n - 1][0]}</b></div><div class="small-t muted num">${next ? `${RS.fmt(p.earned)} of ${RS.fmt(next[1])} to ${next[0]}` : 'Top of the sport'}</div></div>
+      <div class="meter" role="img" aria-label="${share} percent of the way to the next rank"><i style="width:${share}%"></i></div>`;
+  }
   function viewGarage() {
     const p = P();
     const bikes = Object.entries(BIKES).map(([id, r]) => {
       const own = p.ownedB.includes(id);
       const on = p.bike === id;
       const short = r.cost - p.points;
-      return `<button class="ride ${on ? 'on' : ''}" data-act="bike" data-id="${id}" ${!own && short > 0 ? 'aria-disabled="true"' : ''}>
+      const need = !own && stillNeeds(p, r);
+      return `<button class="ride ${on ? 'on' : ''}" data-act="bike" data-id="${id}" ${!own && (short > 0 || need) ? 'aria-disabled="true"' : ''}>
         <div class="stage">${bike(id, p.paint)}</div>
         <b>${r.label}</b>
-        <span class="chip ${on ? 'good' : own ? '' : short > 0 ? '' : 'lime'} num">${on ? 'Riding' : own ? 'Yours' : short > 0 ? `${RS.fmt(r.cost)} points` : `Buy for ${RS.fmt(r.cost)}`}</span>
+        <span class="chip ${on ? 'good' : own ? '' : short > 0 || need ? '' : 'lime'} num">${on ? 'Riding' : own ? 'Yours' : short > 0 ? `${RS.fmt(r.cost)} points` : need ? 'Locked' : `Buy for ${RS.fmt(r.cost)}`}</span>
+        ${need ? `<small class="small-t muted" style="padding-inline:4px">${need}</small>` : ''}
       </button>`;
     });
     const paints = Object.entries(PAINTS).map(([id, c]) => {
       const own = p.ownedP.includes(id);
       return `<button class="paint ${p.paint === id ? 'on' : ''}" data-act="paint" data-id="${id}" aria-label="${c.label}">
         <span class="swatch" style="--c:${c.hex};color:${c.ink}">${own ? (p.paint === id ? ic('check', 20) : '') : ic('lock', 16)}</span>
-        <span>${c.label}${own ? '' : `<br><b class="num">${c.cost}</b>`}</span>
+        <span>${c.label}${own ? '' : `<br><b class="${stillNeeds(p, c) ? 'lock-need' : 'num'}">${stillNeeds(p, c) ? `Rank ${c.rank}` : RS.fmt(c.cost)}</b>`}</span>
       </button>`;
     });
     const badges = BADGES.map((b) => `<div class="badge ${p.badges.includes(b.id) ? 'got' : ''}"><b>${b.label}</b><small>${b.desc}</small></div>`);
     return shell(`
       <section class="card" style="display:grid;gap:10px">
-        <div class="hero-head"><div><div class="eyebrow">Your bike</div><div class="h-sec" style="font-size:24px">${BIKES[p.bike].label}</div></div><span class="chip lime num">${RS.fmt(p.points)} points</span></div>
-        <div class="stage">${bike(p.bike, p.paint)}</div>
+        <div class="hero-head"><div><div class="eyebrow">Your rider</div><div class="h-sec" style="font-size:24px">${BIKES[p.bike].label}</div></div><span class="chip lime num">${RS.fmt(p.points)} points</span></div>
+        <div class="stage">${rig(p)}</div>
+        ${rankCard(p)}
       </section>
+      <section class="card"><div class="h-sec" style="margin-bottom:4px">Rider gear</div><p class="small-t muted" style="margin-bottom:10px">Tap to wear it. Top gear needs a higher rank, and it isn't cheap.</p><div class="gear-list">${gearPanel(p)}</div></section>
       <section class="card"><div class="h-sec" style="margin-bottom:10px">Race number</div>
         <div class="plate-row"><input id="plate-input" class="plate-input" type="text" inputmode="numeric" maxlength="3" value="${h(String(p.plate))}" aria-label="Your race number" autocomplete="off"><p class="small-t muted" style="flex:1;min-width:150px">Pick your number. It goes on your plate at the top of every screen.</p></div>
       </section>
@@ -6715,7 +7446,7 @@ Jordy's Science test, Tuesday 10 November: Planet Earth and Beyond. Written from
     if (mode === 'fix' && !fixList(P(), sub).length) mode = 'daily';
     const n = mode === 'exam' ? sub.examSize : 10;
     ui.result = null;
-    ui.run = { id: uuid(), mode, topicId, queue: buildQueue(P(), sub, mode, topicId, n).map((slot) => (typeof slot === 'string' ? { skill: slot } : slot)), i: 0, total: n, q: null, typed: '', tries: 0, combo: 0, bestCombo: 0, pts: 0, score: 0, right: 0, log: [], extras: 0, asked: new Set(), sheet: null, heard: '', listening: false, started: Date.now(), fixed: [], fixNote: '', firstGiven: null, qStart: Date.now() };
+    ui.run = { id: uuid(), mode, topicId, queue: buildQueue(P(), sub, mode, topicId, n).map((slot) => (typeof slot === 'string' ? { skill: slot } : slot)), i: 0, total: n, q: null, typed: '', tries: 0, combo: 0, bestCombo: 0, pts: 0, score: 0, right: 0, log: [], extras: 0, asked: new Set(), sheet: null, heard: '', listening: false, started: Date.now(), halfPay: mode === 'topic' && ((P().topics[topicId] || {}).stars || 0) >= 3, fixed: [], fixNote: '', firstGiven: null, qStart: Date.now() };
     audio();
     nextQuestion();
   }
@@ -6813,12 +7544,15 @@ Jordy's Science test, Tuesday 10 November: Planet Earth and Beyond. Written from
       secs: Math.round((Date.now() - r.qStart) / 1000),
     });
   }
-  function award(n) {
+  function award(amount) {
     const p = P();
+    // A section with 3 stars already pays half, so nobody grinds what they know.
+    const n = ui.run.halfPay ? Math.ceil(amount / 2) : amount;
     p.points += n;
     p.earned += n;
     dayLog(p).pts += n;
     ui.run.pts += n;
+    return n;
   }
 
   function submit(given, optionIndex) {
@@ -6861,9 +7595,9 @@ Jordy's Science test, Tuesday 10 November: Planet Earth and Beyond. Written from
       // Right first time on the very first question: first into the first corner.
       const holeshot = first && r.i === 0;
       const pts = (q.bonus || !first ? 5 : 10 * mult) + (holeshot ? 10 : 0);
-      award(pts);
+      const paid = award(pts);
       settle(q, true, first, given);
-      r.sheet = { type: 'right', title: holeshot ? 'Holeshot!' : RS.pick(PRAISE), pts, mult: first ? mult : 1, spell: res.spell, holeshot };
+      r.sheet = { type: 'right', title: holeshot ? 'Holeshot!' : RS.pick(PRAISE), pts: paid, mult: first ? mult : 1, spell: res.spell, holeshot };
       sfx(mult > 1 || holeshot ? 'combo' : 'right');
       if (navigator.vibrate) navigator.vibrate(18);
     } else if (r.tries === 0) {
@@ -6896,7 +7630,9 @@ Jordy's Science test, Tuesday 10 November: Planet Earth and Beyond. Written from
     let bonus = 20;
     if (pct === 100) bonus += 50;
     if (r.mode === 'exam' && pct >= 80) bonus += 50;
-    award(bonus);
+    const rankBefore = rankOf(p.earned - r.pts);
+    bonus = award(bonus);
+    const rankNow = rankOf(p.earned);
     const today = dayKey();
     if (p.lastDay !== today) {
       p.streak = p.lastDay === dayKey(daysAgo(1)) ? p.streak + 1 : 1;
@@ -6922,7 +7658,7 @@ Jordy's Science test, Tuesday 10 November: Planet Earth and Beyond. Written from
     }
     p.runs.unshift({ label: `${sub.label}: ${label}`, pct, right: r.right, total: r.total, pts: r.pts, when: today, mode: r.mode });
     p.runs = p.runs.slice(0, 30);
-    const x = { label, pct, stars: earnedStars, pts: r.pts, bonus, bestCombo: r.bestCombo, right: r.right, total: r.total, mode: r.mode, topicId: r.topicId, missed: r.log.filter((l) => !l.ok), newBadges: [], streak: p.streak, fixed: new Set(r.fixed.filter((id) => !p.fix[id])).size, fixLeft: fixList(p, sub).length };
+    const x = { label, pct, stars: earnedStars, pts: r.pts, bonus, bestCombo: r.bestCombo, right: r.right, total: r.total, mode: r.mode, topicId: r.topicId, missed: r.log.filter((l) => !l.ok), newBadges: [], streak: p.streak, halfPay: r.halfPay, newRank: rankNow > rankBefore ? RANKS[rankNow - 1][0] : '', fixed: new Set(r.fixed.filter((id) => !p.fix[id])).size, fixLeft: fixList(p, sub).length };
     for (const b of BADGES) {
       if (!p.badges.includes(b.id) && b.test(p, x, sub)) {
         p.badges.push(b.id);
@@ -7157,6 +7893,8 @@ Jordy's Science test, Tuesday 10 November: Planet Earth and Beyond. Written from
         ${tile('bolt', 'Best in a row', x.bestCombo, `<span class="chip">${x.bestCombo >= 6 ? 'Full gas' : x.bestCombo >= 3 ? 'Nice combo' : 'Keep building'}</span>`)}
         ${tile('flame', 'Day streak', x.streak, `<span class="chip good">Ride again tomorrow</span>`)}
       </section>
+      ${x.newRank ? `<section class="card"><div class="eyebrow">New rank</div><div class="h-sec" style="font-size:24px">${x.newRank}</div><p class="small-t muted">New gear is open in the pits.</p></section>` : ''}
+      ${x.halfPay ? '<p class="small-t muted" style="padding-inline:4px">You already have 3 stars here, so this section paid half points. A section that needs work pays in full.</p>' : ''}
       ${x.newBadges.length ? `<section class="card"><div class="h-sec" style="margin-bottom:8px">New badge${x.newBadges.length > 1 ? 's' : ''}</div><div class="badges">${x.newBadges.map((b) => `<div class="badge got"><b>${b.label}</b><small>${b.desc}</small></div>`).join('')}</div></section>` : ''}
       ${x.missed.length ? `<section class="card"><div class="h-sec" style="margin-bottom:8px">Look at these again</div><div class="log">${x.missed.map((m) => `<div class="log-item"><div>${h(m.q)}</div><div class="small-t" style="margin-top:2px"><b>Answer:</b> ${h(m.correct)}${m.given ? ` <span class="muted">(you said ${h(String(m.given))})</span>` : ''}</div><details><summary>Show the working</summary><ol>${m.steps.map((s) => `<li>${h(s)}</li>`).join('')}</ol></details></div>`).join('')}</div></section>` : ''}
       ${x.mode === 'fix' || x.fixLeft ? `<section class="card"><div class="h-sec" style="margin-bottom:6px">Fix list</div><p class="small-t">${x.fixed ? `${x.fixed} cleared. ` : ''}${x.fixLeft ? `${x.fixLeft} still to fix. Get each one right ${FIX_NEED} times in a row to clear it.` : 'All clear. Nothing left to fix here.'}</p></section>` : ''}
@@ -7553,33 +8291,23 @@ Jordy's Science test, Tuesday 10 November: Planet Earth and Beyond. Written from
         window.scrollTo(0, 0);
         break;
       case 'bike': {
-        const r = BIKES[id];
-        if (p.ownedB.includes(id)) p.bike = id;
-        else if (p.points >= r.cost) {
-          p.points -= r.cost;
-          p.ownedB.push(id);
-          p.bike = id;
-          sfx('combo');
-        } else {
-          toast(`You need ${RS.fmt(r.cost - p.points)} more points for the ${r.label}.`);
-          break;
-        }
+        if (!p.ownedB.includes(id) && !buy(p, { ...BIKES[id], id }, p.ownedB)) break;
+        p.bike = id;
         save();
         render();
         break;
       }
       case 'paint': {
-        const c = PAINTS[id];
-        if (p.ownedP.includes(id)) p.paint = id;
-        else if (p.points >= c.cost) {
-          p.points -= c.cost;
-          p.ownedP.push(id);
-          p.paint = id;
-          sfx('combo');
-        } else {
-          toast(`You need ${RS.fmt(c.cost - p.points)} more points for ${c.label}.`);
-          break;
-        }
+        if (!p.ownedP.includes(id) && !buy(p, { ...PAINTS[id], id }, p.ownedP)) break;
+        p.paint = id;
+        save();
+        render();
+        break;
+      }
+      case 'gear': {
+        const slot = el.dataset.slot;
+        if (!p.ownedG.includes(id) && !buy(p, { ...GEAR[slot].items[id], id }, p.ownedG)) break;
+        p.gear[slot] = id;
         save();
         render();
         break;
