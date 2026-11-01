@@ -4924,10 +4924,15 @@ details ol { margin: 6px 0 0; padding-left: 20px; }
     return s;
   }
   const state = load();
-  function save() {
+  function keepState() {
     try {
       localStorage.setItem(KEY, JSON.stringify(state));
     } catch (e) { /* storage blocked */ }
+  }
+  function save() {
+    if (ui.who) P().updatedAt = Date.now();
+    keepState();
+    syncSoon();
   }
 
   // ---------- results log ----------
@@ -4978,32 +4983,103 @@ details ol { margin: 6px 0 0; padding-left: 20px; }
     } catch (e) { /* no signal: the next answer or the next visit tries again */ }
     sending = false;
   }
-  window.addEventListener('online', logSend);
+  window.addEventListener('online', () => {
+    logSend();
+    syncNow();
+  });
   document.addEventListener('visibilitychange', () => {
     if (document.visibilityState === 'hidden') logSend();
+    syncNow();
   });
 
-  // ---------- family code ----------
-  // A light lock for anyone who stumbles on the link. The page holds a fingerprint of the code, not the code.
-  // Each device asks once. Change CODE_PRINT and every device asks again.
-  const CODE_PRINT = '7ffa86e6721ff73be946eaa4e1d9f75a8db6917e9d835a69ee9351aaeb73a0a8';
+  // ---------- family code and progress across devices ----------
+  // The code is checked on the server and isn't in this page. A device that types it gets a long key of its own,
+  // kept here, and that key is what lets it save and fetch progress. Only the live site and local previews have the lock.
+  const SYNC_URL = 'https://kyosepbdxjwugunylvyo.supabase.co/functions/v1/holeshot-sync';
+  const SYNC_ON = /\.github\.io$|^localhost$/.test(location.hostname);
   const CODE_KEY = 'holeshot.code.v1';
-  function rememberCode() {
+  const SYNC_KEY = 'holeshot.sync.v1';
+  const BACKUP_KEY = 'holeshot.backup.v1';
+  function getKey(key) {
     try {
-      localStorage.setItem(CODE_KEY, CODE_PRINT);
+      return localStorage.getItem(key);
+    } catch (e) {
+      return null;
+    }
+  }
+  function setKey(key, value) {
+    try {
+      if (value === null) localStorage.removeItem(key);
+      else localStorage.setItem(key, value);
     } catch (e) { /* storage blocked: it asks again next visit */ }
   }
-  let locked = /\.github\.io$|^localhost$/.test(location.hostname) && !!(window.crypto && crypto.subtle);
-  if (locked) {
-    let known = null;
+  let syncToken = SYNC_ON ? getKey(SYNC_KEY) : null;
+  // A device that was already riding, or typed the code before keys existed, stays in. It is only invited to link, so nobody is stopped mid-revision.
+  const knownDevice = getKey(CODE_KEY) !== null || Object.values(state.players).some((p) => p.totalQ > 0);
+  let locked = SYNC_ON && !syncToken && !knownDevice;
+  let askLink = SYNC_ON && !syncToken && knownDevice;
+
+  async function syncCall(body) {
     try {
-      known = localStorage.getItem(CODE_KEY);
-    } catch (e) { /* storage blocked */ }
-    // A device already riding when the lock arrived stays in, so nobody is stopped mid-revision.
-    const riding = Object.values(state.players).some((p) => p.totalQ > 0);
-    if (known === CODE_PRINT || (known === null && riding)) {
-      locked = false;
-      rememberCode();
+      const res = await fetch(SYNC_URL, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
+      if (!res.ok) return null;
+      const out = await res.json();
+      if (out.reason === 'token') {
+        syncToken = null;
+        setKey(SYNC_KEY, null);
+      }
+      return out;
+    } catch (e) {
+      return null;
+    }
+  }
+  // The copy with the most answered wins, so a device with less on it can never wipe the work. A reset raises the epoch.
+  function isAhead(a, b) {
+    const x = [a.epoch || 0, a.totalQ || 0, a.updatedAt || 0];
+    const y = [b.epoch || 0, b.totalQ || 0, b.updatedAt || 0];
+    const i = x.findIndex((v, n) => v !== y[n]);
+    return i >= 0 && x[i] > y[i];
+  }
+  let syncTimer = null;
+  let syncing = false;
+  let syncAgain = false;
+  function syncSoon() {
+    if (!syncToken || ui.run) return;
+    clearTimeout(syncTimer);
+    syncTimer = setTimeout(syncNow, 1500);
+  }
+  // Takes the saved copy of a rider if it is ahead, and saves this device's copy if this one is. It leaves a race in progress alone.
+  async function syncNow() {
+    if (!syncToken || ui.run || navigator.onLine === false) return;
+    if (syncing) {
+      syncAgain = true;
+      return;
+    }
+    syncing = true;
+    const got = await syncCall({ action: 'get', token: syncToken });
+    if (got && got.ok) {
+      let changed = false;
+      for (const id of Object.keys(RS.packs)) {
+        if (ui.run) break;
+        const mine = state.players[id];
+        const theirs = got.progress[id];
+        if (theirs && isAhead(theirs, mine)) {
+          setKey(BACKUP_KEY, JSON.stringify({ id, when: Date.now(), data: mine }));
+          state.players[id] = Object.assign(blankPlayer(RS.packs[id]), theirs);
+          changed = true;
+        } else if (theirs ? isAhead(mine, theirs) : mine.totalQ > 0 || mine.updatedAt) {
+          await syncCall({ action: 'put', token: syncToken, player: id, data: mine });
+        }
+      }
+      if (changed) {
+        keepState();
+        if (!ui.run) render();
+      }
+    }
+    syncing = false;
+    if (syncAgain) {
+      syncAgain = false;
+      syncSoon();
     }
   }
 
@@ -5679,6 +5755,7 @@ details ol { margin: 6px 0 0; padding-left: 20px; }
     });
     ui.run = null;
     ui.result = x;
+    syncSoon();
     render();
     window.scrollTo(0, 0);
     sfx('fanfare');
@@ -6093,34 +6170,47 @@ details ol { margin: 6px 0 0; padding-left: 20px; }
       <form id="lock-form" class="card lock" autocomplete="off">
         <label class="h-sec" for="lock-input">Family code</label>
         <input id="lock-input" class="lock-input" type="text" inputmode="numeric" maxlength="12" autocomplete="off" spellcheck="false" aria-describedby="lock-msg">
-        <p id="lock-msg" class="small-t muted" role="status">Type the code to open the track. You only need to do this once on each device.</p>
+        <p id="lock-msg" class="small-t muted" role="status">${locked ? 'Type the code to open the track. You only need to do this once on each device.' : 'Type the code once so your work follows you to your other devices.'}</p>
         <button class="btn primary full" type="submit">Open ${ic('arrow')}</button>
+        ${locked ? '' : '<button class="btn full" type="button" data-act="link-later">Not now</button>'}
       </form>
     </main>`;
   }
+  let checkingCode = false;
   document.addEventListener('submit', async (e) => {
     if (e.target.id !== 'lock-form') return;
     e.preventDefault();
+    if (checkingCode) return;
     const input = $('#lock-input');
-    const typed = new TextEncoder().encode(`holeshot:${input.value.trim()}`);
-    const print = [...new Uint8Array(await crypto.subtle.digest('SHA-256', typed))].map((b) => b.toString(16).padStart(2, '0')).join('');
-    if (print === CODE_PRINT) {
+    const msg = $('#lock-msg');
+    checkingCode = true;
+    msg.textContent = 'Checking...';
+    if (!state.device) state.device = uuid();
+    const res = await syncCall({ action: 'link', code: input.value, device: state.device });
+    checkingCode = false;
+    if (res && res.ok) {
+      syncToken = res.token;
+      setKey(SYNC_KEY, syncToken);
+      setKey(CODE_KEY, 'yes');
+      keepState();
       locked = false;
-      rememberCode();
+      askLink = false;
       render();
+      toast('This device is linked. Your work will follow you.');
+      syncNow();
       return;
     }
     input.value = '';
     input.classList.remove('shake');
     void input.offsetWidth;
     input.classList.add('shake');
-    $('#lock-msg').textContent = "That's not the code. Try again.";
+    msg.textContent = !res ? "Couldn't check the code. Check the internet and try again." : res.reason === 'wait' ? 'Too many wrong tries. Wait an hour, then try again.' : "That's not the code. Try again.";
     input.focus();
   });
   function render() {
     applyAccent();
     const app = $('#app');
-    if (locked) app.innerHTML = viewLock();
+    if (locked || askLink) app.innerHTML = viewLock();
     else if (!ui.who) app.innerHTML = viewPick();
     else if (ui.run) drawRun();
     else if (ui.result) app.innerHTML = viewResult();
@@ -6233,6 +6323,7 @@ details ol { margin: 6px 0 0; padding-left: 20px; }
         stopSpeaking();
         save();
         ui.run = null;
+        syncSoon();
         render();
         window.scrollTo(0, 0);
         break;
@@ -6285,8 +6376,13 @@ details ol { margin: 6px 0 0; padding-left: 20px; }
         ui.confirmReset = false;
         render();
         break;
+      case 'link-later':
+        askLink = false;
+        render();
+        break;
       case 'reset-yes':
-        state.players[ui.who] = blankPlayer(PK());
+        // The raised epoch lets this reset reach the rider's other devices.
+        state.players[ui.who] = Object.assign(blankPlayer(PK()), { epoch: (P().epoch || 0) + 1 });
         ui.confirmReset = false;
         save();
         render();
@@ -6343,6 +6439,7 @@ details ol { margin: 6px 0 0; padding-left: 20px; }
   RS._ui = ui;
   RS._render = render;
   logSend();
+  syncNow();
   RS._applySpeech = applySpeech;
 
   render();
