@@ -167,6 +167,12 @@ svg { display: block; }
 .rig { position: relative; height: 300px; max-width: 100%; }
 .rig .shot { display: block; width: 100%; height: 100%; max-width: none; }
 .rig > i, .rig > svg, .rig > .shot-shade { position: absolute; left: 0; top: 0; width: 100%; height: 100%; max-width: none; display: block; pointer-events: none; }
+.pin { display: grid; gap: 12px; justify-items: center; text-align: center; }
+.pin-dots { display: flex; gap: 14px; padding: 6px 0; }
+.pin-dot { width: 18px; height: 18px; border-radius: 50%; background: var(--card-2); box-shadow: inset 0 0 0 2px var(--ink-3); }
+.pin-dot.on { background: var(--accent); box-shadow: none; }
+.pin-keys { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; width: 100%; max-width: 300px; }
+.pin-keys .key { height: 58px; }
 .walk { display: grid; gap: 14px; }
 .walk-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
 .walk-title { font-family: var(--display); font-weight: 800; font-size: 26px; letter-spacing: -.01em; }
@@ -916,7 +922,15 @@ details ol { margin: 6px 0 0; padding-left: 20px; }
     return { dropped, carried: carryPurchases(theirs, mine) };
   }
 
-  Object.assign(RS, { receiptKey, carryPurchases, squarePurchases, bank, addQuestions, addSection, ri, pick, shuffle, gcd, lcm, r2, roundTo, simp, factorsOf, primeFactors, isPrime, distinctDigits, coprimeTop, fmt, money, fr, mixedStr, plain, html, mc, parseValue, check, spoken, matchOption, speakable, wordsToInt, editDistance });
+  // A rider's password follows its newest change, whichever copy of the rider wins. Says whether it moved.
+  function carryPassword(from, to) {
+    const at = (p) => (p.pin && p.pin.at) || 0;
+    if (at(from) <= at(to)) return false;
+    to.pin = from.pin;
+    return true;
+  }
+
+  Object.assign(RS, { receiptKey, carryPurchases, squarePurchases, carryPassword, bank, addQuestions, addSection, ri, pick, shuffle, gcd, lcm, r2, roundTo, simp, factorsOf, primeFactors, isPrime, distinctDigits, coprimeTop, fmt, money, fr, mixedStr, plain, html, mc, parseValue, check, spoken, matchOption, speakable, wordsToInt, editDistance });
 })(typeof window !== 'undefined' ? window : globalThis);
 
 /* Jordy: Grade 6 Term 4 maths, NumberSense Workbook 24, pages 1 to 24.
@@ -8245,12 +8259,12 @@ Jordy's Science test, Tuesday 10 November: Planet Earth and Beyond. Written from
   // ---------- staying up to date ----------
   // An open tab or a home screen app keeps running the page it first loaded, old prices and all. So it asks which version
   // is live when it comes back into view and every few minutes, and swaps over between races. build.mjs fills in BUILD.
-  const BUILD = '278642dd81';
+  const BUILD = '57725a2500';
   const BACK_KEY = 'holeshot.back.v1';
   const TRIED_KEY = 'holeshot.tried.v1';
   let liveBuild = null;
   function swapToLive() {
-    if (!liveBuild || ui.run || ui.result || ui.parents || ui.tryOn || ui.walk) return;
+    if (!liveBuild || ui.run || ui.result || ui.parents || ui.tryOn || ui.walk || ui.pin) return;
     // Right after a release the site can still hand out the old page, so each version only gets one try every five minutes.
     const [tried, when] = String(getKey(TRIED_KEY) || '').split(' ');
     if (tried === liveBuild && Date.now() - +when < 300000) return;
@@ -8355,7 +8369,8 @@ Jordy's Science test, Tuesday 10 November: Planet Earth and Beyond. Written from
           setKey(BACKUP_KEY, JSON.stringify({ id, when: Date.now(), data: mine }));
           const fresh = Object.assign(blankPlayer(RS.packs[id]), theirs);
           // A purchase made here that hadn't been saved yet stays, and goes up with the next save.
-          if (RS.carryPurchases(mine, fresh)) {
+          const carried = RS.carryPurchases(mine, fresh);
+          if (RS.carryPassword(mine, fresh) || carried) {
             fresh.updatedAt = Date.now();
             syncAgain = true;
           }
@@ -8364,7 +8379,7 @@ Jordy's Science test, Tuesday 10 November: Planet Earth and Beyond. Written from
         } else if (theirs ? isAhead(mine, theirs) : mine.totalQ > 0 || mine.updatedAt) {
           if (theirs) {
             const { dropped, carried } = RS.squarePurchases(mine, theirs, blankPlayer(RS.packs[id]));
-            if (dropped || carried) changed = true;
+            if (RS.carryPassword(theirs, mine) || dropped || carried) changed = true;
             if (dropped) toast('Something bought on an old copy of the game went back, and the points were returned.');
           }
           await syncCall({ action: 'put', token: syncToken, player: id, data: mine, build: BUILD });
@@ -8585,6 +8600,180 @@ Jordy's Science test, Tuesday 10 November: Planet Earth and Beyond. Written from
       ${SYNC_ON ? '<button class="parents-link small-t muted" data-act="parents">Parents</button>' : ''}
     </main>`;
   }
+
+  // ---------- riders' passwords ----------
+  // Four numbers so the boys can't get into each other's profiles. It's a lock for brothers, not for strangers: the family code does
+  // that job. Mom and Dad open any profile with the parent code, which the server checks, and can give a rider a new password there.
+  const PIN_LENGTH = 4;
+  const PIN_TRIES = 5;
+  const PIN_FAILS = 'holeshot.pinfails.v1';
+  const pinHash = async (id, pin) => {
+    const bytes = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(`holeshot:${id}:${pin}`));
+    return [...new Uint8Array(bytes)].map((b) => b.toString(16).padStart(2, '0')).join('');
+  };
+  const pinFails = () => {
+    try {
+      return JSON.parse(getKey(PIN_FAILS)) || {};
+    } catch (e) {
+      return {};
+    }
+  };
+  function openRider(id) {
+    ui.pin = null;
+    ui.who = id;
+    ui.subject = openSubject(RS.packs[id]);
+    ui.tab = 'home';
+    render();
+    window.scrollTo(0, 0);
+  }
+  function askPassword(id) {
+    if (!SYNC_ON) return openRider(id);
+    ui.pin = { id, mode: state.players[id].pin ? 'enter' : 'new', typed: '', msg: '' };
+    render();
+    window.scrollTo(0, 0);
+    // A password set on another device may not have reached this one yet.
+    if (!state.players[id].pin) {
+      syncNow().then(() => {
+        if (ui.pin && ui.pin.id === id && ui.pin.mode === 'new' && !ui.pin.typed && !ui.pin.byParent && !ui.pin.change && state.players[id].pin) {
+          ui.pin.mode = 'enter';
+          render();
+        }
+      });
+    }
+  }
+  async function pinKey(k) {
+    const v = ui.pin;
+    if (!v || v.busy || v.typed.length >= PIN_LENGTH) return;
+    const fails = pinFails();
+    const wait = fails[v.id] && fails[v.id].until > Date.now();
+    if (v.mode === 'enter' && wait) {
+      v.msg = 'Too many wrong tries. Wait a minute, then try again.';
+      return render();
+    }
+    v.typed += k;
+    v.miss = false;
+    render();
+    if (v.typed.length < PIN_LENGTH) return;
+    v.busy = true;
+    const typed = v.typed;
+    v.typed = '';
+    if (v.mode === 'enter') {
+      const same = (await pinHash(v.id, typed)) === state.players[v.id].pin.h;
+      v.busy = false;
+      if (same) {
+        delete fails[v.id];
+        setKey(PIN_FAILS, JSON.stringify(fails));
+        return openRider(v.id);
+      }
+      const n = ((fails[v.id] && fails[v.id].n) || 0) + 1;
+      fails[v.id] = n >= PIN_TRIES ? { n: 0, until: Date.now() + 60000 } : { n, until: 0 };
+      setKey(PIN_FAILS, JSON.stringify(fails));
+      v.msg = n >= PIN_TRIES ? 'Too many wrong tries. Wait a minute, then try again.' : "That's not it. Try again.";
+      v.miss = true;
+    } else if (v.mode === 'new') {
+      v.first = typed;
+      v.mode = 'again';
+      v.msg = '';
+      v.busy = false;
+    } else {
+      const same = typed === v.first;
+      if (same) {
+        const p = state.players[v.id];
+        p.pin = { h: await pinHash(v.id, typed), at: Date.now() };
+        p.updatedAt = Date.now();
+        keepState();
+        syncSoon();
+        v.busy = false;
+        if (v.change) {
+          ui.pin = null;
+          toast('Your new password is set.');
+          return render();
+        }
+        return openRider(v.id);
+      }
+      v.mode = 'new';
+      v.first = '';
+      v.msg = "They didn't match. Pick your numbers again.";
+      v.miss = true;
+      v.busy = false;
+    }
+    render();
+  }
+  function viewPin() {
+    const v = ui.pin;
+    const name = RS.packs[v.id].name;
+    if (v.mode === 'parent') {
+      return `<main class="pick"><form id="pin-parent-form" class="card lock" autocomplete="off">
+        <label class="h-sec" for="pin-parent-input">Mom or Dad</label>
+        <input id="pin-parent-input" class="lock-input" type="text" inputmode="numeric" maxlength="12" autocomplete="off" spellcheck="false" style="-webkit-text-security:disc" aria-describedby="pin-parent-msg">
+        <p id="pin-parent-msg" class="small-t muted" role="status">${h(v.msg || 'Type the parent code.')}</p>
+        <button class="btn primary full" type="submit" ${v.busy ? 'disabled' : ''}>${v.busy ? 'Checking...' : 'Check'}</button>
+        <button class="btn full" type="button" data-act="pin-back">Back</button>
+      </form></main>`;
+    }
+    if (v.mode === 'parentOk') {
+      return `<main class="pick"><section class="card lock">
+        <div class="h-sec">Hello, Mom or Dad</div>
+        <button class="btn primary full" data-act="pin-open">Open ${name}'s profile ${ic('arrow')}</button>
+        <button class="btn full" data-act="pin-reset">Give ${name} a new password</button>
+        <button class="btn full" data-act="pin-off">Back</button>
+      </section></main>`;
+    }
+    const titles = {
+      enter: [`${name}'s password`, 'Type your 4 numbers.'],
+      new: [v.byParent ? `A new password for ${name}` : v.change ? 'Change your password' : `${name}, pick a password`, 'Choose 4 numbers you will remember, and keep them secret.'],
+      again: ['Type it again', 'The same 4 numbers, to be sure.'],
+    }[v.mode];
+    const dots = Array.from({ length: PIN_LENGTH }, (_, i) => `<span class="pin-dot ${i < v.typed.length ? 'on' : ''}"></span>`).join('');
+    const keys = ['1', '2', '3', '4', '5', '6', '7', '8', '9'].map((k) => `<button class="key" data-act="pin-key" data-id="${k}">${k}</button>`).join('');
+    return `<main class="pick"><section class="card lock pin">
+      <div class="h-sec">${titles[0]}</div>
+      <p class="small-t muted" role="status">${h(v.msg || titles[1])}</p>
+      <div class="pin-dots ${v.miss ? 'shake' : ''}" aria-label="${v.typed.length} of ${PIN_LENGTH} numbers typed">${dots}</div>
+      <div class="pin-keys">${keys}<button class="key alt" data-act="pin-off" aria-label="Back">Back</button><button class="key" data-act="pin-key" data-id="0">0</button><button class="key alt" data-act="pin-del" aria-label="Delete">Del</button></div>
+      ${v.mode === 'enter' ? '<button class="parents-link small-t muted" data-act="pin-parent">Forgotten it? Mom or Dad</button>' : ''}
+    </section></main>`;
+  }
+  document.addEventListener('keydown', (e) => {
+    const v = ui.pin;
+    if (!v || v.mode === 'parent' || v.mode === 'parentOk') return;
+    if (/^[0-9]$/.test(e.key)) pinKey(e.key);
+    else if (e.key === 'Backspace') {
+      v.typed = v.typed.slice(0, -1);
+      render();
+    }
+  });
+  document.addEventListener('submit', async (e) => {
+    if (e.target.id !== 'pin-parent-form') return;
+    e.preventDefault();
+    const v = ui.pin;
+    if (!v || v.busy) return;
+    const code = $('#pin-parent-input').value;
+    v.busy = true;
+    render();
+    const res = await syncCall({ action: 'report', code, days: 1 });
+    v.busy = false;
+    if (ui.pin !== v) return;
+    if (res && res.ok) {
+      v.mode = 'parentOk';
+      v.msg = '';
+    } else v.msg = !res ? "Couldn't check the code. This needs the internet." : res.reason === 'wait' ? 'Too many wrong tries. Wait an hour, then try again.' : "That's not the code. Try again.";
+    render();
+  });
+  // Someone else might pick up a device that's been put down, so after 10 minutes away it goes back to who's riding. A race is left alone.
+  let awaySince = 0;
+  document.addEventListener('visibilitychange', () => {
+    if (document.hidden) {
+      awaySince = Date.now();
+      return;
+    }
+    if (SYNC_ON && awaySince && ui.who && !ui.run && !ui.result && Date.now() - awaySince > 600000) {
+      ui.who = null;
+      ui.tryOn = null;
+      ui.walk = null;
+      render();
+    }
+  });
 
   // ---------- shell ----------
   const TABS = [['home', 'home', 'Home'], ['route', 'route', 'Track'], ['garage', 'wrench', 'Pits'], ['progress', 'chart', 'Progress']];
@@ -9084,6 +9273,7 @@ Jordy's Science test, Tuesday 10 November: Planet Earth and Beyond. Written from
     const toggle = (key, label, sub) => `<button class="toggle" role="switch" aria-checked="${!!state[key]}" data-act="toggle" data-id="${key}"><span><b style="font-weight:600">${label}</b><br><span class="small-t muted">${sub}</span></span><span class="switch"></span></button>`;
     return shell(`
       ${leagueCard()}
+      <section class="card"><div class="h-sec" style="margin-bottom:4px">Share today with a parent</div><p class="small-t muted" style="margin-bottom:8px">Rewards at home come from this. Copy the code and give it to a parent.</p><div class="num" style="font-size:15px;word-break:break-all;background:var(--card-2);border-radius:12px;padding:10px;margin-bottom:8px">${shareCode(ui.who)}</div><button class="btn dark small" data-act="sharecopy">${ui.shareCopied ? 'Copied' : 'Copy code'}</button></section>
       <section class="card"><div class="h-sec">Points per day</div><div class="small-t muted" style="margin-bottom:8px">Last 14 days</div>${dayChart(p)}</section>
       <section class="card"><div class="h-sec" style="margin-bottom:10px">${sub.label}: how strong is each topic?</div><div class="rows">${rows.join('')}</div></section>
       <section class="card"><div class="h-sec" style="margin-bottom:10px">Recent motos</div><div class="log">${runs.join('') || '<p class="small-t muted">Your motos will show here after your first one.</p>'}</div></section>
@@ -9093,6 +9283,7 @@ Jordy's Science test, Tuesday 10 November: Planet Earth and Beyond. Written from
         <p class="small-t muted">Version ${BUILD.slice(0, 6)}</p>
         ${toggle('sound', 'Sound effects', 'Dings and fanfares')}
         ${toggle('autoRead', 'Read questions aloud', 'Speaks each question when it appears')}
+        ${SYNC_ON ? '<button class="btn full" style="margin-top:10px" data-act="pin-change">Change my password</button>' : ''}
         <div style="margin-top:10px">${ui.confirmReset
           ? `<p class="small-t" style="margin-bottom:8px">This wipes ${pack.name}'s points, streak and bikes on this device. It cannot be undone.</p><div style="display:flex;gap:8px;flex-wrap:wrap"><button class="btn dark small" data-act="reset-yes">Yes, start over</button><button class="btn small" data-act="reset-no">Keep my progress</button></div>`
           : `<button class="btn small" data-act="reset">Start ${pack.name} over</button>`}</div>
@@ -10084,6 +10275,7 @@ Jordy's Science test, Tuesday 10 November: Planet Earth and Beyond. Written from
     const app = $('#app');
     if (locked || askLink) app.innerHTML = viewLock();
     else if (ui.parents) app.innerHTML = viewParents();
+    else if (ui.pin) app.innerHTML = viewPin();
     else if (!ui.who) app.innerHTML = viewPick();
     else if (ui.run) drawRun();
     else if (ui.result) app.innerHTML = viewResult();
@@ -10106,6 +10298,22 @@ Jordy's Science test, Tuesday 10 November: Planet Earth and Beyond. Written from
     if (stage) stage.innerHTML = rig(tried(P()));
   });
 
+  // ---------- result code to share with a parent ----------
+  // A short signed code of today's stages and streak. A parent's app checks the signature before it pays out a reward.
+  function shareHash(t0) {
+    let h = 5381;
+    const t = 'hs-share|' + t0;
+    for (let i = 0; i < t.length; i++) h = ((h << 5) + h + t.charCodeAt(i)) | 0;
+    return (h >>> 0).toString(36);
+  }
+  function shareCode(id) {
+    const p = state.players[id];
+    const k = dayKey();
+    const d = p.days[k] || {};
+    const stages = p.runs.filter((r) => r.when === k).length;
+    const body = ['HS', id, k.replace(/-/g, ''), stages, d.ok || 0, d.q || 0, liveStreak(p)].join('.');
+    return body + '.' + shareHash(body);
+  }
   // ---------- taps ----------
   let buying = false;
   document.addEventListener('click', (e) => {
@@ -10117,10 +10325,37 @@ Jordy's Science test, Tuesday 10 November: Planet Earth and Beyond. Written from
     const p = ui.who ? P() : null;
     switch (act) {
       case 'who':
-        ui.who = id;
-        ui.subject = openSubject(RS.packs[id]);
-        ui.tab = 'home';
         audio();
+        askPassword(id);
+        break;
+      case 'pin-key':
+        pinKey(id);
+        break;
+      case 'pin-del':
+        ui.pin.typed = ui.pin.typed.slice(0, -1);
+        render();
+        break;
+      case 'pin-off':
+        ui.pin = null;
+        render();
+        break;
+      case 'pin-back':
+        Object.assign(ui.pin, { mode: 'enter', msg: '', typed: '' });
+        render();
+        break;
+      case 'pin-parent':
+        Object.assign(ui.pin, { mode: 'parent', msg: '', typed: '', miss: false });
+        render();
+        break;
+      case 'pin-open':
+        openRider(ui.pin.id);
+        break;
+      case 'pin-reset':
+        Object.assign(ui.pin, { mode: 'new', byParent: true, msg: '', typed: '' });
+        render();
+        break;
+      case 'pin-change':
+        ui.pin = { id: ui.who, mode: 'new', change: true, typed: '', msg: '' };
         render();
         window.scrollTo(0, 0);
         break;
@@ -10137,6 +10372,14 @@ Jordy's Science test, Tuesday 10 November: Planet Earth and Beyond. Written from
         render();
         window.scrollTo(0, 0);
         break;
+      case 'sharecopy': {
+        const c = shareCode(ui.who);
+        try { navigator.clipboard.writeText(c).catch(() => {}); } catch (err) { /* older phones: the code is on screen to copy by hand */ }
+        ui.shareCopied = true;
+        render();
+        setTimeout(() => { ui.shareCopied = false; render(); }, 2500);
+        break;
+      }
       case 'tab':
         ui.tab = id;
         ui.confirmReset = false;
@@ -10364,7 +10607,7 @@ Jordy's Science test, Tuesday 10 November: Planet Earth and Beyond. Written from
         break;
       case 'reset-yes':
         // The raised epoch lets this reset reach the rider's other devices.
-        state.players[ui.who] = Object.assign(blankPlayer(PK()), { epoch: (P().epoch || 0) + 1 });
+        state.players[ui.who] = Object.assign(blankPlayer(PK()), { epoch: (P().epoch || 0) + 1, pin: P().pin });
         ui.confirmReset = false;
         save();
         render();
