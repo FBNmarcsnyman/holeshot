@@ -4324,6 +4324,314 @@ details ol { margin: 6px 0 0; padding-left: 20px; }
   };
 })(typeof window !== 'undefined' ? window : globalThis);
 
+/* Kash's school work. He writes weekly tests, not exams. The sections follow his own books and test sheets,
+   with new questions on the same facts. Nothing is copied from the books. */
+(function (root) {
+  'use strict';
+  const RS = root.RS;
+  const { bank, mc, pick, shuffle, fmt } = RS;
+  const pack = RS.packs.kash;
+  const S = pack.skills;
+  const noted = (section, notes, more) => Object.assign(section, { notes }, more);
+
+  // ---------- Natural Sciences, Topic 15: the Sun, pages 163 to 166 ----------
+  S.ns_sun = bank([
+    { q: `What is the Sun made of?`, a: `Very hot gas`, w: [`Very hot rock`, `Burning coal`, `Melted metal`], why: `The Sun is a huge ball of very hot gas.` },
+    { q: `What kind of object is the Sun?`, a: `A star`, w: [`A planet`, `A moon`, `A cloud`], why: `The Sun is one of the stars. It gives off its own light.` },
+    { q: `What are all stars?`, a: `Huge balls of very hot gas`, w: [`Huge balls of very cold ice`, `Small bits of broken rock`, `Big lumps of shiny metal`], why: `All stars are like this, and the Sun is one of them.` },
+    { q: `How many stars are there in space?`, a: `Millions`, w: [`Eight`, `About a hundred`, `Only one`], why: `There are millions of stars in space.` },
+    { q: `Which two types of energy does the Sun give out?`, a: `Heat and light`, w: [`Heat and sound`, `Light and sound`, `Sound and wind`], why: `The hot gas gives out heat and light.` },
+    { q: `You sit next to a campfire at the track. Which two types of energy reach you?`, a: `Heat and light`, w: [`Light and sound only`, `Water and wind`, `Heat and rock`], why: `You feel the fire's heat and see its light. The Sun reaches Earth in the same way.` },
+    { q: `What does it mean when energy is "transferred"?`, a: `It moves from its source to another place`, w: [`It stays at its source for ever`, `It turns into water and rain`, `It disappears and is gone`], why: `Heat and light move from the Sun to the Earth.` },
+    { q: `About how many times wider than the Earth is the Sun?`, a: `110 times`, w: [`4 times`, `8 times`, `29 times`], why: `The Sun's diameter is about 110 times the Earth's diameter.` },
+    { q: `How many Earths could fit in a line across the Sun?`, a: `About 110`, w: [`About 4`, `About 18`, `About 1 500`], why: `Next to the Sun, the Earth is only a small dot.` },
+    { q: `How far is the Sun from the Earth?`, a: `About 150 million km`, w: [`About 150 km`, `About 150 thousand km`, `About 384 thousand km`], why: `It is about 150 million kilometres. No distance on Earth is nearly that big.` },
+    { q: `Which star is closest to the Earth?`, a: `The Sun`, w: [`The Moon`, `Jupiter`, `Neptune`], why: `The Sun is our closest star. The Moon and the planets aren't stars at all.` },
+    { q: `Why does the Sun look bigger and brighter than other stars?`, a: `It is so much closer to us`, w: [`It is the biggest star in space`, `It is the only real star there is`, `It is the brightest star of them all`], why: `The Sun isn't a very big or bright star. It just looks that way because it's close.` },
+    { tf: true, q: `True or false: compared with other stars, the Sun is not very big or bright.`, why: `It only looks huge and bright because it's so much closer than the others.` },
+    { q: `Why don't other stars give Earth the heat and light it needs?`, a: `They are much too far away`, w: [`They are much too cold`, `They are made of ice`, `They only shine at night`], why: `Other stars are even further away than the Sun.` },
+    { q: `At a speed that gets you to the Sun in 8 minutes, how long would the next nearest star take?`, a: `4 years`, w: [`8 minutes`, `8 days`, `4 hours`], why: `That's how much further away the other stars are.` },
+    { q: `What would Earth be like without the Sun's heat and light?`, a: `Very cold and very dark`, w: [`Very hot and very dark`, `Very cold and very bright`, `Just the same as it is now`], why: `Plants and animals would not survive.` },
+    { q: `What would happen to plants and animals with no heat or light from the Sun?`, a: `They would not survive`, w: [`They would grow much bigger`, `They would not notice at all`, `They would move to the Moon`], why: `Living things need the Sun's heat and light.` },
+    { q: `Does all of the Sun's heat and light reach the Earth?`, a: `No, it goes in all directions and some reaches us`, w: [`Yes, all of it travels straight to the Earth`, `No, it stops about halfway through space`, `Yes, but it only reaches us during summer`], why: `It travels through space in all directions, and only some reaches Earth.` },
+    { q: `What is a model?`, a: `Something you make to show what a real thing is like`, w: [`A photo of the real thing taken from far away`, `A story people tell about the real thing`, `A test of how much you know about something`], why: `A model shows the main features of the real thing.` },
+    { q: `What size is a model usually?`, a: `Smaller than the real thing`, w: [`Bigger than the real thing`, `Exactly the same as the real thing`, `As big as a whole classroom`], why: `A model of the Sun fits in your hands.` },
+    { q: `In a paper model of the Sun, what do the yellow paper "fingers" show?`, a: `Heat and light coming from the Sun`, w: [`Planets moving around the Sun`, `Clouds hiding part of the Sun`, `Rocks falling off the Sun`], why: `They spread out from the Sun, as its heat and light do.` },
+    { q: `What does the round shape of a model Sun show?`, a: `That the Sun is round like a ball`, w: [`That the Sun is flat like a plate`, `That the Sun is very far away`, `That the Sun is made of gas`], why: `The shape shows the shape.` },
+    { q: `Which of these can a cardboard model of the Sun NOT show?`, a: `How hot the real Sun is`, w: [`That the Sun is round`, `That the Sun looks yellow`, `That light spreads out from it`], why: `A model can't show everything. Its heat and real size are two things it misses.` },
+    { q: `The Sun is a ball of very hot ___.`, t: [`gas`], why: `All stars are balls of very hot gas.`, h: `It isn't solid and it isn't a liquid.` },
+    { q: `The Sun is the closest ___ to the Earth.`, t: [`star`], why: `It's our closest star.`, h: `There are millions of these in space.` },
+    { q: `Heat and light are both types of ___.`, t: [`energy`], why: `Energy can move from its source to other places.`, h: `It starts with "e".` },
+    { tf: false, q: `True or false: the Sun is a planet.`, why: `The Sun is a star. Planets move around it.` },
+    { tf: true, q: `True or false: all the other stars are further from Earth than the Sun is.`, why: `That's why the Sun is called our closest star.` },
+  ]);
+
+  // ---------- Topic 15: planets and orbits, pages 167 to 169 ----------
+  const PLANETS = ['Mercury', 'Venus', 'Earth', 'Mars', 'Jupiter', 'Saturn', 'Uranus', 'Neptune'];
+  S.ns_planets = bank([
+    { q: `How many planets move around the Sun?`, a: `Eight`, w: [`Seven`, `Nine`, `Ten`], why: `The Earth and seven other planets.` },
+    { q: `What is the path a planet follows around the Sun called?`, a: `Its orbit`, w: [`Its phase`, `Its crater`, `Its cycle`], why: `Each planet moves along its own orbit, like a rider following a track.` },
+    { q: `The path of a planet around the Sun is called its ___.`, t: [`orbit`], why: `It starts with "o" and it's a key word in your book.`, h: `It starts with "o".` },
+    { q: `What is the solar system?`, a: `The Sun and all the objects that move around it`, w: [`The Earth and all the stars around it`, `The Moon and all of the craters on it`, `All of the stars in the whole of space`], why: `The Sun is at the centre and everything else moves around it.` },
+    { q: `What is at the centre of the solar system?`, a: `The Sun`, w: [`The Earth`, `The Moon`, `Jupiter`], why: `Everything else moves around the Sun.` },
+    { q: `Where does the word "solar" come from?`, a: `"Sol", the Latin name for the Sun`, w: [`"Solo", which means alone`, `"Soil", which means the ground`, `"Solid", which means hard`], why: `We use "solar" for things linked to the Sun.` },
+    { q: `Which language does the word "sol" come from?`, a: `Latin`, w: [`Afrikaans`, `isiXhosa`, `English`], why: `Latin was the language of the ancient Romans.` },
+    { q: `How many stars are there in the solar system?`, a: `One`, w: [`Eight`, `Nine`, `Millions`], why: `The only star in the solar system is the Sun.` },
+    { q: `Which planet is closest to the Sun?`, a: `Mercury`, w: [`Venus`, `Earth`, `Neptune`], why: `The order starts Mercury, Venus, Earth.` },
+    { q: `Which planet is furthest from the Sun?`, a: `Neptune`, w: [`Uranus`, `Saturn`, `Mercury`], why: `The order ends Saturn, Uranus, Neptune.` },
+    { q: `Which planet has the shortest orbit?`, a: `Mercury`, w: [`Neptune`, `Earth`, `Mars`], why: `It's closest to the Sun, so its path round is the shortest.` },
+    { q: `Which planet has the longest orbit?`, a: `Neptune`, w: [`Mercury`, `Jupiter`, `Earth`], why: `It's furthest from the Sun, so its path round is the longest.` },
+    { q: `Which is the biggest planet?`, a: `Jupiter`, w: [`Saturn`, `Earth`, `Neptune`], why: `Jupiter is the biggest of the eight.` },
+    { q: `Which planet is famous for the big rings around it?`, a: `Saturn`, w: [`Mars`, `Venus`, `Earth`], why: `You can see Saturn's rings in the picture in your book.` },
+    { q: `What is the biggest object in the solar system?`, a: `The Sun`, w: [`Jupiter`, `Saturn`, `The Earth`], why: `The Sun is much, much bigger than any planet.` },
+    { q: `Going only by how close it is to the Sun, which planet should be the hottest?`, a: `Mercury`, w: [`Neptune`, `Earth`, `Jupiter`], why: `Mercury is closest, so that's the answer your book is after. Scientists have found Venus is actually hotter, because its thick air traps heat.` },
+    { q: `Going only by distance from the Sun, which planet should be the coldest?`, a: `Neptune`, w: [`Mercury`, `Earth`, `Mars`], why: `It's the furthest from the Sun's heat.` },
+    { q: `Why is the furthest planet from the Sun so cold?`, a: `It gets the least heat from the Sun`, w: [`It is the smallest planet of them all`, `It has the shortest orbit of them all`, `It is made of ice and nothing else`], why: `The further from the Sun, the less heat a planet gets.` },
+    { q: `How many planets are closer to the Sun than the Earth is?`, a: `Two`, w: [`One`, `Three`, `Five`], why: `Mercury and Venus.` },
+    { q: `How many planets are further from the Sun than the Earth is?`, a: `Five`, w: [`Two`, `Six`, `Seven`], why: `Mars, Jupiter, Saturn, Uranus and Neptune.` },
+    { q: `Which two planets are closer to the Sun than the Earth?`, a: `Mercury and Venus`, w: [`Mars and Venus`, `Mercury and Mars`, `Jupiter and Saturn`], why: `The order starts Mercury, Venus, Earth.` },
+    { q: `Which list is in the right order, starting closest to the Sun?`, a: `Mercury, Venus, Earth, Mars`, w: [`Venus, Mercury, Earth, Mars`, `Mercury, Venus, Mars, Earth`, `Earth, Venus, Mercury, Mars`], why: `Then come Jupiter, Saturn, Uranus and Neptune.` },
+    { q: `Which list is in the right order, going away from the Sun?`, a: `Jupiter, Saturn, Uranus, Neptune`, w: [`Saturn, Jupiter, Uranus, Neptune`, `Jupiter, Saturn, Neptune, Uranus`, `Uranus, Saturn, Jupiter, Neptune`], why: `The first four are Mercury, Venus, Earth and Mars.` },
+    { tf: false, q: `True or false: all the planets are the same size.`, why: `They aren't the same size and they don't all look the same.` },
+    { tf: true, q: `True or false: each planet moves in its own orbit.`, why: `Each one has its own path around the Sun.` },
+    { tf: false, q: `True or false: all the planets move at the same speed.`, why: `The real planets don't move at the same speed.` },
+    { tf: true, q: `True or false: the Earth is in a different place in its orbit every day.`, why: `It's always moving around the Sun.` },
+    { q: `What shape are the planets?`, a: `Large spheres, round like balls`, w: [`Flat circles, like big plates`, `Long tubes, like big pipes`, `Square blocks, like big boxes`], why: `Planets are all large spheres that travel round the Sun.` },
+    { q: `The planet closest to the Sun is ___.`, t: [`Mercury`], why: `Start every planet's name with a capital letter in your test.`, h: `It starts with "M", but it isn't Mars.` },
+    { q: `The biggest planet is ___.`, t: [`Jupiter`], why: `Start every planet's name with a capital letter in your test.`, h: `It starts with "J".` },
+    { q: `The planet with the big rings is ___.`, t: [`Saturn`], why: `Start every planet's name with a capital letter in your test.`, h: `It starts with "S".` },
+    { q: `The planet furthest from the Sun is ___.`, t: [`Neptune`], why: `Start every planet's name with a capital letter in your test.`, h: `It starts with "N".` },
+  ]);
+  S.ns_order = () => {
+    const i = pick([0, 1, 2, 3, 4, 5, 6, 7]);
+    const items = ['Sun', ...PLANETS.map((p, n) => (n === i ? '?' : p))];
+    const others = shuffle(PLANETS.filter((p) => p !== PLANETS[i]));
+    return mc('Which planet is missing from the order?', PLANETS[i], others.slice(0, 3), {
+      visual: { type: 'flow', items },
+      hint: 'Mercury, Venus, Earth, Mars, Jupiter, Saturn, Uranus, Neptune.',
+      steps: [`The order is ${PLANETS.join(', ')}.`, `Each name starts with a capital letter.`],
+    });
+  };
+
+  // ---------- Topic 15: the Sun and life, pages 170 and 171 ----------
+  S.ns_life = bank([
+    { q: `Where does the energy in an energy chain start?`, a: `The Sun`, w: [`The owl`, `The soil`, `The Moon`], why: `Energy moves from the Sun to plants, and then to animals.` },
+    { q: `How does sunlight help a wheat plant?`, a: `It helps it make its own food`, w: [`It stops it needing any water`, `It keeps the field mice away`, `It turns the wheat into soil`], why: `Plants use light from the Sun to make their food.` },
+    { q: `What does a field mouse get from eating wheat?`, a: `Energy for its life processes`, w: [`Light to make its own food`, `Water for the water cycle`, `Heat to warm up the Sun`], why: `Then an owl gets that energy by eating the mouse.` },
+    { q: `An owl eats a field mouse that ate wheat. Where did that energy come from to start with?`, a: `The Sun`, w: [`The owl`, `The wheat`, `The mouse`], why: `Every energy chain starts with the Sun.` },
+    { q: `Which of these can make its own food?`, a: `A tree`, w: [`A lizard`, `An eagle`, `A field mouse`], why: `Plants make their own food using sunlight. Animals have to eat.` },
+    { q: `How many life processes are there?`, a: `Seven`, w: [`Five`, `Eight`, `Two`], why: `All living things need energy for the seven life processes.` },
+    { q: `In a chain from tree to caterpillar to lizard to snake to eagle, what if the tree can't make food?`, a: `The animals would run out of food and die`, w: [`The animals would start making their own food`, `Nothing would change for any of the animals`, `The animals would all grow a lot bigger`], why: `Every animal in the chain depends on the plant at the start.` },
+    { q: `Why can the Sun supply heat and light, but the Earth can't?`, a: `The Sun is a star made of very hot gas`, w: [`The Earth is further from the Moon`, `The Earth is bigger than the Sun`, `The Sun is the only thing that is round`], why: `The hot gas gives out heat and light. The Earth is not a star.` },
+    { q: `Why do seeds need heat from the Sun?`, a: `Seeds need warmth to grow`, w: [`Seeds need heat to make rain`, `Seeds need heat to turn into rock`, `Seeds need heat to stay asleep`], why: `Without heat, seeds wouldn't grow.` },
+    { q: `If seeds could not grow, what would happen on Earth?`, a: `No plants, and so no food`, w: [`More plants, and more food`, `Only very tall plants would grow`, `Animals would make plants instead`], why: `Plants are where the food on Earth starts.` },
+    { q: `Why does a lizard lie on a rock in the Sun?`, a: `To keep warm`, w: [`To get a drink`, `To make its own food`, `To cool down`], why: `Animals need warmth for their life processes.` },
+    { q: `What can too much or too little heat do?`, a: `Kill many plants and animals`, w: [`Make the Earth a star`, `Stop the Earth's orbit`, `Turn water into rock`], why: `The Earth as a whole gets just the right amount.` },
+    { tf: false, q: `True or false: every place on Earth gets the same amount of heat from the Sun.`, why: `Places don't all get the same amount, but the Earth as a whole gets enough to support life.` },
+    { tf: true, q: `True or false: the Earth as a whole gets the right amount of energy from the Sun to support life.`, why: `It's just the right distance from the Sun.` },
+    { q: `Why should you wear a hat and sunblock at a sunny race?`, a: `Too much of the Sun's energy can harm you`, w: [`Sunblock makes the Sun cooler for everyone`, `A hat helps you to see the planets better`, `The Sun only shines on people with no hat`], why: `Energy from the Sun can be harmful, so don't spend too long out in it unprotected.` },
+    { q: `Which two things does life on Earth need to survive?`, a: `Water and energy`, w: [`Rock and dust`, `Gas and ice`, `Sand and wind`], why: `The Sun's heat and light help us to meet both needs.` },
+    { q: `Why can life survive on Earth?`, a: `It is just the right distance from the Sun`, w: [`It is the closest planet to the Sun`, `It is the biggest of the eight planets`, `It has the longest orbit of all planets`], why: `It gets the right amount of heat and light.` },
+    { q: `All living things need ___ for the seven life processes.`, t: [`energy`], why: `That energy starts with the Sun.`, h: `It's the same word as for heat and light.` },
+    { q: `Plants use ___ from the Sun to make their own food.`, t: [`light`, `sunlight`], why: `Light from the Sun starts the energy chain.`, h: `It's not the heat. It's the other one.` },
+  ]);
+  const CHAINS = [
+    ['Sun', 'Wheat', 'Field mouse', 'Owl'],
+    ['Sun', 'Tree', 'Caterpillar', 'Lizard', 'Snake', 'Eagle'],
+    ['Sun', 'Grass', 'Zebra', 'Lion'],
+    ['Sun', 'Grass', 'Grasshopper', 'Frog', 'Snake'],
+    ['Sun', 'Maize', 'Chicken', 'Jackal'],
+  ];
+  S.ns_chain = () => {
+    const chain = pick(CHAINS);
+    const i = pick(chain.map((_, n) => n));
+    const items = chain.map((c, n) => (n === i ? '?' : c));
+    const isSun = i === 0;
+    const pool = isSun ? ['The Moon', 'The soil', 'The rain'] : ['The Moon', 'A rock', 'The rain', 'A cloud'];
+    return mc('What is missing from this energy chain?', isSun ? 'The Sun' : chain[i], shuffle(pool).slice(0, 3), {
+      visual: { type: 'flow', items },
+      hint: 'Energy starts with the Sun, goes to a plant, and then to animals.',
+      steps: [chain.join(' → ')],
+    });
+  };
+
+  // ---------- Topic 15: the water cycle, page 172 ----------
+  S.ns_water = bank([
+    { q: `What makes water evaporate?`, a: `Heat from the Sun`, w: [`Light from the Moon`, `Cold from the clouds`, `Wind from the sea`], why: `It's the heat from the Sun that causes evaporation.` },
+    { q: `What happens to water vapour when it cools?`, a: `It condenses`, w: [`It evaporates`, `It burns up`, `It disappears`], why: `Then clouds form.` },
+    { q: `What forms after water vapour condenses?`, a: `Clouds`, w: [`Rivers`, `Seeds`, `Stars`], why: `Then rain falls from the clouds.` },
+    { q: `What brings liquid water back down to earth?`, a: `Rain`, w: [`Vapour`, `Sunlight`, `Wind`], why: `Rain falls and the cycle carries on.` },
+    { q: `Where do rivers take rainwater?`, a: `Down to the sea`, w: [`Up to the clouds`, `Back to the Sun`, `Up to the mountains`], why: `Then the Sun heats that water, and the cycle starts again.` },
+    { q: `What does rain fill up?`, a: `Rivers, dams and underground stores`, w: [`Stars, planets and moons`, `Craters on the Moon's surface`, `Only the sea, and nothing else`], why: `People and animals use this water.` },
+    { tf: false, q: `True or false: new water is being made on Earth all the time.`, why: `No new water is being made. The same water goes around and around.` },
+    { q: `Why might there not be enough clean water in future?`, a: `People waste it or make it dirty`, w: [`The Sun is getting colder each year`, `Rain has stopped being part of the cycle`, `The Moon is taking water from the sea`], why: `The same water keeps going round, so we have to look after it.` },
+    { q: `Why does life on Earth need the water cycle?`, a: `It gives the rain and water all life needs`, w: [`It gives plants the light they need`, `It keeps the planets in their orbits`, `It makes the Earth's soil out of rock`], why: `Rain waters plants and fills rivers and dams.` },
+    { q: `What would happen if the Earth got no heat from the Sun?`, a: `Water wouldn't evaporate, so there'd be no rain`, w: [`Water would evaporate much faster, with more rain`, `Rain would fall all the time, with no clouds`, `Nothing at all would change in the water cycle`], why: `Heat starts the cycle, and life needs the rain.` },
+    { q: `What has happened to any water on hot planets closer to the Sun?`, a: `It has evaporated`, w: [`It has frozen`, `It has turned to rock`, `It has fallen as rain`], why: `They are so hot that the water has evaporated.` },
+    { q: `Why has the water evaporated on planets much closer to the Sun?`, a: `They are very hot`, w: [`They are very cold`, `They are very small`, `They have no orbit`], why: `The closer to the Sun, the hotter the planet.` },
+    { q: `What has happened to any water on cold planets far from the Sun?`, a: `It is frozen`, w: [`It has evaporated`, `It has become gas`, `It is boiling`], why: `They get so little heat that any water is frozen.` },
+    { q: `Which of these saves water?`, a: `Washing your bike with a bucket, not a hose`, w: [`Leaving the tap on while you brush your teeth`, `Taking a much longer shower after every ride`, `Hosing down the whole driveway every day`], why: `A bucket uses far less than a running hose.` },
+    { q: `When water heats up and turns into vapour, we say it ___.`, t: [`evaporates`, `evaporate`, `evaporated`], why: `Heat from the Sun makes water evaporate.`, h: `It starts with "e".` },
+    { q: `When water vapour cools down, it ___ and forms clouds.`, t: [`condenses`, `condense`, `condensed`], why: `Vapour cools and condenses, then clouds form.`, h: `It starts with "c".` },
+    { tf: true, q: `True or false: rain is part of the water cycle.`, why: `Rain brings liquid water back to earth.` },
+    { q: `Why is the Sun's heat important in the water cycle?`, a: `It makes the water evaporate`, w: [`It makes the rain fall down`, `It makes the rivers flow down`, `It makes the clouds go dark`], why: `Without evaporation the cycle can't start.` },
+  ]);
+  const CYCLE = ['Sun heats the water', 'Water evaporates', 'Vapour cools and condenses', 'Clouds form', 'Rain falls'];
+  S.ns_cycle = () => {
+    const i = pick([0, 1, 2, 3, 4]);
+    const start = pick([0, 1, 2, 3, 4]);
+    const items = CYCLE.map((c, n) => (n === i ? '?' : c));
+    const shown = [...items.slice(start), ...items.slice(0, start)];
+    const others = CYCLE.filter((c) => c !== CYCLE[i]);
+    return mc('The water cycle goes round and round. Which step is missing?', CYCLE[i], shuffle(others).slice(0, 3), {
+      visual: { type: 'flow', items: shown },
+      hint: 'Start with the Sun heating water, then follow it up to the clouds and back down.',
+      steps: [`${CYCLE.join(', then ')}, and round again.`],
+    });
+  };
+
+  // ---------- Topic 15: sharing what you know, page 173 ----------
+  S.ns_share = bank([
+    { q: `What should you think about first when you share information?`, a: `Your audience`, w: [`Your pencil case`, `The weather`, `Your lunch`], why: `How old are they? How well do they read? What might they already know?` },
+    { q: `Who is your audience?`, a: `The people you are sharing with`, w: [`The people who wrote your book`, `The planets in your drawing`, `The people in your family only`], why: `Think about what they'll find interesting.` },
+    { q: `Which of these is NOT one of the four ways to share information?`, a: `Keeping it to yourself`, w: [`Writing`, `Talking`, `Drawing`], why: `The four ways are writing, talking, showing a picture and drawing.` },
+    { q: `Which is one of the four ways to share information?`, a: `Showing a picture`, w: [`Hiding your notes`, `Whispering to yourself`, `Rubbing out your work`], why: `The four ways are writing, talking, showing a picture and drawing.` },
+    { q: `What should a good poster have on it?`, a: `A clear heading`, w: [`No words at all`, `Very tiny writing`, `Only one colour`], why: `A heading tells people what the poster is about.` },
+    { q: `Why should you practise what you are going to say?`, a: `So that you can explain it clearly`, w: [`So that your poster dries in time`, `So that nobody asks you about it`, `So that you never need a heading`], why: `Use your poster to help you practise.` },
+    { q: `You are teaching Grade 2s about the Sun. What should you ask yourself?`, a: `How well can they read?`, w: [`How old is the Sun?`, `How fast is Jupiter?`, `How far is the Moon?`], why: `Younger learners need clear pictures and easy words.` },
+    { tf: true, q: `True or false: a clear labelled drawing can help you to explain the solar system.`, why: `Drawing is one of the four ways of sharing information.` },
+  ]);
+
+  // ---------- Topic 16: the Moon, pages 175 to 179 ----------
+  S.ns_moon = bank([
+    { q: `What is the Moon made of?`, a: `Rock`, w: [`Hot gas`, `Ice`, `Metal`], why: `The Moon is a ball of rock in space.` },
+    { q: `What shape is the Moon?`, a: `Round, like a ball`, w: [`Flat, like a plate`, `Always a thin curve`, `Square, like a box`], why: `It's always round. Only the lit part we can see changes.` },
+    { q: `What covers the surface of the Moon?`, a: `Dust and pieces of broken rock`, w: [`Rich soil and short grass`, `Ice and deep oceans`, `Very hot gas and flames`], why: `There's no proper soil on the Moon.` },
+    { tf: false, q: `True or false: plants could grow in the good soil on the Moon.`, why: `There's no proper soil on the Moon, only dust and broken rock.` },
+    { q: `What is a crater?`, a: `A round hole made by something that fell on a surface`, w: [`A tall mountain made of rock and ice on a planet`, `A dry river that once ran across a planet`, `A shadow that moves across the face of the Moon`], why: `The Moon's surface is covered in them.` },
+    { q: `Large round dents on the Moon's surface are called ___.`, t: [`craters`, `crater`], why: `Something fell on the surface and made the dent.`, h: `It starts with "c".` },
+    { tf: true, q: `True or false: there is no air on the Moon.`, why: `So living things that need air can't survive there.` },
+    { tf: false, q: `True or false: rivers and oceans cover parts of the Moon.`, why: `There's no liquid water on the Moon.` },
+    { q: `Why does rain never fall on the Moon?`, a: `There is no liquid water there`, w: [`It's much too close to the Sun`, `It's covered in thick clouds`, `The rain all falls on Earth`], why: `No liquid water means no rivers, no oceans and no rain.` },
+    { q: `Where do scientists think there might be ice on the Moon?`, a: `In very deep, shaded craters`, w: [`In its big blue oceans`, `On top of its mountains`, `Inside every Moon rock`], why: `Those places are shaded and cold.` },
+    { q: `Which three reasons explain why living things can't survive on the Moon?`, a: `No air, no liquid water, no proper soil`, w: [`No rock, no dust, no craters`, `Too much air, water and soil`, `No Sun, no Earth, no stars`], why: `Plants and animals need all three.` },
+    { q: `What is an astronaut?`, a: `A person who travels into space`, w: [`A person who studies rocks on Earth`, `A person who draws the planets`, `A person who fixes telescopes`], why: `Astronauts have walked on the Moon.` },
+    { q: `What did astronauts bring back from the Moon?`, a: `Pieces of Moon rock`, w: [`Bottles of Moon water`, `Bags of Moon soil`, `Pots of Moon plants`], why: `Scientists have studied them.` },
+    { q: `What did scientists find out about Moon rocks?`, a: `They are similar to rocks on Earth`, w: [`They are made of very hot gas`, `They are as soft as wet sand`, `They are made of solid ice`], why: `The Moon's rock isn't that different from ours.` },
+    { q: `Why does an astronaut on the Moon need a special suit?`, a: `There is no air to breathe there`, w: [`It rains all day on the Moon`, `The Moon is too crowded`, `The suit makes them run fast`], why: `An astronaut has to carry the air they breathe.` },
+    { q: `How does the Moon's size compare with the Earth's?`, a: `It is much smaller`, w: [`It is much bigger`, `It is the same size`, `It is slightly bigger`], why: `About 4 Moons fit across the Earth.` },
+    { q: `About how many Moons could fit across the Earth?`, a: `About 4`, w: [`About 110`, `About 8`, `About 30`], why: `And about 110 Earths fit across the Sun.` },
+    { q: `Which list goes from biggest to smallest?`, a: `Sun, Earth, Moon`, w: [`Earth, Sun, Moon`, `Moon, Earth, Sun`, `Sun, Moon, Earth`], why: `The Sun is much bigger than the Earth, and the Earth is much bigger than the Moon.` },
+    { q: `Which list goes from closest to the Earth to furthest away?`, a: `Moon, Sun, stars`, w: [`Sun, Moon, stars`, `Stars, Sun, Moon`, `Moon, stars, Sun`], why: `The Moon is nearest, then the Sun, and the other stars are much further.` },
+    { q: `What is the nearest body in space to the Earth?`, a: `The Moon`, w: [`The Sun`, `Mars`, `Venus`], why: `It's much closer than the Sun.` },
+    { q: `How far is the Moon from the Earth?`, a: `${fmt(384400)} km`, w: [`${fmt(150000000)} km`, `${fmt(110)} km`, `${fmt(29500)} km`], why: `The Sun is much further, at ${fmt(150000000)} km.` },
+    { q: `How far is the Sun from the Earth, according to the table in your book?`, a: `${fmt(150000000)} km`, w: [`${fmt(384400)} km`, `${fmt(1500)} km`, `${fmt(29500)} km`], why: `The Moon is much closer, at ${fmt(384400)} km.` },
+    { q: `At a speed that reaches the Sun in 8 minutes, how long would the Moon take?`, a: `1,5 seconds`, w: [`8 minutes`, `4 years`, `15 days`], why: `That shows how much closer the Moon is.` },
+    { tf: true, q: `True or false: no planet is closer to the Earth than the Moon is.`, why: `The Moon is the nearest body in space to the Earth.` },
+    { q: `In a hanging model of the Sun, Earth and Moon, which two hang close together?`, a: `The Earth and the Moon`, w: [`The Sun and the Earth`, `The Sun and the Moon`, `All three of them`], why: `The Sun is much further from both.` },
+    { q: `In that model, which object is much bigger than the other two?`, a: `The Sun`, w: [`The Earth`, `The Moon`, `The hanger`], why: `Even so, a model can't show how much bigger the real Sun is.` },
+    { q: `What is the only place in the solar system where the environment can sustain life?`, a: `The Earth`, w: [`The Moon`, `Mars`, `The Sun`], why: `So we need to look after it.` },
+    { q: `What could stop the Earth supporting life in the same way?`, a: `Making the water and air dirty`, w: [`Planting many more trees`, `Saving water at home`, `Looking up at the Moon`], why: `That's called pollution.` },
+    { q: `People who travel into space are called ___.`, t: [`astronauts`, `astronaut`], why: `Astronauts collected rocks from the Moon.`, h: `It starts with "a".` },
+    { q: `The Moon is made of ___.`, t: [`rock`, `rocks`], why: `So it can't make its own light.`, h: `It's the same stuff as a koppie.` },
+    { q: `There is no ___ water on the Moon.`, t: [`liquid`], why: `There might be some frozen water, but none that flows.`, h: `It's the opposite of frozen.` },
+    { q: `There might be some ___ water deep in the Moon's craters.`, t: [`frozen`], why: `We call frozen water ice.`, h: `It's the opposite of liquid.` },
+  ]);
+
+  // ---------- Topic 16: phases of the Moon, pages 180 to 183 ----------
+  const HALF = '29{1/2}';
+  S.ns_phases = bank([
+    { q: `Why can we see the Moon shining?`, a: `The Sun's light lights up its surface`, w: [`It makes its own light inside it`, `It's on fire, just like the Sun`, `It's made of very hot gas`], why: `The Moon is made of rock, so it doesn't make any light.` },
+    { q: `Why can't the Moon make its own light, while the Sun can?`, a: `The Moon is rock, and the Sun is very hot gas`, w: [`The Moon is smaller than the Earth is`, `The Moon is much too far from the Earth`, `The Moon only comes out during the night`], why: `The Sun's hot gas gives out light. Rock doesn't.` },
+    { q: `What is lighting the Moon?`, a: `The Sun`, w: [`The Earth`, `Other stars`, `Its own fire`], why: `The Sun's light shines on its surface and lights it up.` },
+    { q: `Why can't the Sun shine on all of the Moon at once?`, a: `The Moon is round`, w: [`The Moon is too small`, `The Moon has craters`, `The Moon is too far`], why: `Like a ball in the light of a torch, only one side gets lit.` },
+    { q: `Why can't we see the part of the Moon that isn't lit?`, a: `It is too dark`, w: [`It has gone away`, `It is see-through`, `It has fallen off`], why: `We can only see the part that sunlight shines on.` },
+    { q: `What are the phases of the Moon?`, a: `The changing pattern of sunlight on the Moon`, w: [`The paths the planets follow around the Sun`, `The round holes on the surface of the Moon`, `The stories people tell about the Moon`], why: `Each lit shape is one phase.` },
+    { q: `How often does the pattern of phases repeat?`, a: `Every ${HALF} days`, w: [`Every 7 days`, `Every 365 days`, `Every 110 days`], why: `That's about a month.` },
+    { q: `It's Full Moon tonight. When will it next be Full Moon?`, a: `In ${HALF} days`, w: [`In 8 days`, `In 7 days`, `In 150 days`], why: `The pattern repeats every ${HALF} days.` },
+    { q: `Which phase comes straight after New Moon?`, a: `Crescent`, w: [`Quarter`, `Gibbous`, `Full Moon`], why: `The order is New Moon, Crescent, Quarter, Gibbous, Full Moon.` },
+    { q: `As the lit part grows, which phase comes just before Full Moon?`, a: `Gibbous`, w: [`Crescent`, `Quarter`, `New Moon`], why: `The order is New Moon, Crescent, Quarter, Gibbous, Full Moon.` },
+    { q: `Which list is in the right order as the lit part grows?`, a: `New, Crescent, Quarter, Gibbous, Full`, w: [`New, Quarter, Crescent, Gibbous, Full`, `Full, Crescent, Quarter, Gibbous, New`, `New, Crescent, Gibbous, Quarter, Full`], why: `Then it goes back again, from Full to New.` },
+    { q: `What is the phase called when all the Moon we can see is lit?`, a: `Full Moon`, w: [`New Moon`, `Crescent`, `Quarter`], why: `It looks like a bright round ball.` },
+    { q: `What is the phase called when the lit part we can see is at its smallest?`, a: `New Moon`, w: [`Full Moon`, `Gibbous`, `Quarter`], why: `At New Moon we see almost none of the lit part.` },
+    { q: `How does the lit part change from New Moon to Full Moon?`, a: `It gets bigger`, w: [`It gets smaller`, `It stays the same`, `It disappears`], why: `Then it shrinks again on the way back to New Moon.` },
+    { q: `How does the lit part change from Full Moon to New Moon?`, a: `It gets smaller`, w: [`It gets bigger`, `It stays the same`, `It gets brighter`], why: `Then it grows again on the way back to Full Moon.` },
+    { q: `What is the phase called when the Moon is just a thin curved shape?`, a: `Crescent`, w: [`Gibbous`, `Quarter`, `Full Moon`], why: `A crescent is the thin curved shape.` },
+    { q: `The changing pattern of sunlight on the Moon is called the ___ of the Moon.`, t: [`phases`, `phase`], why: `It's a key word in your book.`, h: `It starts with "ph".` },
+    { q: `The phase between Quarter and Full Moon is called ___.`, t: [`gibbous`], why: `The order is New Moon, Crescent, Quarter, Gibbous, Full Moon.`, h: `It starts with "g".` },
+    { q: `The phase that comes straight after New Moon is called ___.`, t: [`crescent`], why: `It's a thin curved shape.`, h: `It starts with "c".` },
+    { tf: true, q: `True or false: the phases always come in the same order.`, why: `The pattern repeats every ${HALF} days.` },
+    { tf: false, q: `True or false: the Moon itself changes shape during the month.`, why: `The Moon is always round. Only the lit part we can see changes.` },
+    { q: `You draw the Moon every night for a month. What do you write when you can't see it?`, a: `Not seen`, w: [`Full Moon`, `No Moon`, `Crescent`], why: `That's what your book's activity asks you to write.` },
+  ]);
+  const PHASE_NAMES = ['New Moon', 'Crescent', 'Quarter', 'Gibbous', 'Full Moon'];
+  const PHASE_LOOK = ['almost none of it is lit', 'it is a thin curved shape', 'half of the side we see is lit', 'more than half is lit', 'all of the side we see is lit'];
+  S.ns_moonpic = () => {
+    const i = pick([0, 1, 2, 3, 4]);
+    const side = pick(['right', 'left']);
+    const visual = { type: 'moon', phase: i, side };
+    const steps = [`This is ${PHASE_NAMES[i]}: ${PHASE_LOOK[i]}.`, `The order is ${PHASE_NAMES.join(', ')}.`];
+    const hint = 'How much of the Moon is lit: none, a thin curve, half, more than half, or all of it?';
+    if (i < 4 && Math.random() < 0.4) {
+      const next = PHASE_NAMES[i + 1];
+      return mc('The lit part of the Moon is growing. Which phase comes next?', next, PHASE_NAMES.filter((n) => n !== next).slice(0, 3), { visual, hint: 'New Moon, Crescent, Quarter, Gibbous, Full Moon.', steps: [`This is ${PHASE_NAMES[i]}, and next comes ${next}.`] });
+    }
+    return mc('Which phase of the Moon is this?', PHASE_NAMES[i], shuffle(PHASE_NAMES.filter((n) => n !== PHASE_NAMES[i])).slice(0, 3), { visual, hint, steps });
+  };
+
+  // ---------- Topic 16: Moon stories, pages 184 and 185 ----------
+  S.ns_stories = bank([
+    { q: `In the San story, why must the Moon beg the Sun for mercy?`, a: `It had made the Sun angry`, w: [`It wanted some of the Sun's water`, `It had stolen some of the Sun's light`, `It wanted to go and live on Earth`], why: `The San people thought of the Moon as a person who had angered the Sun.` },
+    { q: `In the San story, what shape is the Moon when it begs the Sun?`, a: `A crescent`, w: [`A Full Moon`, `A gibbous shape`, `A quarter`], why: `It's just a thin sliver when it begs to go on living.` },
+    { q: `In the San story, what does the Sun do once the Moon is whole again?`, a: `Its rays slice pieces off the Moon`, w: [`It hides the Moon under the ocean`, `It fills the Moon with illnesses`, `It sends a brand new Moon to the sky`], why: `Then the pattern starts all over again.` },
+    { q: `In the San story, which phase is the Moon in when the Sun starts slicing it again?`, a: `Full Moon`, w: [`New Moon`, `Crescent`, `Quarter`], why: `The Sun's rays start cutting once the Moon is whole.` },
+    { q: `Which people told the story of the Moon begging the Sun?`, a: `The San`, w: [`The early Xhosa`, `The Venda`, `The Sotho`], why: `In their story, the Moon is a person who angered the Sun.` },
+    { q: `What did some Tswana people see in the shapes on the Moon?`, a: `A person with wood strapped to their back`, w: [`A bowl turned upside down and full of water`, `A new Moon rising slowly from out of the sea`, `A huge hole deep down under the ocean`], why: `They believed the surface of the Moon formed shapes.` },
+    { q: `What else did some Tswana people see on the Moon?`, a: `A mother with her child tied to her back`, w: [`A person begging the Sun to let them live`, `A bowl with illnesses falling out of it`, `A farmer who is planting his crops`], why: `Different people saw different shapes.` },
+    { q: `Where did the early Xhosa people believe new Moons were stored?`, a: `In a huge hole under the ocean`, w: [`In a big bowl up in the sky`, `In a deep cave behind the Sun`, `In a dark cave up a mountain`], why: `One Moon drops under the ocean as a new one rises.` },
+    { q: `In the early Xhosa belief, what happens as one Moon drops under the ocean?`, a: `A new Moon slowly rises into the sky`, w: [`The Sun slices it into many pieces`, `Illnesses fall on everybody below`, `Clouds form and heavy rain falls`], why: `The ocean stores many new Moons.` },
+    { q: `In that Xhosa belief, how often would a new Moon rise?`, a: `About every ${HALF} days`, w: [`Every single night`, `Once every 7 days`, `Once every year`], why: `The phases repeat every ${HALF} days.` },
+    { q: `Which people saw the crescent Moon as a bowl?`, a: `The Sotho, Venda and Tswana`, w: [`The San and early Xhosa`, `The ancient Romans`, `The early Xhosa only`], why: `They looked at which way its pointy ends faced.` },
+    { q: `In the bowl story, what was the bowl filled with?`, a: `Illnesses`, w: [`Water`, `Food`, `New Moons`], why: `The bowl could spill them, or hold them in.` },
+    { q: `In the bowl story, what happened when the Moon's pointy ends faced down?`, a: `Illnesses fell, and nobody went out`, w: [`Rain fell, and crops were planted`, `Everyone went out with no fear`, `A new Moon rose from the sea`], why: `The bowl was upside down, so it spilled.` },
+    { q: `In the bowl story, what happened when the Moon's pointy ends faced up?`, a: `Everyone could go out without fear`, w: [`Everyone had to stay inside`, `Illnesses fell from the bowl`, `The Sun sliced the Moon up`], why: `The illnesses stayed in the bowl.` },
+    { q: `What do some people use the phases of the Moon to decide?`, a: `When to start planting their crops`, w: [`Which planet is the biggest of all`, `How far away the Sun is from Earth`, `What the Moon's rocks are made of`], why: `Phases also mark important days in many religions.` },
+    { q: `What do different phases of the Moon mark in many religions?`, a: `Important days`, w: [`Holy mountains`, `Long journeys`, `Family names`], why: `The Moon has mattered to people for a very long time.` },
+    { q: `What do cultural stories about the Moon tell us?`, a: `The Moon has been important in people's lives`, w: [`The Moon is really bigger than the Sun`, `People never used to look at the Moon`, `The Moon is made of a bowl of illnesses`], why: `Many cultures have stories to explain things about it.` },
+    { tf: true, q: `True or false: these Moon stories are people's beliefs, not science.`, why: `People told them to explain what they saw, long before anyone visited the Moon.` },
+  ]);
+
+  pack.subjects.science = {
+    label: 'Science',
+    source: 'Natural Sciences, Topics 15 and 16',
+    scope: 'The Sun and the Moon, pages 163 to 186',
+    note: 'Questions are new but follow the book',
+    examSize: 20,
+    startWith: ['ns_sun', 'ns_system', 'ns_moon'],
+    topics: [
+      noted(RS.section('ns_sun', 0, 'The Sun is a star', 'Topic 15, pages 163 to 166'), ['The Sun is a star: a huge ball of very hot gas.', 'It gives out heat and light, which are types of energy.', 'It is about 110 times wider than the Earth and about 150 million km away.', 'It looks big and bright because it is our closest star.']),
+      noted(RS.section('ns_system', 1, 'Planets and orbits', 'Topic 15, pages 167 to 169', ['ns_planets', 'ns_order']), ['The solar system is the Sun and everything that moves around it.', 'An orbit is the path a planet follows.', 'In order: Mercury, Venus, Earth, Mars, Jupiter, Saturn, Uranus, Neptune.', 'Jupiter is the biggest planet. Saturn has the rings. The Sun is the biggest object.']),
+      noted(RS.section('ns_chain_sec', 2, 'The Sun and life', 'Topic 15, pages 170 and 171', ['ns_life', 'ns_chain']), ['Light helps plants make their own food.', 'Energy moves from the Sun to plants, then to animals: an energy chain.', 'Living things need warmth. Too much or too little heat can kill them.']),
+      noted(RS.section('ns_water_sec', 3, 'The water cycle', 'Topic 15, page 172', ['ns_water', 'ns_cycle']), ['The Sun heats water, and it evaporates.', 'Water vapour cools and condenses, and clouds form.', 'Rain falls and brings liquid water back to earth.', 'No new water is made. The same water goes round and round.']),
+      RS.section('ns_share', 4, 'Sharing what you know', 'Topic 15, page 173'),
+      noted(RS.section('ns_moon', 5, 'Features of the Moon', 'Topic 16, pages 175 to 179'), ['The Moon is round and made of rock.', 'Its surface has dust, broken rock and craters. There is no proper soil.', 'There is no air and no liquid water.', 'It is much smaller than the Earth, and only 384 400 km away.']),
+      noted(RS.section('ns_phase_sec', 6, 'Phases of the Moon', 'Topic 16, pages 180 to 183', ['ns_phases', 'ns_moonpic']), ['The Moon makes no light. Sunlight lights up its surface.', 'We only see the lit part. The rest is too dark.', 'New Moon, Crescent, Quarter, Gibbous, Full Moon, and back again.', 'The pattern repeats every 29 1/2 days.']),
+      noted(RS.section('ns_stories', 7, 'Moon stories', 'Topic 16, pages 184 and 185'), ['San: the Moon begs the angry Sun, grows full, and the Sun slices it again.', 'Tswana: shapes on the Moon, like a person carrying wood or a mother and child.', 'Early Xhosa: new Moons stored in a hole under the ocean.', 'Sotho, Venda, Tswana: a crescent bowl of illnesses. Ends down, stay inside. Ends up, go out.']),
+    ],
+  };
+
+  // He writes weekly tests, not exams, so the home screen says "test".
+  pack.testWord = 'test';
+  pack.locked = ['Social Sciences'];
+  pack.exams = [
+    { date: '2026-11-03', subject: 'english', label: 'English' },
+    { date: '2026-11-10', subject: 'science', label: 'Science' },
+    { date: '2026-11-10', subject: 'afrikaans', label: 'Afrikaans' },
+  ];
+
+  /*__KASH_MORE__*/
+})(typeof window !== 'undefined' ? window : globalThis);
+
 /* Jordy's maths exam, Monday 2 November. The teacher's list: fractions, decimals and
    percentages; divisibility rules; division; exchange rates; time; ratio.
    Original questions, made fresh each time. */
@@ -6968,6 +7276,38 @@ Jordy's Science test, Tuesday 10 November: Planet Earth and Beyond. Written from
     syncNow();
   });
 
+  // ---------- staying up to date ----------
+  // An open tab or a home screen app keeps running the page it first loaded, old prices and all. So it asks which version
+  // is live when it comes back into view and every few minutes, and swaps over between races. build.mjs fills in BUILD.
+  const BUILD = '8175860973';
+  const BACK_KEY = 'holeshot.back.v1';
+  const TRIED_KEY = 'holeshot.tried.v1';
+  let liveBuild = null;
+  function swapToLive() {
+    if (!liveBuild || ui.run || ui.result || ui.parents || ui.tryOn) return;
+    // Right after a release the site can still hand out the old page, so each version only gets one try every five minutes.
+    const [tried, when] = String(getKey(TRIED_KEY) || '').split(' ');
+    if (tried === liveBuild && Date.now() - +when < 300000) return;
+    setKey(TRIED_KEY, `${liveBuild} ${Date.now()}`);
+    try {
+      sessionStorage.setItem(BACK_KEY, JSON.stringify({ who: ui.who, subject: ui.subject, tab: ui.tab, pit: ui.pit }));
+    } catch (e) { /* it opens on the who's riding screen instead */ }
+    keepState();
+    // A new address gets past any saved copy of the page.
+    location.replace(`${location.pathname}?v=${liveBuild}`);
+  }
+  async function checkBuild() {
+    if (!SYNC_ON || navigator.onLine === false) return;
+    try {
+      const res = await fetch(`version.json?t=${Date.now()}`, { cache: 'no-store' });
+      const { build } = await res.json();
+      if (build && build !== BUILD) {
+        liveBuild = build;
+        swapToLive();
+      }
+    } catch (e) { /* no signal: it asks again later */ }
+  }
+
   // ---------- family code and progress across devices ----------
   // The code is checked on the server and isn't in this page. A device that types it gets a long key of its own,
   // kept here, and that key is what lets it save and fetch progress. Only the live site and local previews have the lock.
@@ -7044,7 +7384,7 @@ Jordy's Science test, Tuesday 10 November: Planet Earth and Beyond. Written from
           state.players[id] = Object.assign(blankPlayer(RS.packs[id]), theirs);
           changed = true;
         } else if (theirs ? isAhead(mine, theirs) : mine.totalQ > 0 || mine.updatedAt) {
-          await syncCall({ action: 'put', token: syncToken, player: id, data: mine });
+          await syncCall({ action: 'put', token: syncToken, player: id, data: mine, build: BUILD });
         }
       }
       if (changed) {
@@ -7285,7 +7625,7 @@ Jordy's Science test, Tuesday 10 November: Planet Earth and Beyond. Written from
         const has = !!pack.subjects[e.subject];
         const cls = `${e.subject === ui.subject ? 'on' : ''} ${n < 0 ? 'past' : ''}`;
         return chip(e.subject, e.label, has ? shortDay(e.date) : 'Coming soon', cls, !has);
-      }).join('');
+      }).join('') + Object.entries(pack.subjects).filter(([id]) => !pack.exams.some((e) => e.subject === id)).map(([id, s]) => chip(id, s.label, 'Open', id === ui.subject ? 'on' : '', false)).join('');
     }
     return Object.entries(pack.subjects).map(([id, s]) => chip(id, s.label, 'Open', id === ui.subject ? 'on' : '', false)).join('') + (pack.locked || []).map((l) => chip('', l, 'Needs its books', '', true)).join('');
   }
@@ -7294,9 +7634,10 @@ Jordy's Science test, Tuesday 10 November: Planet Earth and Beyond. Written from
     const list = `<div class="sub-strip" role="group" aria-label="Choose a subject">${subjectStrip(pack)}</div>`;
     if (!e) return `<section class="card" aria-label="Subjects"><div class="eyebrow" style="margin-bottom:8px">Subjects</div>${list}</section>`;
     const n = daysUntil(e.date);
-    return `<section class="card next-exam ${n <= 1 ? 'soon' : ''}" aria-label="Next exam">
+    const word = pack.testWord || 'exam';
+    return `<section class="card next-exam ${n <= 1 ? 'soon' : ''}" aria-label="Next ${word}">
       <div class="next-head">
-        <div style="min-width:0"><div class="eyebrow">Next exam</div><div class="next-name">${e.label}</div><div class="small-t muted num">${shortDay(e.date)}</div></div>
+        <div style="min-width:0"><div class="eyebrow">Next ${word}</div><div class="next-name">${e.label}</div><div class="small-t muted num">${shortDay(e.date)}</div></div>
         <div class="next-when">${whenText(n)}</div>
       </div>
       ${list}
@@ -8118,6 +8459,38 @@ Jordy's Science test, Tuesday 10 November: Planet Earth and Beyond. Written from
     const dots = v.points.map(([k, val]) => `<circle class="dot" cx="${x(k)}" cy="${y(val)}" r="3"/>`).join('');
     return `<div><div class="small-t muted">${h(v.title)}</div><svg class="chart" viewBox="0 0 ${W} ${H}" width="100%" role="img" aria-label="${h(v.title)}: ${v.points.map(([k, val]) => k + ' km ' + val + ' m').join(', ')}">${lines}<polyline class="line" points="${path}"/>${dots}${ticks}<text x="${(L + W) / 2}" y="${H - 4}" text-anchor="middle">${h(v.xLabel)}</text></svg></div>`;
   }
+  // How much of the Moon is lit. The aria label stays general, because the question asks what it shows.
+  function chartMoon(v) {
+    const R = 62, C = 80;
+    const lit = [null, [1, 0.62], [0, 0], [1, 0.62], null][v.phase];
+    const sweep = v.phase === 3 ? 1 : 0;
+    const shape = v.phase === 4 ? `<circle cx="${C}" cy="${C}" r="${R}" fill="#EDE8D8"/>` : !lit ? ''
+      : `<path transform="${v.side === 'left' ? `translate(${2 * C} 0) scale(-1 1)` : ''}" d="M${C} ${C - R}A${R} ${R} 0 0 1 ${C} ${C + R}A${(R * lit[1]).toFixed(1)} ${R} 0 0 ${sweep} ${C} ${C - R}Z" fill="#EDE8D8"/>`;
+    return `<svg viewBox="0 0 160 160" style="display:block;width:100%;max-width:200px;margin-inline:auto;background:#101116;border-radius:20px" role="img" aria-label="A picture of the Moon"><circle cx="${C}" cy="${C}" r="${R}" fill="#2B2E36" stroke="#4A4F5C"/>${shape}</svg>`;
+  }
+  // A bar cut into equal parts, some of them shaded.
+  function chartStrip(v) {
+    const W = 320, H = 54, each = W / v.parts;
+    const parts = Array.from({ length: v.parts }, (_, i) => `<rect class="${i < v.shaded ? 'bar' : 'dot-land'}" x="${(i * each).toFixed(1)}" y="2" width="${each.toFixed(1)}" height="${H - 4}" stroke="#15161B" stroke-width="2"/>`).join('');
+    return `<svg class="chart" viewBox="-2 0 ${W + 4} ${H}" style="display:block;width:100%;max-width:${W}px;margin-inline:auto" role="img" aria-label="A bar cut into equal parts, some of them shaded">${parts}</svg>`;
+  }
+  // A measuring jug, with numbered marks and little marks between them.
+  function chartJug(v) {
+    const W = 220, H = 270, L = 62, R = 172, T = 20, B = 252;
+    const y = (ml) => B - (ml / v.max) * (B - T);
+    let marks = '';
+    for (let m = 0; m <= v.max; m += v.little) {
+      const big = m % v.big === 0;
+      marks += `<line x1="${L}" x2="${L + (big ? 26 : 13)}" y1="${y(m)}" y2="${y(m)}" stroke="#15161B" stroke-width="${big ? 2 : 1.2}"/>`;
+      if (big) marks += `<text x="${L - 6}" y="${y(m) + 4}" text-anchor="end" style="font-size:13px">${RS.fmt(m)}</text>`;
+    }
+    return `<svg class="chart" viewBox="0 0 ${W} ${H}" style="display:block;width:100%;max-width:230px;margin-inline:auto" role="img" aria-label="A measuring jug with a scale in ${v.unit}">
+      <path d="M${R} ${T + 30}h22q12 0 12 12v70q0 12-12 12h-22" fill="none" stroke="#8C909C" stroke-width="8"/>
+      <rect x="${L}" y="${y(v.level)}" width="${R - L}" height="${B - y(v.level)}" fill="#6FB7E8"/>
+      <path d="M${L} ${T - 8}V${B}h${R - L}V${T - 8}" fill="none" stroke="#8C909C" stroke-width="3"/>
+      ${marks}<text x="${R - 6}" y="${T + 2}" text-anchor="end" style="font-size:13px">${v.unit}</text>
+    </svg>`;
+  }
   function visual(q) {
     const v = q.visual;
     if (!v) return '';
@@ -8128,6 +8501,9 @@ Jordy's Science test, Tuesday 10 November: Planet Earth and Beyond. Written from
     if (v.type === 'bars') return chartBars(v);
     if (v.type === 'line') return chartLine(v);
     if (v.type === 'dots') return chartDots(v);
+    if (v.type === 'moon') return chartMoon(v);
+    if (v.type === 'strip') return chartStrip(v);
+    if (v.type === 'jug') return chartJug(v);
     return `<div class="tbl-wrap"><table class="tbl"><thead><tr>${v.head.map((x) => `<th scope="col">${h(String(x))}</th>`).join('')}</tr></thead><tbody>${v.rows.map((row) => `<tr>${row.map((x) => `<td>${h(String(x))}</td>`).join('')}</tr>`).join('')}</tbody></table></div>`;
   }
   const voiceReady = () => !ui.voiceBlocked && !!(window.SpeechRecognition || window.webkitSpeechRecognition);
@@ -8647,6 +9023,7 @@ Jordy's Science test, Tuesday 10 November: Planet Earth and Beyond. Written from
   });
 
   function render() {
+    if (liveBuild) swapToLive();
     applyAccent();
     const app = $('#app');
     if (locked || askLink) app.innerHTML = viewLock();
@@ -8915,6 +9292,22 @@ Jordy's Science test, Tuesday 10 November: Planet Earth and Beyond. Written from
   logSend();
   syncNow();
   RS._applySpeech = applySpeech;
+
+  // After swapping to a new version, carry on where the rider was.
+  if (location.search) history.replaceState(null, '', location.pathname);
+  try {
+    const back = JSON.parse(sessionStorage.getItem(BACK_KEY));
+    sessionStorage.removeItem(BACK_KEY);
+    if (back && RS.packs[back.who]) {
+      Object.assign(ui, back);
+      if (!PK().subjects[ui.subject]) ui.subject = openSubject(PK());
+    }
+  } catch (e) { /* it opens on the who's riding screen instead */ }
+  checkBuild();
+  setInterval(checkBuild, 300000);
+  document.addEventListener('visibilitychange', () => {
+    if (document.visibilityState === 'visible') checkBuild();
+  });
 
   render();
 })();
