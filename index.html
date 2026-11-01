@@ -260,6 +260,9 @@ svg { display: block; }
 .swatch { width: 46px; height: 46px; border-radius: 50%; background: var(--c); display: grid; place-items: center; color: #fff; }
 .paint.on .swatch { outline: 3px solid var(--ink); outline-offset: 2px; }
 .plate-row { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; }
+.lock { display: grid; gap: 12px; }
+.lock-input { width: 100%; height: 72px; border-radius: 16px; border: 2px solid var(--line); background: var(--card-2, var(--card)); color: var(--ink); text-align: center; font: 800 34px/1 var(--display); letter-spacing: .12em; }
+.lock-input:focus { outline: none; border-color: var(--accent); }
 .plate-input { width: 120px; height: 72px; border-radius: 16px; border: 4px solid var(--accent); background: #fff; color: #111318; text-align: center; font: 800 38px/1 var(--display); letter-spacing: -.02em; }
 .badges { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 8px; }
 .badge { background: var(--card-2); border-radius: 18px; padding: 10px; display: grid; gap: 2px; }
@@ -4980,6 +4983,30 @@ details ol { margin: 6px 0 0; padding-left: 20px; }
     if (document.visibilityState === 'hidden') logSend();
   });
 
+  // ---------- family code ----------
+  // A light lock for anyone who stumbles on the link. The page holds a fingerprint of the code, not the code.
+  // Each device asks once. Change CODE_PRINT and every device asks again.
+  const CODE_PRINT = '7ffa86e6721ff73be946eaa4e1d9f75a8db6917e9d835a69ee9351aaeb73a0a8';
+  const CODE_KEY = 'holeshot.code.v1';
+  function rememberCode() {
+    try {
+      localStorage.setItem(CODE_KEY, CODE_PRINT);
+    } catch (e) { /* storage blocked: it asks again next visit */ }
+  }
+  let locked = /\.github\.io$|^localhost$/.test(location.hostname) && !!(window.crypto && crypto.subtle);
+  if (locked) {
+    let known = null;
+    try {
+      known = localStorage.getItem(CODE_KEY);
+    } catch (e) { /* storage blocked */ }
+    // A device already riding when the lock arrived stays in, so nobody is stopped mid-revision.
+    const riding = Object.values(state.players).some((p) => p.totalQ > 0);
+    if (known === CODE_PRINT || (known === null && riding)) {
+      locked = false;
+      rememberCode();
+    }
+  }
+
   const ui = { who: null, subject: null, tab: 'home', run: null, result: null, confirmReset: false, chartPick: null, voiceBlocked: false };
   const P = () => state.players[ui.who];
   const PK = () => RS.packs[ui.who];
@@ -6060,10 +6087,41 @@ details ol { margin: 6px 0 0; padding-left: 20px; }
   }
 
   // ---------- main render ----------
+  function viewLock() {
+    return `<main class="pick">
+      <div class="pick-hero">${photo('hero-jump', 'A rider whipping a dirt bike over a jump')}<div class="brand">Holeshot</div></div>
+      <form id="lock-form" class="card lock" autocomplete="off">
+        <label class="h-sec" for="lock-input">Family code</label>
+        <input id="lock-input" class="lock-input" type="text" inputmode="numeric" maxlength="12" autocomplete="off" spellcheck="false" aria-describedby="lock-msg">
+        <p id="lock-msg" class="small-t muted" role="status">Type the code to open the track. You only need to do this once on each device.</p>
+        <button class="btn primary full" type="submit">Open ${ic('arrow')}</button>
+      </form>
+    </main>`;
+  }
+  document.addEventListener('submit', async (e) => {
+    if (e.target.id !== 'lock-form') return;
+    e.preventDefault();
+    const input = $('#lock-input');
+    const typed = new TextEncoder().encode(`holeshot:${input.value.trim()}`);
+    const print = [...new Uint8Array(await crypto.subtle.digest('SHA-256', typed))].map((b) => b.toString(16).padStart(2, '0')).join('');
+    if (print === CODE_PRINT) {
+      locked = false;
+      rememberCode();
+      render();
+      return;
+    }
+    input.value = '';
+    input.classList.remove('shake');
+    void input.offsetWidth;
+    input.classList.add('shake');
+    $('#lock-msg').textContent = "That's not the code. Try again.";
+    input.focus();
+  });
   function render() {
     applyAccent();
     const app = $('#app');
-    if (!ui.who) app.innerHTML = viewPick();
+    if (locked) app.innerHTML = viewLock();
+    else if (!ui.who) app.innerHTML = viewPick();
     else if (ui.run) drawRun();
     else if (ui.result) app.innerHTML = viewResult();
     else app.innerHTML = { home: viewHome, route: viewRoute, garage: viewGarage, progress: viewProgress }[ui.tab]();
