@@ -165,17 +165,13 @@ svg { display: block; }
 /* pictures */
 .bike { display: block; width: 100%; height: auto; }
 .rig { position: relative; width: 100%; max-width: 460px; }
-.rig .bike { max-width: none; }
-.rider { position: absolute; left: 0; bottom: 0; width: 100%; height: auto; overflow: visible; pointer-events: none; }
-.rig-in { position: relative; }
-.rig-in .bike { display: block; width: 100%; }
-.rd { position: absolute; pointer-events: none; }
-.rd > i, .rd > img, .rd > svg { position: absolute; left: 0; top: 0; width: 100%; height: 100%; max-width: none; display: block; }
-.rd > i { -webkit-mask-size: 100% 100%; mask-size: 100% 100%; -webkit-mask-repeat: no-repeat; mask-repeat: no-repeat; }
+.rig .shot { display: block; width: 100%; height: auto; max-width: none; }
+.rig > i, .rig > svg, .rig > .shot-shade { position: absolute; left: 0; top: 0; width: 100%; height: 100%; max-width: none; display: block; pointer-events: none; }
+.rig > i { -webkit-mask-size: 100% 100%; mask-size: 100% 100%; -webkit-mask-repeat: no-repeat; mask-repeat: no-repeat; }
 .lock-need { font-weight: 600; }
 .rank-line { display: flex; justify-content: space-between; gap: 8px; flex-wrap: wrap; }
 .photo { display: block; width: 100%; height: 100%; object-fit: cover; }
-.stage { background: var(--stage); border-radius: 20px; padding: 10px 14px; display: grid; place-items: center; min-width: 0; }
+.stage { background: #fff; border-radius: 20px; overflow: hidden; display: grid; place-items: center; min-width: 0; }
 .stage .bike { max-width: 460px; }
 .on-photo { background: rgba(10, 11, 14, .72); color: #fff; }
 .on-photo.lime { background: var(--lime); color: var(--lime-ink); }
@@ -261,7 +257,7 @@ svg { display: block; }
 /* ---------- the pits ---------- */
 .rides { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 10px; }
 .ride { background: var(--card-2); border-radius: 20px; padding: 8px 8px 10px; display: grid; gap: 6px; text-align: left; min-width: 0; align-content: start; }
-.ride .stage { padding: 8px; border-radius: 14px; }
+.ride .stage { border-radius: 14px; }
 .ride.on { outline: 3px solid var(--accent); outline-offset: -3px; }
 .ride b { font-weight: 600; font-size: 14px; padding-inline: 4px; }
 .ride .chip { justify-self: start; margin-inline: 4px; }
@@ -277,7 +273,6 @@ svg { display: block; }
 .lap-card { display: grid; gap: 10px; }
 .lap-clock { font-size: 24px; min-width: 76px; text-align: right; }
 .pit-left { position: sticky; top: 8px; z-index: 4; display: grid; gap: 8px; margin-bottom: 12px; padding: 10px 12px; }
-.pit-left .stage { padding: 6px 10px; }
 .pit-left .rig { max-width: 250px; margin-inline: auto; }
 .pit-right { display: grid; gap: 12px; min-width: 0; }
 .pit-tabs { display: flex; flex-wrap: wrap; gap: 6px; }
@@ -6665,9 +6660,9 @@ Jordy's Science test, Tuesday 10 November: Planet Earth and Beyond. Written from
   const $ = (s) => document.querySelector(s);
   const KEY = 'holeshot.v1';
 
-  /* The bike photos have orange plastics. A colour filter turns them into each graphics kit. */
+  /* filter colours the small bike on the track bar. The big pictures paint the plastics with coat, or hex. */
   const PAINTS = {
-    orange: { label: 'Factory orange', hex: '#E9501C', dark: '#B93A10', ink: '#FFFFFF', cost: 1500, filter: 'none' },
+    orange: { label: 'Factory orange', hex: '#E9501C', dark: '#B93A10', ink: '#FFFFFF', cost: 1500, coat: '#F4650F', filter: 'none' },
     blue: { label: 'Team blue', hex: '#1F5FE0', dark: '#1646AC', ink: '#FFFFFF', cost: 1500, filter: 'hue-rotate(195deg) saturate(1.15)' },
     green: { label: 'Team green', hex: '#0B8457', dark: '#07603F', ink: '#FFFFFF', cost: 1500, filter: 'hue-rotate(115deg) saturate(1.1)' },
     violet: { label: 'Purple haze', hex: '#5B3DF5', dark: '#4126C9', ink: '#FFFFFF', cost: 1500, filter: 'hue-rotate(235deg) saturate(1.15)' },
@@ -7045,118 +7040,93 @@ Jordy's Science test, Tuesday 10 November: Planet Earth and Beyond. Written from
     const alt = label === undefined ? `${BIKES[id].label} bike in ${p.label}` : label;
     return `<img class="bike" src="img/bike-${id}.webp" alt="${alt}" style="filter:${p.filter}" decoding="sync">`;
   };
-  // Each bike's footpeg and grip, in the photo's own pixels, which is where the rider's boot and hand go.
-  // side places the side number board: x, y, turn, width, height. front is the corners of the front board. panels traces the plastics that take stickers.
+  // Each bike is one photo with the rider on it, cut into parts by assets/photos.mjs. A part is a mask over a colour or pattern,
+  // and the photo's own shadows and shine go on top, so paint, stickers and kit look like they belong to the picture.
+  // Positions are in the picture's own pixels. side, front, shirt and logo are corners, running top back, top front, bottom front, bottom back.
   const SEATS = {
-    mini: { w: 640, h: 423, peg: [262, 295], grip: [385, 22], side: [186, 163, 13, 74, 52], front: [[428, 47], [466, 53], [500, 119], [462, 113]],
-      panels: 'M263 147L310 124L352 133L388 146L358 105L378 105L442 148L442 156L415 186L400 208L378 198L372 170ZM34 93L140 95L157 112L152 125L85 102ZM120 125L152 127L200 145L262 152L222 167L240 205L200 203L165 175L135 155ZM470 148L480 122L540 122L560 135L609 166L550 142L500 137ZM502 208L512 215L545 302L525 318L505 250Z' },
-    mx: { w: 640, h: 443, peg: [215, 295], grip: [320, 18], side: [168, 158, 14, 74, 52], front: [[385, 29], [431, 34], [452, 96], [417, 90]],
-      panels: 'M220 132L290 113L325 100L350 102L385 128L395 145L375 155L372 172L350 208L335 205L330 178L345 160L320 150L280 145L205 160ZM36 92L120 97L160 125L118 118L65 102ZM108 124L160 128L220 132L205 160L217 200L175 190L135 165ZM432 118L437 100L520 103L545 118L590 149L530 125L505 120L440 122ZM455 215L462 200L508 302L488 318L458 250Z' },
-    enduro: { w: 640, h: 475, peg: [230, 362], grip: [330, 160], side: [176, 268, 10, 74, 52], front: [[352, 160], [384, 163], [406, 208], [374, 205]],
-      panels: 'M198 249L265 225L320 240L320 228L296 213L315 215L345 228L367 255L352 268L335 300L320 300L317 265L250 252ZM42 210L120 215L165 240L200 250L150 237L120 232L60 218ZM122 235L152 238L200 250L235 252L220 300L207 300L172 295L140 262ZM385 228L395 220L440 222L455 230L500 258L445 235L385 240ZM407 292L417 300L447 370L435 375L410 310ZM352 160L365 158L385 182L392 212L385 220L365 198L355 172Z' },
-    hard: { w: 640, h: 387, peg: [235, 270], grip: [388, 15], side: [190, 140, 18, 74, 52], front: [[424, 20], [462, 30], [492, 90], [456, 84]],
-      panels: 'M240 135L260 125L360 88L385 88L443 128L435 133L415 148L400 188L385 183L378 140L280 128ZM35 83L130 85L240 135L240 150L265 188L210 172L165 145L130 118L112 95L60 90ZM453 112L465 89L525 90L545 102L598 132L535 108L470 112ZM487 172L497 178L532 265L515 275L487 200Z' },
-    factory: { w: 640, h: 383, peg: [245, 272], grip: [390, 15], side: [195, 138, 14, 74, 52], front: [[426, 24], [462, 32], [492, 92], [458, 86]],
-      panels: 'M245 120L315 102L355 89L385 89L442 120L445 131L415 143L400 180L385 180L380 140L320 125L250 130ZM37 80L140 83L170 97L210 115L165 102L125 97L75 90ZM130 103L170 105L200 115L245 120L243 138L258 172L225 165L200 160L160 135ZM457 112L465 89L530 90L547 102L602 131L542 107L465 112ZM492 172L500 180L535 265L515 274L492 200Z' },
+    mini: { w: 720, h: 783, side: [[124, 456], [212, 468], [204, 528], [140, 505]], front: [[447, 345], [487, 338], [517, 406], [482, 413]], shirt: [[148, 262], [210, 276], [205, 322], [142, 312]], logo: [[310, 462], [432, 462], [430, 486], [305, 488]] },
+    mx: { w: 720, h: 671, side: [[152, 352], [234, 360], [232, 404], [162, 392]], front: [[438, 250], [480, 262], [498, 300], [458, 296]], shirt: [[212, 180], [262, 186], [262, 230], [210, 226]], logo: [[352, 350], [445, 356], [442, 374], [352, 368]] },
+    enduro: { w: 720, h: 559, side: [[205, 280], [275, 296], [268, 328], [215, 312]], front: [[483, 176], [510, 188], [534, 246], [505, 235]], frontPatch: true, shirt: [[262, 135], [310, 145], [312, 195], [258, 188]], logo: [[420, 280], [498, 296], [494, 312], [418, 298]] },
+    hard: { w: 720, h: 620, side: [[150, 305], [238, 318], [232, 356], [172, 340]], front: [[447, 224], [480, 214], [505, 276], [476, 280]], shirt: [[235, 145], [285, 152], [288, 205], [230, 198]], logo: [[395, 290], [468, 318], [462, 332], [392, 305]] },
+    factory: { w: 720, h: 604, side: [[170, 304], [258, 314], [262, 364], [196, 342]], front: [[466, 214], [495, 220], [517, 266], [490, 272]], shirt: [[242, 140], [295, 150], [298, 205], [236, 198]], logo: [[395, 300], [485, 310], [482, 328], [392, 318]] },
   };
   let svgNo = 0;
   const stickerFill = (s, scale = 1) => {
     const id = `st${++svgNo}`;
     return { id, def: `<pattern id="${id}" width="${s.w}" height="${s.h}" patternUnits="userSpaceOnUse" patternTransform="rotate(${s.turn || 0}) scale(${scale})">${s.art}</pattern>` };
   };
-  const numberBoard = (num, [x, y, turn, wide, tall], paint) => {
-    const size = Math.min(tall * 0.8, (wide * 0.86) / (num.length * 0.62));
-    return `<g transform="translate(${x} ${y}) rotate(${turn})">
-      <rect x="${-wide / 2}" y="${-tall / 2}" width="${wide}" height="${tall}" rx="${Math.round(Math.min(wide, tall) * 0.2)}" fill="#fff" stroke="${paint.dark}" stroke-width="3"/>
-      <text y="${(size * 0.36).toFixed(1)}" font-size="${size.toFixed(1)}" font-weight="800" text-anchor="middle" fill="#111318" style="font-family:var(--display)">${num}</text>
-    </g>`;
-  };
-  // The front board leans with the fork and faces a little towards you, like a real one seen from this angle.
-  // Its corners run top back, top front, bottom front, bottom back, and the number is printed in the same perspective.
-  const frontBoard = (num, [a, b, c, d], paint) => {
-    const across = [(b[0] - a[0] + c[0] - d[0]) / 200, (b[1] - a[1] + c[1] - d[1]) / 200];
-    const down = [(d[0] - a[0] + c[0] - b[0]) / 200, (d[1] - a[1] + c[1] - b[1]) / 200];
+  // Prints text across four corners, in their perspective. A squeeze below 1 narrows it, for a board seen at an angle.
+  const printOn = ([a, b, c, d], text, opts = {}) => {
+    const across = [(b[0] - a[0] + c[0] - d[0]) / 2, (b[1] - a[1] + c[1] - d[1]) / 2];
+    const down = [(d[0] - a[0] + c[0] - b[0]) / 2, (d[1] - a[1] + c[1] - b[1]) / 2];
+    const wide = Math.hypot(...across);
+    const tall = Math.hypot(...down);
+    const squeeze = opts.squeeze || 1;
+    const size = Math.min(tall * 0.84, wide / (String(text).length * 0.62 * squeeze));
+    const unit = (v, k = 1) => [(v[0] / Math.hypot(...v)) * k, (v[1] / Math.hypot(...v)) * k];
     const mid = [(a[0] + b[0] + c[0] + d[0]) / 4, (a[1] + b[1] + c[1] + d[1]) / 4];
-    const size = num.length > 2 ? 46 : num.length > 1 ? 66 : 84;
-    return `<path d="M${a}L${b}L${c}L${d}Z" fill="#fff" stroke="${paint.dark}" stroke-width="3" stroke-linejoin="round"/>
-      <text transform="matrix(${across} ${down} ${mid})" y="${(size * 0.36).toFixed(1)}" font-size="${size}" font-weight="800" text-anchor="middle" fill="#111318" style="font-family:var(--display)">${num}</text>`;
+    const m = [...unit(across, squeeze), ...unit(down), ...mid].map((n) => n.toFixed(3)).join(' ');
+    return `<text transform="matrix(${m}) skewX(-8)" y="${(size * 0.36).toFixed(1)}" font-size="${size.toFixed(1)}" font-weight="800" text-anchor="middle" fill="${opts.fill || '#111318'}" ${opts.stroke ? `stroke="${opts.stroke}" stroke-width="${opts.line || 3}"` : ''} style="font-family:var(--display);paint-order:stroke">${text}</text>`;
   };
-  // What goes on the bike itself: a special colour, the sticker kit, and the race number on the side panel and the front plate.
-  function decals(p, spot) {
-    const paint = PAINTS[p.paint] || PAINTS.orange;
-    const sticker = STICKERS[p.sticker];
-    const num = h(String(p.plate));
-    let out = paint.coat ? `<path d="${spot.panels}" fill="${paint.coat}" opacity=".86"/>` : '';
-    if (sticker && sticker.art) {
-      const fill = stickerFill(sticker);
-      out += `<defs>${fill.def}</defs><path d="${spot.panels}" fill="url(#${fill.id})" opacity=".92"/>`;
-    }
-    return out + numberBoard(num, spot.side, paint) + frontBoard(num, spot.front, paint);
+  const SHOT_PARTS = ['shade', 'plastic', 'helmet', 'peak', 'lens', 'jersey', 'jersey2', 'pants', 'pants2', 'gloves', 'boots', 'boots2'];
+  const readied = {};
+  function ready(id) {
+    if (readied[id]) return;
+    readied[id] = true;
+    SHOT_PARTS.forEach((part) => {
+      new Image().src = `img/${id}-${part}.webp`;
+    });
   }
-  // The rider is one photo cut into parts (assets/rider.mjs). Each part is a mask over a plain colour, with the photo's shadows and shine on top.
-  // RIDER is in the picture's own pixels. It gets lined up with each bike's grip and peg in SEATS, so the hand and boot land in the right place.
-  const RIDER = { w: 387, h: 735, grip: [355, 328], peg: [188, 708], number: [86, 272] };
-  const RIDER_PARTS = ['base', 'shade', 'helmet', 'peak', 'lens', 'jersey', 'jersey2', 'pants', 'pants2', 'gloves', 'gloves2', 'boots', 'boots2'];
-  // Loaded up front so changing gear doesn't flash.
-  RIDER_PARTS.forEach((part) => {
-    new Image().src = `img/rider-${part}.webp`;
-  });
-  const riderFit = (spot) => {
-    const [gx, gy] = spot.grip;
-    const [px, py] = spot.peg;
-    const scale = Math.hypot(gx - px, gy - py) / Math.hypot(RIDER.grip[0] - RIDER.peg[0], RIDER.grip[1] - RIDER.peg[1]);
-    const turn = ((Math.atan2(gy - py, gx - px) - Math.atan2(RIDER.grip[1] - RIDER.peg[1], RIDER.grip[0] - RIDER.peg[0])) * 180) / Math.PI;
-    const left = px - RIDER.peg[0] * scale;
-    const top = py - RIDER.peg[1] * scale;
-    return { scale, turn, left, top };
-  };
   const lookArt = {
-    stripe: [64, 64, 26, (c) => `<path d="M-16 16L16-16M0 64L64 0M48 80L80 48" stroke="${c}" stroke-width="14" fill="none"/>`],
-    check: [40, 40, 13, (c) => `<path d="M0 0h20v20H0zM20 20h20v20H20z" fill="${c}"/>`],
-    bolt: [70, 66, 26, (c) => `<path d="M26 1h20L34 25h14L18 65l8-28H12z" fill="${c}"/>`],
-    camo: [120, 90, 42, (c) => `<path d="M0 20C20 5 45 8 55 25S40 55 20 50-10 35 0 20ZM60 58C78 48 105 55 112 70S90 96 72 88 48 68 60 58Z" fill="${c}"/>`],
-    flame: [130, 80, 30, (c) => `<path d="M0 80C16 70 14 52 6 40C20 46 26 44 26 28C36 38 42 34 44 14C56 30 60 44 56 58C64 52 68 52 72 62C80 56 84 62 86 80Z" fill="${c}"/>`],
-    carbon: [12, 12, 5, (c) => `<path d="M0 0L6 6L0 12M6 0L12 6L6 12" stroke="${c}" stroke-width="2" fill="none"/>`],
-    band: [60, 60, 34, (c) => `<path d="M0 8h60v14H0zM0 30h60v5H0z" fill="${c}"/>`],
-    chev: [60, 40, 24, (c) => `<path d="M0 34L30 8L60 34" stroke="${c}" stroke-width="9" fill="none"/>`],
+    stripe: [64, 64, 13, (c) => `<path d="M-16 16L16-16M0 64L64 0M48 80L80 48" stroke="${c}" stroke-width="14" fill="none"/>`],
+    check: [40, 40, 6.5, (c) => `<path d="M0 0h20v20H0zM20 20h20v20H20z" fill="${c}"/>`],
+    bolt: [70, 66, 13, (c) => `<path d="M26 1h20L34 25h14L18 65l8-28H12z" fill="${c}"/>`],
+    camo: [120, 90, 20, (c) => `<path d="M0 20C20 5 45 8 55 25S40 55 20 50-10 35 0 20ZM60 58C78 48 105 55 112 70S90 96 72 88 48 68 60 58Z" fill="${c}"/>`],
+    flame: [130, 80, 15, (c) => `<path d="M0 80C16 70 14 52 6 40C20 46 26 44 26 28C36 38 42 34 44 14C56 30 60 44 56 58C64 52 68 52 72 62C80 56 84 62 86 80Z" fill="${c}"/>`],
+    carbon: [12, 12, 2.4, (c) => `<path d="M0 0L6 6L0 12M6 0L12 6L6 12" stroke="${c}" stroke-width="2" fill="none"/>`],
+    band: [60, 60, 16, (c) => `<path d="M0 8h60v14H0zM0 30h60v5H0z" fill="${c}"/>`],
+    chev: [60, 40, 12, (c) => `<path d="M0 34L30 8L60 34" stroke="${c}" stroke-width="9" fill="none"/>`],
   };
+  const svgFill = (svg, sizing) => `url('data:image/svg+xml,${encodeURIComponent(svg)}') 0 0 / ${sizing}`;
   const lookFill = (look, c) => {
     const art = lookArt[look];
     if (!art) return '';
-    const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${art[0]}" height="${art[1]}" viewBox="0 0 ${art[0]} ${art[1]}">${art[3](c)}</svg>`;
-    return `url('data:image/svg+xml,${encodeURIComponent(svg)}') 0 0 / ${art[2]}% auto`;
+    return svgFill(`<svg xmlns="http://www.w3.org/2000/svg" width="${art[0]}" height="${art[1]}" viewBox="0 0 ${art[0]} ${art[1]}">${art[3](c)}</svg>`, `${art[2]}% auto`);
   };
-  const coat = (part, fill) => (fill ? `<i style="-webkit-mask-image:url(img/rider-${part}.webp);mask-image:url(img/rider-${part}.webp);background:${fill}"></i>` : '');
-  function riderHtml(p, spot) {
+  const stickerSheet = (s, spot) => svgFill(`<svg xmlns="http://www.w3.org/2000/svg" width="${spot.w}" height="${spot.h}" viewBox="0 0 ${spot.w} ${spot.h}"><defs><pattern id="s" width="${s.w}" height="${s.h}" patternUnits="userSpaceOnUse" patternTransform="rotate(${s.turn || 0})">${s.art}</pattern></defs><rect width="${spot.w}" height="${spot.h}" fill="url(#s)"/></svg>`, '100% 100%');
+  function rig(p, label) {
+    const id = SEATS[p.bike] ? p.bike : 'mini';
+    const spot = SEATS[id];
+    ready(id);
     const pickG = (slot) => GEAR[slot].items[p.gear[slot]] || Object.values(GEAR[slot].items)[0];
     const kit = pickG('kit');
-    const jersey = kit.team ? PAINTS[p.paint].hex : kit.c;
+    const paint = PAINTS[p.paint] || PAINTS.orange;
+    const jersey = kit.team ? paint.hex : kit.c;
     const helmet = pickG('helmet');
     const goggles = pickG('goggles');
     const gloves = pickG('gloves');
     const boots = pickG('boots');
-    const fit = riderFit(spot);
-    const box = [`left:${((100 * fit.left) / spot.w).toFixed(2)}%`, `top:${((100 * fit.top) / spot.h).toFixed(2)}%`, `width:${((100 * RIDER.w * fit.scale) / spot.w).toFixed(2)}%`, `height:${((100 * RIDER.h * fit.scale) / spot.h).toFixed(2)}%`, `transform-origin:${((100 * RIDER.peg[0]) / RIDER.w).toFixed(2)}% ${((100 * RIDER.peg[1]) / RIDER.h).toFixed(2)}%`, `transform:rotate(${fit.turn.toFixed(2)}deg)`].join(';');
-    return `<div class="rd" style="${box}" aria-hidden="true">
-      <img src="img/rider-base.webp" alt="" decoding="sync">
+    const sticker = STICKERS[p.sticker];
+    const num = h(String(p.plate));
+    const coat = (part, fill) => (fill ? `<i style="-webkit-mask-image:url(img/${id}-${part}.webp);mask-image:url(img/${id}-${part}.webp);background:${fill}"></i>` : '');
+    const alt = label === undefined ? `Rider on a ${BIKES[id].label} bike in ${paint.label}` : label;
+    const patch = spot.frontPatch ? `<path d="M${spot.front[0]}L${spot.front[1]}L${spot.front[2]}L${spot.front[3]}Z" fill="#fff" stroke="#fff" stroke-width="5" stroke-linejoin="round"/>` : '';
+    return `<div class="rig">
+      <img class="shot" src="img/photo-${id}.webp" alt="${alt}" width="${spot.w}" height="${spot.h}" decoding="sync">
+      ${coat('plastic', paint.coat || paint.hex)}${sticker && sticker.art ? coat('plastic', stickerSheet(sticker, spot)) : ''}
       ${coat('pants', kit.p)}${coat('pants2', kit.c2)}${coat('boots', boots.c)}${coat('boots2', boots.c2)}
       ${coat('jersey', jersey)}${coat('jersey2', kit.c2)}${coat('jersey', lookFill(kit.look, kit.c2))}
-      ${coat('gloves', gloves.c)}${coat('gloves2', gloves.c2)}
-      ${coat('helmet', helmet.team ? PAINTS[p.paint].hex : helmet.c)}${coat('helmet', lookFill(helmet.look, helmet.c2))}${coat('peak', helmet.c2)}
+      ${coat('gloves', gloves.c)}
+      ${coat('helmet', helmet.team ? paint.hex : helmet.c)}${coat('helmet', lookFill(helmet.look, helmet.c2))}${coat('peak', helmet.c2)}
       ${coat('lens', goggles.look === 'rainbow' ? 'linear-gradient(90deg,#EF4444,#F2C200,#2F8FE8)' : goggles.c)}
-      <img src="img/rider-shade.webp" alt="" decoding="sync">
-      <svg viewBox="0 0 ${RIDER.w} ${RIDER.h}"><text x="${RIDER.number[0]}" y="${RIDER.number[1]}" transform="rotate(-8 ${RIDER.number[0]} ${RIDER.number[1]})" font-size="58" font-weight="800" text-anchor="middle" fill="${kit.c2}" stroke="${jersey}" stroke-width="6" style="font-family:var(--display);paint-order:stroke">${h(String(p.plate))}</text></svg>
+      <svg viewBox="0 0 ${spot.w} ${spot.h}" aria-hidden="true">
+        ${sticker && sticker.art ? printOn(spot.logo, 'HOLESHOT', { fill: '#fff', stroke: '#15161B', line: 2.5 }) : ''}
+        ${patch}${printOn(spot.side, num)}${printOn(spot.front, num, { squeeze: 0.8 })}
+        ${printOn(spot.shirt, num, { fill: kit.c2, stroke: jersey, line: 4 })}
+      </svg>
+      <img class="shot-shade" src="img/${id}-shade.webp" alt="" decoding="sync">
     </div>`;
   }
-  const decalSvg = (p, spot) => `<svg class="rider" viewBox="0 0 ${spot.w} ${spot.h}" aria-hidden="true">${decals(p, spot)}</svg>`;
-  const rig = (p, label) => {
-    const spot = SEATS[p.bike] || SEATS.mini;
-    // Room above the bike for the rider's head, whatever the bike's size.
-    const room = Math.max(0, (-riderFit(spot).top / spot.w) * 100 + 2);
-    return `<div class="rig" style="padding-top:${room.toFixed(1)}%"><div class="rig-in">${bike(p.bike, p.paint, label)}${decalSvg(p, spot)}${riderHtml(p, spot)}</div></div>`;
-  };
-  // A bike on its own, with its number and stickers but no rider.
-  const dressedBike = (p, id) => `<div class="rig"><div class="rig-in">${bike(id, p.paint)}${decalSvg(p, SEATS[id])}</div></div>`;
   const photo = (name, alt = '') => `<img class="photo" src="img/${name}.webp" alt="${alt}" decoding="async">`;
   const plate = (num) => `<span class="plate" aria-label="Race number ${h(String(num))}">${h(String(num))}</span>`;
 
@@ -7558,7 +7528,7 @@ Jordy's Science test, Tuesday 10 November: Planet Earth and Beyond. Written from
         const need = !own && stillNeeds(p, r);
         const on = ui.tryOn ? ui.tryOn.id === id : p.bike === id;
         return `<button class="ride ${on ? 'on' : ''}" data-act="wear" data-tab="bike" data-id="${id}">
-          <div class="stage">${dressedBike(p, id)}</div>
+          <div class="stage">${rig({ ...p, bike: id }, '')}</div>
           <b>${r.label}</b>
           <span class="chip ${p.bike === id ? 'good' : own || short > 0 || need ? '' : 'lime'} num">${p.bike === id ? 'Riding' : own ? 'Yours' : need ? 'Locked' : `${RS.fmt(r.cost)} points`}</span>
           ${need ? `<small class="small-t muted" style="padding-inline:4px">${need}</small>` : ''}
