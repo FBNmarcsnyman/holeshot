@@ -2338,8 +2338,8 @@ details ol { margin: 6px 0 0; padding-left: 20px; }
 })(typeof window !== 'undefined' ? window : globalThis);
 
 /* Jordy's Afrikaans test, Wednesday 11 November. The racing sections follow the book's numbered rules,
-   as limited by the school's list, with new sentences. Verkleining (pages 48 to 51) was written without
-   those pages. The other first lists came before the pages arrived, so they are extra practice only. */
+   as limited by the school's list, with new sentences. The first lists came before the pages arrived,
+   so they are extra practice only. */
 (function (root) {
   'use strict';
   const RS = root.RS;
@@ -2500,30 +2500,67 @@ details ol { margin: 6px 0 0; padding-left: 20px; }
     { q: `Wat is die meervoud van "wolf"?`, a: `wolwe`, w: [`wolfe`, `wolfs`, `wolle`], why: `The f changes to w: wolf → wolwe.` },
   ], AF);
 
+  // ---------- pages 48 to 52: verkleinwoorde. The school's list has rules 1, 2, 3, 5, 7 and 10, which race. The rest is extra practice. ----------
+  const lastOf = (s) => s.slice(-1);
+  const SMALL = {
+    1: { rule: 'Rule 1: a short vowel in the middle: double the last letter and add -ie.', wrong: (s) => [`${s}ie`, `${s}tjie`, `${s}jie`], words: [['lap', 'lappie'], ['tak', 'takkie'], ['lag', 'laggie'], ['sif', 'siffie'], ['rug', 'ruggie'], ['kas', 'kassie'], ['plas', 'plassie'], ['rak', 'rakkie'], ['das', 'dassie'], ['kop', 'koppie'], ['vis', 'vissie'], ['bok', 'bokkie'], ['klip', 'klippie'], ['sak', 'sakkie'], ['rok', 'rokkie'], ['hek', 'hekkie'], ['vlag', 'vlaggie'], ['bus', 'bussie']] },
+    2: { rule: 'Rule 2: a repeated vowel in the middle: drop one of the two and add -ie.', wrong: (s, d) => [`${s}ie`, `${d.slice(0, -2)}${lastOf(s)}ie`, `${s}tjie`], words: [['skaap', 'skapie'], ['plaas', 'plasie'], ['aas', 'asie'], ['neef', 'nefie'], ['saag', 'sagie'], ['plaag', 'plagie'], ['seep', 'sepie'], ['maag', 'magie'], ['aap', 'apie'], ['haas', 'hasie'], ['baas', 'basie'], ['roos', 'rosie'], ['oog', 'ogie'], ['draak', 'drakie'], ['raap', 'rapie'], ['kaas', 'kasie']] },
+    3: { rule: 'Rule 3: a short vowel, ending in l, m, n, r or b: double the last letter and add -etjie.', wrong: (s) => [`${s}tjie`, `${s}${lastOf(s)}ie`, `${s}pie`], words: [['bal', 'balletjie'], ['lam', 'lammetjie'], ['kan', 'kannetjie'], ['kar', 'karretjie'], ['rib', 'ribbetjie'], ['man', 'mannetjie'], ['ram', 'rammetjie'], ['rebel', 'rebelletjie'], ['model', 'modelletjie'], ['pen', 'pennetjie'], ['son', 'sonnetjie'], ['ster', 'sterretjie'], ['kam', 'kammetjie'], ['krab', 'krabbetjie'], ['pil', 'pilletjie'], ['dam', 'dammetjie']] },
+    5: { rule: 'Rule 5: a short vowel, ending in a consonant and an "m": add -pie.', wrong: (s) => [`${s}tjie`, `${s}ie`, `${s}${lastOf(s)}etjie`], words: [['skelm', 'skelmpie'], ['wurm', 'wurmpie'], ['swerm', 'swermpie'], ['arm', 'armpie'], ['besem', 'besempie'], ['asem', 'asempie'], ['helm', 'helmpie'], ['film', 'filmpie'], ['storm', 'stormpie'], ['vorm', 'vormpie']] },
+    7: { rule: 'Rule 7: one syllable, ending in -ng: add -etjie.', wrong: (s) => [`${s}tjie`, `${s}ie`, `${s.slice(0, -1)}kie`], words: [['slang', 'slangetjie'], ['tang', 'tangetjie'], ['kring', 'kringetjie'], ['ring', 'ringetjie'], ['ding', 'dingetjie'], ['string', 'stringetjie'], ['wang', 'wangetjie'], ['long', 'longetjie']] },
+    10: { rule: 'Rule 10: a double vowel in the middle, or two consonants at the end: add -ie.', wrong: (s) => [`${s}tjie`, `${s}${lastOf(s)}ie`, `${s}jie`], words: [['huis', 'huisie'], ['reus', 'reusie'], ['vurk', 'vurkie'], ['hark', 'harkie'], ['muis', 'muisie'], ['neus', 'neusie'], ['druif', 'druifie'], ['boek', 'boekie'], ['kroeg', 'kroegie'], ['koek', 'koekie'], ['hoek', 'hoekie'], ['dorp', 'dorpie'], ['berg', 'bergie'], ['wolk', 'wolkie'], ['stoep', 'stoepie'], ['fiets', 'fietsie']] },
+  };
+  const SMALL_MORE = {
+    4: { rule: 'Rule 4: a longer word ending in l, n or r: add -tjie.', wrong: (s) => [`${s}ie`, `${s}${lastOf(s)}etjie`, `${s}pie`], words: [['paal', 'paaltjie'], ['soen', 'soentjie'], ['blaar', 'blaartjie'], ['venster', 'venstertjie'], ['skolier', 'skoliertjie'], ['viool', 'viooltjie'], ['lepel', 'lepeltjie'], ['beker', 'bekertjie'], ['oor', 'oortjie'], ['seun', 'seuntjie'], ['stoel', 'stoeltjie'], ['tafel', 'tafeltjie'], ['skoen', 'skoentjie'], ['skool', 'skooltjie']] },
+    6: { rule: 'Rule 6: a double or repeated vowel, ending in "m": add -pie.', wrong: (s) => [`${s}ie`, `${s}tjie`, `${s}${lastOf(s)}etjie`], words: [['raam', 'raampie'], ['boom', 'boompie'], ['riem', 'riempie'], ['soom', 'soompie'], ['oom', 'oompie'], ['room', 'roompie'], ['naam', 'naampie'], ['duim', 'duimpie']] },
+    8: { rule: 'Rule 8: more than one syllable, ending in -ng: drop the "g" and add -kie.', wrong: (s) => [`${s}etjie`, `${s}ie`, `${s}tjie`], words: [['koning', 'koninkie'], ['heining', 'heininkie'], ['woning', 'woninkie'], ['bestelling', 'bestellinkie'], ['sening', 'seninkie'], ['rottang', 'rottankie'], ['ketting', 'kettinkie'], ['leerling', 'leerlinkie']] },
+    9: { rule: 'Rule 9: ending in d or t: add -jie.', wrong: (s) => [`${s}ie`, `${s}${lastOf(s)}ie`, `${s}tjie`], words: [['vat', 'vaatjie'], ['baard', 'baardjie'], ['poot', 'pootjie'], ['draad', 'draadjie'], ['lat', 'latjie'], ['bord', 'bordjie'], ['hoed', 'hoedjie'], ['kat', 'katjie'], ['bad', 'badjie'], ['hond', 'hondjie'], ['voet', 'voetjie'], ['perd', 'perdjie']] },
+    11: { rule: 'Rule 11: ending in a double or triple vowel with one set sound: add -tjie.', wrong: (s) => [`${s}ie`, `${s}jie`, `${s}pie`], words: [['kraai', 'kraaitjie'], ['vrou', 'vroutjie'], ['trui', 'truitjie'], ['by', 'bytjie'], ['knie', 'knietjie'], ['ou', 'outjie'], ['meisie', 'meisietjie'], ['drie', 'drietjie'], ['leeu', 'leeutjie'], ['koei', 'koeitjie'], ['tou', 'toutjie']] },
+  };
+  const SMALL_ODD = [['gat', 'gaatjie', ['gatjie', 'gattie', 'gaatie']], ['pad', 'paadjie', ['padjie', 'paddie', 'padtjie']], ['spel', 'speletjie', ['spelletjie', 'speltjie', 'spelie']], ['wa', 'waentjie', [`wa'tjie`, 'watjie', 'wagie']], ['nooi', 'nooientjie', ['nooitjie', 'nooiie', 'nooientie']], ['hoera', `hoera'tjie`, ['hoeratjie', 'hoeraatjie', `hoera'pie`]], ['pa', `pa'tjie`, ['patjie', 'paatjie', `pa'pie`]], ['ma', `ma'tjie`, ['matjie', 'maatjie', `ma'pie`]], ['glas', 'glasie', ['glassie', 'glastjie', 'glaasie']], ['foto', `foto'tjie`, ['fototjie', 'fotootjie', `foto'pie`]], ['blad', 'blaadjie', ['bladjie', 'bladdie', 'bladtjie']]];
+  const smallPair = (s, d, wrongs, rule) => [
+    { q: `Wat is die verkleinwoord van "${s}"?`, t: [d], why: `${rule} ${s} word ${d}.`, h: rule },
+    { q: `Kies die regte verkleinwoord van "${s}".`, a: d, w: wrongs, why: `${rule} ${s} word ${d}.`, h: rule },
+  ];
+  const smallItems = (groups) => Object.values(groups).flatMap((g) => g.words.flatMap(([s, d]) => smallPair(s, d, g.wrong(s, d), g.rule)));
+  const SMALL_PLURAL = 'Go back to one, make it small, then add "s".';
+  const smallPlural = (many, one, d) => ({ q: `Wat is die verkleinwoord van die meervoud "${many}"?`, t: [`${d}s`], why: `${many} word ${one}, dan ${d}, dan ${d}s.`, h: SMALL_PLURAL });
   S.afr_dim = bank([
-    { q: `Wat is die verkleining van "boek"?`, t: [`boekie`], why: `boek → boekie`, h: `Add -ie.` },
-    { q: `Wat is die verkleining van "huis"?`, t: [`huisie`], why: `huis → huisie`, h: `Add -ie.` },
-    { q: `Wat is die verkleining van "fiets"?`, t: [`fietsie`], why: `fiets → fietsie`, h: `Add -ie.` },
-    { q: `Wat is die verkleining van "hond"?`, t: [`hondjie`], why: `Words ending in -d take -jie: hondjie.`, h: `Words ending in -d take -jie.` },
-    { q: `Wat is die verkleining van "hoed"?`, t: [`hoedjie`], why: `Words ending in -d take -jie: hoedjie.`, h: `Words ending in -d take -jie.` },
-    { q: `Wat is die verkleining van "kat"?`, t: [`katjie`], why: `Words ending in -t take -jie: katjie.`, h: `Words ending in -t take -jie.` },
-    { q: `Wat is die verkleining van "voet"?`, t: [`voetjie`], why: `Words ending in -t take -jie: voetjie.`, h: `Words ending in -t take -jie.` },
-    { q: `Wat is die verkleining van "boom"?`, t: [`boompie`], why: `Words ending in -m after a long vowel take -pie: boompie.`, h: `Words like this take -pie.` },
-    { q: `Wat is die verkleining van "arm"?`, t: [`armpie`], why: `Words ending in -rm take -pie: armpie.`, h: `Words like this take -pie.` },
-    { q: `Wat is die verkleining van "seun"?`, t: [`seuntjie`], why: `Words ending in -n after a long vowel take -tjie: seuntjie.`, h: `Words like this take -tjie.` },
-    { q: `Wat is die verkleining van "stoel"?`, t: [`stoeltjie`], why: `Words ending in -l after a long vowel take -tjie: stoeltjie.`, h: `Words like this take -tjie.` },
-    { q: `Wat is die verkleining van "tafel"?`, t: [`tafeltjie`], why: `Words ending in -el take -tjie: tafeltjie.`, h: `Words like this take -tjie.` },
-    { q: `Wat is die verkleining van "man"?`, a: `mannetjie`, w: [`mantjie`, `mannie`, `manjie`], why: `Short vowel + n: double it and add -etjie.` },
-    { q: `Wat is die verkleining van "pen"?`, a: `pennetjie`, w: [`pentjie`, `pennie`, `penjie`], why: `Short vowel + n: double it and add -etjie.` },
-    { q: `Wat is die verkleining van "bal"?`, a: `balletjie`, w: [`baltjie`, `ballie`, `baljie`], why: `Short vowel + l: double it and add -etjie.` },
-    { q: `Wat is die verkleining van "ring"?`, a: `ringetjie`, w: [`ringtjie`, `ringie`, `ringjie`], why: `Words ending in -ng take -etjie.` },
-    { q: `Wat is die verkleining van "kop"?`, a: `koppie`, w: [`kopie`, `koptjie`, `kopjie`], why: `Short vowel: double the last letter and add -ie.` },
-    { q: `Wat is die verkleining van "vis"?`, a: `vissie`, w: [`visie`, `vistjie`, `visjie`], why: `Short vowel: double the last letter and add -ie.` },
-    { q: `Wat is die verkleining van "bok"?`, a: `bokkie`, w: [`bokie`, `boktjie`, `bokjie`], why: `Short vowel: double the last letter and add -ie.` },
-    { q: `Wat is die verkleining van "klip"?`, a: `klippie`, w: [`klipie`, `kliptjie`, `klipjie`], why: `Short vowel: double the last letter and add -ie.` },
-    { q: `Wat is die verkleining van "pad"?`, a: `paadjie`, w: [`padjie`, `paddie`, `padtjie`], why: `pad → paadjie. The vowel gets longer.` },
-    { q: `Wat beteken "verkleining"?`, a: `Dit maak 'n woord kleiner, soos "a small ..."`, w: [`Dit maak 'n woord meervoud`, `Dit sit die sin in die verlede tyd`, `Dit is die teenoorgestelde van 'n woord`], why: `Verkleining is the diminutive: a small version of something.` },
+    ...smallItems(SMALL),
+    smallPlural('skape', 'skaap', 'skapie'),
+    smallPlural('boeke', 'boek', 'boekie'),
+    smallPlural('huise', 'huis', 'huisie'),
+    smallPlural('balle', 'bal', 'balletjie'),
+    smallPlural('slange', 'slang', 'slangetjie'),
+    smallPlural('ringe', 'ring', 'ringetjie'),
+    smallPlural('oë', 'oog', 'ogie'),
   ], AF);
+  S.afr_dim_ander = bank([
+    ...smallItems(SMALL_MORE),
+    ...SMALL_ODD.flatMap(([s, d, w]) => smallPair(s, d, w, 'Rule 12: this word breaks the rules, so learn it by heart.')),
+    smallPlural('blare', 'blaar', 'blaartjie'),
+    smallPlural('bome', 'boom', 'boompie'),
+  ], AF);
+  S.afr_dim_reels = bank([
+    { q: `What is a verkleinwoord?`, a: `The word for a small one of something`, w: [`The word for many of something`, `A word that joins two sentences`, `A verb in the past tense`], why: `A small cat (kat) is a katjie.` },
+    { q: `Why does "kop" become "koppie"?`, a: `A short vowel doubles the last letter`, w: [`A repeated vowel loses one letter`, `It ends in two consonants`, `It has more than one syllable`], why: `Rule 1: double the last letter and add -ie.` },
+    { q: `Why does "skaap" become "skapie", with only one "a"?`, a: `A repeated vowel loses one letter`, w: [`A short vowel doubles the last letter`, `It ends in two consonants`, `It has more than one syllable`], why: `Rule 2: drop one of the two vowels and add -ie.` },
+    { q: `What goes on a short-vowel word ending in l, m, n, r or b?`, a: `Double the last letter, then -etjie`, w: [`Only -ie, and nothing else changes`, `Only -pie, and nothing else changes`, `Only -tjie, and nothing else changes`], why: `Rule 3: bal becomes balletjie.` },
+    { q: `Which ending goes on a word like "arm", with a short vowel and ending in a consonant and "m"?`, a: `-pie`, w: [`-etjie`, `-tjie`, `-kie`], why: `Rule 5: arm becomes armpie.` },
+    { q: `Which ending goes on a word of one syllable ending in "-ng"?`, a: `-etjie`, w: [`-kie`, `-pie`, `-ie`], why: `Rule 7: slang becomes slangetjie.` },
+    { q: `Why does "huis" take only "-ie"?`, a: `It has a double vowel in the middle`, w: [`It has a short vowel in the middle`, `It ends in the letter "m"`, `It ends in the letters "ng"`], why: `Rule 10: huis becomes huisie.` },
+    { q: `Why does "vurk" take only "-ie"?`, a: `It ends in two consonants`, w: [`It has a repeated vowel`, `It ends in the letter "m"`, `It ends in the letters "ng"`], why: `Rule 10: vurk becomes vurkie.` },
+    { q: `Which word doubles its last letter before "-ie"?`, a: `sak`, w: [`skaap`, `boek`, `vurk`], why: `sak has a short vowel, so it becomes sakkie.` },
+    { q: `Which word loses a vowel in its verkleinwoord?`, a: `maag`, w: [`huis`, `hek`, `vurk`], why: `maag becomes magie.` },
+    { q: `Which word takes "-pie"?`, a: `skelm`, w: [`skaap`, `kar`, `ring`], why: `skelm becomes skelmpie.` },
+    { q: `Which word takes "-etjie"?`, a: `ram`, w: [`rak`, `arm`, `reus`], why: `ram becomes rammetjie.` },
+    { q: `Which verkleinwoord is spelt correctly?`, a: `nefie`, w: [`neefie`, `neifie`, `neffie`], why: `neef has a repeated vowel, so it loses one: nefie.` },
+    { q: `Which verkleinwoord is spelt correctly?`, a: `sepie`, w: [`seepie`, `seppie`, `sepi`], why: `seep has a repeated vowel, so it loses one, and the word still ends in -ie: sepie.` },
+    { q: `Which verkleinwoord is spelt correctly?`, a: `stringetjie`, w: [`stiringetjie`, `stringtjie`, `strinkie`], why: `string has one syllable and ends in -ng: stringetjie.` },
+    { q: `How do you make the verkleinwoord of a plural such as "blare"?`, a: `Go back to one, make it small, add "s"`, w: [`Add -tjie straight onto the plural`, `Drop the last letter and add -ie`, `Leave it just as it is`], why: `blare, then blaar, then blaartjie, then blaartjies.` },
+    { tf: false, q: `True or false: every Afrikaans word takes "-tjie" to make it small.`, why: `The ending depends on the vowel and on how the word ends.` },
+    { tf: true, q: `True or false: "boom" and "arm" both take "-pie".`, why: `boompie and armpie.` },
+  ]);
 
   S.afr_adverb = bank([
     { q: `Wat beskryf 'n bywoord meestal?`, a: `'n Werkwoord`, w: [`'n Naamwoord`, `'n Voornaamwoord`, `'n Lidwoord`], why: `An adverb usually tells you more about a verb: how, when or where.` },
@@ -2980,9 +3017,9 @@ details ol { margin: 6px 0 0; padding-left: 20px; }
       RS.section('afr_prep2', 4, 'Voorsetsels', 'Pages 97 to 99', ['afr_vs']),
       RS.section('afr_pron2', 5, 'Voornaamwoorde', 'Pages 93 to 95', ['afr_pn']),
       RS.section('afr_plural2', 6, 'Meervoude', 'Pages 42 to 46, rules 3, 4, 8, 9, 10, 12', ['afr_mv', 'afr_mv_reels']),
-      RS.section('afr_dim', 7, 'Verkleining', 'Pages 48 to 51, rules 1, 2, 3, 5, 7, 10. Written without those pages'),
+      RS.section('afr_small', 7, 'Verkleining', 'Pages 48 to 51, rules 1, 2, 3, 5, 7, 10', ['afr_dim', 'afr_dim_reels']),
       RS.section('afr_adverb2', 8, 'Bywoorde', 'Pages 112 and 113', ['afr_bw']),
-      Object.assign(RS.section('afr_extra', 9, 'Beyond the list', 'Extra practice: other plural rules and more', ['afr_mv_ander', 'afr_past', 'afr_future', 'afr_stompi', 'afr_conj', 'afr_prep', 'afr_pron', 'afr_plural', 'afr_adverb']), { warmup: true, stop: 'Pit lane' }),
+      Object.assign(RS.section('afr_extra', 9, 'Beyond the list', 'Extra practice: other plural and verkleinwoord rules, and more', ['afr_mv_ander', 'afr_dim_ander', 'afr_past', 'afr_future', 'afr_stompi', 'afr_conj', 'afr_prep', 'afr_pron', 'afr_plural', 'afr_adverb']), { warmup: true, stop: 'Pit lane' }),
     ],
   };
 })(typeof window !== 'undefined' ? window : globalThis);
@@ -6588,11 +6625,6 @@ Jordy's Science test, Tuesday 10 November: Planet Earth and Beyond. Written from
       { q: `Wat is die meervoud van "wiel"?`, t: [`wiele`], why: `Add -e: wiel, wiele.`, h: `Add one letter to the end.` },
       { q: `Wat is die meervoud van "klip"?`, t: [`klippe`], why: `The short vowel means the last letter doubles: klip, klippe.`, h: `The vowel sound is short.` },
       { q: `Wat is die meervoud van "vlag"?`, a: `vlae`, w: [`vlagte`, `vlagge`, `vlags`], why: `The g falls away: vlag becomes vlae, just as dag becomes dae.` },
-    ],
-    afr_dim: [
-      { q: `Wat is die verkleining van "skoen"?`, t: [`skoentjie`], why: `After a long sound and "n", add -tjie: skoentjie.`, h: `Listen to the sound before the "n". Is it long or short?` },
-      { q: `Wat is die verkleining van "helm"?`, t: [`helmpie`], why: `Words ending in "lm" or "rm" take -pie, just like arm becomes armpie.`, h: `Think of how "arm" changes.` },
-      { q: `Wat is die verkleining van "son"?`, a: `sonnetjie`, w: [`sontjie`, `sonnie`, `sonpie`], why: `Short vowel and "n": double the n and add -etjie.` },
     ],
     afr_adverb: [
       { q: `Vind die bywoord: Die ryer draai versigtig.`, a: `versigtig`, w: [`ryer`, `draai`, `die`], why: `"Versigtig" tells you how the rider turns.` },
