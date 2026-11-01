@@ -3026,7 +3026,7 @@ details ol { margin: 6px 0 0; padding-left: 20px; }
 })(typeof window !== 'undefined' ? window : globalThis);
 
 /* Jordy's English test, Friday 13 November: the language rules on the school's list.
-   The teacher says comprehension can't be studied for, so it isn't here. */
+   Comprehension isn't here, because it can't be studied for. */
 (function (root) {
   'use strict';
   const RS = root.RS;
@@ -4325,7 +4325,7 @@ details ol { margin: 6px 0 0; padding-left: 20px; }
   };
 })(typeof window !== 'undefined' ? window : globalThis);
 
-/* Kash's school work. He writes weekly tests, not exams. The sections follow his own books and test sheets,
+/* Kash's revision questions. He writes weekly tests, not exams. The sections follow his own books,
    with new questions on the same facts. Nothing is copied from the books. */
 (function (root) {
   'use strict';
@@ -4358,10 +4358,10 @@ details ol { margin: 6px 0 0; padding-left: 20px; }
     { q: `What is a model?`, a: `Something you make to show what a real thing is like`, w: [`A photo of the real thing taken from far away`, `A story people tell about the real thing`, `A test of how much you know about something`], why: `A model shows the main features of the real thing.` },
     { q: `What size is a model usually?`, a: `Smaller than the real thing`, w: [`Bigger than the real thing`, `Exactly the same as the real thing`, `As big as a whole classroom`], why: `A model of the Sun fits in your hands.` },
     { q: `In a paper model of the Sun, what do the yellow paper "fingers" show?`, a: `Heat and light coming from the Sun`, w: [`Planets moving around the Sun`, `Clouds hiding part of the Sun`, `Rocks falling off the Sun`], why: `They spread out from the Sun, as its heat and light do.` },
-    { q: `What does the round shape of a model Sun show?`, a: `That the Sun is round like a ball`, w: [`That the Sun is flat like a plate`, `That the Sun is very far away`, `That the Sun is made of gas`], why: `The shape shows the shape.` },
+    { q: `What does the round shape of a model Sun show?`, a: `That the Sun is round like a ball`, w: [`That the Sun is flat like a plate`, `That the Sun is very far away`, `That the Sun is made of gas`], why: `A model copies the shape of the real thing.` },
     { q: `Which of these can a cardboard model of the Sun NOT show?`, a: `How hot the real Sun is`, w: [`That the Sun is round`, `That the Sun looks yellow`, `That light spreads out from it`], why: `A model can't show everything. Its heat and real size are two things it misses.` },
-    { q: `The Sun is a ball of very hot ___.`, t: [`gas`], why: `All stars are balls of very hot gas.`, h: `It isn't solid and it isn't a liquid.` },
-    { q: `The Sun is the closest ___ to the Earth.`, t: [`star`], why: `It's our closest star.`, h: `There are millions of these in space.` },
+    { q: `The Sun is a ball of very hot ___.`, strict: true, t: [`gas`], why: `All stars are balls of very hot gas.`, h: `It isn't solid and it isn't a liquid.` },
+    { q: `The Sun is the closest ___ to the Earth.`, strict: true, t: [`star`], why: `It's our closest star.`, h: `There are millions of these in space.` },
     { q: `Heat and light are both types of ___.`, t: [`energy`], why: `Energy can move from its source to other places.`, h: `It starts with "e".` },
     { tf: false, q: `True or false: the Sun is a planet.`, why: `The Sun is a star. Planets move around it.` },
     { tf: true, q: `True or false: all the other stars are further from Earth than the Sun is.`, why: `That's why the Sun is called our closest star.` },
@@ -4385,7 +4385,7 @@ details ol { margin: 6px 0 0; padding-left: 20px; }
     { q: `Which is the biggest planet?`, a: `Jupiter`, w: [`Saturn`, `Earth`, `Neptune`], why: `Jupiter is the biggest of the eight.` },
     { q: `Which planet is famous for the big rings around it?`, a: `Saturn`, w: [`Mars`, `Venus`, `Earth`], why: `You can see Saturn's rings in the picture in your book.` },
     { q: `What is the biggest object in the solar system?`, a: `The Sun`, w: [`Jupiter`, `Saturn`, `The Earth`], why: `The Sun is much, much bigger than any planet.` },
-    { q: `Going only by how close it is to the Sun, which planet should be the hottest?`, a: `Mercury`, w: [`Neptune`, `Earth`, `Jupiter`], why: `Mercury is closest, so that's the answer your book is after. Scientists have found Venus is actually hotter, because its thick air traps heat.` },
+    { q: `Going only by how close it is to the Sun, which planet should be the hottest?`, a: `Mercury`, w: [`Neptune`, `Earth`, `Jupiter`], why: `Mercury is closest to the Sun. Scientists have found that Venus is actually hotter, because its thick air traps heat.` },
     { q: `Going only by distance from the Sun, which planet should be the coldest?`, a: `Neptune`, w: [`Mercury`, `Earth`, `Mars`], why: `It's the furthest from the Sun's heat.` },
     { q: `Why is the furthest planet from the Sun so cold?`, a: `It gets the least heat from the Sun`, w: [`It is the smallest planet of them all`, `It has the shortest orbit of them all`, `It is made of ice and nothing else`], why: `The further from the Sun, the less heat a planet gets.` },
     { q: `How many planets are closer to the Sun than the Earth is?`, a: `Two`, w: [`One`, `Three`, `Five`], why: `Mercury and Venus.` },
@@ -4406,12 +4406,15 @@ details ol { margin: 6px 0 0; padding-left: 20px; }
   S.ns_order = () => {
     const i = pick([0, 1, 2, 3, 4, 5, 6, 7]);
     const items = ['Sun', ...PLANETS.map((p, n) => (n === i ? '?' : p))];
-    const others = shuffle(PLANETS.filter((p) => p !== PLANETS[i]));
-    return mc('Which planet is missing from the order?', PLANETS[i], others.slice(0, 3), {
+    return {
+      kind: 'word',
+      q: 'Which planet is missing from the order?',
+      accept: [PLANETS[i]],
+      correct: PLANETS[i],
       visual: { type: 'flow', items },
-      hint: 'Mercury, Venus, Earth, Mars, Jupiter, Saturn, Uranus, Neptune.',
-      steps: [`The order is ${PLANETS.join(', ')}.`, `Each name starts with a capital letter.`],
-    });
+      hint: 'Mercury, Venus, Earth, Mars, Jupiter, Saturn, Uranus, Neptune. Say them in order, and stop at the gap.',
+      steps: [`The order is ${PLANETS.join(', ')}.`, 'Each name starts with a capital letter.'],
+    };
   };
 
   // ---------- Topic 15: the Sun and life, pages 170 and 171 ----------
@@ -4434,7 +4437,7 @@ details ol { margin: 6px 0 0; padding-left: 20px; }
     { q: `Which two things does life on Earth need to survive?`, a: `Water and energy`, w: [`Rock and dust`, `Gas and ice`, `Sand and wind`], why: `The Sun's heat and light help us to meet both needs.` },
     { q: `Why can life survive on Earth?`, a: `It is just the right distance from the Sun`, w: [`It is the closest planet to the Sun`, `It is the biggest of the eight planets`, `It has the longest orbit of all planets`], why: `It gets the right amount of heat and light.` },
     { q: `All living things need ___ for the seven life processes.`, t: [`energy`], why: `That energy starts with the Sun.`, h: `It's the same word as for heat and light.` },
-    { q: `Plants use ___ from the Sun to make their own food.`, t: [`light`, `sunlight`], why: `Light from the Sun starts the energy chain.`, h: `It's not the heat. It's the other one.` },
+    { q: `Plants use ___ from the Sun to make their own food.`, strict: true, t: [`light`, `sunlight`], why: `Light from the Sun starts the energy chain.`, h: `It's not the heat. It's the other one.` },
   ]);
   const CHAINS = [
     ['Sun', 'Wheat', 'Field mouse', 'Owl'],
@@ -4479,13 +4482,11 @@ details ol { margin: 6px 0 0; padding-left: 20px; }
   ]);
   const CYCLE = ['Sun heats the water', 'Water evaporates', 'Vapour cools and condenses', 'Clouds form', 'Rain falls'];
   S.ns_cycle = () => {
-    const i = pick([0, 1, 2, 3, 4]);
     const start = pick([0, 1, 2, 3, 4]);
-    const items = CYCLE.map((c, n) => (n === i ? '?' : c));
-    const shown = [...items.slice(start), ...items.slice(0, start)];
-    const others = CYCLE.filter((c) => c !== CYCLE[i]);
-    return mc('The water cycle goes round and round. Which step is missing?', CYCLE[i], shuffle(others).slice(0, 3), {
-      visual: { type: 'flow', items: shown },
+    const shown = [0, 1, 2].map((n) => CYCLE[(start + n) % 5]);
+    const next = CYCLE[(start + 3) % 5];
+    return mc('The water cycle goes round and round. What happens next?', next, CYCLE.filter((c) => c !== next), {
+      visual: { type: 'flow', items: [...shown, '?'] },
       hint: 'Start with the Sun heating water, then follow it up to the clouds and back down.',
       steps: [`${CYCLE.join(', then ')}, and round again.`],
     });
@@ -4515,7 +4516,7 @@ details ol { margin: 6px 0 0; padding-left: 20px; }
     { tf: false, q: `True or false: rivers and oceans cover parts of the Moon.`, why: `There's no liquid water on the Moon.` },
     { q: `Why does rain never fall on the Moon?`, a: `There is no liquid water there`, w: [`It's much too close to the Sun`, `It's covered in thick clouds`, `The rain all falls on Earth`], why: `No liquid water means no rivers, no oceans and no rain.` },
     { q: `Where do scientists think there might be ice on the Moon?`, a: `In very deep, shaded craters`, w: [`In its big blue oceans`, `On top of its mountains`, `Inside every Moon rock`], why: `Those places are shaded and cold.` },
-    { q: `Which three reasons explain why living things can't survive on the Moon?`, a: `No air, no liquid water, no proper soil`, w: [`No rock, no dust, no craters`, `Too much air, water and soil`, `No Sun, no Earth, no stars`], why: `Plants and animals need all three.` },
+    { q: `Which three reasons explain why living things can't survive on the Moon?`, a: `No air, no liquid water, no food`, w: [`No rock, no dust, no craters`, `Too much air, water and food`, `No Sun, no Earth, no stars`], why: `Living things need air, water and food, and the Moon has none of them.` },
     { q: `What is an astronaut?`, a: `A person who travels into space`, w: [`A person who studies rocks on Earth`, `A person who draws the planets`, `A person who fixes telescopes`], why: `Astronauts have walked on the Moon.` },
     { q: `What did astronauts bring back from the Moon?`, a: `Pieces of Moon rock`, w: [`Bottles of Moon water`, `Bags of Moon soil`, `Pots of Moon plants`], why: `Scientists have studied them.` },
     { q: `What did scientists find out about Moon rocks?`, a: `They are similar to rocks on Earth`, w: [`They are made of very hot gas`, `They are as soft as wet sand`, `They are made of solid ice`], why: `The Moon's rock isn't that different from ours.` },
@@ -4530,11 +4531,11 @@ details ol { margin: 6px 0 0; padding-left: 20px; }
     { q: `At a speed that reaches the Sun in 8 minutes, how long would the Moon take?`, a: `1,5 seconds`, w: [`8 minutes`, `4 years`, `15 days`], why: `That shows how much closer the Moon is.` },
     { tf: true, q: `True or false: no planet is closer to the Earth than the Moon is.`, why: `The Moon is the nearest body in space to the Earth.` },
     { q: `In a hanging model of the Sun, Earth and Moon, which two hang close together?`, a: `The Earth and the Moon`, w: [`The Sun and the Earth`, `The Sun and the Moon`, `All three of them`], why: `The Sun is much further from both.` },
-    { q: `In that model, which object is much bigger than the other two?`, a: `The Sun`, w: [`The Earth`, `The Moon`, `The hanger`], why: `Even so, a model can't show how much bigger the real Sun is.` },
+    { q: `In a hanging model of the Sun, Earth and Moon, which object is much bigger than the other two?`, a: `The Sun`, w: [`The Earth`, `The Moon`, `The hanger`], why: `Even so, a model can't show how much bigger the real Sun is.` },
     { q: `What is the only place in the solar system where the environment can sustain life?`, a: `The Earth`, w: [`The Moon`, `Mars`, `The Sun`], why: `So we need to look after it.` },
-    { q: `What could stop the Earth supporting life in the same way?`, a: `Making the water and air dirty`, w: [`Planting many more trees`, `Saving water at home`, `Looking up at the Moon`], why: `That's called pollution.` },
+    { q: `What could damage the Earth so that it can't support life?`, a: `Making the water and air dirty`, w: [`Planting many more trees`, `Saving water at home`, `Looking up at the Moon`], why: `That's called pollution.` },
     { q: `People who travel into space are called ___.`, t: [`astronauts`, `astronaut`], why: `Astronauts collected rocks from the Moon.`, h: `It starts with "a".` },
-    { q: `The Moon is made of ___.`, t: [`rock`, `rocks`], why: `So it can't make its own light.`, h: `It's the same stuff as a koppie.` },
+    { q: `The Moon is made of ___.`, strict: true, t: [`rock`, `rocks`], why: `So it can't make its own light.`, h: `It's the same stuff as a koppie.` },
     { q: `There is no ___ water on the Moon.`, t: [`liquid`], why: `There might be some frozen water, but none that flows.`, h: `It's the opposite of frozen.` },
     { q: `There might be some ___ water deep in the Moon's craters.`, t: [`frozen`], why: `We call frozen water ice.`, h: `It's the opposite of liquid.` },
   ]);
@@ -4591,7 +4592,7 @@ details ol { margin: 6px 0 0; padding-left: 20px; }
     { q: `What else did some Tswana people see on the Moon?`, a: `A mother with her child tied to her back`, w: [`A person begging the Sun to let them live`, `A bowl with illnesses falling out of it`, `A farmer who is planting his crops`], why: `Different people saw different shapes.` },
     { q: `Where did the early Xhosa people believe new Moons were stored?`, a: `In a huge hole under the ocean`, w: [`In a big bowl up in the sky`, `In a deep cave behind the Sun`, `In a dark cave up a mountain`], why: `One Moon drops under the ocean as a new one rises.` },
     { q: `In the early Xhosa belief, what happens as one Moon drops under the ocean?`, a: `A new Moon slowly rises into the sky`, w: [`The Sun slices it into many pieces`, `Illnesses fall on everybody below`, `Clouds form and heavy rain falls`], why: `The ocean stores many new Moons.` },
-    { q: `In that Xhosa belief, how often would a new Moon rise?`, a: `About every ${HALF} days`, w: [`Every single night`, `Once every 7 days`, `Once every year`], why: `The phases repeat every ${HALF} days.` },
+    { q: `In the early Xhosa belief about the ocean, how often would a new Moon rise?`, a: `About every ${HALF} days`, w: [`Every single night`, `Once every 7 days`, `Once every year`], why: `The phases repeat every ${HALF} days.` },
     { q: `Which people saw the crescent Moon as a bowl?`, a: `The Sotho, Venda and Tswana`, w: [`The San and early Xhosa`, `The ancient Romans`, `The early Xhosa only`], why: `They looked at which way its pointy ends faced.` },
     { q: `In the bowl story, what was the bowl filled with?`, a: `Illnesses`, w: [`Water`, `Food`, `New Moons`], why: `The bowl could spill them, or hold them in.` },
     { q: `In the bowl story, what happened when the Moon's pointy ends faced down?`, a: `Illnesses fell, and nobody went out`, w: [`Rain fell, and crops were planted`, `Everyone went out with no fear`, `A new Moon rose from the sea`], why: `The bowl was upside down, so it spilled.` },
@@ -4658,16 +4659,16 @@ details ol { margin: 6px 0 0; padding-left: 20px; }
     { q: `Finish the simile: The rider darted through the bends like a ___.`, a: `cheetah`, w: [`snail`, `boulder`, `tortoise`], why: `A cheetah is quick, so it fits something moving fast.` },
     { q: `Finish the simile: The boulder on the track was as big as a ___.`, a: `bakkie`, w: [`marble`, `pencil`, `button`], why: `The word has to be something big.` },
     { q: `Finish the simile: After the rain, the track was as slippery as ___.`, a: `soap`, w: [`rock`, `sand`, `wood`], why: `Wet soap is very slippery.` },
-    { q: `Finish the simile: as brave as a ___.`, t: [`lion`], why: `As brave as a lion.`, h: `Think of the king of the animals.` },
-    { q: `Finish the simile: as busy as a ___.`, t: [`bee`], why: `As busy as a bee.`, h: `It makes honey.` },
-    { q: `Finish the simile: as quiet as a ___.`, t: [`mouse`], why: `As quiet as a mouse.`, h: `It's small and squeaks, and a cat chases it.` },
-    { q: `Finish the simile: as cold as ___.`, t: [`ice`], why: `As cold as ice.`, h: `It's frozen water.` },
-    { q: `Finish the simile: as light as a ___.`, t: [`feather`], why: `As light as a feather.`, h: `It falls off a bird.` },
-    { q: `Finish the simile: as slow as a ___.`, t: [`snail`, `tortoise`], why: `As slow as a snail. A tortoise works too.`, h: `It carries its house on its back.` },
-    { q: `Finish the simile: as strong as an ___.`, t: [`ox`], why: `As strong as an ox.`, h: `It's a big farm animal that pulls a plough. Two letters.` },
-    { q: `Finish the simile: as sly as a ___.`, t: [`fox`], why: `As sly as a fox.`, h: `It has a bushy tail and tricks others in stories.` },
-    { q: `Fill in the missing word: My bike goes ___ the wind.`, t: [`like`], why: `It compares the bike to the wind, using "like".`, h: `A simile uses one of two little words. It isn't "as" here.` },
-    { q: `Fill in the missing word: The track was ___ dry as a bone.`, t: [`as`], why: `As dry as a bone.`, h: `A simile uses one of two little words. It isn't "like" here.` },
+    { q: `Finish the simile: as brave as a ___.`, strict: true, t: [`lion`], why: `As brave as a lion.`, h: `Think of the king of the animals.` },
+    { q: `Finish the simile: as busy as a ___.`, strict: true, t: [`bee`], why: `As busy as a bee.`, h: `It makes honey.` },
+    { q: `Finish the simile: as quiet as a ___.`, strict: true, t: [`mouse`], why: `As quiet as a mouse.`, h: `It's small and squeaks, and a cat chases it.` },
+    { q: `Finish the simile: as cold as ___.`, strict: true, t: [`ice`], why: `As cold as ice.`, h: `It's frozen water.` },
+    { q: `Finish the simile: as light as a ___.`, strict: true, t: [`feather`], why: `As light as a feather.`, h: `It falls off a bird.` },
+    { q: `Finish the simile: as slow as a ___.`, strict: true, t: [`snail`, `tortoise`], why: `As slow as a snail. A tortoise works too.`, h: `It carries its house on its back.` },
+    { q: `Finish the simile: as strong as an ___.`, strict: true, t: [`ox`], why: `As strong as an ox.`, h: `It's a big farm animal that pulls a plough. Two letters.` },
+    { q: `Finish the simile: as sly as a ___.`, strict: true, t: [`fox`], why: `As sly as a fox.`, h: `It has a bushy tail and tricks others in stories.` },
+    { q: `Fill in the missing word: My bike goes ___ the wind.`, strict: true, t: [`like`], why: `It compares the bike to the wind, using "like".`, h: `A simile uses one of two little words. It isn't "as" here.` },
+    { q: `Fill in the missing word: The track was ___ dry as a bone.`, strict: true, t: [`as`], why: `As dry as a bone.`, h: `A simile uses one of two little words. It isn't "like" here.` },
     { tf: true, q: `True or false: a simile compares two different things.`, why: `It says one thing is like another: a bike and the wind.` },
     { tf: false, q: `True or false: every sentence with the word "like" has a simile.`, why: `"I like chips" just means you enjoy chips.` },
     { tf: true, q: `True or false: "as hard as a rock" is a simile.`, why: `It compares something to a rock, using "as".` },
@@ -4675,7 +4676,7 @@ details ol { margin: 6px 0 0; padding-left: 20px; }
   ]);
   S.en_person = bank([
     { q: `What is personification?`, a: `Giving a thing human actions or feelings`, w: [`Comparing two things using "like" or "as"`, `Writing the name of a real person`, `Using a word that sounds like its noise`], why: `The wind can't really whisper, but a person can.` },
-    { q: `Which word is hiding inside "personification"?`, a: `Person`, w: [`Fiction`, `Son`, `Cat`], why: `We write about a thing as if it were a person.` },
+    { q: `Which word is hiding inside "personification"?`, a: `Person`, w: [`Fiction`, `Nation`, `Perfect`], why: `We write about a thing as if it were a person.` },
     { q: `Which sentence uses personification?`, a: `The wind whispered through the trees.`, w: [`The wind blew hard through the trees.`, `The trees were tall and very green.`, `The rider rode between the trees.`], why: `Wind can't whisper. Only people can.` },
     { q: `Which sentence uses personification?`, a: `The sun smiled down on the riders.`, w: [`The sun was hot on the riders.`, `The riders smiled at the end.`, `The riders rode in the sun.`], why: `The sun can't smile. Only people can.` },
     { q: `Which sentence uses personification?`, a: `My old bike groaned up the hill.`, w: [`My old bike went up the hill.`, `I groaned when I saw the hill.`, `The hill was steep and very rocky.`], why: `Groaning is what a tired person does, not a bike.` },
@@ -4690,11 +4691,11 @@ details ol { margin: 6px 0 0; padding-left: 20px; }
     { q: `"The thunder grumbled all night." Which thing is acting like a person?`, a: `The thunder`, w: [`The night`, `The cloud`, `The rain`], why: `The thunder is grumbling, as a cross person does.` },
     { q: `"The angry river chased us down the bank." Which thing is acting like a person?`, a: `The river`, w: [`The bank`, `Us`, `The boat`], why: `A river can't be angry or chase anyone.` },
     { q: `"The leaves danced in the wind." Which word shows the human action?`, a: `danced`, w: [`leaves`, `wind`, `the`], why: `Dancing is what people do.` },
-    { q: `"The old gate moaned when we opened it." Which word shows the human action?`, a: `moaned`, w: [`gate`, `old`, `opened`], why: `Moaning is what people do.` },
+    { q: `"The old gate moaned when we opened it." Which word shows the human action?`, a: `moaned`, w: [`gate`, `old`, `when`], why: `Moaning is what people do.` },
     { q: `"The sun peeped over the mountain." Which word shows the human action?`, a: `peeped`, w: [`sun`, `over`, `mountain`], why: `Peeping is what people do.` },
     { q: `"The stars winked at the riders." Which word shows the human action?`, a: `winked`, w: [`stars`, `riders`, `at`], why: `Winking is what people do.` },
     { q: `"The bike coughed and refused to start." Which words show human actions?`, a: `coughed and refused`, w: [`bike and start`, `the and and`, `bike and refused`], why: `People cough and refuse. Bikes don't really.` },
-    { q: `"The wind whispered." What does this mean is really happening?`, a: `The wind is blowing softly`, w: [`The wind is telling a secret`, `A person is talking softly`, `The wind has stopped blowing`], why: `The writer makes the soft sound seem like a person's whisper.` },
+    { q: `"The wind whispered." What is really happening?`, a: `The wind is blowing softly`, w: [`The wind is telling a secret`, `A person is talking softly`, `The wind has stopped blowing`], why: `The writer makes the soft sound seem like a person's whisper.` },
     { q: `"The rain tapped on my window." What is really happening?`, a: `Raindrops are hitting the window`, w: [`Somebody is knocking on the glass`, `The window is about to break`, `The rain has stopped falling`], why: `The rain sounds like fingers tapping.` },
     { q: `Why do writers use personification?`, a: `To make their writing come alive`, w: [`To make their sentences shorter`, `To make the spelling easier`, `To show that a story is true`], why: `It helps us picture things and feel what's happening.` },
     { q: `Choose the word that makes this personification: The wind ___ through the door.`, a: `whispered`, w: [`blew`, `came`, `went`], why: `Whispering is a human action. The others are just what wind does.` },
@@ -4703,7 +4704,6 @@ details ol { margin: 6px 0 0; padding-left: 20px; }
     { q: `Choose the word that makes this personification: The flowers ___ their heads in the rain.`, a: `bowed`, w: [`grew`, `got`, `had`], why: `Bowing your head is a human action.` },
     { q: `Choose the word that makes this personification: The storm ___ at the riders.`, a: `shouted`, w: [`rained`, `started`, `arrived`], why: `Shouting is a human action.` },
     { q: `Giving a thing human actions or feelings is called ___.`, t: [`personification`], why: `The word "person" is hiding inside it.`, h: `It starts with "person".` },
-    { q: `Complete the personification: The wind ___ through the trees.`, t: [`whispered`, `sang`, `howled`, `danced`, `whistled`, `cried`, `moaned`, `sighed`, `screamed`, `laughed`, `whispers`, `sings`, `howls`, `dances`], why: `Whispered is one good answer. It has to be something a person can do.`, h: `Think of something people do with their voices, like talk softly.` },
     { q: `What's the thing acting like a person? The clouds cried all afternoon.`, t: [`clouds`, `the clouds`, `cloud`], why: `Clouds can't cry. It means it rained.`, h: `Look for the thing that's doing something only people can do.` },
     { tf: true, q: `True or false: "The trees waved at us" is personification.`, why: `Trees don't have hands to wave with.` },
     { tf: false, q: `True or false: "The boy waved at us" is personification.`, why: `A boy is a person, and people really do wave.` },
@@ -4722,14 +4722,14 @@ details ol { margin: 6px 0 0; padding-left: 20px; }
     { q: `"The rider won the race on Saturday." What is this?`, a: `Neither of them`, w: [`Simile`, `Personification`, `Both of them`], why: `It just tells us what happened. Nothing is compared, and a rider really can win.` },
     { q: `"I like my new gloves." What is this?`, a: `Neither of them`, w: [`Simile`, `Personification`, `Both of them`], why: `Here "like" means enjoy, so nothing is compared.` },
     { q: `"The bike was fast and loud." What is this?`, a: `Neither of them`, w: [`Simile`, `Personification`, `Both of them`], why: `It describes the bike, but it doesn't compare it or make it act like a person.` },
-    { q: `Which sentence is a simile?`, a: `The dust hung in the air like smoke.`, w: [`The dust tickled my nose.`, `The dust was all over my bike.`, `The dust ran away from the wind.`], why: `"Like smoke" compares the dust to smoke.` },
-    { q: `Which sentence is personification?`, a: `The dust tickled my nose.`, w: [`The dust hung in the air like smoke.`, `The dust was all over my bike.`, `The dust was as fine as flour.`], why: `Tickling is something people do, and dust can't really.` },
+    { q: `Which sentence is a simile?`, a: `The dust hung in the air like smoke.`, w: [`The dust danced on my nose.`, `The dust was all over my bike.`, `The dust ran away from the wind.`], why: `"Like smoke" compares the dust to smoke.` },
+    { q: `Which sentence is personification?`, a: `The dust danced on my nose.`, w: [`The dust hung in the air like smoke.`, `The dust was all over my bike.`, `The dust was as fine as flour.`], why: `Dancing is something people do, and dust can't really.` },
     { q: `Which sentence is a simile?`, a: `The rain fell like tiny stones.`, w: [`The rain knocked on the roof.`, `The rain fell all day long.`, `The rain sang us to sleep.`], why: `"Like tiny stones" compares the rain to stones.` },
     { q: `Which sentence is personification?`, a: `The rain knocked on the roof.`, w: [`The rain fell like tiny stones.`, `The rain fell all day long.`, `The rain was as cold as ice.`], why: `Knocking is something people do.` },
     { q: `How can you tell a simile from personification?`, a: `A simile compares using "like" or "as"`, w: [`A simile is always about an animal`, `Personification always has the word "as"`, `Personification only talks about people`], why: `Personification gives a thing human actions. It doesn't need like or as.` },
-    { q: `Look for "like" or "as" comparing two things. If you find it, it is a ___.`, t: [`simile`], why: `A simile compares using like or as.`, h: `It starts with "s".` },
+    { q: `Look for "like" or "as" comparing two things. If you find it, it is a ___.`, strict: true, t: [`simile`], why: `A simile compares using like or as.`, h: `It starts with "s".` },
     { tf: false, q: `True or false: "The moon is like a silver coin" is personification.`, why: `It compares the Moon to a coin using "like", so it's a simile.` },
-    { tf: false, q: `True or false: "The wind pushed me up the hill" is a simile.`, why: `Pushing is a human action and there's no comparison, so it's personification.` },
+    { tf: false, q: `True or false: "The wind chased me up the hill" is a simile.`, why: `Chasing is a human action and there's no comparison, so it's personification.` },
   ]);
   pack.subjects.english = {
     label: 'English',
@@ -4784,8 +4784,8 @@ details ol { margin: 6px 0 0; padding-left: 20px; }
     { q: `Watter vraag vra jy om die selfstandige naamwoord te vind?`, a: `Wie? of Wat?`, w: [`Wanneer?`, `Hoe?`, `Hoekom?`], why: `Die seun skop die bal. Wie skop? Die seun. Wat skop hy? Die bal.` },
     { q: `Watter vraag vra jy om die byvoeglike naamwoord te vind?`, a: `Watter? of Hoe lyk dit?`, w: [`Wat doen?`, `Waar?`, `Wanneer?`], why: `Watter bal? Die groot bal.` },
     { q: `Watter vraag vra jy om die werkwoord te vind?`, a: `Wat doen?`, w: [`Wie?`, `Waar?`, `Watter?`], why: `Wat doen die seun? Hy skop.` },
-    { q: `Watter drie vrae antwoord 'n bywoord?`, a: `Wanneer? Waar? Hoe?`, w: [`Wie? Wat? Watter?`, `Wat doen? Wie? Wat?`, `Hoekom? Wie? Hoeveel?`], why: `'n Bywoord sê meer van die werkwoord: wanneer, waar en hoe.` },
-    { q: `"Mia speel. Sy lag." Watter naamwoord vervang "Sy"?`, a: `Mia`, w: [`speel`, `lag`, `ons`], why: `Sy neem die plek van Mia in.` },
+    { q: `Watter drie vrae beantwoord 'n bywoord?`, a: `Wanneer? Waar? Hoe?`, w: [`Wie? Wat? Watter?`, `Wat doen? Wie? Wat?`, `Hoekom? Wie? Hoeveel?`], why: `'n Bywoord sê meer van die werkwoord: wanneer, waar en hoe.` },
+    { q: `"Mia speel. Sy lag." "Sy" staan in die plek van watter naamwoord?`, a: `Mia`, w: [`speel`, `lag`, `ons`], why: `Sy neem die plek van Mia in.` },
     { q: `Which word kind describes a noun?`, a: `byvoeglike naamwoord`, w: [`bywoord`, `voorsetsel`, `voegwoord`], why: `Die mooi hond: mooi beskryf die hond.` },
     { q: `Which word kind tells you more about a verb?`, a: `bywoord`, w: [`byvoeglike naamwoord`, `voornaamwoord`, `telwoord`], why: `Hy hardloop vinnig: vinnig sê hoe hy hardloop.` },
     { tf: true, q: `True or false: "buite" and "vinnig" are both bywoorde.`, why: `Buite sê waar, en vinnig sê hoe.` },
@@ -4845,7 +4845,7 @@ details ol { margin: 6px 0 0; padding-left: 20px; }
     { q: `In SV1TOMPv2I, what does the O stand for?`, a: `Voorwerp (wie of wat?)`, w: [`Oor (waar?)`, `Ook (hoe?)`, `Ons (wie?)`], why: `O = Voorwerp: haar kos, die bal.` },
     { q: `In SV1TOMPv2I, what does the M stand for?`, a: `Manier of wyse (hoe?)`, w: [`Môre (wanneer?)`, `Mense (wie?)`, `Moet (wat?)`], why: `M = Manier: vinnig, stadig, mooi.` },
     { q: `In SV1TOMPv2I, what does the P stand for?`, a: `Plek (waar?)`, w: [`Pa (wie?)`, `Praat (hoe?)`, `Pas (wanneer?)`], why: `P = Plek: buite, by die tafel.` },
-    { q: `In SV1TOMPv2I, what does the I stand for?`, a: `Infinitief, die volle werkwoord`, w: [`In die, 'n voorsetsel`, `Iemand, 'n voornaamwoord`, `Iets, 'n selfstandige naamwoord`], why: `Mia wil môre buite speel: "speel" is die infinitief.` },
+    { q: `In SV1TOMPv2I, what does the I stand for?`, a: `Infinitief, die volle werkwoord`, w: [`In die, 'n voorsetsel`, `Iemand, 'n voornaamwoord`, `Ink, 'n selfstandige naamwoord`], why: `Mia wil môre buite speel: "speel" is die infinitief.` },
     { q: `Which letter comes straight after the S and V1?`, a: `T`, w: [`O`, `M`, `P`], why: `S V1 T O M P V2 I.` },
     { q: `Which order is right?`, a: `T O M P`, w: [`T M O P`, `O T M P`, `P M O T`], why: `Tyd, Voorwerp, Manier, Plek.` },
     { q: `Which comes first in the sentence: when it happens, or where it happens?`, a: `Wanneer, dan waar`, w: [`Waar, dan wanneer`, `Dit maak nie saak nie`, `Waar kom nooit voor nie`], why: `T comes before P: Ek swem môre in die see.` },
@@ -4882,10 +4882,10 @@ details ol { margin: 6px 0 0; padding-left: 20px; }
     return mc(`Begin met "Môre": ${t.now}`, r, wrong, { lang: 'af-ZA', hint: t.hint, steps: [r, 'Môre means the future tense.'] });
   };
 
-  // ---------- Bywoorde: the verb is always one of the wrong answers, because the two are easy to mix up ----------
+  // ---------- Bywoorde: the verb is always one of the wrong answers ----------
   const BYW = [
-    ['Die ryer oefen vandag op die baan.', 'vandag', 'tyd', 'oefen'], ['Ons ry môre strand toe.', 'môre', 'tyd', 'ry'], ['Oupa drink altyd koffie.', 'altyd', 'tyd', 'drink'], ['Die bus kom later.', 'later', 'tyd', 'kom'], ['Thabo eet nou sy toebroodjie.', 'nou', 'tyd', 'eet'], ['Ek was gister my fiets.', 'gister', 'tyd', 'was'], ['Hulle wen soms die wedren.', 'soms', 'tyd', 'wen'], ['Ons swem jaarliks in die see.', 'jaarliks', 'tyd', 'swem'], ['Ek sien binnekort my niggie.', 'binnekort', 'tyd', 'sien'], ['Pa werk gereeld by die hawe.', 'gereeld', 'tyd', 'werk'],
-    ['Die honde slaap buite.', 'buite', 'plek', 'slaap'], ['Die ryer wag hier.', 'hier', 'plek', 'wag'], ['Die fiets staan daar.', 'daar', 'plek', 'staan'], ['Sipho werk binne.', 'binne', 'plek', 'werk'], ['Ons soek oral na die sleutel.', 'oral', 'plek', 'soek'], ['My oom woon naby.', 'naby', 'plek', 'woon'], ['Die meisie draai links.', 'links', 'plek', 'draai'], ['Die ryer bly tuis.', 'tuis', 'plek', 'bly'], ['Die seun gooi die bal ver.', 'ver', 'plek', 'gooi'],
+    ['Die ryer oefen vandag op die baan.', 'vandag', 'tyd', 'oefen'], ['Ons ry môre strand toe.', 'môre', 'tyd', 'ry'], ['Oupa drink altyd koffie.', 'altyd', 'tyd', 'drink'], ['Die bus kom later.', 'later', 'tyd', 'kom'], ['Thabo eet nou sy toebroodjie.', 'nou', 'tyd', 'eet'], ['Ek het gister my fiets gewas.', 'gister', 'tyd', 'gewas'], ['Hulle wen soms die wedren.', 'soms', 'tyd', 'wen'], ['Ons swem jaarliks in die see.', 'jaarliks', 'tyd', 'swem'], ['Ek sien binnekort my niggie.', 'binnekort', 'tyd', 'sien'], ['Pa werk gereeld by die hawe.', 'gereeld', 'tyd', 'werk'],
+    ['Die honde slaap buite.', 'buite', 'plek', 'slaap'], ['Die ryer wag hier.', 'hier', 'plek', 'wag'], ['Die fiets staan daar.', 'daar', 'plek', 'staan'], ['Sipho werk binne.', 'binne', 'plek', 'werk'], ['Ons soek oral na die sleutel.', 'oral', 'plek', 'soek'], ['My oom woon naby.', 'naby', 'plek', 'woon'], ['Die meisie draai links.', 'links', 'plek', 'draai'], ['Die ryer bly tuis.', 'tuis', 'plek', 'bly'], ['My ouma woon ver.', 'ver', 'plek', 'woon'],
     ['Die ryer ry vinnig.', 'vinnig', 'wyse', 'ry'], ['Die skilpad stap stadig.', 'stadig', 'wyse', 'stap'], ['Die baba slaap rustig.', 'rustig', 'wyse', 'slaap'], ['Die kinders werk netjies.', 'netjies', 'wyse', 'werk'], ['Die meisie praat saggies.', 'saggies', 'wyse', 'praat'], ['Die enjin brul hard.', 'hard', 'wyse', 'brul'], ['Lerato klim versigtig oor die rotse.', 'versigtig', 'wyse', 'klim'], ['Die span werk fluks.', 'fluks', 'wyse', 'werk'], ['Oom Piet wag geduldig by die hek.', 'geduldig', 'wyse', 'wag'], ['Die seun skryf duidelik.', 'duidelik', 'wyse', 'skryf'],
   ];
   const BYW_ASK = { tyd: 'Wanneer?', plek: 'Waar?', wyse: 'Hoe?' };
@@ -4899,7 +4899,7 @@ details ol { margin: 6px 0 0; padding-left: 20px; }
       return mc(`Vind die bywoord: ${sin}`, bw, wrong, { lang: 'af-ZA', hint: `Find the verb first. The bywoord tells you when, where or how it happens. It is not the verb.`, steps });
     }
     if (roll < 0.8) return afChoice(`"${bw}" in: ${sin} Watter soort bywoord is dit?`, ['tyd', 'plek', 'wyse'], soort, 'Tyd says when (wanneer?). Plek says where (waar?). Wyse says how (hoe?).', steps);
-    return afChoice(`"${bw}" in: ${sin} Watter vraag antwoord die bywoord?`, ['Wanneer?', 'Waar?', 'Hoe?'], BYW_ASK[soort], 'Tyd says when (wanneer?). Plek says where (waar?). Wyse says how (hoe?).', steps);
+    return afChoice(`"${bw}" in: ${sin} Watter vraag beantwoord die bywoord?`, ['Wanneer?', 'Waar?', 'Hoe?'], BYW_ASK[soort], 'Tyd says when (wanneer?). Plek says where (waar?). Wyse says how (hoe?).', steps);
   };
   S.kaf_byw_reels = bank([
     { q: `What does a bywoord do?`, a: `It tells you more about the verb`, w: [`It is the verb in the sentence`, `It describes a noun in the sentence`, `It stands in for a noun in the sentence`], why: `Sy swem stadig: "stadig" tells you how she swims.` },
@@ -4914,7 +4914,7 @@ details ol { margin: 6px 0 0; padding-left: 20px; }
     { q: `What does "êrens" mean?`, a: `somewhere`, w: [`sometimes`, `always`, `soon`], why: `Êrens is a bywoord van plek.` },
     { q: `What does "altyd" mean?`, a: `always`, w: [`annually`, `soon`, `near`], why: `Altyd is a bywoord van tyd.` },
     { q: `Which goes best? Die kinders stap ___ oor die warm sand.`, a: `vinnig`, w: [`groot`, `tafel`, `hulle`], why: `Vinnig tells you how they walk. The others aren't bywoorde.` },
-    { q: `Which goes best? Ons kom ___ by die huis aan.`, a: `later`, w: [`mooi`, `boek`, `onder`], why: `Later tells you when you arrive.` },
+    { q: `Which goes best? Ons kom ___ by die huis aan.`, a: `later`, w: [`groot`, `boek`, `onder`], why: `Later tells you when you arrive.` },
     { tf: false, q: `True or false: in "Die seun hardloop vinnig", the bywoord is "hardloop".`, why: `Hardloop is the verb. Vinnig is the bywoord: it says how he runs.` },
     { tf: true, q: `True or false: a bywoord van plek answers Waar?`, why: `Hier, daar, buite, binne.` },
     { q: `A bywoord that tells you HOW is a bywoord van ___.`, t: [`wyse`], why: `Wyse: vinnig, stadig, mooi.`, h: `Tyd, plek or wyse?` },
@@ -4923,7 +4923,7 @@ details ol { margin: 6px 0 0; padding-left: 20px; }
   ], AF);
 
   // ---------- Byvoeglike naamwoorde ----------
-  const BYV_FIND = [[`Die vinnige ryer wen die wedren.`, 'vinnige', 'ryer'], [`Ek ry op 'n ou fiets.`, 'ou', 'fiets'], [`Die geel bakkie staan by die baan.`, 'geel', 'bakkie'], [`Ons sien 'n klein skilpad.`, 'klein', 'skilpad'], [`Die sagte sand is warm.`, 'sagte', 'sand'], [`Sy dra 'n blou helm.`, 'blou', 'helm'], [`Die groot brander breek op die strand.`, 'groot', 'brander'], [`Ek eet 'n sappige appel.`, 'sappige', 'appel']];
+  const BYV_FIND = [[`Die vinnige ryer wen die wedren.`, 'vinnige', 'ryer'], [`Ek ry op 'n ou fiets.`, 'ou', 'fiets'], [`Die geel bakkie staan by die baan.`, 'geel', 'bakkie'], [`Ons sien 'n klein skilpad.`, 'klein', 'skilpad'], [`Die sagte sand lê op die strand.`, 'sagte', 'sand'], [`Sy dra 'n blou helm.`, 'blou', 'helm'], [`Die groot brander breek op die strand.`, 'groot', 'brander'], [`Ek eet 'n sappige appel.`, 'sappige', 'appel']];
   S.kaf_byv_vind = () => {
     const [sin, byv, sn] = pick(BYV_FIND);
     const rest = sin.replace('.', '').split(' ').filter((w) => w !== byv && w !== sn && !/^(die|'n)$/i.test(w));
@@ -4953,7 +4953,7 @@ details ol { margin: 6px 0 0; padding-left: 20px; }
     { q: `In "Die seun is eerlik", where does the byvoeglike naamwoord stand?`, a: `After the noun`, w: [`Before the noun`, `At the start`, `There isn't one`], why: `Seun is the noun, and eerlik comes after it.` },
     { q: `In "Dit is 'n eerlike seun", where does the byvoeglike naamwoord stand?`, a: `Before the noun`, w: [`After the noun`, `At the end`, `There isn't one`], why: `Eerlike comes before seun, and it gets an -e.` },
     { q: `What must you often add when the word comes before the noun?`, a: `-e`, w: [`-ste`, `-er`, `-tjie`], why: `Rustig: 'n rustige klas. Moeilik: 'n moeilike som.` },
-    { q: `The water kook. What do you call it?`, a: `kokende water`, w: [`kook water`, `gekookte water`, `kooker water`], why: `Like -ing in English: boiling water is kokende water.` },
+    { q: `Die water kook. What do you call it?`, a: `kokende water`, w: [`kook water`, `gekookte water`, `kooker water`], why: `Like -ing in English: boiling water is kokende water.` },
     { q: `Die rivier vloei. What do you call it?`, a: `'n vloeiende rivier`, w: [`'n vloei rivier`, `'n vloeier rivier`, `'n gevloei rivier`], why: `Like -ing in English: a flowing river is 'n vloeiende rivier.` },
     { q: `Die seun bou 'n groot, mooi sandkasteel. Which words describe the sandkasteel?`, a: `groot, mooi`, w: [`seun, bou`, `bou, sandkasteel`, `seun, groot`], why: `Groot and mooi are the byvoeglike naamwoorde.` },
     { q: `What does "stokoud" mean?`, a: `very, very old`, w: [`very, very new`, `very, very sweet`, `very, very red`], why: `Oud becomes stokoud.` },
@@ -4970,7 +4970,7 @@ details ol { margin: 6px 0 0; padding-left: 20px; }
     ['hoog', 'hoër', 'hoogste', 'high'], ['laag', 'laer', 'laagste', 'low'], ['warm', 'warmer', 'warmste', 'warm'], ['ver', 'verder', 'verste', 'far'], ['vaal', 'valer', 'vaalste', 'dull'], ['helder', 'helderder', 'helderste', 'bright'], ['min', 'minder', 'minste', 'few'], ['lank', 'langer', 'langste', 'tall'], ['glad', 'gladder', 'gladste', 'smooth'], ['mooi', 'mooier', 'mooiste', 'pretty'], ['dun', 'dunner', 'dunste', 'thin'], ['duur', 'duurder', 'duurste', 'expensive'], ['maklik', 'makliker', 'maklikste', 'easy'], ['lekker', 'lekkerder', 'lekkerste', 'nice'],
   ];
   const TRAP_SIN = [[`Die blou bakkie is ___ as die rooi bakkie.`, 'groot', 1], [`Dit is die ___ fiets by die baan.`, 'nuut', 2], [`Die see is ___ as gister.`, 'koud', 1], [`Sy is die ___ meisie in die klas.`, 'skaam', 2], [`Die ryer ry ___ as sy broer.`, 'vinnig', 1], [`Dit is die ___ handdoek in die huis.`, 'nat', 2], [`My fiets is ___ as jou fiets.`, 'oud', 1], [`Dit is die ___ skilpad wat ek nog gesien het.`, 'klein', 2], [`Ek is ___ as my maat.`, 'bang', 1], [`Dit is die ___ tyd wat hy nog gery het.`, 'goed', 2], [`Ons het ___ water as gister.`, 'baie', 1], [`Hy kom altyd die ___ by die skool aan.`, 'laat', 2], [`Hierdie bult is ___ as daardie bult.`, 'hoog', 1], [`Vandag is die ___ dag van die jaar.`, 'warm', 2]];
-  const trapWrongs = (w) => [`${w[0]}er`, `${w[0]}ste`, w[1], w[2], `${w[1]}ste`, `meer ${w[0]}`].filter((x, i, a) => a.indexOf(x) === i);
+  const trapWrongs = (w, which) => [`${w[0]}er`, `${w[0]}ste`, w[1], w[2], `${w[1]}ste`, which === 1 ? `mees ${w[0]}` : `meer ${w[0]}`].filter((x, n, list) => list.indexOf(x) === n);
   S.kaf_trap = () => {
     const w = pick(TRAP);
     const i = pick([1, 2]);
@@ -4979,7 +4979,7 @@ details ol { margin: 6px 0 0; padding-left: 20px; }
     const hint = i === 1 ? 'Vergrotende trap: comparing two, usually -er.' : 'Oortreffende trap: the most of all, usually -ste.';
     const q = `Wat is die ${name} trap van "${w[0]}"?`;
     if (Math.random() < 0.6) return { kind: 'word', q, accept: [w[i]], correct: w[i], strict: true, lang: 'af-ZA', hint, steps };
-    return mc(q, w[i], trapWrongs(w), { lang: 'af-ZA', hint, steps });
+    return mc(q, w[i], trapWrongs(w, i), { lang: 'af-ZA', hint, steps });
   };
   S.kaf_trap_sin = () => {
     const [sin, stem, i] = pick(TRAP_SIN);
@@ -4989,7 +4989,7 @@ details ol { margin: 6px 0 0; padding-left: 20px; }
     const steps = [`The clue is "${clue}".`, `${w[0]}, ${w[1]}, ${w[2]}.`];
     const q = `${sin} (${stem})`;
     if (Math.random() < 0.5) return { kind: 'word', q, accept: [w[i]], correct: w[i], strict: true, lang: 'af-ZA', hint, steps };
-    return mc(q, w[i], trapWrongs(w), { lang: 'af-ZA', hint, steps });
+    return mc(q, w[i], trapWrongs(w, i), { lang: 'af-ZA', hint, steps });
   };
   S.kaf_trap_reels = bank([
     { q: `What is the stellende trap?`, a: `The ordinary form of the word`, w: [`Comparing two things`, `One stands above all the others`, `A word that makes it very strong`], why: `Klein is the stellende trap.` },
@@ -5003,8 +5003,8 @@ details ol { margin: 6px 0 0; padding-left: 20px; }
     { q: `Which row is right?`, a: `baie, meer, meeste`, w: [`baie, baier, baiste`, `baie, meer, baiste`, `baie, baier, meeste`], why: `Baie changes completely. There's no "baier".` },
     { q: `Which row is right?`, a: `koud, kouer, koudste`, w: [`koud, kouder, koudste`, `koud, kouer, kouste`, `koud, kouder, kouste`], why: `Kouer loses the d, and koudste keeps it.` },
     { q: `Which row is right?`, a: `oud, ouer, oudste`, w: [`oud, ouder, oudste`, `oud, ouer, ouste`, `oud, ouder, ouste`], why: `Ouer loses the d, and oudste keeps it.` },
-    { q: `What do you do with a longer word like "opgewonde"?`, a: `meer opgewonde, mees opgewonde`, w: [`opgewonder, opgewondeste`, `opgewonde, opgewondste`, `meer opgewonder, mees opgewondeste`], why: `Some long words take meer and mees in front.` },
-    { q: `Which is the right vergrotende trap of "doof" (deaf)?`, a: `dower`, w: [`doofer`, `doower`, `doofder`], why: `The f changes to w: doof, dower, doofste.` },
+    { q: `What do you do with a longer word like "opgewonde"?`, a: `meer opgewonde, mees opgewonde`, w: [`opgewonner, opgewonste`, `opgewonde, opgewondste`, `meer opgewonner, mees opgewonste`], why: `Some long words take meer and mees in front.` },
+    { q: `Which is the right vergrotende trap of "doof" (deaf)?`, a: `dower`, w: [`doofter`, `doower`, `doofder`], why: `The f changes to w: doof, dower, doofste.` },
     { tf: false, q: `True or false: you say "Hy is die groter seun in die klas".`, why: `"Die" is the clue for -ste: Hy is die grootste seun in die klas.` },
     { tf: true, q: `True or false: "Ek is ouer as my broer" is correct.`, why: `"As" is the clue for -er.` },
   ], AF);
@@ -5041,13 +5041,15 @@ details ol { margin: 6px 0 0; padding-left: 20px; }
 
   // ---------- Teenoorgesteldes ----------
   const TEEN = [['maer', 'vet'], ['hard', 'sag'], ['mooi', 'lelik'], ['vuil', 'skoon'], ['goedkoop', 'duur'], ['groot', 'klein'], ['oud', 'jonk'], ['lank', 'kort'], ['koud', 'warm'], ['vinnig', 'stadig'], ['nat', 'droog'], ['hoog', 'laag'], ['bo', 'onder'], ['voor', 'agter'], ['dag', 'nag'], ['seun', 'meisie'], ['lig', 'swaar'], ['sterk', 'swak'], ['moeilik', 'maklik']];
+  // Other right answers a typed reply can give.
+  const TEEN_ALSO = { jonk: ['jong', 'nuut'], lank: ['lang'], vet: ['dik'], swaar: ['donker'], sag: ['sagte'] };
   S.kaf_teen = () => {
     const pair = pick(TEEN);
     const [a, b] = Math.random() < 0.7 ? pair : [pair[1], pair[0]];
     const q = `Wat is die teenoorgestelde van "${a}"?`;
     const steps = [`${a} en ${b} is teenoorgesteldes.`];
     const hint = `Teenoorgestelde means the opposite.`;
-    if (Math.random() < 0.5) return { kind: 'word', q, accept: b === 'jonk' ? ['jonk', 'jong'] : [b], correct: b, strict: true, lang: 'af-ZA', hint, steps };
+    if (Math.random() < 0.5) return { kind: 'word', q, accept: [b, ...(TEEN_ALSO[b] || [])], correct: b, strict: true, lang: 'af-ZA', hint, steps };
     return mc(q, b, others(TEEN.flat().filter((x) => x !== a), b), { lang: 'af-ZA', hint, steps });
   };
 
@@ -5057,13 +5059,13 @@ details ol { margin: 6px 0 0; padding-left: 20px; }
     { q: `Thandi het 'n fiets. ___ ry elke dag.`, a: `Sy`, w: [`Haar`, `Hare`, `Hy`], why: `Sy ry elke dag.` },
     { q: `Thandi het 'n fiets. Die fiets is ___.`, a: `hare`, w: [`sy`, `haar`, `hy`], why: `Dit behoort aan haar: die fiets is hare.` },
     { q: `(You, more than one) ___ eet julle kos.`, a: `Julle`, w: [`Ons`, `Hulle`, `Jy`], why: `More than one "you" is julle.` },
-    { q: `Julle eet ___ kos.`, a: `julle`, w: [`ons`, `hulle`, `jou`], why: `Julle eet julle kos.` },
+    { q: `Julle eet ___ kos. (your, more than one)`, a: `julle`, w: [`ons`, `hulle`, `jou`], why: `Julle eet julle kos.` },
     { q: `Die kos behoort aan julle. Die kos is ___.`, a: `julle s'n`, w: [`ons s'n`, `hulle s'n`, `jou s'n`], why: `The food belongs to you all: dit is julle s'n.` },
     { q: `Dit is Sipho. ___ is 'n seun.`, a: `Hy`, w: [`Sy`, `Hulle`, `Ek`], why: `A boy is hy.` },
     { q: `Dit is Sipho. Dit is ___ fiets.`, a: `sy`, w: [`hy`, `hulle`, `ons`], why: `Sy can mean she, and it can also mean his. Sy fiets: his bike.` },
-    { q: `Hulle was ___ fietse.`, a: `hulle`, w: [`ons`, `julle`, `my`], why: `Hulle was hulle fietse.` },
+    { q: `Hulle was ___ fietse. (their)`, a: `hulle`, w: [`ons`, `julle`, `my`], why: `Hulle was hulle fietse.` },
     { q: `Die fietse behoort aan hulle. Die fietse is ___.`, a: `hulle s'n`, w: [`hulle`, `ons s'n`, `julle s'n`], why: `It belongs to them: dit is hulle s'n.` },
-    { q: `Ons speel in ___ tuin.`, a: `ons`, w: [`hulle`, `julle`, `haar`], why: `Ons speel in ons tuin.` },
+    { q: `Ons speel in ___ tuin. (our)`, a: `ons`, w: [`hulle`, `julle`, `haar`], why: `Ons speel in ons tuin.` },
     { q: `What does "julle" mean?`, a: `you, more than one person`, w: [`they`, `we`, `you, one person`], why: `Jy is one person, and julle is more than one.` },
     { q: `What does "hulle" mean?`, a: `they`, w: [`we`, `you, more than one person`, `she`], why: `Hulle speel: they play.` },
     { q: `What does a voornaamwoord do?`, a: `It stands in the place of a noun`, w: [`It describes a noun`, `It joins two sentences`, `It says where something is`], why: `Mia speel. Sy lag. Sy neem die plek van Mia in.` },
@@ -5081,7 +5083,7 @@ details ol { margin: 6px 0 0; padding-left: 20px; }
   ];
   S.kaf_nie = () => {
     const [sin, right, wrong] = pick(NEGS);
-    return mc(`Skryf in die ontkenning: ${sin}`, right, wrong, { lang: 'af-ZA', hint: 'Two nies. Iemand becomes niemand, iets becomes niks, altyd becomes nooit, êrens becomes nêrens.', steps: [right, 'A negative sentence always ends with an extra "nie".'] });
+    return mc(`Skryf in die ontkenning: ${sin}`, right, wrong, { lang: 'af-ZA', hint: 'Usually two nies: one after the verb and one at the end. With niemand, niks, nooit or nêrens, only the nie at the end stays.', steps: [right, 'A negative sentence always ends with an extra "nie".'] });
   };
   S.kaf_nie_reels = bank([
     { q: `What is the negative of "iemand" (someone)?`, a: `niemand`, w: [`niks`, `nooit`, `nêrens`], why: `Iemand becomes niemand.` },
@@ -5090,25 +5092,26 @@ details ol { margin: 6px 0 0; padding-left: 20px; }
     { q: `What is the negative of "êrens" (somewhere)?`, a: `nêrens`, w: [`niks`, `niemand`, `nooit`], why: `Êrens becomes nêrens.` },
     { q: `Which is right?`, a: `Nee, die seun eet nie alles nie.`, w: [`Nee, die seun eet alles nie.`, `Nee, die seun nie eet alles nie.`, `Nee, die seun eet nie alles.`], why: `Nie goes after the verb, and another nie goes at the end.` },
     { q: `Which is right?`, a: `Nee, die arend vlieg nooit oor die berge nie.`, w: [`Nee, die arend vlieg altyd oor die berge nie.`, `Nee, die arend vlieg nie altyd oor die berge.`, `Nee, die arend nooit vlieg oor die berge nie.`], why: `Altyd becomes nooit, and it ends with nie.` },
-    { q: `The negative of "iemand" is ___.`, t: [`niemand`], why: `Iemand becomes niemand.`, h: `Put "n" and an "i" at the front.` },
+    { q: `The negative of "iemand" is ___.`, t: [`niemand`], why: `Iemand becomes niemand.`, h: `Put an "n" at the front.` },
     { q: `The negative of "altyd" is ___.`, t: [`nooit`], why: `Altyd becomes nooit.`, h: `It means never.` },
   ], AF);
 
   // ---------- Words and sounds ----------
-  const STRAND = [['umbrella', 'sambreel', 'Sonbreel'], ['lighthouse', 'vuurtoring', 'veerhane'], ['shells', 'skulpe', 'skelpe'], ['lifesaver', 'lewensredder', 'leerguard'], ['cool drinks', 'koeldranke', 'kool dranke'], ['swimming costume', 'baaikostuum', 'boot kostuem'], ['rock pool', 'rotspoel', 'rots poel'], ['sandwiches', 'toebroodjies', 'toebrotjies'], ['basket', 'mandjie', 'manjie'], ['carefully', 'versigtig', 'marsigtig'], ['barefoot', 'kaalvoet', 'cahvoet'], ['ships', 'skepe', 'skipe'], ['back', 'terug', 'terig'], ['between', 'tussen', 'tuisen'], ['next to', 'langs', 'banks'], ['excited', 'opgewonde', 'opgewonder'], ['seaweed', 'seewier', 'seewir'], ['waves', 'branders', 'brandes'], ['fishing rod', 'visstok', 'vis stok'], ['beach chair', 'seilstoel', 'sail stoel'], ['sun hat', 'sonhoed', 'son hoed']];
-  const WOORDE = [['clean', 'skoon'], ['farmer', 'boer'], ['cake', 'koek'], ['desk', 'lessenaar'], ['stove', 'stoof'], ['eyebrow', 'wenkbrou'], ['sandwich', 'toebroodjie'], ['thin', 'dun'], ['glasses', 'bril'], ['soft', 'sag'], ['throw', 'gooi'], ['catch', 'vang'], ['thirty-five', 'vyf-en-dertig'], ['twenty-six', 'ses-en-twintig']];
+  const STRAND = [['umbrella', 'sambreel', ['sambriel', 'sambree', 'smbreel']], ['lighthouse', 'vuurtoring', ['vuurtoreng', 'vuurtorin', 'vurtoring']], ['shells', 'skulpe', ['skelpe', 'skolpe', 'skulppe']], ['lifesaver', 'lewensredder', ['lewensreder', 'lewensredde', 'lwensredder']], ['cool drinks', 'koeldranke', ['kouldranke', 'koeldrankke', 'koeldrannke']], ['swimming costume', 'baaikostuum', ['baaikostum', 'baikostuum', 'baaikostuu']], ['rock pool', 'rotspoel', ['rotspool', 'rotspoe', 'rtspoel']], ['sandwiches', 'toebroodjies', ['toebrodjies', 'toebroodjeis', 'toebroojies']], ['basket', 'mandjie', ['mantjie', 'mandji', 'mndjie']], ['carefully', 'versigtig', ['versigtag', 'versigti', 'vrsigtig']], ['barefoot', 'kaalvoet', ['kaalfoet', 'kaalvoe', 'kalvoet']], ['ships', 'skepe', ['skeepe', 'skeppe', 'skiepe']], ['back (as in go back)', 'terug', ['teroeg', 'teru', 'trug']], ['between', 'tussen', ['tusen', 'tusse', 'tssen']], ['next to', 'langs', ['lanks', 'lings', 'lagns']], ['excited', 'opgewonde', ['opgewonne', 'opgewond', 'ogewonde']], ['seaweed', 'seewier', ['seewiir', 'seewie', 'sewier']], ['waves', 'branders', ['brandars', 'brandders', 'brannders']], ['fishing rod', 'visstok', ['vistok', 'vissto', 'vsstok']], ['beach chair', 'seilstoel', ['seilstul', 'seilstoe', 'selstoel']], ['sun hat', 'sonhoed', ['sonhoet', 'sonhoe', 'snhoed']]];
+  const SAYS_ALSO = { branders: ['golwe'], visstok: ['hengel'], dun: ['maer'], sag: ['sagte'] };
+  const WOORDE = [['clean', 'skoon'], ['farmer', 'boer'], ['cake', 'koek'], ['desk', 'lessenaar'], ['stove', 'stoof'], ['eyebrow', 'wenkbrou'], ['sandwich', 'toebroodjie'], ['thin', 'dun'], ['glasses (to see with)', 'bril'], ['soft', 'sag'], ['throw', 'gooi'], ['catch', 'vang'], ['thirty-five', 'vyf-en-dertig'], ['twenty-six', 'ses-en-twintig']];
   S.kaf_spel = () => {
-    const [en, af, slip] = pick(STRAND);
+    const [en, af, wrong] = pick(STRAND);
     const steps = [`${en} = ${af}`];
     const hint = 'Say it slowly, one sound at a time.';
-    if (Math.random() < 0.6) return { kind: 'word', q: `Skryf in Afrikaans: ${en}`, accept: [af], correct: af, strict: true, lang: 'af-ZA', hint, steps };
-    return mc(`Which is spelt correctly? (${en})`, af, [slip, `${af.slice(0, -1)}`, `${af[0]}${af.slice(2)}`], { lang: 'af-ZA', hint, steps });
+    if (Math.random() < 0.6) return { kind: 'word', q: `Skryf in Afrikaans: ${en}`, accept: [af, ...(SAYS_ALSO[af] || [])], correct: af, strict: true, lang: 'af-ZA', hint, steps };
+    return mc(`Which is spelt correctly? (${en})`, af, wrong, { lang: 'af-ZA', hint, steps });
   };
   S.kaf_woord = () => {
     const [en, af] = pick(WOORDE);
     const steps = [`${en} = ${af}`];
     const hint = 'If you know it in English, picture it. Then say the Afrikaans word.';
-    if (Math.random() < 0.5) return { kind: 'word', q: `Skryf in Afrikaans: ${en}`, accept: [af, af.replace(/-/g, ' '), af.replace(/-/g, '')], correct: af, strict: true, lang: 'af-ZA', hint, steps };
+    if (Math.random() < 0.5) return { kind: 'word', q: `Skryf in Afrikaans: ${en}`, accept: [af, af.replace(/-/g, ' '), af.replace(/-/g, ''), ...(SAYS_ALSO[af] || [])], correct: af, strict: true, lang: 'af-ZA', hint, steps };
     return mc(`What is "${en}" in Afrikaans?`, af, others(WOORDE.map((x) => x[1]), af), { lang: 'af-ZA', hint, steps });
   };
   S.kaf_diere = bank([
@@ -5150,7 +5153,7 @@ details ol { margin: 6px 0 0; padding-left: 20px; }
       noted(RS.section('kaf_trap_sec', 4, 'Trappe van vergelyking', 'Klein, kleiner, kleinste', ['kaf_trap', 'kaf_trap_sin', 'kaf_trap_reels']), [`Stellende: the ordinary word.`, `Vergrotende: comparing two, with the clue "as": kleiner as.`, `Oortreffende: the most of all, with the clue "die": die kleinste.`, `Watch out: nat natter natste, groot groter grootste, goed beter beste, baie meer meeste.`]),
       noted(RS.section('kaf_vs', 5, 'Voorsetsels', 'What they mean and when to use them'), [`op on, in in, onder under, oor over, om around, langs next to, tussen between, agter behind, voor in front of.`, `Lief vir. Hou van. Per motor. Aan tafel. Blaf vir.`]),
       noted(RS.section('kaf_teen', 6, 'Teenoorgesteldes', 'Opposites'), [`maer vet, hard sag, mooi lelik, vuil skoon, goedkoop duur, oud jonk.`]),
-      noted(RS.section('kaf_pron_sec', 7, 'Voornaamwoorde en ontkenning', 'Sy, haar, hare, and two nies', ['kaf_vnw', 'kaf_nie', 'kaf_nie_reels']), [`Sy doen dit. Dit is haar boek. Die boek is hare.`, `Jy is one person, and julle is more than one.`, `Negatives need two nies: Ek kan nie ry nie.`, `iemand niemand, iets niks, altyd nooit, êrens nêrens.`]),
+      noted(RS.section('kaf_pron_sec', 7, 'Voornaamwoorde en ontkenning', 'Sy, haar, hare, and negatives', ['kaf_vnw', 'kaf_nie', 'kaf_nie_reels']), [`Sy doen dit. Dit is haar boek. Die boek is hare.`, `Jy is one person, and julle is more than one.`, `Negatives end with nie: Ek kan nie ry nie.`, `iemand niemand, iets niks, altyd nooit, êrens nêrens.`]),
       noted(RS.section('kaf_woord_sec', 8, 'Woorde en spelling', 'Strand words, klein words and animal sounds', ['kaf_spel', 'kaf_woord', 'kaf_klein', 'kaf_diere']), [`Spell it out loud, one sound at a time.`, `Sambreel, vuurtoring, lewensredder, koeldranke, baaikostuum, versigtig, kaalvoet, skepe, terug.`]),
     ],
   };
@@ -5186,7 +5189,7 @@ details ol { margin: 6px 0 0; padding-left: 20px; }
       const n = pick([1, 2, 3]);
       const a = ri(n + 1, 6);
       const b = ri(a + 1, 8);
-      return twoChoice('Which is greater?', fr(n, a), fr(n, b), fr(n, a), 'The top numbers are the same. The more parts you cut it into, the smaller each part is.', [`A ${a}th-sized piece is bigger than a ${b}th-sized piece, so ${fr(n, a)} is greater.`]);
+      return twoChoice('Which is greater?', fr(n, a), fr(n, b), fr(n, a), 'The top numbers are the same. The more parts you cut it into, the smaller each part is.', [`Cut into ${a} parts, each part is bigger than when it is cut into ${b} parts.`, `So ${fr(n, a)} is greater.`]);
     }
     const [p, q2, r, s2] = pick(SHORT);
     const big = p * s2 > r * q2 ? fr(p, q2) : fr(r, s2);
@@ -5272,8 +5275,8 @@ details ol { margin: 6px 0 0; padding-left: 20px; }
     { q: `How many cm are in 1 m?`, a: `100`, w: [`10`, `1 000`, `50`], why: `1 m = 100 cm.` },
     { q: `How many m are in 1 km?`, a: `${fmt(1000)}`, w: [`10`, `100`, `${fmt(10000)}`], why: `1 km = 1 000 m.` },
     { q: `What would you use to measure the length of your pencil?`, a: `A ruler`, w: [`A scale`, `A measuring jug`, `A thermometer`], why: `A ruler measures short lengths in cm and mm.` },
-    { q: `About how long is a new pencil?`, a: `About 18 cm`, w: [`About 18 mm`, `About 18 m`, `About 18 km`], why: `18 mm is smaller than your thumbnail is wide, near enough, and 18 m is longer than a bus.` },
-    { q: `Which unit would you use for the length of a motocross track?`, a: `km`, w: [`mm`, `cm`, `ml`], why: `Long distances are measured in kilometres.` },
+    { q: `About how long is a new pencil?`, a: `About 18 cm`, w: [`About 18 mm`, `About 18 m`, `About 18 km`], why: `18 mm is only about as wide as your thumb, and 18 m is longer than a bus.` },
+    { q: `Which unit would you use for the length of a motocross track?`, a: `km`, w: [`mm`, `cm`, `mL`], why: `Long distances are measured in kilometres.` },
     { q: `Which unit would you use for the thickness of your fingernail?`, a: `mm`, w: [`km`, `m`, `kg`], why: `Very small lengths are measured in millimetres.` },
     { q: `Which unit would you use for the length of a classroom?`, a: `m`, w: [`mm`, `km`, `g`], why: `Metres suit rooms and buildings.` },
   ]);
@@ -5301,7 +5304,7 @@ details ol { margin: 6px 0 0; padding-left: 20px; }
   };
   S.km_mc_word = () => {
     const kinds = [
-      () => { const a = pick([1, 2, 3]); const ag = pick([250, 500, 750]); const b = pick([1]); const bg = pick([0, 250]); const t = a * 1000 + ag - b * 1000 - bg; return num(`A kitchen has ${a} kg of rice and another ${ag} g. It uses ${b} kg ${bg} g. How many grams are left?`, t, 'g', 'Change everything into grams first.', [`${fmt(a * 1000)} + ${ag} = ${fmt(a * 1000 + ag)}`, `Used: ${fmt(b * 1000 + bg)} g`, `${fmt(a * 1000 + ag)} − ${fmt(b * 1000 + bg)} = ${fmt(t)}`]); },
+      () => { const a = pick([2, 3]); const ag = pick([250, 500, 750]); const b = 1; const bg = pick([250, 500]); const t = a * 1000 + ag - b * 1000 - bg; return num(`A kitchen has ${a} kg of rice and another ${ag} g. It uses ${b} kg ${bg} g. How many grams are left?`, t, 'g', 'Change everything into grams first.', [`${fmt(a * 1000)} + ${ag} = ${fmt(a * 1000 + ag)}`, `Used: ${fmt(b * 1000 + bg)} g`, `${fmt(a * 1000 + ag)} − ${fmt(b * 1000 + bg)} = ${fmt(t)}`]); },
       () => { const l = pick([1, 2]); const m = pick([250, 500, 750]); const c = pick([2, 3]); const t = l * 1000 + m - c * 250; return num(`A jug holds ${l} L ${m} mL of water. You pour out ${c} cups of 250 mL each. How many mL are left?`, t, 'mL', 'Change it all into mL. Each cup is 250 mL.', [`${l} L ${m} mL = ${fmt(l * 1000 + m)} mL`, `${c} × 250 = ${c * 250}`, `${fmt(l * 1000 + m)} − ${c * 250} = ${fmt(t)}`]); },
       () => { const l = pick([1, 2]); const m = pick([250, 500]); const e = pick([500, 750]); const t = l * 1000 + m + e; return num(`There is ${l} L ${m} mL of juice and another ${e} mL. How many mL is that altogether?`, t, 'mL', 'Change the litres into mL first.', [`${l} L ${m} mL = ${fmt(l * 1000 + m)} mL`, `${fmt(l * 1000 + m)} + ${e} = ${fmt(t)}`]); },
       () => { const cups = pick([4, 6, 8, 9, 10]); return num(`How many full 250 mL cups can you pour from ${fmt(cups * 250)} mL of juice?`, cups, 'cups', 'How many 250s fit? Four 250s make 1 000.', [`${fmt(cups * 250)} ÷ 250 = ${cups}`]); },
@@ -5368,7 +5371,7 @@ details ol { margin: 6px 0 0; padding-left: 20px; }
     { q: `How many cups make 1 litre?`, a: `4`, w: [`2`, `10`, `25`], why: `4 × 250 mL = 1 000 mL.` },
     { q: `How many teaspoons make 1 tablespoon?`, a: `3`, w: [`4`, `5`, `15`], why: `3 × 5 mL = 15 mL.` },
     { q: `Which holds more: 1 tablespoon or 4 teaspoons?`, a: `4 teaspoons, by 5 mL`, w: [`1 tablespoon, by 5 mL`, `4 teaspoons, by 20 mL`, `They hold the same`], why: `4 × 5 = 20 mL, and 20 − 15 = 5 mL.` },
-    { q: `You take a medicine of 2,5 mL. How full is the teaspoon?`, a: `Half full`, w: [`Quite full`, `A quarter full`, `Overflowing`], why: `A teaspoon holds 5 mL, and half of 5 is 2,5.` },
+    { q: `A teaspoon has 2,5 mL of cough mixture in it. How full is it?`, a: `Half full`, w: [`Completely full`, `A quarter full`, `Three-quarters full`], why: `A teaspoon holds 5 mL, and half of 5 is 2,5.` },
     { q: `Which is correct?`, a: `2,5 L = 2 500 mL`, w: [`2,5 L = 25 mL`, `2,5 L = 250 mL`, `2,5 L = 2 050 mL`], why: `Multiply by 1 000: 2,5 × 1 000 = 2 500.` },
     { q: `Which is correct?`, a: `${fr(3, 4)} of 1 kg = 750 g`, w: [`${fr(3, 4)} of 1 kg = 250 g`, `${fr(3, 4)} of 1 kg = 75 g`, `${fr(3, 4)} of 1 kg = 340 g`], why: `1 000 ÷ 4 = 250, and 250 × 3 = 750.` },
     { q: `How do you write one thousand five hundred grams in kg?`, a: `1,5 kg`, w: [`15 kg`, `150 kg`, `1,05 kg`], why: `1 500 ÷ 1 000 = 1,5. In South Africa we use a comma, low on the line.` },
@@ -5379,14 +5382,14 @@ details ol { margin: 6px 0 0; padding-left: 20px; }
   // ---------- Area and perimeter ----------
   S.km_ap_calc = () => {
     const kinds = [
-      () => { const l = ri(4, 15); const b = ri(2, l - 1); return num(`A rectangle is ${l} cm long and ${b} cm wide. What is its perimeter?`, (l + b) * 2, 'cm', 'P = (L + B) × 2', [`P = (${l} + ${b}) × 2`, `P = ${l + b} × 2 = ${(l + b) * 2} cm`]); },
-      () => { const l = ri(4, 15); const b = ri(2, l - 1); return num(`A rectangle is ${l} cm long and ${b} cm wide. What is its area?`, l * b, 'cm²', 'A = L × B', [`A = ${l} × ${b} = ${l * b} cm²`]); },
+      () => { const l = ri(4, 15); const b = ri(2, l - 1); return num(`A rectangle is ${l} cm long and ${b} cm wide. What is its perimeter?`, (l + b) * 2, 'cm', 'P = (L + W) × 2', [`P = (${l} + ${b}) × 2`, `P = ${l + b} × 2 = ${(l + b) * 2} cm`]); },
+      () => { const l = ri(4, 15); const b = ri(2, l - 1); return num(`A rectangle is ${l} cm long and ${b} cm wide. What is its area?`, l * b, 'cm²', 'A = L × W', [`A = ${l} × ${b} = ${l * b} cm²`]); },
       () => { const s2 = ri(3, 12); return num(`A square has sides of ${s2} cm. What is its perimeter?`, s2 * 4, 'cm', 'P = 4 × S: a square has 4 equal sides.', [`P = 4 × ${s2} = ${s2 * 4} cm`]); },
       () => { const s2 = ri(3, 12); return num(`A square has sides of ${s2} cm. What is its area?`, s2 * s2, 'cm²', 'A = S × S', [`A = ${s2} × ${s2} = ${s2 * s2} cm²`]); },
-      () => { const l = pick([6, 8, 9, 10, 12]); const b = ri(2, 7); return num(`A rectangle has an area of ${l * b} cm². One side is ${l} cm. How long is the other side?`, b, 'cm', 'Area is L × B, so do the opposite to get back: divide.', [`${l} × ? = ${l * b}`, `${l * b} ÷ ${l} = ${b} cm`]); },
+      () => { const l = pick([6, 8, 9, 10, 12]); const b = ri(2, 5); return num(`A rectangle has an area of ${l * b} cm². One side is ${l} cm. How long is the other side?`, b, 'cm', 'Area is L × W, so do the opposite to get back: divide.', [`${l} × ? = ${l * b}`, `${l * b} ÷ ${l} = ${b} cm`]); },
       () => { const s2 = ri(3, 12); return num(`A square has a perimeter of ${s2 * 4} cm. How long is one side?`, s2, 'cm', 'A square has 4 equal sides, so divide by 4.', [`${s2 * 4} ÷ 4 = ${s2} cm`]); },
-      () => { const a = ri(6, 14); const b = ri(5, 12); const c = ri(4, 10); return num(`A triangle has a perimeter of ${a + b + c} cm. Two sides are ${a} cm and ${b} cm. How long is the third side?`, c, 'cm', 'Perimeter is all the sides added. Take away the two you know.', [`${a + b + c} − ${a} = ${b + c}`, `${b + c} − ${b} = ${c} cm`]); },
-      () => { const l = ri(6, 14); const b = ri(3, l - 1); const p = (l + b) * 2; return num(`A rectangle has a perimeter of ${p} cm. It is ${l} cm long. How wide is it?`, b, 'cm', 'Half the perimeter is L + B. Then take away the length.', [`${p} ÷ 2 = ${l + b}`, `${l + b} − ${l} = ${b} cm`]); },
+      () => { const a = ri(8, 14); const b = ri(8, 14); const c = ri(Math.max(4, Math.abs(a - b) + 1), 10); return num(`A triangle has a perimeter of ${a + b + c} cm. Two sides are ${a} cm and ${b} cm. How long is the third side?`, c, 'cm', 'Perimeter is all the sides added. Take away the two you know.', [`${a + b + c} − ${a} = ${b + c}`, `${b + c} − ${b} = ${c} cm`]); },
+      () => { const l = ri(6, 14); const b = ri(3, l - 1); const p = (l + b) * 2; return num(`A rectangle has a perimeter of ${p} cm. It is ${l} cm long. How wide is it?`, b, 'cm', 'Half the perimeter is L + W. Then take away the length.', [`${p} ÷ 2 = ${l + b}`, `${l + b} − ${l} = ${b} cm`]); },
       () => { const a = ri(3, 6); const b = ri(4, 8); const c = ri(2, 6); const d = ri(3, 7); return num(`An L-shape is cut into two rectangles. One is ${a} cm by ${b} cm, and the other is ${c} cm by ${d} cm. What is the total area?`, a * b + c * d, 'cm²', 'Find each area, then add them: A1 + A2.', [`A1 = ${a} × ${b} = ${a * b}`, `A2 = ${c} × ${d} = ${c * d}`, `${a * b} + ${c * d} = ${a * b + c * d} cm²`]); },
     ];
     return pick(kinds)();
@@ -5394,15 +5397,15 @@ details ol { margin: 6px 0 0; padding-left: 20px; }
   S.km_ap_words = bank([
     { q: `What is the perimeter of a shape?`, a: `The distance around the shape`, w: [`The space inside the shape`, `The number of sides it has`, `The longest side of the shape`], why: `Think of riding one lap around the edge of a track.` },
     { q: `What is the area of a shape?`, a: `The space inside the shape`, w: [`The distance around the shape`, `The number of corners it has`, `The longest side of the shape`], why: `Think of how much grass grows inside the track.` },
-    { q: `What is the formula for the perimeter of a rectangle?`, a: `P = (L + B) × 2`, w: [`P = L × B`, `P = 4 × S`, `P = S × S`], why: `Add the length and breadth, then double it.` },
-    { q: `What is the formula for the area of a rectangle?`, a: `A = L × B`, w: [`A = (L + B) × 2`, `A = 4 × S`, `A = L + B`], why: `Length times breadth.` },
+    { q: `What is the formula for the perimeter of a rectangle?`, a: `P = (L + W) × 2`, w: [`P = L × W`, `P = 4 × S`, `P = S × S`], why: `Add the length and width, then double it.` },
+    { q: `What is the formula for the area of a rectangle?`, a: `A = L × W`, w: [`A = (L + W) × 2`, `A = 4 × S`, `A = L + W`], why: `Length times width.` },
     { q: `What is the formula for the perimeter of a square?`, a: `P = 4 × S`, w: [`P = S × S`, `P = S + S`, `P = 2 × S`], why: `A square has 4 equal sides.` },
     { q: `What is the formula for the area of a square?`, a: `A = S × S`, w: [`A = 4 × S`, `A = S + S`, `A = 2 × S`], why: `Side times side.` },
     { q: `Which unit goes with area?`, a: `cm²`, w: [`cm`, `mL`, `kg`], why: `Area counts squares, so it's in square units.` },
     { q: `Which unit goes with perimeter?`, a: `cm`, w: [`cm²`, `mL`, `g`], why: `Perimeter is a length, so it's in cm or m.` },
-    { q: `A rectangle's area is 48 cm² and one side is 12 cm. What do you do to find the other side?`, a: `48 ÷ 12`, w: [`48 − 12`, `48 + 12`, `48 × 12`], why: `Area is L × B, and the opposite of × is ÷.` },
+    { q: `A rectangle's area is 48 cm² and one side is 12 cm. What do you do to find the other side?`, a: `48 ÷ 12`, w: [`48 − 12`, `48 + 12`, `48 × 12`], why: `Area is L × W, and the opposite of × is ÷.` },
     { q: `How do you find the area of an L-shape?`, a: `Cut it into two rectangles and add their areas`, w: [`Multiply all of the sides together`, `Add up all of the sides around it`, `Multiply the two longest sides`], why: `A1 + A2 gives the total area.` },
-    { tf: true, q: `True or false: a shape's opposite sides in a rectangle are equal.`, why: `That's why you can double (L + B).` },
+    { tf: true, q: `True or false: a rectangle's opposite sides are equal.`, why: `That's why you can double (L + W).` },
     { tf: false, q: `True or false: perimeter and area are the same thing.`, why: `Perimeter goes around the shape, and area is the space inside it.` },
   ]);
 
@@ -5447,7 +5450,7 @@ details ol { margin: 6px 0 0; padding-left: 20px; }
 
   // The starter topics stay as extra practice, so the riding he's already done still counts.
   const maths = pack.subjects.maths;
-  maths.source = 'His maths books and tests';
+  maths.source = 'His maths books';
   maths.scope = 'Tables, fractions, length, mass and capacity, area and perimeter';
   maths.note = 'Questions are new but follow his work';
   maths.startWith = ['km_tab', 'km_frac', 'km_mass'];
@@ -5458,7 +5461,7 @@ details ol { margin: 6px 0 0; padding-left: 20px; }
     noted(RS.section('km_frac', 1, 'Fractions', 'Fraction wall, adding, shading, sharing', ['km_frac_big', 'km_frac_order', 'km_frac_add', 'km_frac_strip', 'km_frac_left', 'km_frac_share']), ['Same bottom number: the bigger top number wins.', 'Same top number: the smaller bottom number wins.', 'One piece short of a whole: the smaller missing piece wins, so {7/8} beats {6/7}.', 'Adding: the bottom stays the same. Add the tops.']),
     noted(RS.section('km_len', 2, 'Length', 'mm, cm, m and km', ['km_len_conv', 'km_len_miss', 'km_len_mix', 'km_len_words']), ['1 cm = 10 mm. 1 m = 100 cm. 1 m = 1 000 mm. 1 km = 1 000 m.', 'Big unit to small unit: multiply. Small unit to big unit: divide.']),
     noted(RS.section('km_mass', 3, 'Mass and capacity', 'g, kg, mL, L, jugs and baking', ['km_mc_conv', 'km_mc_frac', 'km_mc_word', 'km_mc_rank', 'km_mc_compare', 'km_jug', 'km_mc_words']), ['1 kg = 1 000 g. 1 L = 1 000 mL.', '1 teaspoon = 5 mL. 1 tablespoon = 15 mL. 1 cup = 250 mL.', 'Mass is g and kg. Capacity is mL and L.', 'Reading a jug: big jump ÷ the number of little jumps = one little jump.', 'Ordering: write the amounts the way they were first given.']),
-    noted(RS.section('km_ap', 4, 'Area and perimeter', 'Formulas and missing sides', ['km_ap_calc', 'km_ap_words']), ['Perimeter is the distance around. Area is the space inside.', 'Rectangle: P = (L + B) × 2. A = L × B.', 'Square: P = 4 × S. A = S × S.', 'Missing side: do the opposite. 48 ÷ 12 = 4.']),
+    noted(RS.section('km_ap', 4, 'Area and perimeter', 'Formulas and missing sides', ['km_ap_calc', 'km_ap_words']), ['Perimeter is the distance around. Area is the space inside.', 'Rectangle: P = (L + W) × 2. A = L × W.', 'Square: P = 4 × S. A = S × S.', 'Missing side: do the opposite. 48 ÷ 12 = 4.']),
     ...oldTopics.filter((t) => t.id !== 'tables' && t.id !== 'fractions').map((t) => Object.assign(t, { warmup: true, stop: 'Pit lane' })),
     Object.assign(oldTopics.find((t) => t.id === 'fractions'), { warmup: true, stop: 'Pit lane', title: 'More fractions' }),
   ];
@@ -5472,7 +5475,6 @@ details ol { margin: 6px 0 0; padding-left: 20px; }
     { date: '2026-11-10', subject: 'afrikaans', label: 'Afrikaans' },
   ];
 
-  /*__KASH_MORE__*/
 })(typeof window !== 'undefined' ? window : globalThis);
 
 /* Jordy's maths exam, Monday 2 November. The teacher's list: fractions, decimals and
@@ -8122,7 +8124,7 @@ Jordy's Science test, Tuesday 10 November: Planet Earth and Beyond. Written from
   // ---------- staying up to date ----------
   // An open tab or a home screen app keeps running the page it first loaded, old prices and all. So it asks which version
   // is live when it comes back into view and every few minutes, and swaps over between races. build.mjs fills in BUILD.
-  const BUILD = '26a9267722';
+  const BUILD = '4c0edf20a4';
   const BACK_KEY = 'holeshot.back.v1';
   const TRIED_KEY = 'holeshot.tried.v1';
   let liveBuild = null;
