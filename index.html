@@ -7046,9 +7046,9 @@ Jordy's Science test, Tuesday 10 November: Planet Earth and Beyond. Written from
   const SEATS = {
     mini: { w: 720, h: 783, side: [[124, 456], [212, 468], [204, 528], [140, 505]], front: [[447, 345], [487, 338], [517, 406], [482, 413]], shirt: [[148, 262], [210, 276], [205, 322], [142, 312]], logo: [[310, 462], [432, 462], [430, 486], [305, 488]] },
     mx: { w: 720, h: 671, side: [[152, 352], [234, 360], [232, 404], [162, 392]], front: [[438, 250], [480, 262], [498, 300], [458, 296]], shirt: [[212, 180], [262, 186], [262, 230], [210, 226]], logo: [[352, 350], [445, 356], [442, 374], [352, 368]] },
-    enduro: { w: 720, h: 559, side: [[205, 280], [275, 296], [268, 328], [215, 312]], front: [[483, 176], [510, 188], [534, 246], [505, 235]], frontPatch: true, shirt: [[262, 135], [310, 145], [312, 195], [258, 188]], logo: [[420, 280], [498, 296], [494, 312], [418, 298]] },
-    hard: { w: 720, h: 620, side: [[150, 305], [238, 318], [232, 356], [172, 340]], front: [[447, 224], [480, 214], [505, 276], [476, 280]], shirt: [[235, 145], [285, 152], [288, 205], [230, 198]], logo: [[395, 290], [468, 318], [462, 332], [392, 305]] },
-    factory: { w: 720, h: 604, side: [[170, 304], [258, 314], [262, 364], [196, 342]], front: [[466, 214], [495, 220], [517, 266], [490, 272]], shirt: [[242, 140], [295, 150], [298, 205], [236, 198]], logo: [[395, 300], [485, 310], [482, 328], [392, 318]] },
+    enduro: { w: 720, h: 559, side: [[205, 280], [275, 296], [268, 328], [215, 312]], front: [[486, 178], [514, 190], [538, 246], [509, 236]], frontPatch: true, shirt: [[262, 135], [310, 145], [312, 195], [258, 188]], logo: [[420, 280], [498, 296], [494, 312], [418, 298]] },
+    hard: { w: 720, h: 620, side: [[150, 305], [238, 318], [232, 356], [172, 340]], front: [[452, 222], [486, 212], [512, 276], [481, 282]], frontPatch: true, shirt: [[235, 145], [285, 152], [288, 205], [230, 198]], logo: [[395, 290], [468, 318], [462, 332], [392, 305]] },
+    factory: { w: 720, h: 604, side: [[170, 304], [258, 314], [262, 364], [196, 342]], front: [[468, 213], [504, 219], [526, 268], [493, 274]], frontPatch: true, shirt: [[242, 140], [295, 150], [298, 205], [236, 198]], logo: [[395, 300], [485, 310], [482, 328], [392, 318]] },
   };
   let svgNo = 0;
   const stickerFill = (s, scale = 1) => {
@@ -7110,7 +7110,7 @@ Jordy's Science test, Tuesday 10 November: Planet Earth and Beyond. Written from
     const num = h(String(p.plate));
     const coat = (part, fill) => (fill ? `<i style="-webkit-mask-image:url(img/${id}-${part}.webp);mask-image:url(img/${id}-${part}.webp);background:${fill}"></i>` : '');
     const alt = label === undefined ? `Rider on a ${BIKES[id].label} bike in ${paint.label}` : label;
-    const patch = spot.frontPatch ? `<path d="M${spot.front[0]}L${spot.front[1]}L${spot.front[2]}L${spot.front[3]}Z" fill="#fff" stroke="#fff" stroke-width="5" stroke-linejoin="round"/>` : '';
+    const patch = spot.frontPatch ? `<path d="M${spot.front[0]}L${spot.front[1]}L${spot.front[2]}L${spot.front[3]}Z" fill="#fff" stroke="#C9CDD4" stroke-width="1.5" stroke-linejoin="round"/>` : '';
     return `<div class="rig">
       <img class="shot" src="img/photo-${id}.webp" alt="${alt}" width="${spot.w}" height="${spot.h}" decoding="sync">
       ${coat('plastic', paint.coat || paint.hex)}${sticker && sticker.art ? coat('plastic', stickerSheet(sticker, spot)) : ''}
