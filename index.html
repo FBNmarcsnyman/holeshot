@@ -845,7 +845,55 @@ details ol { margin: 6px 0 0; padding-left: 20px; }
     pack.subjects[subject].topics.push(RS.section(id, photo, title, blurb, skills));
   }
 
-  Object.assign(RS, { bank, addQuestions, addSection, ri, pick, shuffle, gcd, lcm, r2, roundTo, simp, factorsOf, primeFactors, isPrime, distinctDigits, coprimeTop, fmt, money, fr, mixedStr, plain, html, mc, parseValue, check, spoken, matchOption, speakable, wordsToInt, editDistance });
+  // ---------- purchases ----------
+  // A purchase carries a receipt, written by a copy of the game that had just checked it was the live one. That is how
+  // a purchase from an out-of-date copy, at an out-of-date price, gets spotted once that device has updated.
+  const OWNED_LISTS = ['ownedB', 'ownedP', 'ownedG', 'ownedS'];
+  const receiptKey = (list, id) => `${list}:${id}`;
+  // Brings across purchases one copy of a rider has and the other hasn't yet, and charges for them.
+  // A raised epoch means a reset or a reversal, so nothing carries across one.
+  function carryPurchases(from, to) {
+    if ((from.epoch || 0) !== (to.epoch || 0)) return 0;
+    let carried = 0;
+    for (const list of OWNED_LISTS) {
+      for (const id of from[list] || []) {
+        const paid = from.receipts && from.receipts[receiptKey(list, id)];
+        if (!paid || (to[list] || []).includes(id)) continue;
+        to[list] = [...(to[list] || []), id];
+        to.receipts = { ...(to.receipts || {}), [receiptKey(list, id)]: paid };
+        to.points = Math.max(0, (to.points || 0) - paid.cost);
+        carried++;
+      }
+    }
+    return carried;
+  }
+  // Squares this device's copy with the saved copy, just before saving over it. Anything here that isn't saved and has
+  // no receipt goes back, and the points become what was saved, plus what's been earned since, less what's been paid for since.
+  function squarePurchases(mine, theirs, blank) {
+    let paid = 0;
+    let dropped = 0;
+    for (const list of OWNED_LISTS) {
+      mine[list] = (mine[list] || []).filter((id) => {
+        if ((theirs[list] || []).includes(id) || (blank[list] || []).includes(id)) return true;
+        const receipt = mine.receipts && mine.receipts[receiptKey(list, id)];
+        if (receipt) paid += receipt.cost;
+        else dropped++;
+        return !!receipt;
+      });
+    }
+    if (dropped) {
+      mine.points = Math.max(0, (theirs.points || 0) + (mine.earned || 0) - (theirs.earned || 0) - paid);
+      if (!mine.ownedB.includes(mine.bike)) mine.bike = blank.bike;
+      if (!mine.ownedP.includes(mine.paint)) mine.paint = blank.paint;
+      if (!mine.ownedS.includes(mine.sticker)) mine.sticker = blank.sticker;
+      for (const slot of Object.keys(blank.gear)) {
+        if (!mine.ownedG.includes(mine.gear[slot])) mine.gear[slot] = blank.gear[slot];
+      }
+    }
+    return { dropped, carried: carryPurchases(theirs, mine) };
+  }
+
+  Object.assign(RS, { receiptKey, carryPurchases, squarePurchases, bank, addQuestions, addSection, ri, pick, shuffle, gcd, lcm, r2, roundTo, simp, factorsOf, primeFactors, isPrime, distinctDigits, coprimeTop, fmt, money, fr, mixedStr, plain, html, mc, parseValue, check, spoken, matchOption, speakable, wordsToInt, editDistance });
 })(typeof window !== 'undefined' ? window : globalThis);
 
 /* Jordy: Grade 6 Term 4 maths, NumberSense Workbook 24, pages 1 to 24.
@@ -8124,7 +8172,7 @@ Jordy's Science test, Tuesday 10 November: Planet Earth and Beyond. Written from
   // ---------- staying up to date ----------
   // An open tab or a home screen app keeps running the page it first loaded, old prices and all. So it asks which version
   // is live when it comes back into view and every few minutes, and swaps over between races. build.mjs fills in BUILD.
-  const BUILD = '4c0edf20a4';
+  const BUILD = '52bcdba0f6';
   const BACK_KEY = 'holeshot.back.v1';
   const TRIED_KEY = 'holeshot.tried.v1';
   let liveBuild = null;
@@ -8232,9 +8280,20 @@ Jordy's Science test, Tuesday 10 November: Planet Earth and Beyond. Written from
         const theirs = got.progress[id];
         if (theirs && isAhead(theirs, mine)) {
           setKey(BACKUP_KEY, JSON.stringify({ id, when: Date.now(), data: mine }));
-          state.players[id] = Object.assign(blankPlayer(RS.packs[id]), theirs);
+          const fresh = Object.assign(blankPlayer(RS.packs[id]), theirs);
+          // A purchase made here that hadn't been saved yet stays, and goes up with the next save.
+          if (RS.carryPurchases(mine, fresh)) {
+            fresh.updatedAt = Date.now();
+            syncAgain = true;
+          }
+          state.players[id] = fresh;
           changed = true;
         } else if (theirs ? isAhead(mine, theirs) : mine.totalQ > 0 || mine.updatedAt) {
+          if (theirs) {
+            const { dropped, carried } = RS.squarePurchases(mine, theirs, blankPlayer(RS.packs[id]));
+            if (dropped || carried) changed = true;
+            if (dropped) toast('Something bought on an old copy of the game went back, and the points were returned.');
+          }
           await syncCall({ action: 'put', token: syncToken, player: id, data: mine, build: BUILD });
         }
       }
@@ -8275,8 +8334,8 @@ Jordy's Science test, Tuesday 10 November: Planet Earth and Beyond. Written from
   const dayLog = (p) => p.days[dayKey()] || (p.days[dayKey()] = { pts: 0, q: 0, ok: 0 });
   const mastery = (p, t) => t.skills.reduce((a, id) => a + ((p.skills[id] && p.skills[id].m) || 0), 0) / t.skills.length;
   const seenTopic = (p, t) => t.skills.some((id) => p.skills[id] && p.skills[id].seen);
-  // Cleared takes both: a good race, and every kind of question in the section known well.
-  const isCleared = (p, t) => ((p.topics[t.id] && p.topics[t.id].stars) || 0) >= 2 && mastery(p, t) >= 0.8;
+  // Cleared means the bar is full, the same 100% the rider can see. A wrong answer can take it back down.
+  const isCleared = (p, t) => Math.round(mastery(p, t) * 100) === 100;
   const clearedCount = (p, sub) => racing(sub).filter((t) => isCleared(p, t)).length;
   const nextStop = (p, sub) => racing(sub).find((t) => !isCleared(p, t));
   const topicOf = (skill) => SUB().topics.find((t) => t.skills.includes(skill));
@@ -8687,7 +8746,7 @@ Jordy's Science test, Tuesday 10 November: Planet Earth and Beyond. Written from
       <section class="card">
         <div class="eyebrow">${sub.source}</div>
         <div class="h-sec" style="font-size:24px">The ${sub.label} track</div>
-        <p class="small-t muted" style="margin-bottom:10px">${sub.scope}. ${sub.note}. Ride the sections in any order. A section is cleared at 2 stars and 80%.</p>
+        <p class="small-t muted" style="margin-bottom:10px">${sub.scope}. ${sub.note}. Ride the sections in any order. A section is cleared when its bar is full at 100%.</p>
         ${list}
       </section>
       <div class="stops">
@@ -8729,6 +8788,8 @@ Jordy's Science test, Tuesday 10 November: Planet Earth and Beyond. Written from
     }
     p.points -= item.cost;
     owned.push(item.id);
+    const list = ['ownedB', 'ownedP', 'ownedG', 'ownedS'].find((k) => p[k] === owned);
+    p.receipts = { ...(p.receipts || {}), [RS.receiptKey(list, item.id)]: { cost: item.cost, build: BUILD, at: Date.now() } };
     sfx('combo');
     return true;
   }
@@ -10054,7 +10115,10 @@ Jordy's Science test, Tuesday 10 November: Planet Earth and Beyond. Written from
         if (buying) break;
         buying = true;
         const { tab, id: item } = ui.tryOn;
-        checkBuild().then((found) => {
+        checkBuild().then(async (found) => {
+          // Buy against the latest saved copy, so a sale can't be made on points that another device has already spent.
+          if (found === 'same') await syncNow();
+          const p = P();
           buying = false;
           if (found === 'newer') {
             toast('The game has just been updated. Try that again in a moment.');
