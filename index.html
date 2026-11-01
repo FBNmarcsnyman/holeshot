@@ -173,6 +173,7 @@ svg { display: block; }
 .pin-dot.on { background: var(--accent); box-shadow: none; }
 .pin-keys { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; width: 100%; max-width: 300px; }
 .pin-keys .key { height: 58px; }
+.char-line { font-style: italic; }
 .walk { display: grid; gap: 14px; }
 .walk-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
 .walk-title { font-family: var(--display); font-weight: 800; font-size: 26px; letter-spacing: -.01em; }
@@ -8128,7 +8129,63 @@ Jordy's Science test, Tuesday 10 November: Planet Earth and Beyond. Written from
       kCamo: { label: 'Camo', cost: 11000, rank: 3, c: '#59683F', c2: '#2F3A24', p: '#2F3A24', look: 'camo' },
       kNight: { label: 'Night rider', cost: 14000, rank: 4, c: '#17181D', c2: '#B7E021', p: '#17181D' },
       kFlame: { label: 'Flame suit', cost: 18000, rank: 4, c: '#15161B', c2: '#F97316', p: '#15161B', look: 'flame' },
+      kSlash: { label: 'Slash', cost: 6000, rank: 2, c: '#17181D', c2: '#2FA8E8', p: '#17181D', look: 'slash' },
+      kShard: { label: 'Shard', cost: 10000, rank: 3, c: '#F2F3F5', c2: '#D4262F', p: '#23262C', look: 'shard' },
+      kDigital: { label: 'Digital camo', cost: 12000, rank: 3, c: '#3B4250', c2: '#17181D', p: '#23262C', look: 'digital' },
+      kTiger: { label: 'Tiger', cost: 16000, rank: 4, c: '#E9501C', c2: '#15161B', p: '#15161B', look: 'tiger' },
       kGold: { label: 'Champion', cost: 30000, rank: 6, c: '#D9A514', c2: '#17181D', p: '#17181D' },
+    } },
+    // Original characters, spoken by the free voices already on the device, so how they sound differs a little between devices.
+    // prefer lists voice names to look for on Apple, Windows, Android and Chrome. Pitch and speed do the rest.
+    voice: { title: 'Voice', items: {
+      vStock: { label: 'Standard', cost: 0, c: '#8A93A1', c2: '#3B4250', sample: 'This is the standard voice. Tap Read to hear a question.' },
+      vDave: { label: 'Big Dave', cost: 3000, c: '#E9501C', c2: '#15161B', prefer: ['Daniel', 'Google UK English Male', 'Microsoft Ryan', 'Microsoft George', 'Microsoft David', 'Mark'], pitch: 0.75, rate: 1.08,
+        sample: 'Welcome to the track! I am Big Dave, and this is going to be a big one!',
+        right: ['And that is a huge holeshot!', 'What a line! The crowd is on its feet!', 'Ladies and gentlemen, that answer was pinned flat!', 'Oh, sent that one right over the triple!'],
+        wrong: ['Oh! Down in the first corner! But back up again!', 'A big wobble there, folks. Plenty of laps left!', 'Ooh, that one went into the hay bales!'] },
+      vPiet: { label: 'Oom Piet', cost: 3000, c: '#7A5C2E', c2: '#F2C200', prefer: ['Daniel', 'Ralph', 'Microsoft David', 'Google UK English Male', 'Mark'], pitch: 0.7, rate: 0.82,
+        sample: 'Ja nee. Sit down, my boy. Oom Piet will help you with this one.',
+        right: ['Ja nee, that is lekker, my boy.', 'Now that is how you plough a straight line.', 'Mooi so! Your ouma will be proud.', 'Clever like a jackal, this one.'],
+        wrong: ['Ag shame, man. Try again, hey.', 'Eish. Even my old bakkie stalls sometimes.', 'Nee wat, that one is not it. Drink some water.'] },
+      vRik: { label: 'Rookie Rik', cost: 4000, rank: 2, c: '#2FA8E8', c2: '#FFFFFF', prefer: ['Junior', 'Samantha', 'Google US English', 'Microsoft Zira', 'Karen'], pitch: 1.6, rate: 1.18,
+        sample: 'Hi! I am Rookie Rik! I am going to beat you to the first corner!',
+        right: ['Yes! Even I did not know that one!', 'Whoa! Can you do my homework too?', 'Braaap! You are so good it is annoying!', 'Nice one! I am telling everyone it was me.'],
+        wrong: ['Ha ha! Nope! Try not to crash this time!', 'Oops! I will not tell your brother. Maybe.', 'Wrong way, champ! The track is over there!'] },
+      vSpanner: { label: 'Uncle Spanner', cost: 5000, rank: 2, c: '#4A5568', c2: '#F2C200', prefer: ['Rishi', 'Fred', 'Microsoft David', 'Google UK English Male', 'Daniel'], pitch: 0.85, rate: 0.9,
+        sample: 'Uncle Spanner here. I have seen your riding. We need to talk.',
+        right: ['Finally! I can put my spanner down.', 'Hmm. Not bad. Do not tell anyone I said so.', 'Correct. I almost smiled. Almost.', 'Good. That is the first thing today that has worked properly.'],
+        wrong: ['Wrong. I am not angry. Just very, very disappointed.', 'I fixed a gearbox faster than you read that question.', 'That answer just made my spanner cry.', 'Put the bike down. Go and look at your rule card.'] },
+      vDad: { label: 'Dozy Dad', cost: 6000, rank: 2, c: '#0E9AA7', c2: '#FFFFFF', prefer: ['Ralph', 'Fred', 'Mark', 'Microsoft David', 'Google US English'], pitch: 0.6, rate: 0.8,
+        sample: 'Howzit, my boy. I was going to help, but I have lost my glasses. Oh, they are on my head.',
+        right: ['Yes! That calls for a boerewors roll.', 'Well done, my boy. Now, where did I put my keys?', 'Correct! Wait, was I meant to be watching?', 'Lekker! I am so proud I could have a nap.'],
+        wrong: ['Ag, no. Never mind. I once put diesel in the petrol bike.', 'Not quite. Let us think about it over a boerewors roll.', 'Oops. I did that too. Yesterday. With the lawnmower.'] },
+      vTurbo: { label: 'Turbo the robot', cost: 8000, rank: 3, c: '#5B3DF5', c2: '#B7E021', prefer: ['Zarvox', 'Trinoids', 'Fred', 'Microsoft David', 'Google US English'], pitch: 0.3, rate: 1,
+        sample: 'Beep boop. I am Turbo. Your pit crew robot. Systems ready.',
+        right: ['Answer correct. Happiness levels rising.', 'Beep boop. Excellent. Engine at full power.', 'Calculation complete. You are awesome.'],
+        wrong: ['Error. Error. Please try again, human.', 'Does not compute. Checking the rule card.', 'Warning. Wrong answer detected. No damage done.'] },
+    } },
+    // A rider starts with guards worn under the kit, so they take its colour. Buying a set puts it on show.
+    chest: { title: 'Chest guard', items: {
+      cStock: { label: 'Under the jersey', cost: 0, c: '#8A93A1', c2: '#3B4250' },
+      cBlack: { label: 'Black', cost: 1500, c: '#17181D', c2: '#596273' },
+      cWhite: { label: 'White', cost: 1500, c: '#EEF0F3', c2: '#23262C' },
+      cBlue: { label: 'Blue', cost: 2500, c: '#1F5FE0', c2: '#FFFFFF' },
+      cRed: { label: 'Red', cost: 3500, rank: 2, c: '#D4262F', c2: '#17181D' },
+      cOrange: { label: 'Factory orange', cost: 5000, rank: 2, c: '#E9501C', c2: '#17181D' },
+      cNeon: { label: 'Neon', cost: 8000, rank: 3, c: '#B7E021', c2: '#17181D' },
+      cCarbon: { label: 'Carbon', cost: 14000, rank: 4, c: '#2B2F36', c2: '#7C8594', look: 'carbon' },
+      cGold: { label: 'Gold', cost: 24000, rank: 5, c: '#D9A514', c2: '#17181D' },
+    } },
+    knee: { title: 'Knee and shin guards', items: {
+      nStock: { label: 'Under the pants', cost: 0, c: '#4B5361', c2: '#3B4250' },
+      nBlack: { label: 'Black', cost: 1000, c: '#17181D', c2: '#596273' },
+      nWhite: { label: 'White', cost: 1000, c: '#EEF0F3', c2: '#23262C' },
+      nBlue: { label: 'Blue', cost: 2000, c: '#1F5FE0', c2: '#FFFFFF' },
+      nRed: { label: 'Red', cost: 3000, rank: 2, c: '#D4262F', c2: '#17181D' },
+      nOrange: { label: 'Factory orange', cost: 4000, rank: 2, c: '#E9501C', c2: '#17181D' },
+      nNeon: { label: 'Neon', cost: 6000, rank: 3, c: '#B7E021', c2: '#17181D' },
+      nCarbon: { label: 'Carbon', cost: 10000, rank: 4, c: '#2B2F36', c2: '#7C8594', look: 'carbon' },
+      nGold: { label: 'Gold', cost: 18000, rank: 5, c: '#D9A514', c2: '#17181D' },
     } },
     gloves: { title: 'Gloves', items: {
       gStock: { label: 'Stock grey', cost: 0, c: '#6B7280', c2: '#3B4250' },
@@ -8176,7 +8233,7 @@ Jordy's Science test, Tuesday 10 November: Planet Earth and Beyond. Written from
     days: {}, skills: {}, topics: {}, runs: [], missed: [], badges: [], fix: {}, laps: {},
     paint: pack.defaultPaint, bike: 'mini', plate: pack.plate, ownedP: [pack.defaultPaint], ownedB: ['mini'], dailyBy: {}, examBy: {},
     sticker: 'plain', ownedS: ['plain'],
-    gear: { helmet: 'hStock', goggles: 'oStock', kit: 'kStock', gloves: 'gStock', boots: 'bStock' }, ownedG: ['hStock', 'oStock', 'kStock', 'gStock', 'bStock'],
+    gear: { helmet: 'hStock', goggles: 'oStock', kit: 'kStock', gloves: 'gStock', boots: 'bStock', chest: 'cStock', knee: 'nStock', voice: 'vStock' }, ownedG: ['hStock', 'oStock', 'kStock', 'gStock', 'bStock'],
   });
   function load() {
     let s = null;
@@ -8259,7 +8316,7 @@ Jordy's Science test, Tuesday 10 November: Planet Earth and Beyond. Written from
   // ---------- staying up to date ----------
   // An open tab or a home screen app keeps running the page it first loaded, old prices and all. So it asks which version
   // is live when it comes back into view and every few minutes, and swaps over between races. build.mjs fills in BUILD.
-  const BUILD = '57725a2500';
+  const BUILD = '559b34532f';
   const BACK_KEY = 'holeshot.back.v1';
   const TRIED_KEY = 'holeshot.tried.v1';
   let liveBuild = null;
@@ -8477,11 +8534,11 @@ Jordy's Science test, Tuesday 10 November: Planet Earth and Beyond. Written from
   // and the photo's own shadows and shine go on top, so paint, stickers and kit look like they belong to the picture.
   // Positions are in the picture's own pixels. side, front, shirt and logo are corners, running top back, top front, bottom front, bottom back.
   const SEATS = {
-    mini: { w: 720, h: 1221, side: [[80, 628], [140, 628], [136, 688], [90, 684]], front: [[372, 470], [510, 470], [522, 552], [405, 555]], logo: [[470, 595], [625, 640], [618, 660], [462, 617]] },
-    mx: { w: 720, h: 967, side: [[110, 470], [196, 478], [192, 538], [124, 528]], front: [[412, 330], [492, 338], [490, 398], [434, 396]], logo: [[470, 425], [625, 478], [618, 495], [462, 445]] },
-    enduro: { w: 720, h: 846, side: [[120, 420], [215, 442], [215, 490], [148, 475]], front: [[428, 283], [495, 280], [492, 310], [430, 312]], logo: [[490, 392], [625, 432], [618, 450], [485, 412]] },
-    hard: { w: 720, h: 973, side: [[100, 478], [195, 490], [190, 545], [115, 530]], front: [[400, 318], [490, 322], [494, 382], [432, 390]], logo: [[470, 425], [610, 465], [603, 483], [462, 445]] },
-    factory: { w: 720, h: 876, side: [[118, 462], [192, 470], [192, 520], [146, 505]], front: [[410, 296], [484, 298], [484, 352], [432, 350]], logo: [[475, 378], [625, 425], [618, 442], [467, 397]] },
+    mini: { w: 720, h: 1133, side: [[62, 598], [150, 590], [178, 690], [95, 670]], front: [[418, 478], [522, 470], [528, 548], [448, 560]], logo: [[470, 612], [640, 655], [632, 672], [462, 632]] },
+    mx: { w: 720, h: 995, side: [[122, 534], [204, 541], [206, 606], [140, 590]], front: [[412, 425], [495, 420], [497, 485], [430, 490]], logo: [[450, 520], [630, 570], [622, 585], [445, 540]] },
+    enduro: { w: 720, h: 945, side: [[110, 468], [195, 476], [197, 538], [130, 525]], front: [[410, 342], [492, 340], [492, 378], [420, 382]], logo: [[450, 455], [628, 510], [620, 528], [445, 475]] },
+    hard: { w: 720, h: 963, side: [[100, 482], [178, 488], [195, 552], [130, 545]], front: [[392, 348], [478, 348], [478, 425], [412, 420]], logo: [[440, 450], [625, 505], [618, 522], [435, 470]] },
+    factory: { w: 720, h: 954, side: [[105, 465], [190, 478], [205, 550], [135, 528]], front: [[402, 358], [492, 358], [492, 435], [420, 428]], logo: [[452, 455], [640, 515], [632, 530], [445, 475]] },
   };
   let svgNo = 0;
   const RAINBOW = ['#E9501C', '#1F5FE0', '#0B8457', '#5B3DF5', '#D4262F', '#D81B7C', '#F2C200', '#0E9AA7', '#2FA8E8', '#B7E021'];
@@ -8507,7 +8564,7 @@ Jordy's Science test, Tuesday 10 November: Planet Earth and Beyond. Written from
     const m = [...unit(across, squeeze), ...unit(down), ...mid].map((n) => n.toFixed(3)).join(' ');
     return `<text transform="matrix(${m}) skewX(-8)" y="${(size * 0.36).toFixed(1)}" font-size="${size.toFixed(1)}" font-weight="800" text-anchor="middle" fill="${fill}" ${line} style="font-family:var(--display);paint-order:stroke">${text}</text>`;
   };
-  const SHOT_PARTS = ['shade', 'plastic', 'helmet', 'peak', 'lens', 'jersey', 'jersey2', 'pants', 'pants2', 'gloves', 'boots', 'boots2'];
+  const SHOT_PARTS = ['shade', 'plastic', 'helmet', 'peak', 'lens', 'jersey', 'chest', 'knee', 'pants', 'gloves', 'boots', 'boots2'];
   const readied = {};
   function ready(id) {
     if (readied[id]) return;
@@ -8525,6 +8582,10 @@ Jordy's Science test, Tuesday 10 November: Planet Earth and Beyond. Written from
     carbon: [12, 12, 2.4, (c) => `<path d="M0 0L6 6L0 12M6 0L12 6L6 12" stroke="${c}" stroke-width="2" fill="none"/>`],
     band: [60, 60, 16, (c) => `<path d="M0 8h60v14H0zM0 30h60v5H0z" fill="${c}"/>`],
     chev: [60, 40, 12, (c) => `<path d="M0 34L30 8L60 34" stroke="${c}" stroke-width="9" fill="none"/>`],
+    shard: [120, 120, 30, (c) => `<path d="M0 0L62 34L28 120L0 120ZM120 0L92 70L120 120ZM70 60L104 120L52 120Z" fill="${c}"/>`],
+    slash: [80, 80, 24, (c) => `<path d="M-20 62L62-20L84-20L-20 84ZM40 100L100 40L100 58L58 100Z" fill="${c}"/>`],
+    digital: [48, 48, 9, (c) => `<path d="M0 0h16v8H8v8H0zM24 8h16v16h-8v8h-8zM8 32h8v8h8v8H8zM40 32h8v16h-8z" fill="${c}"/>`],
+    tiger: [90, 70, 20, (c) => `<path d="M0 8C20 2 34 14 52 10C38 22 18 20 0 24ZM36 40C54 32 70 46 90 38V52C70 58 54 46 36 40ZM0 52C14 48 26 56 40 54C28 66 12 62 0 66Z" fill="${c}"/>`],
   };
   const svgFill = (svg, sizing) => `url('data:image/svg+xml,${encodeURIComponent(svg)}') 0 0 / ${sizing}`;
   const lookFill = (look, c) => {
@@ -8545,6 +8606,8 @@ Jordy's Science test, Tuesday 10 November: Planet Earth and Beyond. Written from
     const goggles = pickG('goggles');
     const gloves = pickG('gloves');
     const boots = pickG('boots');
+    const chest = pickG('chest');
+    const knee = pickG('knee');
     const sticker = STICKERS[p.sticker];
     const num = h(String(p.plate));
     const coat = (part, fill, cls) => (fill ? `<i ${cls ? `class="${cls}" ` : ''}style="-webkit-mask-image:url(img/${id}-${part}.webp);mask-image:url(img/${id}-${part}.webp);background:${fill}"></i>` : '');
@@ -8552,8 +8615,9 @@ Jordy's Science test, Tuesday 10 November: Planet Earth and Beyond. Written from
     return `<div class="rig" style="aspect-ratio:${spot.w}/${spot.h}">
       <img class="shot" src="img/photo-${id}.webp" alt="${alt}" width="${spot.w}" height="${spot.h}" decoding="sync">
       ${paint.rainbow ? coat('plastic', rainbowNow || paint.hex, 'rainbow') : coat('plastic', paint.coat || paint.hex)}${sticker && sticker.art ? coat('plastic', stickerSheet(sticker, spot)) : ''}
-      ${coat('pants', kit.p)}${coat('pants2', kit.c2)}${coat('boots', boots.c)}${coat('boots2', boots.c2)}
-      ${coat('jersey', jersey)}${coat('jersey2', kit.c2)}${coat('jersey', lookFill(kit.look, kit.c2))}
+      ${coat('pants', kit.p)}${coat('pants', lookFill(kit.look, kit.c2))}${coat('boots', boots.c)}${coat('boots2', boots.c2)}
+      ${coat('jersey', jersey)}${coat('jersey', lookFill(kit.look, kit.c2))}
+      ${coat('chest', chest.cost ? chest.c : jersey)}${coat('chest', lookFill(chest.look, chest.c2))}${coat('knee', knee.cost ? knee.c : kit.p)}${coat('knee', lookFill(knee.look, knee.c2))}
       ${coat('gloves', gloves.c)}
       ${coat('helmet', helmet.team ? paint.hex : helmet.c)}${coat('helmet', lookFill(helmet.look, helmet.c2))}${coat('peak', helmet.c2)}
       ${coat('lens', goggles.look === 'rainbow' ? 'linear-gradient(90deg,#EF4444,#F2C200,#2F8FE8)' : goggles.c)}
@@ -9123,10 +9187,11 @@ Jordy's Science test, Tuesday 10 November: Planet Earth and Beyond. Written from
     const need = stillNeeds(p, item);
     return need || `${RS.fmt(item.cost)} points`;
   };
-  const PIT_TABS = [['helmet', 'Helmet'], ['goggles', 'Goggles'], ['kit', 'Race kit'], ['gloves', 'Gloves'], ['boots', 'Boots'], ['paint', 'Bike colour'], ['sticker', 'Stickers'], ['number', 'Number'], ['bike', 'Bikes'], ['badges', 'Badges']];
+  const PIT_TABS = [['helmet', 'Helmet'], ['goggles', 'Goggles'], ['kit', 'Race kit'], ['chest', 'Chest guard'], ['knee', 'Knee guards'], ['gloves', 'Gloves'], ['boots', 'Boots'], ['paint', 'Bike colour'], ['sticker', 'Stickers'], ['number', 'Number'], ['voice', 'Voice'], ['bike', 'Bikes'], ['badges', 'Badges']];
   const shopOf = (tab) => (tab === 'paint' ? PAINTS : tab === 'sticker' ? STICKERS : tab === 'bike' ? BIKES : GEAR[tab].items);
   const ownedOf = (p, tab) => (tab === 'paint' ? p.ownedP : tab === 'sticker' ? p.ownedS : tab === 'bike' ? p.ownedB : p.ownedG);
-  const wearing = (p, tab) => (tab === 'paint' ? p.paint : tab === 'sticker' ? p.sticker : tab === 'bike' ? p.bike : p.gear[tab]);
+  const wearing = (p, tab) => (tab === 'paint' ? p.paint : tab === 'sticker' ? p.sticker : tab === 'bike' ? p.bike : p.gear[tab] || Object.keys(GEAR[tab].items)[0]);
+  const hasItem = (p, tab, id) => ownedOf(p, tab).includes(id) || shopOf(tab)[id].cost === 0;
   function wear(p, tab, id) {
     if (tab === 'paint') p.paint = id;
     else if (tab === 'sticker') p.sticker = id;
@@ -9153,7 +9218,7 @@ Jordy's Science test, Tuesday 10 November: Planet Earth and Beyond. Written from
   }
   function pitItems(p, tab) {
     return Object.entries(shopOf(tab)).map(([id, item]) => {
-      const own = ownedOf(p, tab).includes(id);
+      const own = hasItem(p, tab, id);
       const on = ui.tryOn ? ui.tryOn.id === id : wearing(p, tab) === id;
       const need = !own && stillNeeds(p, item);
       const mark = own ? (wearing(p, tab) === id ? ic('check', 20) : '') : ic('lock', 16);
@@ -9210,7 +9275,7 @@ Jordy's Science test, Tuesday 10 November: Planet Earth and Beyond. Written from
       body = `<div class="h-sec" style="margin-bottom:10px">Bikes</div><div class="rides">${rides}</div>`;
     } else {
       const group = PIT_TABS.find(([id]) => id === tab)[1];
-      const note = tab === 'paint' ? 'Your colour paints the bike and the whole app.' : tab === 'sticker' ? 'Sticker kits go on over your bike colour.' : 'Tap to try it on. Top gear needs a higher rank, and it isn\'t cheap.';
+      const note = tab === 'paint' ? 'Your colour paints the bike and the whole app.' : tab === 'sticker' ? 'Sticker kits go on over your bike colour.' : tab === 'voice' ? 'Tap one to hear it. They read your questions when you tap Read, and react to your answers.' : 'Tap to try it on. Top gear needs a higher rank, and it isn\'t cheap.';
       body = `<div class="h-sec" style="margin-bottom:4px">${group}</div><p class="small-t muted" style="margin-bottom:10px">${note}</p><div class="paints">${pitItems(p, tab)}</div>`;
     }
     return shell(`
@@ -9507,9 +9572,10 @@ Jordy's Science test, Tuesday 10 November: Planet Earth and Beyond. Written from
         r.bestCombo = Math.max(r.bestCombo, r.combo);
       } else r.combo = 0;
       // No hints and no second try here, but a rider always sees whether it was right.
-      r.sheet = { type: 'marked', ok: res.ok, pts: res.ok ? award(10) : 0 };
+      r.sheet = { type: 'marked', ok: res.ok, pts: res.ok ? award(10) : 0, line: charLine(res.ok) };
       sfx(res.ok ? 'right' : 'wrong');
-      return drawRun();
+      drawRun();
+      return sayLine(r.sheet.line);
     }
     if (r.mode === 'lap') {
       settle(q, res.ok, true, given);
@@ -9537,18 +9603,18 @@ Jordy's Science test, Tuesday 10 November: Planet Earth and Beyond. Written from
       const pts = (q.bonus || !first ? 5 : 10 * mult) + (holeshot ? 10 : 0);
       const paid = award(pts);
       settle(q, true, first, given);
-      r.sheet = { type: 'right', title: holeshot ? 'Holeshot!' : RS.pick(PRAISE), pts: paid, mult: first ? mult : 1, spell: res.spell, holeshot };
+      r.sheet = { type: 'right', title: holeshot ? 'Holeshot!' : RS.pick(PRAISE), pts: paid, mult: first ? mult : 1, spell: res.spell, holeshot, line: charLine(true) };
       sfx(mult > 1 || holeshot ? 'combo' : 'right');
       if (navigator.vibrate) navigator.vibrate(18);
     } else if (r.tries === 0) {
       r.tries = 1;
       r.firstGiven = RS.plain(given).slice(0, 80);
       r.combo = 0;
-      r.sheet = { type: 'retry' };
+      r.sheet = { type: 'retry', line: charLine(false) };
       sfx('wrong');
     } else {
       settle(q, false, false, given);
-      r.sheet = { type: 'wrong' };
+      r.sheet = { type: 'wrong', line: charLine(false) };
       r.combo = 0;
       if (r.extras < 3 && !q.bonus) {
         r.queue.push({ skill: q.skill, bonus: true });
@@ -9557,6 +9623,7 @@ Jordy's Science test, Tuesday 10 November: Planet Earth and Beyond. Written from
       sfx('wrong');
     }
     drawRun();
+    sayLine(r.sheet.line);
   }
 
   function finishRun() {
@@ -9798,11 +9865,12 @@ Jordy's Science test, Tuesday 10 November: Planet Earth and Beyond. Written from
     }
     if (s.type === 'marked') {
       return s.ok
-        ? `<div class="sheet good" role="status"><div class="sheet-head"><h2>Correct</h2><span class="pts num">+${s.pts}</span></div><button class="btn primary full" data-act="next" data-primary>Next ${ic('arrow')}</button></div>`
-        : `<div class="sheet bad" role="status"><div class="sheet-head"><h2>Not this time</h2></div><p style="font-size:17px">The answer is <b>${h(q.correct).replace(/.$/, '')}</b>.</p>${steps}<button class="btn primary full" data-act="next" data-primary>Next ${ic('arrow')}</button></div>`;
+        ? `<div class="sheet good" role="status"><div class="sheet-head"><h2>Correct</h2><span class="pts num">+${s.pts}</span></div>${lineHTML(s)}<button class="btn primary full" data-act="next" data-primary>Next ${ic('arrow')}</button></div>`
+        : `<div class="sheet bad" role="status"><div class="sheet-head"><h2>Not this time</h2></div>${lineHTML(s)}<p style="font-size:17px">The answer is <b>${h(q.correct).replace(/.$/, '')}</b>.</p>${steps}<button class="btn primary full" data-act="next" data-primary>Next ${ic('arrow')}</button></div>`;
     }
     if (s.type === 'right') {
       return `<div class="sheet good" role="status"><div class="sheet-head"><h2>${s.title}</h2><span class="pts num">+${s.pts}</span></div>
+        ${lineHTML(s)}
         ${s.holeshot ? '<p class="small-t">First into the first corner: +10 bonus.</p>' : ''}
         ${s.mult > 1 ? `<p><span class="combo pop">${ic('bolt', 12, true)} ×${s.mult} full gas</span> ${r.combo} in a row</p>` : ''}
         ${s.spell ? `<p class="small-t">It's spelt <b>${h(s.spell)}</b>.</p>` : ''}
@@ -9811,9 +9879,9 @@ Jordy's Science test, Tuesday 10 November: Planet Earth and Beyond. Written from
         <button class="btn primary full" data-act="next" data-primary>Next ${ic('arrow')}</button></div>`;
     }
     if (s.type === 'retry') {
-      return `<div class="sheet warn" role="status"><div class="sheet-head"><h2>Stalled it</h2></div><p style="font-size:17px">${h(q.hint)}</p>${ruleCard(topicOf(q.skill))}<button class="btn primary full" data-act="retry" data-primary>Kick it over</button></div>`;
+      return `<div class="sheet warn" role="status"><div class="sheet-head"><h2>Stalled it</h2></div>${lineHTML(s)}<p style="font-size:17px">${h(q.hint)}</p>${ruleCard(topicOf(q.skill))}<button class="btn primary full" data-act="retry" data-primary>Kick it over</button></div>`;
     }
-    return `<div class="sheet bad" role="status"><div class="sheet-head"><h2>Here's the line</h2></div><p style="font-size:17px">The answer is <b>${h(q.correct).replace(/.$/, '')}</b>.</p>${steps}${ruleCard(topicOf(q.skill))}<p class="small-t muted">${q.bonus ? '' : "You'll get another one like this at the end. "}It stays on your fix list until you get it right ${FIX_NEED} times in a row.</p><button class="btn primary full" data-act="next" data-primary>Got it ${ic('arrow')}</button></div>`;
+    return `<div class="sheet bad" role="status"><div class="sheet-head"><h2>Here's the line</h2></div>${lineHTML(s)}<p style="font-size:17px">The answer is <b>${h(q.correct).replace(/.$/, '')}</b>.</p>${steps}${ruleCard(topicOf(q.skill))}<p class="small-t muted">${q.bonus ? '' : "You'll get another one like this at the end. "}It stays on your fix list until you get it right ${FIX_NEED} times in a row.</p><button class="btn primary full" data-act="next" data-primary>Got it ${ic('arrow')}</button></div>`;
   }
 
   function viewRun() {
@@ -10026,6 +10094,33 @@ Jordy's Science test, Tuesday 10 November: Planet Earth and Beyond. Written from
   function stopSpeaking() {
     if (window.speechSynthesis) window.speechSynthesis.cancel();
   }
+  const voiceOf = (p) => GEAR.voice.items[p.gear.voice] || GEAR.voice.items.vStock;
+  function dress(u, who, lang) {
+    const voices = window.speechSynthesis.getVoices();
+    const english = lang.startsWith('en');
+    const named = english && who.prefer ? who.prefer.map((name) => voices.find((x) => x.name.includes(name) && x.lang.startsWith('en'))).find(Boolean) : null;
+    const v = named || voices.find((x) => x.lang.replace('_', '-') === lang) || voices.find((x) => x.lang.startsWith(lang.slice(0, 2))) || voices.find((x) => x.lang.startsWith('en'));
+    if (v) u.voice = v;
+    u.lang = v ? v.lang : lang;
+    u.rate = who.rate || 0.97;
+    u.pitch = who.pitch || 1;
+    return u;
+  }
+  function speakAs(who, text) {
+    if (!window.speechSynthesis) return;
+    stopSpeaking();
+    window.speechSynthesis.speak(dress(new SpeechSynthesisUtterance(text), who, 'en-ZA'));
+  }
+  // What the rider's character says about an answer, or nothing for the standard voice.
+  function charLine(ok) {
+    const who = voiceOf(P());
+    const lines = ok ? who.right : who.wrong;
+    return lines ? RS.pick(lines) : '';
+  }
+  function sayLine(line) {
+    if (line && state.sound) speakAs(voiceOf(P()), line);
+  }
+  const lineHTML = (s) => (s.line ? `<p class="char-line"><b>${h(voiceOf(P()).label)}:</b> ${h(s.line)}</p>` : '');
   function readAloud() {
     const r = ui.run;
     if (!r || !window.speechSynthesis) return;
@@ -10033,13 +10128,7 @@ Jordy's Science test, Tuesday 10 November: Planet Earth and Beyond. Written from
     let text = RS.speakable(r.q.q);
     if (r.q.visual && r.q.visual.type === 'flow') text += '. ' + r.q.visual.items.map(RS.speakable).join(', then ');
     if (r.q.kind === 'mc') text += '. ' + r.q.options.map((o, i) => `${'ABCD'[i]}: ${RS.speakable(o)}`).join('. ');
-    const u = new SpeechSynthesisUtterance(text);
-    const voices = window.speechSynthesis.getVoices();
-    const want = r.q.lang || 'en-ZA';
-    const v = voices.find((x) => x.lang.replace('_', '-') === want) || voices.find((x) => x.lang.startsWith(want.slice(0, 2))) || voices.find((x) => x.lang === 'en-GB') || voices.find((x) => /^en/.test(x.lang));
-    if (v) u.voice = v;
-    u.lang = v ? v.lang : 'en-ZA';
-    u.rate = 0.97;
+    const u = dress(new SpeechSynthesisUtterance(text), voiceOf(P()), r.q.lang || 'en-ZA');
     window.speechSynthesis.speak(u);
   }
 
@@ -10490,12 +10579,13 @@ Jordy's Science test, Tuesday 10 November: Planet Earth and Beyond. Written from
         break;
       case 'wear': {
         const tab = el.dataset.tab;
-        if (ownedOf(p, tab).includes(id)) {
+        if (hasItem(p, tab, id)) {
           wear(p, tab, id);
           ui.tryOn = null;
           save();
         } else ui.tryOn = { tab, id };
         render();
+        if (tab === 'voice') speakAs(GEAR.voice.items[id], GEAR.voice.items[id].sample);
         break;
       }
       case 'buy-try': {
@@ -10514,7 +10604,7 @@ Jordy's Science test, Tuesday 10 November: Planet Earth and Beyond. Written from
             swapToLive();
           } else if (found === 'unknown') {
             toast('Buying needs the internet, to check the price is up to date.');
-          } else if (ui.tryOn && !ownedOf(p, tab).includes(item) && buy(p, { ...shopOf(tab)[item], id: item }, ownedOf(p, tab))) {
+          } else if (ui.tryOn && !hasItem(p, tab, item) && buy(p, { ...shopOf(tab)[item], id: item }, ownedOf(p, tab))) {
             wear(p, tab, item);
             ui.tryOn = null;
             toast(`${shopOf(tab)[item].label} is yours.`);
@@ -10677,6 +10767,8 @@ Jordy's Science test, Tuesday 10 November: Planet Earth and Beyond. Written from
       if (!PK().subjects[ui.subject]) ui.subject = openSubject(PK());
     }
   } catch (e) { /* it opens on the who's riding screen instead */ }
+  // Some browsers only fill the list of voices after it's first asked for.
+  if (window.speechSynthesis) window.speechSynthesis.getVoices();
   checkBuild();
   setInterval(checkBuild, 300000);
   // The Rainbow paint fades to another colour every few seconds, picked at random.
