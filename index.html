@@ -167,6 +167,7 @@ svg { display: block; }
 .rig { position: relative; height: 300px; max-width: 100%; }
 .rig .shot { display: block; width: 100%; height: 100%; max-width: none; }
 .rig > i, .rig > svg, .rig > .shot-shade { position: absolute; left: 0; top: 0; width: 100%; height: 100%; max-width: none; display: block; pointer-events: none; }
+.rig > i.rainbow { transition: background-color 1.6s ease; }
 .rig > i { -webkit-mask-size: 100% 100%; mask-size: 100% 100%; -webkit-mask-repeat: no-repeat; mask-repeat: no-repeat; }
 .lock-need { font-weight: 600; }
 .rank-line { display: flex; justify-content: space-between; gap: 8px; flex-wrap: wrap; }
@@ -7972,6 +7973,8 @@ Jordy's Science test, Tuesday 10 November: Planet Earth and Beyond. Written from
     white: { label: 'Arctic white', hex: '#E8EAEE', dark: '#7C8594', ink: '#FFFFFF', accent: '#4A5568', cost: 5000, rank: 2, coat: '#F5F6F8', filter: 'saturate(0) brightness(1.08)' },
     black: { label: 'Midnight', hex: '#17181D', dark: '#000000', ink: '#FFFFFF', accent: '#4A5568', cost: 8000, rank: 3, coat: '#15161B', filter: 'saturate(0) brightness(.85)' },
     gold: { label: 'Champion gold', hex: '#D9A514', dark: '#A77E0B', ink: '#1C1600', cost: 15000, rank: 4, filter: 'hue-rotate(24deg) saturate(.95) brightness(1.02)' },
+    // The bike keeps changing colour at random. As hard to earn as the factory bike.
+    rainbow: { label: 'Rainbow', hex: '#7C3AED', dark: '#5B21B6', ink: '#FFFFFF', cost: 25000, rank: 5, cleared: 0.5, exams: 3, rainbow: true, filter: 'hue-rotate(250deg) saturate(1.2)' },
   };
   // A sticker kit is a repeating tile, drawn over the bike's plastics on the panels traced in SEATS.
   const STICKERS = {
@@ -8172,7 +8175,7 @@ Jordy's Science test, Tuesday 10 November: Planet Earth and Beyond. Written from
   // ---------- staying up to date ----------
   // An open tab or a home screen app keeps running the page it first loaded, old prices and all. So it asks which version
   // is live when it comes back into view and every few minutes, and swaps over between races. build.mjs fills in BUILD.
-  const BUILD = '52bcdba0f6';
+  const BUILD = '8e97d6dfbe';
   const BACK_KEY = 'holeshot.back.v1';
   const TRIED_KEY = 'holeshot.tried.v1';
   let liveBuild = null;
@@ -8396,6 +8399,8 @@ Jordy's Science test, Tuesday 10 November: Planet Earth and Beyond. Written from
     factory: { w: 720, h: 876, side: [[118, 462], [192, 470], [192, 520], [146, 505]], front: [[410, 296], [484, 298], [484, 352], [432, 350]], logo: [[475, 378], [625, 425], [618, 442], [467, 397]] },
   };
   let svgNo = 0;
+  const RAINBOW = ['#E9501C', '#1F5FE0', '#0B8457', '#5B3DF5', '#D4262F', '#D81B7C', '#F2C200', '#0E9AA7', '#2FA8E8', '#B7E021'];
+  let rainbowNow = '';
   const stickerFill = (s, scale = 1) => {
     const id = `st${++svgNo}`;
     return { id, def: `<pattern id="${id}" width="${s.w}" height="${s.h}" patternUnits="userSpaceOnUse" patternTransform="rotate(${s.turn || 0}) scale(${scale})">${s.art}</pattern>` };
@@ -8406,12 +8411,16 @@ Jordy's Science test, Tuesday 10 November: Planet Earth and Beyond. Written from
     const down = [(d[0] - a[0] + c[0] - b[0]) / 2, (d[1] - a[1] + c[1] - b[1]) / 2];
     const wide = Math.hypot(...across);
     const tall = Math.hypot(...down);
-    const squeeze = opts.squeeze || 1;
-    const size = Math.min(tall * 0.84, wide / (String(text).length * 0.62 * squeeze));
+    const across1 = String(text).length * 0.6;
+    // A race number fills its plate: as tall as it can go, narrowed a little if it has to be, and thickened with its own outline.
+    const size = opts.bold ? Math.min(tall * 1.22, (wide * 0.96) / (across1 * 0.74)) : Math.min(tall * 0.84, wide / (String(text).length * 0.62 * (opts.squeeze || 1)));
+    const squeeze = opts.bold ? Math.min(1, (wide * 0.96) / (across1 * size)) : opts.squeeze || 1;
+    const fill = opts.fill || '#111318';
+    const line = opts.bold ? `stroke="${fill}" stroke-width="${(size * 0.05).toFixed(1)}" stroke-linejoin="round"` : opts.stroke ? `stroke="${opts.stroke}" stroke-width="${opts.line || 3}"` : '';
     const unit = (v, k = 1) => [(v[0] / Math.hypot(...v)) * k, (v[1] / Math.hypot(...v)) * k];
     const mid = [(a[0] + b[0] + c[0] + d[0]) / 4, (a[1] + b[1] + c[1] + d[1]) / 4];
     const m = [...unit(across, squeeze), ...unit(down), ...mid].map((n) => n.toFixed(3)).join(' ');
-    return `<text transform="matrix(${m}) skewX(-8)" y="${(size * 0.36).toFixed(1)}" font-size="${size.toFixed(1)}" font-weight="800" text-anchor="middle" fill="${opts.fill || '#111318'}" ${opts.stroke ? `stroke="${opts.stroke}" stroke-width="${opts.line || 3}"` : ''} style="font-family:var(--display);paint-order:stroke">${text}</text>`;
+    return `<text transform="matrix(${m}) skewX(-8)" y="${(size * 0.36).toFixed(1)}" font-size="${size.toFixed(1)}" font-weight="800" text-anchor="middle" fill="${fill}" ${line} style="font-family:var(--display);paint-order:stroke">${text}</text>`;
   };
   const SHOT_PARTS = ['shade', 'plastic', 'helmet', 'peak', 'lens', 'jersey', 'jersey2', 'pants', 'pants2', 'gloves', 'boots', 'boots2'];
   const readied = {};
@@ -8453,11 +8462,11 @@ Jordy's Science test, Tuesday 10 November: Planet Earth and Beyond. Written from
     const boots = pickG('boots');
     const sticker = STICKERS[p.sticker];
     const num = h(String(p.plate));
-    const coat = (part, fill) => (fill ? `<i style="-webkit-mask-image:url(img/${id}-${part}.webp);mask-image:url(img/${id}-${part}.webp);background:${fill}"></i>` : '');
+    const coat = (part, fill, cls) => (fill ? `<i ${cls ? `class="${cls}" ` : ''}style="-webkit-mask-image:url(img/${id}-${part}.webp);mask-image:url(img/${id}-${part}.webp);background:${fill}"></i>` : '');
     const alt = label === undefined ? `Rider on a ${BIKES[id].label} bike in ${paint.label}` : label;
     return `<div class="rig" style="aspect-ratio:${spot.w}/${spot.h}">
       <img class="shot" src="img/photo-${id}.webp" alt="${alt}" width="${spot.w}" height="${spot.h}" decoding="sync">
-      ${coat('plastic', paint.coat || paint.hex)}${sticker && sticker.art ? coat('plastic', stickerSheet(sticker, spot)) : ''}
+      ${paint.rainbow ? coat('plastic', rainbowNow || paint.hex, 'rainbow') : coat('plastic', paint.coat || paint.hex)}${sticker && sticker.art ? coat('plastic', stickerSheet(sticker, spot)) : ''}
       ${coat('pants', kit.p)}${coat('pants2', kit.c2)}${coat('boots', boots.c)}${coat('boots2', boots.c2)}
       ${coat('jersey', jersey)}${coat('jersey2', kit.c2)}${coat('jersey', lookFill(kit.look, kit.c2))}
       ${coat('gloves', gloves.c)}
@@ -8465,7 +8474,7 @@ Jordy's Science test, Tuesday 10 November: Planet Earth and Beyond. Written from
       ${coat('lens', goggles.look === 'rainbow' ? 'linear-gradient(90deg,#EF4444,#F2C200,#2F8FE8)' : goggles.c)}
       <svg viewBox="0 0 ${spot.w} ${spot.h}" aria-hidden="true">
         ${sticker && sticker.art ? printOn(spot.logo, 'HOLESHOT', { fill: '#fff', stroke: '#15161B', line: 2.5 }) : ''}
-        ${printOn(spot.side, num)}${printOn(spot.front, num)}
+        ${printOn(spot.side, num, { bold: true })}${printOn(spot.front, num, { bold: true })}
       </svg>
       <img class="shot-shade" src="img/${id}-shade.webp" alt="" decoding="sync">
     </div>`;
@@ -8820,6 +8829,7 @@ Jordy's Science test, Tuesday 10 November: Planet Earth and Beyond. Written from
       return `<span class="swatch"><svg class="swatch-art" viewBox="0 0 46 46" aria-hidden="true"><defs>${fill.def}</defs><rect width="46" height="46" fill="${PAINTS[p.paint].hex}"/><rect width="46" height="46" fill="url(#${fill.id})"/></svg><span class="swatch-mark">${mark}</span></span>`;
     }
     if (tab === 'sticker') return `<span class="swatch" style="--c:${PAINTS[p.paint].hex}"><span class="swatch-mark">${mark}</span></span>`;
+    if (item.rainbow) return `<span class="swatch" style="--c:conic-gradient(#EF4444,#F2C200,#22C55E,#2F8FE8,#8B5CF6,#EF4444)"><span class="swatch-mark">${mark}</span></span>`;
     const colour = item.team ? PAINTS[p.paint].hex : tab === 'paint' ? item.hex : item.c;
     const look = tab === 'paint' ? colour : item.look === 'rainbow' ? 'linear-gradient(90deg,#EF4444,#F2C200,#2F8FE8)' : `linear-gradient(135deg,${colour} 62%,${item.c2} 62%)`;
     return `<span class="swatch" style="--c:${look}"><span class="swatch-mark">${mark}</span></span>`;
@@ -10235,6 +10245,16 @@ Jordy's Science test, Tuesday 10 November: Planet Earth and Beyond. Written from
   } catch (e) { /* it opens on the who's riding screen instead */ }
   checkBuild();
   setInterval(checkBuild, 300000);
+  // The Rainbow paint fades to another colour every few seconds, picked at random.
+  setInterval(() => {
+    if (document.hidden || matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    const on = document.querySelectorAll('.rig > i.rainbow');
+    if (!on.length) return;
+    rainbowNow = RS.pick(RAINBOW.filter((c) => c !== rainbowNow));
+    on.forEach((el) => {
+      el.style.backgroundColor = rainbowNow;
+    });
+  }, 2500);
   document.addEventListener('visibilitychange', () => {
     if (document.visibilityState === 'visible') checkBuild();
   });
