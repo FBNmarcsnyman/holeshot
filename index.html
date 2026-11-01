@@ -844,8 +844,7 @@ details ol { margin: 6px 0 0; padding-left: 20px; }
      Add h for a specific hint. opts can set lang and strict for language subjects. */
   const DEFAULT_HINT = 'Read it again slowly, then rule out the answers you know are wrong.';
   function bank(items, opts = {}) {
-    const fn = () => {
-      const it = pick(items);
+    const ask = (it) => {
       const hint = it.h || opts.hint || DEFAULT_HINT;
       const base = { hint, lang: opts.lang };
       if (it.t) {
@@ -856,9 +855,36 @@ details ol { margin: 6px 0 0; padding-left: 20px; }
       }
       return mc(it.q, it.a, it.w, Object.assign(base, { steps: [it.why || `The answer is "${it.a}".`] }));
     };
+    const fn = () => ask(pick(items));
     fn.items = items;
+    fn.ask = ask;
     return fn;
   }
+
+  // ---------- not asking the same thing twice ----------
+  // A rider's copy remembers short fingerprints of what's been asked, so written lists go right through before anything comes back.
+  const shortHash = (text) => {
+    let n = 5381;
+    for (let i = 0; i < text.length; i++) n = ((n << 5) + n + text.charCodeAt(i)) | 0;
+    return (n >>> 0).toString(36);
+  };
+  const keys = new WeakMap();
+  const itemKey = (it) => {
+    if (!keys.has(it)) keys.set(it, shortHash(`${it.q}|${it.t ? it.t[0] : it.tf !== undefined ? it.tf : it.a}`));
+    return keys.get(it);
+  };
+  // Questions added later count as new. Once a list is used up it starts again, holding back the most recent third.
+  function pickUnseen(items, seen) {
+    let fresh = items.filter((it) => !seen.includes(itemKey(it)));
+    let kept = seen;
+    if (!fresh.length) {
+      kept = seen.slice(-Math.floor(items.length / 3));
+      fresh = items.filter((it) => !kept.includes(itemKey(it)));
+    }
+    const item = pick(fresh.length ? fresh : items);
+    return { item, seen: [...kept, itemKey(item)] };
+  }
+  const unseenCount = (items, seen) => items.filter((it) => !seen.includes(itemKey(it))).length;
 
   /* For the batch files, src/bank-zz-*.js. See ADDING-QUESTIONS.md.
      addQuestions adds to lists that already exist: {sci_moons: [items], ...}.
@@ -931,7 +957,7 @@ details ol { margin: 6px 0 0; padding-left: 20px; }
     return true;
   }
 
-  Object.assign(RS, { receiptKey, carryPurchases, squarePurchases, carryPassword, bank, addQuestions, addSection, ri, pick, shuffle, gcd, lcm, r2, roundTo, simp, factorsOf, primeFactors, isPrime, distinctDigits, coprimeTop, fmt, money, fr, mixedStr, plain, html, mc, parseValue, check, spoken, matchOption, speakable, wordsToInt, editDistance });
+  Object.assign(RS, { receiptKey, carryPurchases, squarePurchases, carryPassword, shortHash, itemKey, pickUnseen, unseenCount, bank, addQuestions, addSection, ri, pick, shuffle, gcd, lcm, r2, roundTo, simp, factorsOf, primeFactors, isPrime, distinctDigits, coprimeTop, fmt, money, fr, mixedStr, plain, html, mc, parseValue, check, spoken, matchOption, speakable, wordsToInt, editDistance });
 })(typeof window !== 'undefined' ? window : globalThis);
 
 /* Jordy: Grade 6 Term 4 maths, NumberSense Workbook 24, pages 1 to 24.
@@ -4841,6 +4867,91 @@ details ol { margin: 6px 0 0; padding-left: 20px; }
     { tf: false, q: `True or false: "The moon is like a silver coin" is personification.`, why: `It compares the Moon to a coin using "like", so it's a simile.` },
     { tf: false, q: `True or false: "The wind chased me up the hill" is a simile.`, why: `Chasing is a human action and there's no comparison, so it's personification.` },
   ]);
+
+  // ---------- more English: every sentence here is used several ways, so one list makes many different questions ----------
+  {
+  const cap = (s) => s[0].toUpperCase() + s.slice(1);
+  const MORE_SIMILES = [
+    ['The rider shot out of the gate like a rocket.', 'a rocket', 'the rider'], ['My brother snores like a chainsaw.', 'a chainsaw', 'my brother'], ['The dust hung in the air like a thick curtain.', 'a thick curtain', 'the dust'],
+    ['Her new helmet shines like a diamond.', 'a diamond', 'her helmet'], ['The bumps on the track felt like a row of giant teeth.', 'giant teeth', 'the bumps'], ['The front tyre was as flat as a pancake.', 'a pancake', 'the front tyre'],
+    ['The sand felt as hot as an oven.', 'an oven', 'the sand'], ['Our dog is as big as a small horse.', 'a small horse', 'our dog'], ['The rain came down like a waterfall.', 'a waterfall', 'the rain'],
+    ['The old bakkie is as slow as a sleepy tortoise.', 'a sleepy tortoise', 'the old bakkie'], ['The crowd buzzed like a swarm of bees.', 'a swarm of bees', 'the crowd'], ['The gravel was as sharp as broken glass.', 'broken glass', 'the gravel'],
+    ['My legs felt like jelly after the race.', 'jelly', 'my legs'], ['The exhaust was as hot as a braai fire.', 'a braai fire', 'the exhaust'], ['The mud stuck to my boots like glue.', 'glue', 'the mud'],
+    ['The children ran across the field like a herd of zebras.', 'a herd of zebras', 'the children'], ['The thunder rolled over the hills like a giant drum.', 'a giant drum', 'the thunder'], ['The jump looked as tall as a block of flats.', 'a block of flats', 'the jump'],
+    ['The little bike buzzed like an angry wasp.', 'an angry wasp', 'the little bike'], ['His voice was as loud as a fire engine.', 'a fire engine', 'his voice'], ['The track twisted like a snake through the bush.', 'a snake', 'the track'],
+    ['My gloves were as wet as a dishcloth.', 'a dishcloth', 'my gloves'], ['The water in the river was as cold as a fridge.', 'a fridge', 'the water'], ['The sun was like a big orange ball in the sky.', 'a big orange ball', 'the sun'],
+    ['Her hair blew around like long grass in the wind.', 'long grass', 'her hair'], ['The new tyres gripped like a gecko on a wall.', 'a gecko', 'the new tyres'], ['The rider was as calm as a sleeping cat.', 'a sleeping cat', 'the rider'],
+    ['The start gate dropped like a stone.', 'a stone', 'the start gate'], ['The hill was as steep as a wall.', 'a wall', 'the hill'], ['My bag felt as heavy as a bag of bricks.', 'a bag of bricks', 'my bag'],
+    ["The mechanic's hands were as black as coal.", 'coal', "the mechanic's hands"], ['The sky was as blue as the sea.', 'the sea', 'the sky'], ['The little boy jumped around like a frog.', 'a frog', 'the little boy'],
+    ["The bike's paint shone like a mirror.", 'a mirror', "the bike's paint"], ['The wind howled like a hungry wolf.', 'a hungry wolf', 'the wind'], ['The riders lined up like soldiers at the gate.', 'soldiers', 'the riders'],
+    ['The rock felt as smooth as an egg.', 'an egg', 'the rock'], ['My sister sings like a bird in the morning.', 'a bird', 'my sister'], ['The pit lane was as busy as a beehive.', 'a beehive', 'the pit lane'], ['The chain was as rusty as an old gate.', 'an old gate', 'the chain'],
+  ];
+  const MORE_PERSON = [
+    ['The angry wind slapped me in the face.', 'the wind', 'slapped'], ['The big jump laughed at my slow little bike.', 'the big jump', 'laughed'], ['My alarm clock yelled at me to get up.', 'my alarm clock', 'yelled'], ['The rain tapped its fingers on the window.', 'the rain', 'tapped'],
+    ['The leaves waved goodbye to the riders.', 'the leaves', 'waved'], ['The flames danced around the braai.', 'the flames', 'danced'], ['The old truck coughed all the way up the hill.', 'the old truck', 'coughed'], ['The moon smiled down at the sleeping town.', 'the moon', 'smiled'],
+    ['The river whispered secrets to the rocks.', 'the river', 'whispered'], ['My dirty bike begged me for a wash.', 'my dirty bike', 'begged'], ['The thunder shouted across the valley.', 'the thunder', 'shouted'], ['The trees bowed to the passing riders.', 'the trees', 'bowed'],
+    ['The sun hugged the cold riders on the start line.', 'the sun', 'hugged'], ['The door complained loudly when I pushed it.', 'the door', 'complained'], ['The tired engine sighed and went quiet.', 'the tired engine', 'sighed'], ['The stairs groaned under my heavy boots.', 'the stairs', 'groaned'],
+    ['The cold air pinched my fingers.', 'the cold air', 'pinched'], ['The mountain looked down sadly on the empty track.', 'the mountain', 'looked'], ['The sky cried all over the track.', 'the sky', 'cried'], ['My helmet refused to come off my head.', 'my helmet', 'refused'],
+    ['The back tyre screamed as the bike took the corner.', 'the back tyre', 'screamed'], ['The flowers danced in the morning breeze.', 'the flowers', 'danced'], ['The little stream giggled over the stones.', 'the little stream', 'giggled'], ['The sleepy town yawned as the sun came up.', 'the sleepy town', 'yawned'],
+    ['The wind sang the riders to sleep.', 'the wind', 'sang'], ['My handlebar shook hands with the fence.', 'my handlebar', 'shook'], ['The school bell shouted that it was home time.', 'the school bell', 'shouted'], ['The rocks frowned at the riders coming up the hill.', 'the rocks', 'frowned'],
+    ['The kettle sang a happy song.', 'the kettle', 'sang'], ['The waves clapped as the riders came past.', 'the waves', 'clapped'], ['My bed called my name after the race.', 'my bed', 'called'], ['The spanner hid from the mechanic.', 'the spanner', 'hid'],
+    ['The storm marched over the hills.', 'the storm', 'marched'], ['The shadows tiptoed across the track.', 'the shadows', 'tiptoed'], ['The big tree held out its arms to the birds.', 'the big tree', 'held'], ['The wheel winked in the sunlight.', 'the wheel', 'winked'],
+    ['The hungry engine demanded more fuel.', 'the hungry engine', 'demanded'], ['The wooden gate grumbled when we opened it.', 'the wooden gate', 'grumbled'], ['The wind argued with the flags all day.', 'the wind', 'argued'], ['The moon played hide and seek behind the clouds.', 'the moon', 'played'],
+  ];
+  const MORE_PLAIN = [
+    'The rider won the first race.', 'I like riding in the mud.', 'We all like the new track.', 'The wind blew hard all day.', 'The sun set behind the hill.', 'My bike has a blue seat.', 'It rained on the track this morning.', 'The gate opened at ten o\'clock.',
+    'Thabo rode his bike to school.', 'As soon as the gate dropped, we raced.', 'The mud was thick and brown.', 'My brother has a red bike.', 'The moon was full last night.', 'We waited as the mechanic fixed the chain.', 'I would like a new pair of gloves.', 'The river is very cold in winter.',
+    'The engine was loud and hot.', 'She likes her red helmet.', 'The hill is steep and rocky.', 'We ate boerewors after the race.', 'The trees lost their leaves in winter.', 'The old truck went slowly up the hill.', 'My dad washed the bike on Sunday.', 'The track was closed because of the storm.',
+    'Rain fell all night.', 'Our team has six riders.', 'I like it when the sun comes out.', 'As the sun rose, the riders arrived.', 'The flags moved in the wind.', 'The fire burnt the logs.',
+  ];
+  const others = (list, i, ...steps) => steps.map((n) => list[(i + n) % list.length]);
+  const unlike = (right, tries) => [...new Set(tries.filter((t) => t !== right))].slice(0, 3);
+  // Other words from the sentence, so the right word has to be found rather than guessed.
+  const wordsToo = (sentence, right, thing) => {
+    const words = sentence.replace(/[.,']/g, '').split(' ').filter((w) => w.length > 2 && w.toLowerCase() !== right && !thing.includes(w.toLowerCase()) && w.toLowerCase() !== 'the');
+    return unlike(right, [...new Set(words), 'very', 'never', 'always']);
+  };
+  S.en_simile.items.push(
+    ...MORE_SIMILES.map(([s, to, thing], i) => ({ q: 'Which sentence has a simile?', a: s, w: others(MORE_PLAIN, i, 0, 11, 23), why: `It compares ${thing} to ${to}, using "like" or "as".` })),
+    ...MORE_SIMILES.map(([s, to, thing], i) => ({ q: `"${s}" What is being compared to ${thing}?`, a: cap(to), w: unlike(cap(to), [cap(thing), ...others(MORE_SIMILES, i, 7, 17, 29).map((x) => cap(x[1]))]), why: `${cap(thing)} is compared to ${to}.` })),
+    ...MORE_SIMILES.map(([s, to, thing]) => {
+      const word = / like /.test(s) ? 'like' : 'as';
+      return { q: `"${s}" Which word shows that this is a simile?`, a: `"${word}"`, w: ['"the"', '"very"', '"and"'], why: `"${cap(word)}" joins ${thing} to ${to}.` };
+    }),
+    ...[['white as', 'snow'], ['green as', 'grass'], ['sweet as', 'honey'], ['sharp as', 'a razor'], ['hard as', 'a rock'], ['tall as', 'a giraffe'], ['blind as', 'a bat'], ['fit as', 'a fiddle'], ['good as', 'gold'], ['old as', 'the hills'], ['proud as', 'a peacock'], ['red as', 'a beetroot'], ['thin as', 'a rake'], ['wise as', 'an owl'], ['gentle as', 'a lamb'], ['cool as', 'a cucumber']].map(([start, end], i, list) => ({ q: `Choose the words that finish the simile: as ${start} ___.`, a: end, w: unlike(end, others(list, i, 3, 7, 11).map((x) => x[1])), why: `We say "as ${start} ${end}".` })),
+  );
+  S.en_person.items.push(
+    ...MORE_PERSON.map(([s, thing, did], i) => ({ q: 'Which sentence uses personification?', a: s, w: others(MORE_PLAIN, i, 4, 15, 26), why: `${cap(thing)} can't really do that. "${cap(did)}" is something people do.` })),
+    ...MORE_PERSON.map(([s, thing, did]) => ({ q: `"${s}" Which word makes ${thing} sound like a person?`, a: did, w: wordsToo(s, did, thing), why: `People can do this, but ${thing} can't really.` })),
+    ...MORE_PERSON.map(([s, thing, did], i) => ({ q: `"${s}" What is being written about as if it were a person?`, a: cap(thing), w: unlike(cap(thing), others(MORE_PERSON, i, 5, 13, 21, 33).map((x) => cap(x[1]))), why: `${cap(thing)} can't really do that. "${cap(did)}" is something people do.` })),
+  );
+  const NAMES = ['Simile', 'Personification', 'Neither of them', 'Both of them'];
+  S.en_which.items.push(
+    ...MORE_SIMILES.map(([s, to, thing]) => ({ q: `"${s}" Simile, personification or neither?`, a: 'Simile', w: NAMES.filter((n) => n !== 'Simile'), why: `It compares ${thing} to ${to}, using "like" or "as".` })),
+    ...MORE_PERSON.map(([s, thing, did]) => ({ q: `"${s}" Simile, personification or neither?`, a: 'Personification', w: NAMES.filter((n) => n !== 'Personification'), why: `${cap(thing)} can't really do that. "${cap(did)}" is something people do.` })),
+    ...MORE_PLAIN.map((s) => ({ q: `"${s}" Simile, personification or neither?`, a: 'Neither of them', w: NAMES.filter((n) => n !== 'Neither of them'), why: /like|\bAs\b|\bas\b/.test(s) ? 'It has "like" or "as", but nothing is being compared.' : 'It just tells you something. Nothing is compared, and nothing acts like a person.' })),
+  );
+  S.en_terms.items.push(
+    { q: 'What two things does a simile need?', a: 'Two different things to compare, and "like" or "as"', w: ['A person and an animal', 'A long word and a short word', 'A thing that acts like a person'], why: 'It compares two different things using "like" or "as".' },
+    { q: 'What does it mean to "personify" something?', a: 'To write about it as if it were a person', w: ['To write a story about a real person', 'To compare it using "like" or "as"', 'To give it a person\'s name'], why: 'Personify has "person" inside it.' },
+    { q: '"The mud was as thick as glue." Which two things are being compared?', a: 'Mud and glue', w: ['Thick and glue', 'Mud and thick', 'Mud and boots'], why: 'The mud is compared to glue.' },
+    { q: '"The sun smiled." What makes this personification?', a: 'The sun can\'t really smile, but people can', w: ['It uses the word "like"', 'It compares the sun to a person with "as"', 'The sun is very bright'], why: 'A thing is doing something people do.' },
+    { q: 'Can a simile be about a person?', a: 'Yes, if it compares them to something using "like" or "as"', w: ['No, only animals can be in a simile', 'No, only things can be in a simile', 'Yes, but only if they are famous'], why: '"My sister runs like a cheetah" is a simile about a person.' },
+    { q: 'Why isn\'t "The bike is red" a simile?', a: 'It doesn\'t compare the bike to anything', w: ['It is too short', 'Bikes can\'t be in a simile', 'Red is not a real colour'], why: 'A simile needs a comparison using "like" or "as".' },
+    { q: 'Why isn\'t "The bike went up the hill" personification?', a: 'Bikes really do go up hills', w: ['It uses "like" or "as"', 'There is no hill in it', 'It is about a person'], why: 'Nothing here acts like a person.' },
+    { q: 'Why isn\'t "My dad laughed" personification?', a: 'My dad is a person, and people laugh', w: ['It doesn\'t use "like" or "as"', 'Dads can\'t laugh', 'It is too short'], why: 'Personification is about things that aren\'t people.' },
+    { q: 'What is another name for words used to paint a picture, like similes?', a: 'Figures of speech', w: ['Full sentences', 'Spelling words', 'Question marks'], why: 'Similes and personification are both figures of speech.' },
+    { q: 'You read "The stars winked." What should you ask yourself?', a: 'Can stars really wink, or do only people do that?', w: ['Is there a "like" or "as" in it?', 'How far away are the stars?', 'Who wrote the sentence?'], why: 'A thing doing something only people do is personification.' },
+    { q: 'You read "He ran like the wind." What should you look for?', a: 'The word "like" comparing two things', w: ['A thing acting like a person', 'A person\'s name', 'The longest word'], why: 'That word gives the simile away.' },
+    { tf: false, q: 'True or false: a simile must always be about animals.', why: 'It can compare any two different things.' },
+    { tf: true, q: 'True or false: the weather, machines and plants can all be personified.', why: 'Any thing that isn\'t a person can be given human actions.' },
+    { tf: true, q: 'True or false: a figure of speech isn\'t meant to be exactly true.', why: 'The wind doesn\'t really whisper. It paints a picture.' },
+    { tf: true, q: 'True or false: "as fast as a cheetah" compares two things.', why: 'It compares someone\'s speed to a cheetah, using "as".' },
+    { tf: false, q: 'True or false: personification means a person doing something normal.', why: 'It means a thing doing something only people do.' },
+    { tf: true, q: 'True or false: you can find similes in poems and stories.', why: 'Writers use them to help you picture things.' },
+  );
+  }
+
   pack.subjects.english = {
     label: 'English',
     source: 'Language test, Tuesday 3 November',
@@ -8316,7 +8427,7 @@ Jordy's Science test, Tuesday 10 November: Planet Earth and Beyond. Written from
   // ---------- staying up to date ----------
   // An open tab or a home screen app keeps running the page it first loaded, old prices and all. So it asks which version
   // is live when it comes back into view and every few minutes, and swaps over between races. build.mjs fills in BUILD.
-  const BUILD = '559b34532f';
+  const BUILD = 'a790edf2a1';
   const BACK_KEY = 'holeshot.back.v1';
   const TRIED_KEY = 'holeshot.tried.v1';
   let liveBuild = null;
@@ -9061,6 +9172,8 @@ Jordy's Science test, Tuesday 10 November: Planet Earth and Beyond. Written from
       const m = Math.round(mastery(p, t) * 100);
       const done = isCleared(p, t);
       const here = next && next.id === t.id;
+      const lists = t.skills.filter((id) => pack.skills[id].items);
+      const fresh = lists.reduce((n, id) => n + RS.unseenCount(pack.skills[id].items, (p.seen && p.seen[id]) || []), 0);
       return `<article class="stop ${here ? 'here' : ''}">
         <div class="stop-photo">${photo(t.img, t.stop)}<span class="chip on-photo num">${t.warmup ? 'Extra practice' : done ? `${ic('check', 12)} Cleared` : here ? 'You are here' : `Section ${i + 1}`}</span></div>
         <div class="stop-body">
@@ -9069,6 +9182,7 @@ Jordy's Science test, Tuesday 10 November: Planet Earth and Beyond. Written from
             <button class="btn ${here ? 'primary' : ''} small" data-act="start" data-mode="topic" data-topic="${t.id}">Ride</button>
           </div>
           <div class="stop-row"><div class="meter" style="flex:1" role="img" aria-label="${m} percent"><i style="width:${m}%"></i></div><span class="small-t num muted">${m}%</span>${stars(tp.stars || 0, 14)}</div>
+          ${lists.length ? `<div class="small-t muted num">${fresh ? `${fresh} new question${fresh === 1 ? '' : 's'} to go` : 'All asked once. They come round again now.'}</div>` : ''}
           ${t.walk ? `<button class="btn small full walk-go" data-act="walk" data-id="${t.id}">${ic('route', 16)} Track walk: learn it first</button>` : ''}
           ${ruleCard(t)}
         </div>
@@ -9455,13 +9569,23 @@ Jordy's Science test, Tuesday 10 November: Planet Earth and Beyond. Written from
     if (saved) {
       q = JSON.parse(JSON.stringify(saved));
       q.exact = true;
-      key = q.q + (q.options || []).join();
+      key = `${q.q}|${q.correct}`;
     } else {
+      const p = P();
+      p.seen = p.seen || {};
+      const made = p.seen[slot.skill] || [];
       do {
-        q = fn(lvl);
-        key = q.q + (q.options || []).join();
+        if (fn.items) {
+          const got = RS.pickUnseen(fn.items, p.seen[slot.skill] || []);
+          p.seen[slot.skill] = got.seen;
+          q = fn.ask(got.item);
+        } else q = fn(lvl);
+        // The answers get shuffled, so they can't be part of what makes a question the same one.
+        key = `${q.q}|${q.correct}`;
         guard++;
-      } while ((r.asked.has(key) || (r.mode === 'lap' && (q.visual || RS.plain(q.q).length > LAP_CHARS))) && guard < 40);
+      } while ((r.asked.has(key) || (!fn.items && made.includes(RS.shortHash(key))) || (r.mode === 'lap' && (q.visual || RS.plain(q.q).length > LAP_CHARS))) && guard < 40);
+      // Number questions are nearly always new anyway. This is for the ones built from a short list of words.
+      if (!fn.items) p.seen[slot.skill] = [...made, RS.shortHash(key)].slice(-12);
     }
     r.asked.add(key);
     q.skill = slot.skill;
