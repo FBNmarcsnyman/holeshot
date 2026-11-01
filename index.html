@@ -4908,7 +4908,7 @@ details ol { margin: 6px 0 0; padding-left: 20px; }
   // ---------- saved progress ----------
   const blankPlayer = (pack) => ({
     points: 0, earned: 0, streak: 0, best: 0, lastDay: null, runsDone: 0, totalQ: 0, totalOk: 0,
-    days: {}, skills: {}, topics: {}, runs: [], missed: [], badges: [],
+    days: {}, skills: {}, topics: {}, runs: [], missed: [], badges: [], fix: {},
     paint: pack.defaultPaint, bike: 'mini', plate: pack.plate, ownedP: [pack.defaultPaint], ownedB: ['mini'], dailyBy: {}, examBy: {},
   });
   function load() {
@@ -4927,11 +4927,72 @@ details ol { margin: 6px 0 0; padding-left: 20px; }
     } catch (e) { /* storage blocked */ }
   }
 
+  // ---------- results log ----------
+  // Every answer goes to a private results table that this page can add to but never read.
+  // With no signal it waits on the device. Only the live site sends, so the test link and local previews don't muddle the results.
+  const LOG_URL = 'https://kyosepbdxjwugunylvyo.supabase.co/functions/v1/holeshot-log';
+  const LOG_ON = /\.github\.io$/.test(location.hostname);
+  const OUTBOX = 'holeshot.outbox.v1';
+  const uuid = () => (crypto.randomUUID ? crypto.randomUUID() : 'xxxxxxxx-xxxx-4xxx-8xxx-xxxxxxxxxxxx'.replace(/x/g, () => Math.floor(Math.random() * 16).toString(16)));
+  let outbox = [];
+  try {
+    outbox = JSON.parse(localStorage.getItem(OUTBOX)) || [];
+  } catch (e) { /* storage blocked */ }
+  let sending = false;
+  function keepOutbox() {
+    try {
+      localStorage.setItem(OUTBOX, JSON.stringify(outbox));
+    } catch (e) { /* storage blocked or full: the rows still go if the signal holds */ }
+  }
+  function logRow(kind, row) {
+    if (!LOG_ON) return;
+    if (!state.device) {
+      state.device = uuid();
+      save();
+    }
+    outbox.push(Object.assign({ kind, device: state.device, player: ui.who, subject: ui.subject }, row));
+    // A long spell offline mustn't fill the device. The oldest go first.
+    if (outbox.length > 3000) outbox = outbox.slice(-3000);
+    keepOutbox();
+    logSend();
+  }
+  async function logSend() {
+    if (!LOG_ON || sending || !outbox.length || navigator.onLine === false) return;
+    sending = true;
+    try {
+      while (outbox.length) {
+        const batch = outbox.slice(0, 50);
+        const res = await fetch(LOG_URL, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          keepalive: true,
+          body: JSON.stringify({ answers: batch.filter((x) => x.kind === 'answer'), runs: batch.filter((x) => x.kind === 'run') }),
+        });
+        if (!res.ok) break;
+        outbox = outbox.slice(batch.length);
+        keepOutbox();
+      }
+    } catch (e) { /* no signal: the next answer or the next visit tries again */ }
+    sending = false;
+  }
+  window.addEventListener('online', logSend);
+  document.addEventListener('visibilitychange', () => {
+    if (document.visibilityState === 'hidden') logSend();
+  });
+
   const ui = { who: null, subject: null, tab: 'home', run: null, result: null, confirmReset: false, chartPick: null, voiceBlocked: false };
   const P = () => state.players[ui.who];
   const PK = () => RS.packs[ui.who];
   const SUB = () => PK().subjects[ui.subject];
   const racing = (sub) => sub.topics.filter((t) => !t.warmup);
+
+  // ---------- the fix list ----------
+  // Anything missed goes on the list, and stays until it is right first try this many times in a row.
+  const FIX_NEED = 3;
+  const fixList = (p, sub) => {
+    const mine = new Set(sub.topics.flatMap((t) => t.skills));
+    return Object.keys(p.fix).filter((id) => mine.has(id));
+  };
 
   // ---------- dates and sums ----------
   const dayKey = (d = new Date()) => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
@@ -5112,6 +5173,7 @@ details ol { margin: 6px 0 0; padding-left: 20px; }
           </div>
         </section>
         <div class="home-side">
+          ${fixCard(p, sub)}
           <section class="tiles" aria-label="Your numbers">
             ${tile('star', 'Points', RS.fmt(p.points), today.pts ? `<span class="chip lime num">+${today.pts} today</span>` : '<span class="chip">Ride to earn</span>')}
             ${tile('flame', 'Day streak', liveStreak(p), `<span class="chip ${liveStreak(p) ? 'good' : ''} num">Best ${p.best}</span>`)}
@@ -5131,6 +5193,15 @@ details ol { margin: 6px 0 0; padding-left: 20px; }
           </section>
         </div>
       </div>`);
+  }
+  function fixCard(p, sub) {
+    const n = fixList(p, sub).length;
+    if (!n) return '';
+    return `<section class="coach" aria-label="Fix-it lap">
+      <div class="coach-head"><span class="coach-dot">${ic('bolt', 20)}</span><div><div class="h-sec">Fix-it lap</div><div class="small-t muted num">${n} to fix in ${sub.label}</div></div></div>
+      <p class="small-t" style="padding-inline:4px">New questions on what caught you out. Get each one right ${FIX_NEED} times in a row to clear it.</p>
+      <button class="btn primary full" data-act="start" data-mode="fix">Ride the fix-it lap ${ic('arrow')}</button>
+    </section>`;
   }
   const tile = (icon, label, num, sub) => `<div class="tile"><span class="t-ic">${ic(icon, 20)}</span><div><div class="t-label">${label}</div><div class="t-num">${num}</div></div><div class="t-sub">${sub}</div></div>`;
 
@@ -5291,7 +5362,23 @@ details ol { margin: 6px 0 0; padding-left: 20px; }
   }
 
   // ---------- the moto ----------
+  // A fix-it lap: a fresh version of each missed skill, a different kind of question from the same section,
+  // and at the end the exact question that caught them out.
+  function fixSlots(p, sub, n) {
+    const list = RS.shuffle(fixList(p, sub));
+    const exact = list.filter((id) => p.fix[id].q).slice(0, Math.max(1, Math.floor(n / 4)));
+    const out = [];
+    for (let i = 0; out.length < n - exact.length; i++) {
+      const id = list[i % list.length];
+      const others = sub.topics.find((t) => t.skills.includes(id)).skills.filter((s) => s !== id && !list.includes(s));
+      // Every second time round it goes for a neighbouring kind of question.
+      const round = Math.floor(i / list.length);
+      out.push({ skill: round % 2 && others.length ? RS.pick(others) : id });
+    }
+    return [...out, ...exact.map((skill) => ({ skill, exact: true }))];
+  }
   function buildQueue(p, sub, mode, topicId, n) {
+    if (mode === 'fix') return fixSlots(p, sub, n);
     if (mode === 'exam') {
       const out = [];
       const topics = RS.shuffle(racing(sub));
@@ -5308,8 +5395,8 @@ details ol { margin: 6px 0 0; padding-left: 20px; }
     while (out.length < n) {
       const weights = pool.map((id) => {
         const s = p.skills[id];
-        // Focus skills come up more often until they are strong.
-        const base = (s ? 0.25 + (1 - s.m) : 1.3) * ((sub.focus || []).includes(id) && (!s || s.m < 0.8) ? 2 : 1);
+        // Focus skills come up more often until they are strong, and anything on the fix list more often still.
+        const base = (s ? 0.25 + (1 - s.m) : 1.3) * ((sub.focus || []).includes(id) && (!s || s.m < 0.8) ? 2 : 1) * (p.fix[id] ? 3 : 1);
         // One-section banks may repeat the skill; the asked list stops the same question repeating.
         return base * 0.35 ** (used[id] || 0) * (pool.length > 1 && out[out.length - 1] === id ? 0 : 1);
       });
@@ -5329,9 +5416,11 @@ details ol { margin: 6px 0 0; padding-left: 20px; }
 
   function startRun(mode, topicId) {
     const sub = SUB();
+    // An old screen can still offer a lap after the list has emptied.
+    if (mode === 'fix' && !fixList(P(), sub).length) mode = 'daily';
     const n = mode === 'exam' ? sub.examSize : 10;
     ui.result = null;
-    ui.run = { mode, topicId, queue: buildQueue(P(), sub, mode, topicId, n).map((skill) => ({ skill })), i: 0, total: n, q: null, typed: '', tries: 0, combo: 0, bestCombo: 0, pts: 0, score: 0, right: 0, log: [], extras: 0, asked: new Set(), sheet: null, heard: '', listening: false, started: Date.now() };
+    ui.run = { id: uuid(), mode, topicId, queue: buildQueue(P(), sub, mode, topicId, n).map((slot) => (typeof slot === 'string' ? { skill: slot } : slot)), i: 0, total: n, q: null, typed: '', tries: 0, combo: 0, bestCombo: 0, pts: 0, score: 0, right: 0, log: [], extras: 0, asked: new Set(), sheet: null, heard: '', listening: false, started: Date.now(), fixed: [], fixNote: '', firstGiven: null, qStart: Date.now() };
     audio();
     nextQuestion();
   }
@@ -5339,18 +5428,26 @@ details ol { margin: 6px 0 0; padding-left: 20px; }
     const r = ui.run;
     stopVoice();
     stopSpeaking();
-    if (r.i >= r.queue.length) return finishRun();
+    // A fix-it lap ends as soon as the list is clear.
+    if (r.i >= r.queue.length || (r.mode === 'fix' && !fixList(P(), SUB()).length)) return finishRun();
     const slot = r.queue[r.i];
     const fn = PK().skills[slot.skill];
     const lvl = levelFor(P(), slot.skill, r.mode);
+    const saved = slot.exact && P().fix[slot.skill] && P().fix[slot.skill].q;
     let q;
     let key;
     let guard = 0;
-    do {
-      q = fn(lvl);
+    if (saved) {
+      q = JSON.parse(JSON.stringify(saved));
+      q.exact = true;
       key = q.q + (q.options || []).join();
-      guard++;
-    } while (r.asked.has(key) && guard < 40);
+    } else {
+      do {
+        q = fn(lvl);
+        key = q.q + (q.options || []).join();
+        guard++;
+      } while (r.asked.has(key) && guard < 40);
+    }
     r.asked.add(key);
     q.skill = slot.skill;
     q.bonus = !!slot.bonus;
@@ -5359,6 +5456,9 @@ details ol { margin: 6px 0 0; padding-left: 20px; }
     r.tries = 0;
     r.sheet = null;
     r.heard = '';
+    r.fixNote = '';
+    r.firstGiven = null;
+    r.qStart = Date.now();
     drawRun();
     if (state.autoRead) readAloud();
     const w = $('#ans-word');
@@ -5382,12 +5482,41 @@ details ol { margin: 6px 0 0; padding-left: 20px; }
       r.score += credit;
       if (ok) r.right++;
     }
-    r.log.push({ q: q.q, correct: q.correct, given, ok, firstTry, steps: q.steps });
+    r.log.push({ q: q.q, correct: q.correct, given, ok, firstTry, steps: q.steps, bonus: q.bonus });
     if (!ok) {
       p.missed.unshift({ q: q.q, correct: q.correct, given, steps: q.steps, when: dayKey() });
       p.missed = p.missed.slice(0, 30);
     }
+    const f = p.fix[q.skill];
+    if (!ok || !firstTry) {
+      const { skill, bonus, exact, ...plainQ } = q;
+      p.fix[q.skill] = { got: 0, misses: (f ? f.misses : 0) + 1, q: plainQ };
+    } else if (f) {
+      f.got++;
+      if (q.exact) f.q = null;
+      if (f.got >= FIX_NEED) {
+        delete p.fix[q.skill];
+        r.fixed.push(q.skill);
+        r.fixNote = 'Cleared from your fix list!';
+      } else r.fixNote = `${f.got} of ${FIX_NEED} to clear this one`;
+    }
     save();
+    logRow('answer', {
+      id: uuid(),
+      answered_at: new Date().toISOString(),
+      mode: r.mode,
+      topic: (topicOf(q.skill) || {}).id,
+      skill: q.skill,
+      run_id: r.id,
+      q: RS.plain(q.q).slice(0, 400),
+      first_given: r.firstGiven,
+      given: given === undefined || given === null ? null : RS.plain(given).slice(0, 80),
+      correct: RS.plain(q.correct).slice(0, 160),
+      ok,
+      first_try: firstTry,
+      bonus: q.bonus,
+      secs: Math.round((Date.now() - r.qStart) / 1000),
+    });
   }
   function award(n) {
     const p = P();
@@ -5444,6 +5573,7 @@ details ol { margin: 6px 0 0; padding-left: 20px; }
       if (navigator.vibrate) navigator.vibrate(18);
     } else if (r.tries === 0) {
       r.tries = 1;
+      r.firstGiven = RS.plain(given).slice(0, 80);
       r.combo = 0;
       r.sheet = { type: 'retry' };
       sfx('wrong');
@@ -5464,6 +5594,8 @@ details ol { margin: 6px 0 0; padding-left: 20px; }
     const r = ui.run;
     const p = P();
     const sub = SUB();
+    // A fix-it lap can end early, so it is marked out of what was asked.
+    if (r.mode === 'fix') r.total = Math.max(1, r.log.filter((l) => !l.bonus).length);
     const pct = Math.round((100 * r.score) / r.total);
     const earnedStars = pct >= 90 ? 3 : pct >= 70 ? 2 : pct >= 50 ? 1 : 0;
     let bonus = 20;
@@ -5488,12 +5620,14 @@ details ol { margin: 6px 0 0; padding-left: 20px; }
       label = 'Main event';
       p.examBest = Math.max(p.examBest || 0, pct);
       p.examBy[ui.subject] = Math.max(p.examBy[ui.subject] || 0, pct);
+    } else if (r.mode === 'fix') {
+      label = 'Fix-it lap';
     } else {
       p.dailyBy[ui.subject] = today;
     }
     p.runs.unshift({ label: `${sub.label}: ${label}`, pct, right: r.right, total: r.total, pts: r.pts, when: today, mode: r.mode });
     p.runs = p.runs.slice(0, 30);
-    const x = { label, pct, stars: earnedStars, pts: r.pts, bonus, bestCombo: r.bestCombo, right: r.right, total: r.total, mode: r.mode, topicId: r.topicId, missed: r.log.filter((l) => !l.ok), newBadges: [], streak: p.streak };
+    const x = { label, pct, stars: earnedStars, pts: r.pts, bonus, bestCombo: r.bestCombo, right: r.right, total: r.total, mode: r.mode, topicId: r.topicId, missed: r.log.filter((l) => !l.ok), newBadges: [], streak: p.streak, fixed: new Set(r.fixed.filter((id) => !p.fix[id])).size, fixLeft: fixList(p, sub).length };
     for (const b of BADGES) {
       if (!p.badges.includes(b.id) && b.test(p, x, sub)) {
         p.badges.push(b.id);
@@ -5501,6 +5635,21 @@ details ol { margin: 6px 0 0; padding-left: 20px; }
       }
     }
     save();
+    logRow('run', {
+      id: r.id,
+      finished_at: new Date().toISOString(),
+      mode: r.mode,
+      topic: r.topicId || null,
+      label,
+      pct,
+      right_count: r.right,
+      total: r.total,
+      pts: r.pts,
+      best_combo: r.bestCombo,
+      secs: Math.round((Date.now() - r.started) / 1000),
+      fix_left: x.fixLeft,
+      installed: !!navigator.standalone || matchMedia('(display-mode: standalone)').matches,
+    });
     ui.run = null;
     ui.result = x;
     render();
@@ -5608,13 +5757,14 @@ details ol { margin: 6px 0 0; padding-left: 20px; }
         ${s.holeshot ? '<p class="small-t">First into the first corner: +10 bonus.</p>' : ''}
         ${s.mult > 1 ? `<p><span class="combo pop">${ic('bolt', 12, true)} ×${s.mult} full gas</span> ${r.combo} in a row</p>` : ''}
         ${s.spell ? `<p class="small-t">It's spelt <b>${h(s.spell)}</b>.</p>` : ''}
+        ${r.fixNote ? `<p class="small-t"><b>${r.fixNote}</b></p>` : ''}
         <details><summary>Show the working</summary>${steps}</details>
         <button class="btn primary full" data-act="next" data-primary>Next ${ic('arrow')}</button></div>`;
     }
     if (s.type === 'retry') {
       return `<div class="sheet warn" role="status"><div class="sheet-head"><h2>Stalled it</h2></div><p style="font-size:17px">${h(q.hint)}</p>${ruleCard(topicOf(q.skill))}<button class="btn primary full" data-act="retry" data-primary>Kick it over</button></div>`;
     }
-    return `<div class="sheet bad" role="status"><div class="sheet-head"><h2>Here's the line</h2></div><p style="font-size:17px">The answer is <b>${h(q.correct)}</b>.</p>${steps}${ruleCard(topicOf(q.skill))}${q.bonus ? '' : '<p class="small-t muted">You\'ll get another one like this at the end.</p>'}<button class="btn primary full" data-act="next" data-primary>Got it ${ic('arrow')}</button></div>`;
+    return `<div class="sheet bad" role="status"><div class="sheet-head"><h2>Here's the line</h2></div><p style="font-size:17px">The answer is <b>${h(q.correct)}</b>.</p>${steps}${ruleCard(topicOf(q.skill))}<p class="small-t muted">${q.bonus ? '' : "You'll get another one like this at the end. "}It stays on your fix list until you get it right ${FIX_NEED} times in a row.</p><button class="btn primary full" data-act="next" data-primary>Got it ${ic('arrow')}</button></div>`;
   }
 
   function viewRun() {
@@ -5637,6 +5787,7 @@ details ol { margin: 6px 0 0; padding-left: 20px; }
             <span class="chip num">${r.i + 1} of ${r.queue.length}</span>
             <button class="round small" data-act="read" aria-label="Read the question aloud">${ic('speaker', 18)}</button>
           </div>
+          ${q.exact ? '<div class="eyebrow">This one caught you out</div>' : ''}
           <h1 class="q-text">${h(q.q)}</h1>
           ${visual(q)}
         </article>
@@ -5690,7 +5841,9 @@ details ol { margin: 6px 0 0; padding-left: 20px; }
       </section>
       ${x.newBadges.length ? `<section class="card"><div class="h-sec" style="margin-bottom:8px">New badge${x.newBadges.length > 1 ? 's' : ''}</div><div class="badges">${x.newBadges.map((b) => `<div class="badge got"><b>${b.label}</b><small>${b.desc}</small></div>`).join('')}</div></section>` : ''}
       ${x.missed.length ? `<section class="card"><div class="h-sec" style="margin-bottom:8px">Look at these again</div><div class="log">${x.missed.map((m) => `<div class="log-item"><div>${h(m.q)}</div><div class="small-t" style="margin-top:2px"><b>Answer:</b> ${h(m.correct)}${m.given ? ` <span class="muted">(you said ${h(String(m.given))})</span>` : ''}</div><details><summary>Show the working</summary><ol>${m.steps.map((s) => `<li>${h(s)}</li>`).join('')}</ol></details></div>`).join('')}</div></section>` : ''}
-      <button class="btn primary full" ${again}>Go again ${ic('arrow')}</button>
+      ${x.mode === 'fix' || x.fixLeft ? `<section class="card"><div class="h-sec" style="margin-bottom:6px">Fix list</div><p class="small-t">${x.fixed ? `${x.fixed} cleared. ` : ''}${x.fixLeft ? `${x.fixLeft} still to fix. Get each one right ${FIX_NEED} times in a row to clear it.` : 'All clear. Nothing left to fix here.'}</p></section>` : ''}
+      ${x.fixLeft ? `<button class="btn primary full" data-act="start" data-mode="fix">${x.mode === 'fix' ? 'Next fix-it lap' : 'Re-test what you missed'} ${ic('arrow')}</button>` : ''}
+      ${x.mode === 'fix' ? '' : `<button class="btn ${x.fixLeft ? '' : 'primary'} full" ${again}>Go again ${ic('arrow')}</button>`}
       <button class="btn full" data-act="home">Back to the pits</button>
     </div>`;
   }
@@ -6131,6 +6284,7 @@ details ol { margin: 6px 0 0; padding-left: 20px; }
   // Lets test scripts see the game's state. Nothing in the game uses these.
   RS._ui = ui;
   RS._render = render;
+  logSend();
   RS._applySpeech = applySpeech;
 
   render();
