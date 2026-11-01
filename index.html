@@ -164,8 +164,8 @@ svg { display: block; }
 
 /* pictures */
 .bike { display: block; width: 100%; height: auto; }
-.rig { position: relative; width: 100%; max-width: 460px; }
-.rig .shot { display: block; width: 100%; height: auto; max-width: none; }
+.rig { position: relative; height: 300px; max-width: 100%; }
+.rig .shot { display: block; width: 100%; height: 100%; max-width: none; }
 .rig > i, .rig > svg, .rig > .shot-shade { position: absolute; left: 0; top: 0; width: 100%; height: 100%; max-width: none; display: block; pointer-events: none; }
 .rig > i { -webkit-mask-size: 100% 100%; mask-size: 100% 100%; -webkit-mask-repeat: no-repeat; mask-repeat: no-repeat; }
 .lock-need { font-weight: 600; }
@@ -258,6 +258,7 @@ svg { display: block; }
 .rides { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 10px; }
 .ride { background: var(--card-2); border-radius: 20px; padding: 8px 8px 10px; display: grid; gap: 6px; text-align: left; min-width: 0; align-content: start; }
 .ride .stage { border-radius: 14px; }
+.ride .rig { height: 132px; }
 .ride.on { outline: 3px solid var(--accent); outline-offset: -3px; }
 .ride b { font-weight: 600; font-size: 14px; padding-inline: 4px; }
 .ride .chip { justify-self: start; margin-inline: 4px; }
@@ -273,7 +274,7 @@ svg { display: block; }
 .lap-card { display: grid; gap: 10px; }
 .lap-clock { font-size: 24px; min-width: 76px; text-align: right; }
 .pit-left { position: sticky; top: 8px; z-index: 4; display: grid; gap: 8px; margin-bottom: 12px; padding: 10px 12px; }
-.pit-left .rig { max-width: 250px; margin-inline: auto; }
+.pit-left .rig { height: 280px; }
 .pit-right { display: grid; gap: 12px; min-width: 0; }
 .pit-tabs { display: flex; flex-wrap: wrap; gap: 6px; }
 .pit-tab { min-height: 42px; padding: 8px 13px; border-radius: 999px; background: var(--card); color: var(--ink-2); box-shadow: var(--shadow); font-size: 13px; font-weight: 600; }
@@ -284,7 +285,7 @@ svg { display: block; }
 @media (min-width: 900px) {
   .pit { display: grid; grid-template-columns: minmax(0, 440px) minmax(0, 1fr); gap: 12px; align-items: start; }
   .pit-left { margin-bottom: 0; }
-  .pit-left .rig { max-width: 400px; }
+  .pit-left .rig { height: 460px; }
 }
 .plate-row { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; }
 .accents { display: flex; flex-wrap: wrap; gap: 6px; justify-content: center; }
@@ -574,7 +575,7 @@ details ol { margin: 6px 0 0; padding-left: 20px; }
   // ---------- reading what the child typed ----------
   function parseValue(text) {
     let t = String(text).toLowerCase().replace(/ /g, ' ').trim();
-    t = t.replace(/[a-z]+\/[a-z]+/g, ' ').replace(/[a-z%$£€¥]+\.?/g, ' ').replace(/\s+/g, ' ').trim();
+    t = t.replace(/[a-z]+\/[a-z]+/g, ' ').replace(/[a-z%$£€¥²³]+\.?/g, ' ').replace(/\s+/g, ' ').trim();
     let m;
     if ((m = t.match(/^(\d+) (\d+)\/(\d+)$/))) {
       if (!+m[3]) return { values: [] };
@@ -4744,9 +4745,727 @@ details ol { margin: 6px 0 0; padding-left: 20px; }
     ],
   };
 
+  // ---------- Afrikaans, Taaltoets on 10 November: the mind maps at the front of die strand Taalboek ----------
+  const AF = { lang: 'af-ZA', strict: true };
+  const afChoice = (q, options, right, hint, steps) => ({ kind: 'mc', keepOrder: true, lang: 'af-ZA', q, options, answer: options.indexOf(right), correct: right, hint, steps });
+  const others = (list, right, n = 3) => shuffle(list.filter((x) => x !== right)).slice(0, n);
+
+  // Word kinds: name, English, what it does, and sentences with that kind of word in bold.
+  const SOORTE = {
+    'selfstandige naamwoord': { en: 'noun', does: `naam van 'n mens, dier, plek of ding`, says: [`Die **seun** speel buite.`, `Die **hond** slaap op die stoep.`, `Ons ry na die **strand**.`, `My **ma** werk hard.`, `Die **fiets** is nuut.`] },
+    werkwoord: { en: 'verb', does: `'n doen-woord of aksie-woord`, says: [`Die ryer **spring** oor die bult.`, `Ons **eet** by die tafel.`, `Die kinders **swem** in die see.`, `Sipho **skop** die bal.`, `Die hond **hardloop** oor die veld.`] },
+    'byvoeglike naamwoord': { en: 'adjective', does: `beskryf 'n naamwoord`, says: [`Dit is 'n **mooi** fiets.`, `Die **groot** seun lag.`, `Ek dra 'n **rooi** helm.`, `Die **warm** son skyn.`, `Ons het 'n **ou** bakkie.`] },
+    voornaamwoord: { en: 'pronoun', does: `staan in die plek van 'n naamwoord`, says: [`**Hy** ry vinnig.`, `**Sy** lees 'n boek.`, `**Hulle** speel op die strand.`, `**Ons** bou 'n sandkasteel.`, `**Ek** was my fiets.`] },
+    bywoord: { en: 'adverb', does: `sê meer van die werkwoord: hoe, wanneer of waar`, says: [`Die ryer ry **vinnig**.`, `Ons swem **môre**.`, `Die kinders speel **buite**.`, `Die baba slaap **rustig**.`, `Ek oefen **altyd**.`] },
+    voorsetsel: { en: 'preposition', does: `wys plek of posisie`, says: [`Die bal lê **onder** die tafel.`, `Die boek is **op** die rak.`, `Die hond sit **langs** my.`, `Die vis swem **in** die water.`, `Die kat lê **agter** die bank.`] },
+    voegwoord: { en: 'conjunction', does: `verbind woorde of sinne`, says: [`Ek swem **en** ek speel.`, `Hy is moeg, **maar** hy ry verder.`, `Ek bly tuis, **want** dit reën.`, `Sy is siek, **daarom** bly sy tuis.`, `Ons oefen **sodat** ons kan wen.`] },
+    telwoord: { en: 'number word', does: `wys getal of volgorde`, says: [`Ek het **twee** fietse.`, `Hy kom **derde** in die wedren.`, `Daar is **vyf** ryers.`, `Sy het **een** broer.`, `Ons is die **eerste** span.`] },
+  };
+  const SOORT_NAMES = Object.keys(SOORTE);
+  S.kaf_soort = () => {
+    const name = pick(SOORT_NAMES);
+    const k = SOORTE[name];
+    const roll = Math.random();
+    const steps = [`'n ${name} (${k.en}): ${k.does}.`];
+    if (roll < 0.5) {
+      return mc(`Watter woordsoort is die vet woord? ${pick(k.says)}`, name, others(SOORT_NAMES, name), { lang: 'af-ZA', hint: `Noun, verb, adjective, pronoun, adverb, preposition, conjunction or number word: what is this word doing in the sentence?`, steps });
+    }
+    if (roll < 0.75) {
+      return mc(`Watter woordsoort is dit: ${k.does}?`, name, others(SOORT_NAMES, name), { lang: 'af-ZA', hint: `Think of the mind map with Woordsoorte in the middle.`, steps });
+    }
+    return mc(`What is "${name}" in English?`, k.en, others(SOORT_NAMES.map((n) => SOORTE[n].en), k.en), { lang: 'af-ZA', hint: `Think of the mind map with Woordsoorte in the middle.`, steps });
+  };
+  S.kaf_soort_reels = bank([
+    { q: `Watter woord is 'n hulpwerkwoord?`, a: `moet`, w: [`hardloop`, `mooi`, `onder`], why: `Hulpwerkwoorde: is, kan, wil, moet, sal, het.` },
+    { q: `Watter woord is 'n hulpwerkwoord?`, a: `sal`, w: [`speel`, `groot`, `en`], why: `Hulpwerkwoorde: is, kan, wil, moet, sal, het.` },
+    { q: `Which group of voegwoorde is on your mind map as Groep 1?`, a: `en, maar, want`, w: [`dus, daarom`, `omdat, sodat`, `op, onder, langs`], why: `Groep 1: en, maar, want. Groep 2: dus, daarom. Groep 3: omdat, sodat.` },
+    { q: `Which voegwoorde are in Groep 2?`, a: `dus, daarom`, w: [`en, maar, want`, `omdat, sodat`, `hy, sy, hulle`], why: `Groep 1: en, maar, want. Groep 2: dus, daarom. Groep 3: omdat, sodat.` },
+    { q: `Which voegwoorde are in Groep 3?`, a: `omdat, sodat`, w: [`en, maar, want`, `dus, daarom`, `een, twee, derde`], why: `Groep 1: en, maar, want. Groep 2: dus, daarom. Groep 3: omdat, sodat.` },
+    { q: `Watter vraag vra jy om die selfstandige naamwoord te vind?`, a: `Wie? of Wat?`, w: [`Wanneer?`, `Hoe?`, `Hoekom?`], why: `Die seun skop die bal. Wie skop? Die seun. Wat skop hy? Die bal.` },
+    { q: `Watter vraag vra jy om die byvoeglike naamwoord te vind?`, a: `Watter? of Hoe lyk dit?`, w: [`Wat doen?`, `Waar?`, `Wanneer?`], why: `Watter bal? Die groot bal.` },
+    { q: `Watter vraag vra jy om die werkwoord te vind?`, a: `Wat doen?`, w: [`Wie?`, `Waar?`, `Watter?`], why: `Wat doen die seun? Hy skop.` },
+    { q: `Watter drie vrae antwoord 'n bywoord?`, a: `Wanneer? Waar? Hoe?`, w: [`Wie? Wat? Watter?`, `Wat doen? Wie? Wat?`, `Hoekom? Wie? Hoeveel?`], why: `'n Bywoord sê meer van die werkwoord: wanneer, waar en hoe.` },
+    { q: `"Mia speel. Sy lag." Watter naamwoord vervang "Sy"?`, a: `Mia`, w: [`speel`, `lag`, `ons`], why: `Sy neem die plek van Mia in.` },
+    { q: `Which word kind describes a noun?`, a: `byvoeglike naamwoord`, w: [`bywoord`, `voorsetsel`, `voegwoord`], why: `Die mooi hond: mooi beskryf die hond.` },
+    { q: `Which word kind tells you more about a verb?`, a: `bywoord`, w: [`byvoeglike naamwoord`, `voornaamwoord`, `telwoord`], why: `Hy hardloop vinnig: vinnig sê hoe hy hardloop.` },
+    { tf: true, q: `True or false: "buite" and "vinnig" are both bywoorde.`, why: `Buite sê waar, en vinnig sê hoe.` },
+    { tf: false, q: `True or false: "hy, sy, hulle" are selfstandige naamwoorde.`, why: `Dit is voornaamwoorde. Hulle staan in die plek van 'n naamwoord.` },
+    { q: `Name of a person, animal, place or thing: selfstandige ___.`, t: [`naamwoord`], why: `Seun, hond en skool is selfstandige naamwoorde.`, h: `It ends in "woord".` },
+    { q: `'n Doen-woord of aksie-woord is 'n ___.`, t: [`werkwoord`], why: `Hardloop, eet en speel is werkwoorde.`, h: `It's what you do at work, plus "woord".` },
+  ], AF);
+
+  // ---------- SV1TOMPv2I ----------
+  const TOMP = [
+    ['Die ryer', 'was', 'vandag', 'sy fiets', 'vinnig', 'by die huis'],
+    ['Ma', 'bak', 'môre', `'n koek`, 'stadig', 'in die kombuis'],
+    ['Ons', 'eet', 'nou', 'ons kos', 'stil', 'by die tafel'],
+    ['Die seun', 'skop', 'later', 'die bal', 'hard', 'op die veld'],
+    ['Thabo', 'lees', 'vanaand', `'n boek`, 'rustig', 'in sy kamer'],
+    ['Die kinders', 'bou', 'vandag', `'n sandkasteel`, 'versigtig', 'op die strand'],
+    ['Pa', 'vang', 'môre', 'vis', 'geduldig', 'by die rivier'],
+    ['Lerato', 'skryf', 'nou', `'n brief`, 'netjies', 'in haar kamer'],
+  ];
+  const line = (parts) => `${parts.filter(Boolean).join(' ')}.`;
+  const TOMP_NAMES = { 2: ['Tyd', 'Wanneer?'], 3: ['Voorwerp', 'Wie of wat?'], 4: ['Manier', 'Hoe?'], 5: ['Plek', 'Waar?'] };
+  S.kaf_tomp = () => {
+    const [s, v, t, o, m, p] = pick(TOMP);
+    const parts = [s, v, t, o, m, p];
+    const right = line(parts);
+    const steps = [`S ${s}, V1 ${v}, T ${t}, O ${o}, M ${m}, P ${p}.`];
+    if (Math.random() < 0.45) {
+      return mc('Watter sin is in die regte volgorde?', right, [line([s, v, p, o, m, t]), line([s, v, o, t, p, m]), line([s, v, m, p, t, o])], { lang: 'af-ZA', hint: 'After the verb: Tyd, Voorwerp, Manier, Plek. T O M P.', steps });
+    }
+    const i = pick([2, 3, 4, 5]);
+    const [name, ask] = TOMP_NAMES[i];
+    return mc(`${right} Watter deel is die ${name} (${ask})?`, parts[i], [2, 3, 4, 5].filter((n) => n !== i).map((n) => parts[n]), { lang: 'af-ZA', hint: `${name} answers the question ${ask}`, steps });
+  };
+  const TWEE = [
+    ['Die ryer', 'wil', 'môre', 'op die baan', 'oefen'],
+    ['Ons', 'kan', 'vandag', 'in die see', 'swem'],
+    ['Thabo', 'moet', 'nou', 'in sy kamer', 'lees'],
+    ['Lerato', 'sal', 'later', 'by die huis', 'bak'],
+    ['Die kinders', 'wil', 'vanmiddag', 'op die strand', 'speel'],
+    ['Pa', 'moet', 'môre', 'by die werk', 'wees'],
+  ];
+  S.kaf_v1v2 = () => {
+    const [s, v1, t, p, inf] = pick(TWEE);
+    const sin = line([s, v1, t, p, inf]);
+    const steps = [`S ${s}, V1 ${v1}, T ${t}, P ${p}, I ${inf}.`, `The helping verb stays second, and the full verb goes right to the end.`];
+    if (Math.random() < 0.5) {
+      return mc(`${sin} Watter woord is die eerste werkwoord (V1)?`, v1, [inf, t, s], { lang: 'af-ZA', hint: 'V1 comes right after the subject.', steps });
+    }
+    if (Math.random() < 0.5) {
+      return mc(`${sin} Watter woord is die infinitief (I)?`, inf, [v1, t, s], { lang: 'af-ZA', hint: 'The full verb goes right at the end.', steps });
+    }
+    return mc('Watter sin is in die regte volgorde?', sin, [line([s, v1, inf, t, p]), line([s, inf, t, p, v1]), line([s, v1, p, t, inf])], { lang: 'af-ZA', hint: 'S V1 T P I: the full verb goes right at the end.', steps });
+  };
+  S.kaf_tomp_reels = bank([
+    { q: `In SV1TOMPv2I, what does the S stand for?`, a: `Subjek (wie?)`, w: [`Sin (wat?)`, `Sal (wanneer?)`, `Stadig (hoe?)`], why: `S = Subjek. Wie doen dit?` },
+    { q: `In SV1TOMPv2I, what does the T stand for?`, a: `Tyd (wanneer?)`, w: [`Tafel (waar?)`, `Twee (hoeveel?)`, `Taal (wat?)`], why: `T = Tyd: vandag, môre, nou.` },
+    { q: `In SV1TOMPv2I, what does the O stand for?`, a: `Voorwerp (wie of wat?)`, w: [`Oor (waar?)`, `Ook (hoe?)`, `Ons (wie?)`], why: `O = Voorwerp: haar kos, die bal.` },
+    { q: `In SV1TOMPv2I, what does the M stand for?`, a: `Manier of wyse (hoe?)`, w: [`Môre (wanneer?)`, `Mense (wie?)`, `Moet (wat?)`], why: `M = Manier: vinnig, stadig, mooi.` },
+    { q: `In SV1TOMPv2I, what does the P stand for?`, a: `Plek (waar?)`, w: [`Pa (wie?)`, `Praat (hoe?)`, `Pas (wanneer?)`], why: `P = Plek: buite, by die tafel.` },
+    { q: `In SV1TOMPv2I, what does the I stand for?`, a: `Infinitief, die volle werkwoord`, w: [`In die, 'n voorsetsel`, `Iemand, 'n voornaamwoord`, `Iets, 'n selfstandige naamwoord`], why: `Mia wil môre buite speel: "speel" is die infinitief.` },
+    { q: `Which letter comes straight after the S and V1?`, a: `T`, w: [`O`, `M`, `P`], why: `S V1 T O M P V2 I.` },
+    { q: `Which order is right?`, a: `T O M P`, w: [`T M O P`, `O T M P`, `P M O T`], why: `Tyd, Voorwerp, Manier, Plek.` },
+    { q: `Which comes first in the sentence: when it happens, or where it happens?`, a: `Wanneer, dan waar`, w: [`Waar, dan wanneer`, `Dit maak nie saak nie`, `Waar kom nooit voor nie`], why: `T comes before P: Ek swem môre in die see.` },
+    { q: `Watter vraagwoord vra na die Tyd?`, a: `Wanneer?`, w: [`Waar?`, `Hoe?`, `Wie?`], why: `T = Wanneer?` },
+    { q: `Watter vraagwoord vra na die Plek?`, a: `Waar?`, w: [`Wanneer?`, `Hoe?`, `Wat?`], why: `P = Waar?` },
+    { q: `Watter vraagwoord vra na die Manier?`, a: `Hoe?`, w: [`Wanneer?`, `Waar?`, `Wie?`], why: `M = Hoe?` },
+    { q: `Watter vraagwoord vra na die Subjek?`, a: `Wie?`, w: [`Wanneer?`, `Waar?`, `Hoe?`], why: `S = Wie?` },
+    { tf: true, q: `True or false: in "Ek is by die see om te swem", "om te swem" answers Hoekom?`, why: `Hoekom is jy by die see? Om te swem.` },
+    { q: `Tyd answers the question ___?`, t: [`wanneer`], why: `T = Wanneer? Vandag, môre, nou.`, h: `It's the Afrikaans word for "when".` },
+    { q: `Plek answers the question ___?`, t: [`waar`], why: `P = Waar? Buite, by die tafel.`, h: `It's the Afrikaans word for "where".` },
+  ], AF);
+  // Gister needs the past and Môre the future.
+  const TENSE = [
+    { now: `Die ryer woon by die baan.`, past: `Gister het die ryer by die baan gewoon.`, fut: `Môre sal die ryer by die baan woon.`, hint: 'Normal verb: het ... ge-verb, and sal ... verb.' },
+    { now: `Thabo sit in die kombuis.`, past: `Gister het Thabo in die kombuis gesit.`, fut: `Môre sal Thabo in die kombuis sit.`, hint: 'Normal verb: het ... ge-verb, and sal ... verb.' },
+    { now: `Die fiets is baie vuil.`, past: `Gister was die fiets baie vuil.`, fut: `Môre sal die fiets baie vuil wees.`, hint: 'is becomes was, and sal ... wees.' },
+    { now: `Die helm is op die rak.`, past: `Gister was die helm op die rak.`, fut: `Môre sal die helm op die rak wees.`, hint: 'is becomes was, and sal ... wees.' },
+    { now: `Die seun het 'n nuwe fiets.`, past: `Gister het die seun 'n nuwe fiets gehad.`, fut: `Môre sal die seun 'n nuwe fiets hê.`, hint: `het becomes het ... gehad, and sal ... hê.` },
+    { now: `Ma het 'n groot bakkie.`, past: `Gister het ma 'n groot bakkie gehad.`, fut: `Môre sal ma 'n groot bakkie hê.`, hint: `het becomes het ... gehad, and sal ... hê.` },
+    { now: `Ons moet die fiets was.`, past: `Gister moes ons die fiets was.`, fut: `Môre sal ons die fiets moet was.`, hint: 'moet becomes moes, and sal ... moet was.' },
+    { now: `Ek wil 'n boek lees.`, past: `Gister wou ek 'n boek lees.`, fut: `Môre sal ek 'n boek wil lees.`, hint: 'wil becomes wou, and sal ... wil lees.' },
+    { now: `Die hond kan in die tuin speel.`, past: `Gister kon die hond in die tuin speel.`, fut: `Môre sal die hond in die tuin kan speel.`, hint: 'kan becomes kon, and sal ... kan speel.' },
+  ];
+  S.kaf_tyd = () => {
+    const t = pick(TENSE);
+    const low = (s) => (/^(Die|Ma|Ek|Ons)\b/.test(s) ? s[0].toLowerCase() + s.slice(1) : s);
+    if (Math.random() < 0.5) {
+      const r = t.past;
+      const wrong = [t.fut.replace('Môre', 'Gister'), `Gister ${low(t.now)}`, `Gister het ${low(t.now)}`];
+      return mc(`Begin met "Gister": ${t.now}`, r, wrong, { lang: 'af-ZA', hint: t.hint, steps: [r, 'Gister means the past tense.'] });
+    }
+    const r = t.fut;
+    const wrong = [t.past.replace('Gister', 'Môre'), `Môre ${low(t.now)}`, `Môre sal ${low(t.now)}`];
+    return mc(`Begin met "Môre": ${t.now}`, r, wrong, { lang: 'af-ZA', hint: t.hint, steps: [r, 'Môre means the future tense.'] });
+  };
+
+  // ---------- Bywoorde: the verb is always one of the wrong answers, because the two are easy to mix up ----------
+  const BYW = [
+    ['Die ryer oefen vandag op die baan.', 'vandag', 'tyd', 'oefen'], ['Ons ry môre strand toe.', 'môre', 'tyd', 'ry'], ['Oupa drink altyd koffie.', 'altyd', 'tyd', 'drink'], ['Die bus kom later.', 'later', 'tyd', 'kom'], ['Thabo eet nou sy toebroodjie.', 'nou', 'tyd', 'eet'], ['Ek was gister my fiets.', 'gister', 'tyd', 'was'], ['Hulle wen soms die wedren.', 'soms', 'tyd', 'wen'], ['Ons swem jaarliks in die see.', 'jaarliks', 'tyd', 'swem'], ['Ek sien binnekort my niggie.', 'binnekort', 'tyd', 'sien'], ['Pa werk gereeld by die hawe.', 'gereeld', 'tyd', 'werk'],
+    ['Die honde slaap buite.', 'buite', 'plek', 'slaap'], ['Die ryer wag hier.', 'hier', 'plek', 'wag'], ['Die fiets staan daar.', 'daar', 'plek', 'staan'], ['Sipho werk binne.', 'binne', 'plek', 'werk'], ['Ons soek oral na die sleutel.', 'oral', 'plek', 'soek'], ['My oom woon naby.', 'naby', 'plek', 'woon'], ['Die meisie draai links.', 'links', 'plek', 'draai'], ['Die ryer bly tuis.', 'tuis', 'plek', 'bly'], ['Die seun gooi die bal ver.', 'ver', 'plek', 'gooi'],
+    ['Die ryer ry vinnig.', 'vinnig', 'wyse', 'ry'], ['Die skilpad stap stadig.', 'stadig', 'wyse', 'stap'], ['Die baba slaap rustig.', 'rustig', 'wyse', 'slaap'], ['Die kinders werk netjies.', 'netjies', 'wyse', 'werk'], ['Die meisie praat saggies.', 'saggies', 'wyse', 'praat'], ['Die enjin brul hard.', 'hard', 'wyse', 'brul'], ['Lerato klim versigtig oor die rotse.', 'versigtig', 'wyse', 'klim'], ['Die span werk fluks.', 'fluks', 'wyse', 'werk'], ['Oom Piet wag geduldig by die hek.', 'geduldig', 'wyse', 'wag'], ['Die seun skryf duidelik.', 'duidelik', 'wyse', 'skryf'],
+  ];
+  const BYW_ASK = { tyd: 'Wanneer?', plek: 'Waar?', wyse: 'Hoe?' };
+  S.kaf_byw = () => {
+    const [sin, bw, soort, ww] = pick(BYW);
+    const steps = [`"${ww}" is die werkwoord. "${bw}" sê ${BYW_ASK[soort]} Dit is 'n bywoord van ${soort}.`];
+    const roll = Math.random();
+    if (roll < 0.45) {
+      const words = sin.replace('.', '').split(' ').filter((w) => w !== bw && w !== ww && !/^(die|'n)$/i.test(w));
+      const wrong = [ww, ...shuffle(words).slice(0, 2), 'die'].filter((w, i, a) => a.indexOf(w) === i).slice(0, 3);
+      return mc(`Vind die bywoord: ${sin}`, bw, wrong, { lang: 'af-ZA', hint: `Find the verb first. The bywoord tells you when, where or how it happens. It is not the verb.`, steps });
+    }
+    if (roll < 0.8) return afChoice(`"${bw}" in: ${sin} Watter soort bywoord is dit?`, ['tyd', 'plek', 'wyse'], soort, 'Tyd says when (wanneer?). Plek says where (waar?). Wyse says how (hoe?).', steps);
+    return afChoice(`"${bw}" in: ${sin} Watter vraag antwoord die bywoord?`, ['Wanneer?', 'Waar?', 'Hoe?'], BYW_ASK[soort], 'Tyd says when (wanneer?). Plek says where (waar?). Wyse says how (hoe?).', steps);
+  };
+  S.kaf_byw_reels = bank([
+    { q: `What does a bywoord do?`, a: `It tells you more about the verb`, w: [`It is the verb in the sentence`, `It describes a noun in the sentence`, `It stands in for a noun in the sentence`], why: `Sy swem stadig: "stadig" tells you how she swims.` },
+    { q: `"Die kinders speel buite." Which is the bywoord, and why?`, a: `buite, because it says where they play`, w: [`speel, because it is what they do`, `kinders, because it says who plays`, `die, because it comes first`], why: `"Speel" is the verb. "Buite" tells you more about it.` },
+    { q: `"Die ou mense sit geduldig." Which is the bywoord?`, a: `geduldig`, w: [`sit`, `ou`, `mense`], why: `Sit is the verb. Geduldig says how they sit.` },
+    { q: `Which word is a bywoord van tyd?`, a: `jaarliks`, w: [`buite`, `geduldig`, `hoog`], why: `Jaarliks means annually, so it says when.` },
+    { q: `Which word is a bywoord van plek?`, a: `naby`, w: [`altyd`, `nou-nou`, `hard`], why: `Naby means near, so it says where.` },
+    { q: `Which word is a bywoord van wyse?`, a: `geduldig`, w: [`altyd`, `buite`, `naby`], why: `Geduldig means patiently, so it says how.` },
+    { q: `Which word is a bywoord van tyd?`, a: `nou-nou`, w: [`naby`, `hoog`, `buite`], why: `Nou-nou means soon, so it says when.` },
+    { q: `What does "versigtig" mean?`, a: `carefully`, w: [`quickly`, `loudly`, `sometimes`], why: `Versigtig is a bywoord van wyse.` },
+    { q: `What does "partykeer" mean?`, a: `sometimes`, w: [`somewhere`, `carefully`, `far`], why: `Partykeer is a bywoord van tyd.` },
+    { q: `What does "êrens" mean?`, a: `somewhere`, w: [`sometimes`, `always`, `soon`], why: `Êrens is a bywoord van plek.` },
+    { q: `What does "altyd" mean?`, a: `always`, w: [`annually`, `soon`, `near`], why: `Altyd is a bywoord van tyd.` },
+    { q: `Which goes best? Die kinders stap ___ oor die warm sand.`, a: `vinnig`, w: [`groot`, `tafel`, `hulle`], why: `Vinnig tells you how they walk. The others aren't bywoorde.` },
+    { q: `Which goes best? Ons kom ___ by die huis aan.`, a: `later`, w: [`mooi`, `boek`, `onder`], why: `Later tells you when you arrive.` },
+    { tf: false, q: `True or false: in "Die seun hardloop vinnig", the bywoord is "hardloop".`, why: `Hardloop is the verb. Vinnig is the bywoord: it says how he runs.` },
+    { tf: true, q: `True or false: a bywoord van plek answers Waar?`, why: `Hier, daar, buite, binne.` },
+    { q: `A bywoord that tells you HOW is a bywoord van ___.`, t: [`wyse`], why: `Wyse: vinnig, stadig, mooi.`, h: `Tyd, plek or wyse?` },
+    { q: `A bywoord that tells you WHEN is a bywoord van ___.`, t: [`tyd`], why: `Tyd: vandag, môre, altyd.`, h: `Tyd, plek or wyse?` },
+    { q: `A bywoord that tells you WHERE is a bywoord van ___.`, t: [`plek`], why: `Plek: hier, daar, buite.`, h: `Tyd, plek or wyse?` },
+  ], AF);
+
+  // ---------- Byvoeglike naamwoorde ----------
+  const BYV_FIND = [[`Die vinnige ryer wen die wedren.`, 'vinnige', 'ryer'], [`Ek ry op 'n ou fiets.`, 'ou', 'fiets'], [`Die geel bakkie staan by die baan.`, 'geel', 'bakkie'], [`Ons sien 'n klein skilpad.`, 'klein', 'skilpad'], [`Die sagte sand is warm.`, 'sagte', 'sand'], [`Sy dra 'n blou helm.`, 'blou', 'helm'], [`Die groot brander breek op die strand.`, 'groot', 'brander'], [`Ek eet 'n sappige appel.`, 'sappige', 'appel']];
+  S.kaf_byv_vind = () => {
+    const [sin, byv, sn] = pick(BYV_FIND);
+    const rest = sin.replace('.', '').split(' ').filter((w) => w !== byv && w !== sn && !/^(die|'n)$/i.test(w));
+    return mc(`Vind die byvoeglike naamwoord: ${sin}`, byv, [sn, ...shuffle(rest).slice(0, 2)], { lang: 'af-ZA', hint: 'It describes a noun. Find the thing first, then the word that describes it.', steps: [`"${byv}" beskryf die ${sn}.`] });
+  };
+  const BYV_E = [
+    ['rustig', 'rustige', 'kind', 'g'], ['sappig', 'sappige', 'perske', 'g'], ['vinnig', 'vinnige', 'motor', 'g'], ['modderig', 'modderige', 'baan', 'g'], ['moeilik', 'moeilike', 'som', 'lik'], ['lelik', 'lelike', 'dier', 'lik'], ['vriendelik', 'vriendelike', 'man', 'lik'], ['breed', 'breë', 'pad', 'x'], ['goud', 'goue', 'medalje', 'x'], ['goed', 'goeie', 'ryer', 'x'], ['leeg', 'leë', 'bottel', 'x'], ['doof', 'dowe', 'hond', 'x'], ['oud', 'ou', 'bakkie', 'x'], ['nuut', 'nuwe', 'helm', 'x'], ['hoog', 'hoë', 'bult', 'x'],
+  ];
+  const BYV_RULE = { g: 'More than one syllable and ending in -g: add -e.', lik: 'Ending in -lik: add -e.', x: 'This one changes: learn it by heart.' };
+  S.kaf_byv_vorm = () => {
+    const [base, form, sn, kind] = pick(BYV_E);
+    const steps = [BYV_RULE[kind], `Die ${sn} is ${base}. Dit is 'n ${form} ${sn}.`];
+    const q = `Die ${sn} is ${base}. Dit is 'n ___ ${sn}.`;
+    if (Math.random() < 0.5) return { kind: 'word', q, accept: [form], correct: form, strict: true, lang: 'af-ZA', hint: BYV_RULE[kind], steps };
+    return mc(q, form, [base, `${base}e`, `${base}er`, `${base}ste`], { lang: 'af-ZA', hint: BYV_RULE[kind], steps });
+  };
+  const STERK = [['rooi', 'bloedrooi'], ['soet', 'stroopsoet'], ['gewoon', 'doodgewoon'], ['oud', 'stokoud'], ['nuut', 'splinternuut'], ['groen', 'grasgroen'], ['klein', 'piepklein']];
+  S.kaf_sterk = () => {
+    const [a, b] = pick(STERK);
+    const steps = [`${a} word ${b}. Dit maak die woord sterker.`];
+    if (Math.random() < 0.5) return mc(`Wat is die intensiewe vorm van "${a}"?`, b, others(STERK.map((x) => x[1]), b), { lang: 'af-ZA', hint: 'A word in front makes it stronger: very, very red is blood-red.', steps });
+    return mc(`"${b}" is die intensiewe vorm van watter woord?`, a, others(STERK.map((x) => x[0]), a), { lang: 'af-ZA', hint: 'Find the plain word hiding at the end of it.', steps });
+  };
+  S.kaf_byv_reels = bank([
+    { q: `What is a byvoeglike naamwoord?`, a: `A word that describes a noun`, w: [`A word that says what is done`, `A word that joins two sentences`, `A word that stands in for a noun`], why: `Mooi, groot and geel all describe nouns.` },
+    { q: `Name one thing a byvoeglike naamwoord can tell you.`, a: `How something looks or feels`, w: [`When something happened`, `Where something happened`, `Who did the action`], why: `It can say how it looks or feels, how big, how many, and what kind.` },
+    { q: `In "Die seun is eerlik", where does the byvoeglike naamwoord stand?`, a: `After the noun`, w: [`Before the noun`, `At the start`, `There isn't one`], why: `Seun is the noun, and eerlik comes after it.` },
+    { q: `In "Dit is 'n eerlike seun", where does the byvoeglike naamwoord stand?`, a: `Before the noun`, w: [`After the noun`, `At the end`, `There isn't one`], why: `Eerlike comes before seun, and it gets an -e.` },
+    { q: `What must you often add when the word comes before the noun?`, a: `-e`, w: [`-ste`, `-er`, `-tjie`], why: `Rustig: 'n rustige klas. Moeilik: 'n moeilike som.` },
+    { q: `The water kook. What do you call it?`, a: `kokende water`, w: [`kook water`, `gekookte water`, `kooker water`], why: `Like -ing in English: boiling water is kokende water.` },
+    { q: `Die rivier vloei. What do you call it?`, a: `'n vloeiende rivier`, w: [`'n vloei rivier`, `'n vloeier rivier`, `'n gevloei rivier`], why: `Like -ing in English: a flowing river is 'n vloeiende rivier.` },
+    { q: `Die seun bou 'n groot, mooi sandkasteel. Which words describe the sandkasteel?`, a: `groot, mooi`, w: [`seun, bou`, `bou, sandkasteel`, `seun, groot`], why: `Groot and mooi are the byvoeglike naamwoorde.` },
+    { q: `What does "stokoud" mean?`, a: `very, very old`, w: [`very, very new`, `very, very sweet`, `very, very red`], why: `Oud becomes stokoud.` },
+    { q: `What does "stroopsoet" mean?`, a: `very, very sweet`, w: [`very, very old`, `very, very red`, `very, very new`], why: `Soet becomes stroopsoet.` },
+    { tf: true, q: `True or false: "bloedrooi" is stronger than "rooi".`, why: `That's what the intensiewe vorm does.` },
+    { q: `Die venster is breed. Dit is 'n ___ venster.`, t: [`breë`], why: `Breed becomes breë, with two dots on the e.`, h: `Drop the d, and add -e. Mind the two dots.` },
+    { q: `Die ring is goud. Dit is 'n ___ ring.`, t: [`goue`], why: `Goud becomes goue.`, h: `Drop the d, and add -e.` },
+    { q: `Die boek is goed. Dit is 'n ___ boek.`, t: [`goeie`], why: `Goed becomes goeie.`, h: `It's a special one: it starts with "goe" and ends in "ie".` },
+  ], AF);
+
+  // ---------- Trappe van vergelyking ----------
+  const TRAP = [
+    ['nuut', 'nuwer', 'nuutste', 'new'], ['baie', 'meer', 'meeste', 'many'], ['bang', 'banger', 'bangste', 'scared'], ['skaam', 'skamer', 'skaamste', 'shy'], ['groot', 'groter', 'grootste', 'big'], ['goed', 'beter', 'beste', 'good'], ['koud', 'kouer', 'koudste', 'cold'], ['nat', 'natter', 'natste', 'wet'], ['vinnig', 'vinniger', 'vinnigste', 'fast'], ['oud', 'ouer', 'oudste', 'old'], ['klein', 'kleiner', 'kleinste', 'small'], ['laat', 'later', 'laatste', 'late'],
+    ['hoog', 'hoër', 'hoogste', 'high'], ['laag', 'laer', 'laagste', 'low'], ['warm', 'warmer', 'warmste', 'warm'], ['ver', 'verder', 'verste', 'far'], ['vaal', 'valer', 'vaalste', 'dull'], ['helder', 'helderder', 'helderste', 'bright'], ['min', 'minder', 'minste', 'few'], ['lank', 'langer', 'langste', 'tall'], ['glad', 'gladder', 'gladste', 'smooth'], ['mooi', 'mooier', 'mooiste', 'pretty'], ['dun', 'dunner', 'dunste', 'thin'], ['duur', 'duurder', 'duurste', 'expensive'], ['maklik', 'makliker', 'maklikste', 'easy'], ['lekker', 'lekkerder', 'lekkerste', 'nice'],
+  ];
+  const TRAP_SIN = [[`Die blou bakkie is ___ as die rooi bakkie.`, 'groot', 1], [`Dit is die ___ fiets by die baan.`, 'nuut', 2], [`Die see is ___ as gister.`, 'koud', 1], [`Sy is die ___ meisie in die klas.`, 'skaam', 2], [`Die ryer ry ___ as sy broer.`, 'vinnig', 1], [`Dit is die ___ handdoek in die huis.`, 'nat', 2], [`My fiets is ___ as jou fiets.`, 'oud', 1], [`Dit is die ___ skilpad wat ek nog gesien het.`, 'klein', 2], [`Ek is ___ as my maat.`, 'bang', 1], [`Dit is die ___ tyd wat hy nog gery het.`, 'goed', 2], [`Ons het ___ water as gister.`, 'baie', 1], [`Hy kom altyd die ___ by die skool aan.`, 'laat', 2], [`Hierdie bult is ___ as daardie bult.`, 'hoog', 1], [`Vandag is die ___ dag van die jaar.`, 'warm', 2]];
+  const trapWrongs = (w) => [`${w[0]}er`, `${w[0]}ste`, w[1], w[2], `${w[1]}ste`, `meer ${w[0]}`].filter((x, i, a) => a.indexOf(x) === i);
+  S.kaf_trap = () => {
+    const w = pick(TRAP);
+    const i = pick([1, 2]);
+    const name = i === 1 ? 'vergrotende' : 'oortreffende';
+    const steps = [`${w[0]}, ${w[1]}, ${w[2]} (${w[3]}).`];
+    const hint = i === 1 ? 'Vergrotende trap: comparing two, usually -er.' : 'Oortreffende trap: the most of all, usually -ste.';
+    const q = `Wat is die ${name} trap van "${w[0]}"?`;
+    if (Math.random() < 0.6) return { kind: 'word', q, accept: [w[i]], correct: w[i], strict: true, lang: 'af-ZA', hint, steps };
+    return mc(q, w[i], trapWrongs(w), { lang: 'af-ZA', hint, steps });
+  };
+  S.kaf_trap_sin = () => {
+    const [sin, stem, i] = pick(TRAP_SIN);
+    const w = TRAP.find((x) => x[0] === stem);
+    const clue = i === 1 ? 'as' : 'die';
+    const hint = 'See "as"? Use -er. See "die" in front? Use -ste.';
+    const steps = [`The clue is "${clue}".`, `${w[0]}, ${w[1]}, ${w[2]}.`];
+    const q = `${sin} (${stem})`;
+    if (Math.random() < 0.5) return { kind: 'word', q, accept: [w[i]], correct: w[i], strict: true, lang: 'af-ZA', hint, steps };
+    return mc(q, w[i], trapWrongs(w), { lang: 'af-ZA', hint, steps });
+  };
+  S.kaf_trap_reels = bank([
+    { q: `What is the stellende trap?`, a: `The ordinary form of the word`, w: [`Comparing two things`, `One stands above all the others`, `A word that makes it very strong`], why: `Klein is the stellende trap.` },
+    { q: `What is the vergrotende trap?`, a: `Comparing two things`, w: [`The ordinary form of the word`, `One stands above all the others`, `A word that makes it very strong`], why: `Die kat is kleiner as die hond.` },
+    { q: `What is the oortreffende trap?`, a: `One stands above all the others`, w: [`The ordinary form of the word`, `Comparing two things`, `A word that makes it very strong`], why: `Die muis is die kleinste van die drie diere.` },
+    { q: `Which clue word goes with the vergrotende trap?`, a: `as`, w: [`die`, `en`, `op`], why: `Sien jy "as", eindig die woord gewoonlik op -er.` },
+    { q: `Which clue word goes with the oortreffende trap?`, a: `die`, w: [`as`, `en`, `op`], why: `Sien jy "die", eindig die woord gewoonlik op -ste.` },
+    { q: `Watch the spelling. Which row is right?`, a: `nat, natter, natste`, w: [`nat, nater, natste`, `nat, natter, nattste`, `nat, nater, nattste`], why: `Natter has two t's and natste has one.` },
+    { q: `Watch the spelling. Which row is right?`, a: `groot, groter, grootste`, w: [`groot, grooter, grootste`, `groot, groter, grotste`, `groot, grooter, grotste`], why: `Groter loses an o, and grootste keeps both.` },
+    { q: `Which row is right?`, a: `goed, beter, beste`, w: [`goed, goeder, goedste`, `goed, beter, goedste`, `goed, goeder, beste`], why: `Goed changes completely. There's no "goedste".` },
+    { q: `Which row is right?`, a: `baie, meer, meeste`, w: [`baie, baier, baiste`, `baie, meer, baiste`, `baie, baier, meeste`], why: `Baie changes completely. There's no "baier".` },
+    { q: `Which row is right?`, a: `koud, kouer, koudste`, w: [`koud, kouder, koudste`, `koud, kouer, kouste`, `koud, kouder, kouste`], why: `Kouer loses the d, and koudste keeps it.` },
+    { q: `Which row is right?`, a: `oud, ouer, oudste`, w: [`oud, ouder, oudste`, `oud, ouer, ouste`, `oud, ouder, ouste`], why: `Ouer loses the d, and oudste keeps it.` },
+    { q: `What do you do with a longer word like "opgewonde"?`, a: `meer opgewonde, mees opgewonde`, w: [`opgewonder, opgewondeste`, `opgewonde, opgewondste`, `meer opgewonder, mees opgewondeste`], why: `Some long words take meer and mees in front.` },
+    { q: `Which is the right vergrotende trap of "doof" (deaf)?`, a: `dower`, w: [`doofer`, `doower`, `doofder`], why: `The f changes to w: doof, dower, doofste.` },
+    { tf: false, q: `True or false: you say "Hy is die groter seun in die klas".`, why: `"Die" is the clue for -ste: Hy is die grootste seun in die klas.` },
+    { tf: true, q: `True or false: "Ek is ouer as my broer" is correct.`, why: `"As" is the clue for -er.` },
+  ], AF);
+
+  // ---------- Voorsetsels ----------
+  S.kaf_vs = bank([
+    { q: `Oupa kook pap ___ die stoof.`, a: `op`, w: [`aan`, `vir`, `per`], why: `Op die stoof: on the stove.` },
+    { q: `Die kat slaap ___ die bed. (under)`, a: `onder`, w: [`op`, `oor`, `per`], why: `Under = onder.` },
+    { q: `Ons is lief ___ ons oupa.`, a: `vir`, w: [`aan`, `van`, `op`], why: `Lief vir: fond of.` },
+    { q: `Die hond blaf ___ die ryers.`, a: `vir`, w: [`aan`, `op`, `per`], why: `Blaf vir: bark at.` },
+    { q: `Ons gaan ___ bus strand toe.`, a: `per`, w: [`vir`, `aan`, `van`], why: `Per bus: by bus. Per motor: by car.` },
+    { q: `Sipho hou baie ___ fietsry.`, a: `van`, w: [`vir`, `aan`, `op`], why: `Hou van: like.` },
+    { q: `Die gesin sit ___ tafel en eet.`, a: `aan`, w: [`vir`, `per`, `van`], why: `Aan tafel: at the table.` },
+    { q: `Die arend vlieg ___ die berg. (over)`, a: `oor`, w: [`aan`, `per`, `om`], why: `Over = oor.` },
+    { q: `Daar is 'n muur ___ die huis. (around)`, a: `om`, w: [`op`, `per`, `aan`], why: `Around = om.` },
+    { q: `Die visse swem ___ die rivier.`, a: `in`, w: [`per`, `vir`, `om`], why: `In die rivier: in the river.` },
+    { q: `Die ryer sit ___ sy fiets.`, a: `op`, w: [`per`, `vir`, `aan`], why: `Op sy fiets: on his bike.` },
+    { q: `Sy sit ___ my. (next to)`, a: `langs`, w: [`onder`, `om`, `per`], why: `Next to = langs.` },
+    { q: `Daar lê seegras ___ die rotse. (between)`, a: `tussen`, w: [`langs`, `onder`, `oor`], why: `Between = tussen.` },
+    { q: `Die boom staan ___ die huis. (behind)`, a: `agter`, w: [`voor`, `onder`, `tussen`], why: `Behind = agter.` },
+    { q: `Die motor staan ___ die hek. (in front of)`, a: `voor`, w: [`agter`, `onder`, `tussen`], why: `In front of = voor.` },
+    { q: `What does "onder" mean?`, a: `under`, w: [`over`, `next to`, `behind`], why: `Die kat is onder die bed.` },
+    { q: `What does "oor" mean?`, a: `over`, w: [`under`, `around`, `between`], why: `Die arend vlieg oor die berg.` },
+    { q: `What does "langs" mean?`, a: `next to`, w: [`between`, `behind`, `around`], why: `Die hond sit langs my.` },
+    { q: `What does "tussen" mean?`, a: `between`, w: [`next to`, `in front of`, `over`], why: `Tussen die rotse.` },
+    { q: `What does "agter" mean?`, a: `behind`, w: [`in front of`, `under`, `over`], why: `Agter die huis.` },
+    { q: `What does "om" mean in "die muur is om die huis"?`, a: `around`, w: [`over`, `behind`, `next to`], why: `The wall goes around the house.` },
+    { q: `Under the table in Afrikaans: ___ die tafel.`, t: [`onder`], why: `Onder die tafel.`, h: `It starts with "o".` },
+    { q: `Next to the sea in Afrikaans: ___ die see.`, t: [`langs`], why: `Langs die see.`, h: `It starts with "l".` },
+    { q: `Over the sea in Afrikaans: ___ die see.`, t: [`oor`], why: `Oor die see.`, h: `It starts with "o", and it's a word for part of your head too.` },
+    { q: `Ek hou ___ pizza. (like)`, t: [`van`], why: `Ek hou van pizza.`, h: `It's not vir.` },
+    { q: `Ek is lief ___ my hond. (fond of)`, t: [`vir`], why: `Ek is lief vir my hond.`, h: `It's not van.` },
+  ], AF);
+
+  // ---------- Teenoorgesteldes ----------
+  const TEEN = [['maer', 'vet'], ['hard', 'sag'], ['mooi', 'lelik'], ['vuil', 'skoon'], ['goedkoop', 'duur'], ['groot', 'klein'], ['oud', 'jonk'], ['lank', 'kort'], ['koud', 'warm'], ['vinnig', 'stadig'], ['nat', 'droog'], ['hoog', 'laag'], ['bo', 'onder'], ['voor', 'agter'], ['dag', 'nag'], ['seun', 'meisie'], ['lig', 'swaar'], ['sterk', 'swak'], ['moeilik', 'maklik']];
+  S.kaf_teen = () => {
+    const pair = pick(TEEN);
+    const [a, b] = Math.random() < 0.7 ? pair : [pair[1], pair[0]];
+    const q = `Wat is die teenoorgestelde van "${a}"?`;
+    const steps = [`${a} en ${b} is teenoorgesteldes.`];
+    const hint = `Teenoorgestelde means the opposite.`;
+    if (Math.random() < 0.5) return { kind: 'word', q, accept: b === 'jonk' ? ['jonk', 'jong'] : [b], correct: b, strict: true, lang: 'af-ZA', hint, steps };
+    return mc(q, b, others(TEEN.flat().filter((x) => x !== a), b), { lang: 'af-ZA', hint, steps });
+  };
+
+  // ---------- Voornaamwoorde and ontkenning ----------
+  S.kaf_vnw = bank([
+    { q: `Die kat lê by haar katjies. ___ is 'n goeie mama.`, a: `Sy`, w: [`Haar`, `Hulle`, `Ons`], why: `Sy is the one doing it. Haar is for something that belongs to her.` },
+    { q: `Thandi het 'n fiets. ___ ry elke dag.`, a: `Sy`, w: [`Haar`, `Hare`, `Hy`], why: `Sy ry elke dag.` },
+    { q: `Thandi het 'n fiets. Die fiets is ___.`, a: `hare`, w: [`sy`, `haar`, `hy`], why: `Dit behoort aan haar: die fiets is hare.` },
+    { q: `(You, more than one) ___ eet julle kos.`, a: `Julle`, w: [`Ons`, `Hulle`, `Jy`], why: `More than one "you" is julle.` },
+    { q: `Julle eet ___ kos.`, a: `julle`, w: [`ons`, `hulle`, `jou`], why: `Julle eet julle kos.` },
+    { q: `Die kos behoort aan julle. Die kos is ___.`, a: `julle s'n`, w: [`ons s'n`, `hulle s'n`, `jou s'n`], why: `The food belongs to you all: dit is julle s'n.` },
+    { q: `Dit is Sipho. ___ is 'n seun.`, a: `Hy`, w: [`Sy`, `Hulle`, `Ek`], why: `A boy is hy.` },
+    { q: `Dit is Sipho. Dit is ___ fiets.`, a: `sy`, w: [`hy`, `hulle`, `ons`], why: `Sy can mean she, and it can also mean his. Sy fiets: his bike.` },
+    { q: `Hulle was ___ fietse.`, a: `hulle`, w: [`ons`, `julle`, `my`], why: `Hulle was hulle fietse.` },
+    { q: `Die fietse behoort aan hulle. Die fietse is ___.`, a: `hulle s'n`, w: [`hulle`, `ons s'n`, `julle s'n`], why: `It belongs to them: dit is hulle s'n.` },
+    { q: `Ons speel in ___ tuin.`, a: `ons`, w: [`hulle`, `julle`, `haar`], why: `Ons speel in ons tuin.` },
+    { q: `What does "julle" mean?`, a: `you, more than one person`, w: [`they`, `we`, `you, one person`], why: `Jy is one person, and julle is more than one.` },
+    { q: `What does "hulle" mean?`, a: `they`, w: [`we`, `you, more than one person`, `she`], why: `Hulle speel: they play.` },
+    { q: `What does a voornaamwoord do?`, a: `It stands in the place of a noun`, w: [`It describes a noun`, `It joins two sentences`, `It says where something is`], why: `Mia speel. Sy lag. Sy neem die plek van Mia in.` },
+  ], AF);
+  const NEGS = [
+    [`Die seun was die bakkie.`, `Die seun was nie die bakkie nie.`, [`Die seun nie was die bakkie nie.`, `Die seun was die bakkie nie.`, `Die seun was nie die bakkie.`]],
+    [`Die ryer wen die wedren.`, `Die ryer wen nie die wedren nie.`, [`Die ryer nie wen die wedren nie.`, `Die ryer wen die wedren nie.`, `Die ryer wen nie die wedren.`]],
+    [`Ek kan op my fiets ry.`, `Ek kan nie op my fiets ry nie.`, [`Ek nie op my fiets ry nie.`, `Ek kan op my fiets nie ry.`, `Ek kan nie op my fiets ry.`]],
+    [`Ons wil vandag swem.`, `Ons wil nie vandag swem nie.`, [`Ons nie vandag swem nie.`, `Ons wil vandag nie swem.`, `Ons wil nie vandag swem.`]],
+    [`Daar is iemand op die baan.`, `Daar is niemand op die baan nie.`, [`Daar is nie iemand op die baan.`, `Daar is iemand nie op die baan nie.`, `Daar is niemand op die baan.`]],
+    [`Ek het iets in die bakkie gesien.`, `Ek het niks in die bakkie gesien nie.`, [`Ek het iets nie in die bakkie gesien nie.`, `Ek het niks in die bakkie gesien.`, `Ek het nie iets in die bakkie gesien.`]],
+    [`Die voël vlieg altyd oor die berge.`, `Die voël vlieg nooit oor die berge nie.`, [`Die voël vlieg nie altyd oor die berge.`, `Die voël vlieg nooit oor die berge.`, `Die voël nooit vlieg oor die berge nie.`]],
+    [`Die honde hardloop êrens rond.`, `Die honde hardloop nêrens rond nie.`, [`Die honde hardloop nie êrens rond.`, `Die honde hardloop nêrens rond.`, `Die honde nêrens hardloop rond nie.`]],
+    [`Iemand sien die ryers.`, `Niemand sien die ryers nie.`, [`Iemand sien nie die ryers.`, `Niemand sien die ryers.`, `Niemand nie sien die ryers nie.`]],
+  ];
+  S.kaf_nie = () => {
+    const [sin, right, wrong] = pick(NEGS);
+    return mc(`Skryf in die ontkenning: ${sin}`, right, wrong, { lang: 'af-ZA', hint: 'Two nies. Iemand becomes niemand, iets becomes niks, altyd becomes nooit, êrens becomes nêrens.', steps: [right, 'A negative sentence always ends with an extra "nie".'] });
+  };
+  S.kaf_nie_reels = bank([
+    { q: `What is the negative of "iemand" (someone)?`, a: `niemand`, w: [`niks`, `nooit`, `nêrens`], why: `Iemand becomes niemand.` },
+    { q: `What is the negative of "iets" (something)?`, a: `niks`, w: [`niemand`, `nooit`, `nêrens`], why: `Iets becomes niks.` },
+    { q: `What is the negative of "altyd" (always)?`, a: `nooit`, w: [`niks`, `niemand`, `nêrens`], why: `Altyd becomes nooit.` },
+    { q: `What is the negative of "êrens" (somewhere)?`, a: `nêrens`, w: [`niks`, `niemand`, `nooit`], why: `Êrens becomes nêrens.` },
+    { q: `Which is right?`, a: `Nee, die seun eet nie alles nie.`, w: [`Nee, die seun eet alles nie.`, `Nee, die seun nie eet alles nie.`, `Nee, die seun eet nie alles.`], why: `Nie goes after the verb, and another nie goes at the end.` },
+    { q: `Which is right?`, a: `Nee, die arend vlieg nooit oor die berge nie.`, w: [`Nee, die arend vlieg altyd oor die berge nie.`, `Nee, die arend vlieg nie altyd oor die berge.`, `Nee, die arend nooit vlieg oor die berge nie.`], why: `Altyd becomes nooit, and it ends with nie.` },
+    { q: `The negative of "iemand" is ___.`, t: [`niemand`], why: `Iemand becomes niemand.`, h: `Put "n" and an "i" at the front.` },
+    { q: `The negative of "altyd" is ___.`, t: [`nooit`], why: `Altyd becomes nooit.`, h: `It means never.` },
+  ], AF);
+
+  // ---------- Words and sounds ----------
+  const STRAND = [['umbrella', 'sambreel', 'Sonbreel'], ['lighthouse', 'vuurtoring', 'veerhane'], ['shells', 'skulpe', 'skelpe'], ['lifesaver', 'lewensredder', 'leerguard'], ['cool drinks', 'koeldranke', 'kool dranke'], ['swimming costume', 'baaikostuum', 'boot kostuem'], ['rock pool', 'rotspoel', 'rots poel'], ['sandwiches', 'toebroodjies', 'toebrotjies'], ['basket', 'mandjie', 'manjie'], ['carefully', 'versigtig', 'marsigtig'], ['barefoot', 'kaalvoet', 'cahvoet'], ['ships', 'skepe', 'skipe'], ['back', 'terug', 'terig'], ['between', 'tussen', 'tuisen'], ['next to', 'langs', 'banks'], ['excited', 'opgewonde', 'opgewonder'], ['seaweed', 'seewier', 'seewir'], ['waves', 'branders', 'brandes'], ['fishing rod', 'visstok', 'vis stok'], ['beach chair', 'seilstoel', 'sail stoel'], ['sun hat', 'sonhoed', 'son hoed']];
+  const WOORDE = [['clean', 'skoon'], ['farmer', 'boer'], ['cake', 'koek'], ['desk', 'lessenaar'], ['stove', 'stoof'], ['eyebrow', 'wenkbrou'], ['sandwich', 'toebroodjie'], ['thin', 'dun'], ['glasses', 'bril'], ['soft', 'sag'], ['throw', 'gooi'], ['catch', 'vang'], ['thirty-five', 'vyf-en-dertig'], ['twenty-six', 'ses-en-twintig']];
+  S.kaf_spel = () => {
+    const [en, af, slip] = pick(STRAND);
+    const steps = [`${en} = ${af}`];
+    const hint = 'Say it slowly, one sound at a time.';
+    if (Math.random() < 0.6) return { kind: 'word', q: `Skryf in Afrikaans: ${en}`, accept: [af], correct: af, strict: true, lang: 'af-ZA', hint, steps };
+    return mc(`Which is spelt correctly? (${en})`, af, [slip, `${af.slice(0, -1)}`, `${af[0]}${af.slice(2)}`], { lang: 'af-ZA', hint, steps });
+  };
+  S.kaf_woord = () => {
+    const [en, af] = pick(WOORDE);
+    const steps = [`${en} = ${af}`];
+    const hint = 'If you know it in English, picture it. Then say the Afrikaans word.';
+    if (Math.random() < 0.5) return { kind: 'word', q: `Skryf in Afrikaans: ${en}`, accept: [af, af.replace(/-/g, ' '), af.replace(/-/g, '')], correct: af, strict: true, lang: 'af-ZA', hint, steps };
+    return mc(`What is "${en}" in Afrikaans?`, af, others(WOORDE.map((x) => x[1]), af), { lang: 'af-ZA', hint, steps });
+  };
+  S.kaf_diere = bank([
+    { q: `'n Hen ___.`, a: `kekkel`, w: [`kraai`, `bulk`, `runnik`], why: `A hen clucks: 'n hen kekkel.` },
+    { q: `'n Haan ___.`, a: `kraai`, w: [`kekkel`, `balk`, `blêr`], why: `A rooster crows: 'n haan kraai.` },
+    { q: `'n Koei ___.`, a: `bulk`, w: [`balk`, `kraai`, `piep`], why: `A cow moos: 'n koei bulk.` },
+    { q: `'n Donkie ___.`, a: `balk`, w: [`bulk`, `runnik`, `kwaak`], why: `A donkey brays: 'n donkie balk.` },
+    { q: `'n Perd ___.`, a: `runnik`, w: [`balk`, `kraai`, `blêr`], why: `A horse neighs: 'n perd runnik.` },
+    { q: `'n Skaap ___.`, a: `blêr`, w: [`runnik`, `kraai`, `snork`], why: `A sheep bleats: 'n skaap blêr.` },
+    { q: `'n Eend en 'n padda ___.`, a: `kwaak`, w: [`kekkel`, `piep`, `blêr`], why: `Ducks and frogs both kwaak.` },
+    { q: `'n Kuiken en 'n muis ___.`, a: `piep`, w: [`kwaak`, `bulk`, `runnik`], why: `Chicks and mice both piep.` },
+    { q: `'n Vark ___.`, a: `snork`, w: [`piep`, `balk`, `kwaak`], why: `A pig grunts: 'n vark snork.` },
+    { q: `Die perd se baba is 'n ___.`, a: `vulletjie`, w: [`kalfie`, `lammetjie`, `kuiken`], why: `A foal is 'n vulletjie. A calf is 'n kalfie.` },
+    { q: `Die koei se baba is 'n ___.`, a: `kalfie`, w: [`vulletjie`, `lammetjie`, `kuiken`], why: `A calf is 'n kalfie.` },
+  ], AF);
+  const KLEIN = [['tafel', 'tafeltjie'], ['stoel', 'stoeltjie'], ['kat', 'katjie'], ['hond', 'hondjie'], ['tand', 'tandjie'], ['kombers', 'kombersie'], ['kussing', 'kussinkie'], ['bed', 'bedjie'], ['koppie', 'koppietjie'], ['piering', 'pierinkie'], ['eend', 'eendjie'], ['muis', 'muisie'], ['bok', 'bokkie'], ['volstruis', 'volstruisie']];
+  S.kaf_klein = () => {
+    const [a, b] = pick(KLEIN);
+    const q = `Wat is die verkleinwoord van "${a}"?`;
+    const steps = [`'n Klein ${a} is 'n ${b}.`];
+    const hint = 'Most words take -ie, -jie or -tjie. Listen to how the word ends.';
+    if (Math.random() < 0.6) return { kind: 'word', q, accept: [b], correct: b, strict: true, lang: 'af-ZA', hint, steps };
+    return mc(q, b, [`${a}ie`, `${a}jie`, `${a}tjie`, `${a}pie`], { lang: 'af-ZA', hint, steps });
+  };
+
+  pack.subjects.afrikaans = {
+    label: 'Afrikaans',
+    source: 'Taaltoets, Tuesday 10 November',
+    scope: 'The mind maps in die strand Taalboek',
+    note: 'Questions are new but follow the mind maps',
+    examSize: 25,
+    focus: ['kaf_byw', 'kaf_vs', 'kaf_teen'],
+    startWith: ['kaf_byw_sec', 'kaf_soort_sec', 'kaf_vs'],
+    topics: [
+      noted(RS.section('kaf_soort_sec', 0, 'Woordsoorte', 'The eight kinds of word', ['kaf_soort', 'kaf_soort_reels']), [`Selfstandige naamwoord: naam van 'n mens, dier, plek of ding.`, `Werkwoord: 'n doen-woord.`, `Byvoeglike naamwoord: beskryf 'n naamwoord.`, `Voornaamwoord: staan in die plek van 'n naamwoord.`, `Bywoord: sê hoe, wanneer of waar.`, `Voorsetsel: wys plek. Voegwoord: verbind. Telwoord: wys getal.`]),
+      noted(RS.section('kaf_tomp_sec', 1, 'SV1TOMPv2I', 'Word order in a sentence', ['kaf_tomp', 'kaf_v1v2', 'kaf_tomp_reels', 'kaf_tyd']), [`S = Subjek. V1 = eerste werkwoord. T = Tyd. O = Voorwerp. M = Manier. P = Plek. V2 = tweede werkwoord. I = Infinitief.`, `Mia eet vandag haar kos vinnig by die tafel op.`, `Mia wil môre buite speel.`, `Gister: het ... ge-, was, moes, wou, kon. Môre: sal.`]),
+      noted(RS.section('kaf_byw_sec', 2, 'Bywoorde', 'Tyd, plek en wyse', ['kaf_byw', 'kaf_byw_reels']), [`Find the verb first. The bywoord isn't the verb. It tells you more about it.`, `Tyd: wanneer? vandag, môre, altyd.`, `Plek: waar? hier, daar, buite.`, `Wyse: hoe? vinnig, stadig, versigtig.`]),
+      noted(RS.section('kaf_byv_sec', 3, 'Byvoeglike naamwoorde', 'Describing words and the intensiewe vorm', ['kaf_byv_vind', 'kaf_byv_vorm', 'kaf_sterk', 'kaf_byv_reels']), [`It describes a noun: 'n mooi rok.`, `Before the noun, -g and -lik words add -e: 'n rustige klas, 'n moeilike som.`, `Special ones: breed breë, goud goue, goed goeie.`, `Intensiewe vorm: bloedrooi, stroopsoet, doodgewoon, stokoud, splinternuut.`]),
+      noted(RS.section('kaf_trap_sec', 4, 'Trappe van vergelyking', 'Klein, kleiner, kleinste', ['kaf_trap', 'kaf_trap_sin', 'kaf_trap_reels']), [`Stellende: the ordinary word.`, `Vergrotende: comparing two, with the clue "as": kleiner as.`, `Oortreffende: the most of all, with the clue "die": die kleinste.`, `Watch out: nat natter natste, groot groter grootste, goed beter beste, baie meer meeste.`]),
+      noted(RS.section('kaf_vs', 5, 'Voorsetsels', 'What they mean and when to use them'), [`op on, in in, onder under, oor over, om around, langs next to, tussen between, agter behind, voor in front of.`, `Lief vir. Hou van. Per motor. Aan tafel. Blaf vir.`]),
+      noted(RS.section('kaf_teen', 6, 'Teenoorgesteldes', 'Opposites'), [`maer vet, hard sag, mooi lelik, vuil skoon, goedkoop duur, oud jonk.`]),
+      noted(RS.section('kaf_pron_sec', 7, 'Voornaamwoorde en ontkenning', 'Sy, haar, hare, and two nies', ['kaf_vnw', 'kaf_nie', 'kaf_nie_reels']), [`Sy doen dit. Dit is haar boek. Die boek is hare.`, `Jy is one person, and julle is more than one.`, `Negatives need two nies: Ek kan nie ry nie.`, `iemand niemand, iets niks, altyd nooit, êrens nêrens.`]),
+      noted(RS.section('kaf_woord_sec', 8, 'Woorde en spelling', 'Strand words, klein words and animal sounds', ['kaf_spel', 'kaf_woord', 'kaf_klein', 'kaf_diere']), [`Spell it out loud, one sound at a time.`, `Sambreel, vuurtoring, lewensredder, koeldranke, baaikostuum, versigtig, kaalvoet, skepe, terug.`]),
+    ],
+  };
+
+  // ---------- Maths: his tables, fractions, length, mass and capacity, and area and perimeter ----------
+  const { ri, fr, gcd, money } = RS;
+  const twoChoice = (q, a, b, right, hint, steps) => {
+    const options = Math.random() < 0.5 ? [a, b] : [b, a];
+    return { kind: 'mc', keepOrder: true, q, options, answer: options.indexOf(right), correct: right, hint, steps };
+  };
+  const num = (q, answer, unit, hint, steps) => Object.assign({ kind: 'number', q, answer, correct: unit ? `${fmt(answer)} ${unit}` : fmt(answer), hint, steps }, unit ? { suffix: unit } : {});
+  const COPRIME = [[1, 2], [1, 3], [2, 3], [1, 4], [3, 4], [1, 5], [2, 5], [3, 5], [4, 5], [1, 6], [5, 6], [1, 7], [2, 7], [3, 7], [4, 7], [5, 7], [6, 7], [1, 8], [3, 8], [5, 8], [7, 8]];
+
+  const TRICKY = [[6, 8], [8, 6], [7, 8], [8, 7], [6, 7], [7, 6], [8, 8], [7, 7], [9, 6], [6, 9], [9, 7], [7, 9], [9, 8], [8, 9], [12, 4], [4, 12], [12, 3], [12, 6], [12, 7], [7, 12], [12, 8], [8, 12], [12, 9], [11, 3], [3, 11], [11, 6], [11, 8], [11, 12]];
+  S.km_tricky = () => {
+    const [a, b] = pick(TRICKY);
+    const p = a * b;
+    if (Math.random() < 0.65) return num(`${a} × ${b}`, p, '', `Count in ${b}s, ${a} times.`, [`${a} × ${b} = ${p}`, `Check: ${p} ÷ ${a} = ${b}`]);
+    return num(`${p} ÷ ${a}`, b, '', `What times ${a} makes ${p}?`, [`${a} × ${b} = ${p}, so ${p} ÷ ${a} = ${b}`]);
+  };
+
+  // Which is greater? The fraction wall gives three kinds of comparison.
+  const SHORT = [[3, 4, 5, 6], [2, 3, 3, 4], [7, 8, 6, 7], [4, 5, 5, 6], [2, 3, 4, 5], [3, 4, 4, 5], [5, 6, 6, 7], [3, 4, 7, 8], [2, 3, 5, 6], [6, 7, 7, 8], [4, 5, 7, 8]];
+  S.km_frac_big = () => {
+    const kind = pick(['bottom', 'top', 'short', 'short']);
+    if (kind === 'bottom') {
+      const d = pick([5, 6, 7, 8, 9, 10]);
+      const a = ri(1, d - 2);
+      const b = ri(a + 1, d - 1);
+      return twoChoice('Which is greater?', fr(a, d), fr(b, d), fr(b, d), 'The bottom numbers are the same, so the pieces are the same size. Who has more pieces?', [`Both are cut into ${d} parts, and ${b} parts is more than ${a}.`]);
+    }
+    if (kind === 'top') {
+      const n = pick([1, 2, 3]);
+      const a = ri(n + 1, 6);
+      const b = ri(a + 1, 8);
+      return twoChoice('Which is greater?', fr(n, a), fr(n, b), fr(n, a), 'The top numbers are the same. The more parts you cut it into, the smaller each part is.', [`A ${a}th-sized piece is bigger than a ${b}th-sized piece, so ${fr(n, a)} is greater.`]);
+    }
+    const [p, q2, r, s2] = pick(SHORT);
+    const big = p * s2 > r * q2 ? fr(p, q2) : fr(r, s2);
+    return twoChoice('Which is greater?', fr(p, q2), fr(r, s2), big, 'Look at the fraction wall. Each one is close to a whole: which has the smaller gap left to reach 1?', [`${fr(p, q2)} needs ${fr(q2 - p, q2)} more to make 1, and ${fr(r, s2)} needs ${fr(s2 - r, s2)} more.`, `The smaller gap means the fraction is bigger, so ${big} is greater.`]);
+  };
+  S.km_frac_order = () => {
+    const d = pick([5, 7, 8, 9, 10]);
+    const tops = shuffle(Array.from({ length: d }, (_, i) => i + 1)).slice(0, 4).sort((a, b) => a - b);
+    const say = (list) => list.map((n) => fr(n, d)).join('; ');
+    const right = say(tops);
+    const wrong = [say([...tops].reverse()), say([tops[1], tops[0], tops[2], tops[3]]), say([tops[0], tops[2], tops[1], tops[3]])];
+    return mc('Which list goes from smallest to biggest (ascending)?', right, wrong, { hint: 'The bottom numbers are the same, so just look at the top numbers.', steps: [`Ascending means smallest to biggest: ${right}`] });
+  };
+  S.km_frac_add = () => {
+    let d;
+    let parts;
+    let n;
+    do {
+      d = pick([5, 7, 8, 9, 10]);
+      parts = Math.random() < 0.4 ? [ri(1, 2), ri(1, 2), ri(1, 3)] : [ri(1, 4), ri(1, 4)];
+      n = parts.reduce((a, b) => a + b, 0);
+    } while (n >= d || gcd(n, d) !== 1);
+    return { kind: 'fraction', q: parts.map((x) => fr(x, d)).join(' + '), answer: { n, d }, correct: fr(n, d), hint: 'The bottom number stays the same. Add the top numbers.', steps: [`${parts.join(' + ')} = ${n}`, `The answer is ${fr(n, d)}.`] };
+  };
+  S.km_frac_strip = () => {
+    const [n, d] = pick(COPRIME);
+    return { kind: 'fraction', q: 'What fraction of the bar is shaded?', visual: { type: 'strip', parts: d, shaded: n }, answer: { n, d }, correct: fr(n, d), hint: 'Count all the parts for the bottom number, and the shaded ones for the top.', steps: [`${n} of the ${d} equal parts are shaded: ${fr(n, d)}`] };
+  };
+  const SNACKS = ['a slab of chocolate', 'a pizza', 'a cake', 'a bag of biltong'];
+  const EATERS = ['Thabo', 'Lerato', 'Sipho', 'Thandi'];
+  S.km_frac_left = () => {
+    const d = pick([4, 5, 6, 8, 10]);
+    const n = ri(1, d - 1);
+    const left = d - n;
+    const g = gcd(left, d);
+    return { kind: 'fraction', q: `${pick(EATERS)} eats ${fr(n, d)} of ${pick(SNACKS)}. What fraction is left?`, answer: { n: left / g, d: d / g }, correct: fr(left, d), hint: `The whole thing is ${fr(d, d)}. Take away what was eaten.`, steps: [`${fr(d, d)} − ${fr(n, d)} = ${fr(left, d)}`] };
+  };
+  S.km_frac_share = () => {
+    let d;
+    let k;
+    do {
+      d = pick([5, 7, 8, 9]);
+      k = ri(2, 4);
+    } while (gcd(k, d) !== 1 || k >= d);
+    const words = { 5: 'Five', 7: 'Seven', 8: 'Eight', 9: 'Nine' }[d];
+    const kids = { 2: 'two', 3: 'three', 4: 'four' }[k];
+    return { kind: 'fraction', q: `${words} riders share a bag of naartjies equally. What fraction of the bag do ${kids} of them get altogether?`, answer: { n: k, d }, correct: fr(k, d), hint: `Each rider gets ${fr(1, d)} of the bag.`, steps: [`Each rider gets ${fr(1, d)}.`, `${kids[0].toUpperCase()}${kids.slice(1)} riders get ${fr(k, d)}.`] };
+  };
+
+  // ---------- Length ----------
+  S.km_len_conv = () => {
+    const kinds = [
+      () => { const c = ri(2, 95); return num(`${c} cm = ___ mm`, c * 10, 'mm', '1 cm = 10 mm. Big unit to small unit: multiply.', [`${c} × 10 = ${fmt(c * 10)}`]); },
+      () => { const c = ri(2, 95); return num(`${fmt(c * 10)} mm = ___ cm`, c, 'cm', '10 mm = 1 cm. Small unit to big unit: divide.', [`${fmt(c * 10)} ÷ 10 = ${c}`]); },
+      () => { const m = ri(2, 30); return num(`${m} m = ___ cm`, m * 100, 'cm', '1 m = 100 cm. Big unit to small unit: multiply.', [`${m} × 100 = ${fmt(m * 100)}`]); },
+      () => { const c = ri(11, 99) * 10; return num(`${fmt(c)} cm = ___ m`, c / 100, 'm', '100 cm = 1 m. Small unit to big unit: divide.', [`${fmt(c)} ÷ 100 = ${fmt(c / 100)}`]); },
+      () => { const m = ri(2, 12); return num(`${m} m = ___ mm`, m * 1000, 'mm', '1 m = 1 000 mm.', [`${m} × 1 000 = ${fmt(m * 1000)}`]); },
+      () => { const k = ri(2, 40); return num(`${k} km = ___ m`, k * 1000, 'm', '1 km = 1 000 m.', [`${k} × 1 000 = ${fmt(k * 1000)}`]); },
+      () => { const c = ri(102, 998); return num(`${c} cm = ___ mm`, c * 10, 'mm', '1 cm = 10 mm.', [`${c} × 10 = ${fmt(c * 10)}`]); },
+      () => { const [n, d, whole, unit, to] = pick([[1, 2, 1000, 'm', 'mm'], [1, 4, 1000, 'km', 'm'], [1, 2, 1000, 'km', 'm'], [3, 4, 1000, 'km', 'm'], [1, 2, 100, 'm', 'cm'], [1, 4, 100, 'm', 'cm'], [3, 4, 100, 'm', 'cm']]); const a = (whole / d) * n; return num(`${fr(n, d)} ${unit} = ___ ${to}`, a, to, `1 ${unit} = ${fmt(whole)} ${to}. Divide by the bottom, multiply by the top.`, [`${fmt(whole)} ÷ ${d} = ${fmt(whole / d)}`, n > 1 ? `${fmt(whole / d)} × ${n} = ${fmt(a)}` : `So it is ${fmt(a)} ${to}.`]); },
+    ];
+    return pick(kinds)();
+  };
+  S.km_len_miss = () => {
+    const unit = pick(['mm', 'cm', 'm', 'km']);
+    const kind = pick([0, 1, 2, 3]);
+    if (kind === 0) { const a = ri(20, 90); const c = ri(5, a - 5); return num(`${a} ${unit} − □ ${unit} = ${c} ${unit}`, a - c, unit, 'What do you take away to land on that number?', [`${a} − ${c} = ${a - c}`]); }
+    if (kind === 1) { const b = ri(11, 89); return num(`□ ${unit} + ${b} ${unit} = 100 ${unit}`, 100 - b, unit, 'Count on from there to 100.', [`100 − ${b} = ${100 - b}`]); }
+    if (kind === 2) { const a = ri(30, 90); const b = ri(11, a - 5); return num(`${a} ${unit} − ${b} ${unit} = □ ${unit}`, a - b, unit, 'Take away the tens, then the units.', [`${a} − ${b} = ${a - b}`]); }
+    const a = ri(51, 89);
+    return num(`${a} ${unit} + □ ${unit} = 100 ${unit}`, 100 - a, unit, 'Count on from there to 100.', [`100 − ${a} = ${100 - a}`]);
+  };
+  S.km_len_mix = () => {
+    const kind = pick([0, 1, 2]);
+    if (kind === 0) { const m = ri(2, 9); const c = ri(11, 99); return num(`A line measures ${m} m and ${c} cm. How many cm is that?`, m * 100 + c, 'cm', '1 m = 100 cm. Change the metres first, then add.', [`${m} × 100 = ${m * 100}`, `${m * 100} + ${c} = ${m * 100 + c}`]); }
+    if (kind === 1) { const c = ri(11, 29); const mm = ri(1, 9); return num(`A line measures ${c} cm and ${mm} mm. How many mm is that?`, c * 10 + mm, 'mm', '1 cm = 10 mm. Change the cm first, then add.', [`${c} × 10 = ${c * 10}`, `${c * 10} + ${mm} = ${c * 10 + mm}`]); }
+    const mm = ri(1, 9);
+    const c = ri(11, 29);
+    return num(`A line measures ${mm} mm and ${c} cm. How many mm is that?`, c * 10 + mm, 'mm', 'Careful, the units are the other way round. Change the cm to mm, then add.', [`${c} × 10 = ${c * 10}`, `${c * 10} + ${mm} = ${c * 10 + mm}`]);
+  };
+  S.km_len_words = bank([
+    { q: `How many mm are in 1 cm?`, a: `10`, w: [`100`, `1 000`, `5`], why: `1 cm = 10 mm.` },
+    { q: `How many cm are in 1 m?`, a: `100`, w: [`10`, `1 000`, `50`], why: `1 m = 100 cm.` },
+    { q: `How many m are in 1 km?`, a: `${fmt(1000)}`, w: [`10`, `100`, `${fmt(10000)}`], why: `1 km = 1 000 m.` },
+    { q: `What would you use to measure the length of your pencil?`, a: `A ruler`, w: [`A scale`, `A measuring jug`, `A thermometer`], why: `A ruler measures short lengths in cm and mm.` },
+    { q: `About how long is a new pencil?`, a: `About 18 cm`, w: [`About 18 mm`, `About 18 m`, `About 18 km`], why: `18 mm is smaller than your thumbnail is wide, near enough, and 18 m is longer than a bus.` },
+    { q: `Which unit would you use for the length of a motocross track?`, a: `km`, w: [`mm`, `cm`, `ml`], why: `Long distances are measured in kilometres.` },
+    { q: `Which unit would you use for the thickness of your fingernail?`, a: `mm`, w: [`km`, `m`, `kg`], why: `Very small lengths are measured in millimetres.` },
+    { q: `Which unit would you use for the length of a classroom?`, a: `m`, w: [`mm`, `km`, `g`], why: `Metres suit rooms and buildings.` },
+  ]);
+
+  // ---------- Mass and capacity ----------
+  S.km_mc_conv = () => {
+    const kinds = [
+      () => { const k = ri(2, 9); return num(`${k} kg = ___ g`, k * 1000, 'g', '1 kg = 1 000 g. Big unit to small unit: multiply.', [`${k} × 1 000 = ${fmt(k * 1000)}`]); },
+      () => { const l = ri(2, 9); return num(`${l} L = ___ mL`, l * 1000, 'mL', '1 L = 1 000 mL. Big unit to small unit: multiply.', [`${l} × 1 000 = ${fmt(l * 1000)}`]); },
+      () => { const k = ri(1, 9); const extra = pick([250, 500, 750]); return num(`${k},${String(extra).replace(/0+$/, '')} L = ___ mL`, k * 1000 + extra, 'mL', '1 L = 1 000 mL. Move the comma three places.', [`${k} L = ${fmt(k * 1000)} mL`, `Add ${extra} mL: ${fmt(k * 1000 + extra)} mL`]); },
+      () => { const k = ri(1, 9); const [n, d, g] = pick([[1, 2, 500], [1, 4, 250], [3, 4, 750]]); return num(`${k}${fr(n, d)} kg = ___ g`, k * 1000 + g, 'g', `${k} kg is ${fmt(k * 1000)} g. Then add ${fr(n, d)} of 1 000 g.`, [`${k} kg = ${fmt(k * 1000)} g`, `${fr(n, d)} kg = ${g} g`, `${fmt(k * 1000)} + ${g} = ${fmt(k * 1000 + g)}`]); },
+      () => { const c = ri(2, 8); return num(`${c} cups = ___ mL`, c * 250, 'mL', '1 cup = 250 mL.', [`${c} × 250 = ${fmt(c * 250)}`]); },
+      () => { const g = pick([100, 200, 250, 300, 400, 450, 600, 650, 750, 800, 900]); return num(`${g} g + ___ g = 1 kg`, 1000 - g, 'g', '1 kg = 1 000 g. Count on to 1 000.', [`1 000 − ${g} = ${1000 - g}`]); },
+      () => { const g = pick([1250, 1500, 1750, 2250, 2500, 3500, 4750, 6250]); return num(`${fmt(g)} g = ___ kg`, g / 1000, 'kg', '1 000 g = 1 kg. Small unit to big unit: divide. Write it with a comma.', [`${fmt(g)} ÷ 1 000 = ${fmt(g / 1000)}`]); },
+      () => { const m = pick([300, 400, 500, 600, 250]); const t = pick([3, 4, 5, 6]); return num(`${m} mL × ${t} = ___ mL`, m * t, 'mL', 'Multiply, then keep the unit.', [`${m} × ${t} = ${fmt(m * t)}`]); },
+      () => { const c = pick([2, 3, 5]); const m = pick([250, 500, 750]); return num(`${c} cups + ${m} mL = ___ mL`, c * 250 + m, 'mL', 'Change the cups into mL first. 1 cup = 250 mL.', [`${c} × 250 = ${c * 250}`, `${c * 250} + ${m} = ${fmt(c * 250 + m)}`]); },
+    ];
+    return pick(kinds)();
+  };
+  S.km_mc_frac = () => {
+    const [n, d, whole, unit, to] = pick([[1, 2, 1000, 'kg', 'g'], [1, 4, 1000, 'kg', 'g'], [3, 4, 1000, 'kg', 'g'], [1, 2, 1000, 'L', 'mL'], [1, 4, 1000, 'L', 'mL'], [3, 4, 1000, 'L', 'mL'], [1, 10, 1000, 'L', 'mL'], [2, 5, 1000, 'kg', 'g'], [3, 5, 1000, 'kg', 'g'], [3, 4, 2000, '2 L', 'mL'], [1, 4, 2000, '2 kg', 'g'], [3, 4, 3000, '3 kg', 'g']]);
+    const a = (whole / d) * n;
+    const label = unit.includes(' ') ? unit : `1 ${unit}`;
+    return num(`${fr(n, d)} of ${label} = ___ ${to}`, a, to, 'Divide by the bottom number, then multiply by the top number.', [`${label} = ${fmt(whole)} ${to}`, `${fmt(whole)} ÷ ${d} = ${fmt(whole / d)}`, n > 1 ? `${fmt(whole / d)} × ${n} = ${fmt(a)}` : `So it is ${fmt(a)} ${to}.`]);
+  };
+  S.km_mc_word = () => {
+    const kinds = [
+      () => { const a = pick([1, 2, 3]); const ag = pick([250, 500, 750]); const b = pick([1]); const bg = pick([0, 250]); const t = a * 1000 + ag - b * 1000 - bg; return num(`A kitchen has ${a} kg of rice and another ${ag} g. It uses ${b} kg ${bg} g. How many grams are left?`, t, 'g', 'Change everything into grams first.', [`${fmt(a * 1000)} + ${ag} = ${fmt(a * 1000 + ag)}`, `Used: ${fmt(b * 1000 + bg)} g`, `${fmt(a * 1000 + ag)} − ${fmt(b * 1000 + bg)} = ${fmt(t)}`]); },
+      () => { const l = pick([1, 2]); const m = pick([250, 500, 750]); const c = pick([2, 3]); const t = l * 1000 + m - c * 250; return num(`A jug holds ${l} L ${m} mL of water. You pour out ${c} cups of 250 mL each. How many mL are left?`, t, 'mL', 'Change it all into mL. Each cup is 250 mL.', [`${l} L ${m} mL = ${fmt(l * 1000 + m)} mL`, `${c} × 250 = ${c * 250}`, `${fmt(l * 1000 + m)} − ${c * 250} = ${fmt(t)}`]); },
+      () => { const l = pick([1, 2]); const m = pick([250, 500]); const e = pick([500, 750]); const t = l * 1000 + m + e; return num(`There is ${l} L ${m} mL of juice and another ${e} mL. How many mL is that altogether?`, t, 'mL', 'Change the litres into mL first.', [`${l} L ${m} mL = ${fmt(l * 1000 + m)} mL`, `${fmt(l * 1000 + m)} + ${e} = ${fmt(t)}`]); },
+      () => { const cups = pick([4, 6, 8, 9, 10]); return num(`How many full 250 mL cups can you pour from ${fmt(cups * 250)} mL of juice?`, cups, 'cups', 'How many 250s fit? Four 250s make 1 000.', [`${fmt(cups * 250)} ÷ 250 = ${cups}`]); },
+      () => { const [n, d] = pick([[1, 2], [1, 4], [3, 4]]); const k = pick([6, 7, 8]); const a = k * 1000 + (1000 / 2) ; const add = (1000 / d) * n; return num(`${k}${fr(1, 2)} kg + ${fr(n, d)} kg = ___ g`, a + add, 'g', 'Change both into grams, then add.', [`${k}${fr(1, 2)} kg = ${fmt(a)} g`, `${fr(n, d)} kg = ${add} g`, `${fmt(a)} + ${add} = ${fmt(a + add)}`]); },
+      () => { const cap = pick([1, 2, 3]); const inside = pick([300, 400, 700, 850]); return num(`A jug can hold ${cap} L, but it contains ${inside} mL. How much empty space is left?`, cap * 1000 - inside, 'mL', 'Change the capacity into mL, then take away what is inside.', [`${cap} L = ${fmt(cap * 1000)} mL`, `${fmt(cap * 1000)} − ${inside} = ${fmt(cap * 1000 - inside)}`]); },
+    ];
+    return pick(kinds)();
+  };
+  // Mixed units: to compare them, turn them all into the small unit in your head, but write them as they were given.
+  const RANK_SETS = [
+    [[6000, '6 000 g'], [3500, `3${fr(1, 2)} kg`], [765, '765 g'], [7065, '7 065 g']],
+    [[2500, `2${fr(1, 2)} kg`], [2050, '2 050 g'], [2005, '2 005 g'], [250, '250 g']],
+    [[1000, '1 L'], [750, '750 mL'], [250, '1 cup'], [2000, '2 L']],
+    [[2050, '2 050 mL'], [2000, '2 L'], [705, '705 mL'], [250, '1 cup']],
+    [[4000, '4 kg'], [3250, '3 250 g'], [3500, `3${fr(1, 2)} kg`], [800, '800 g']],
+    [[1500, `1${fr(1, 2)} L`], [1250, '1 250 mL'], [500, `${fr(1, 2)} L`], [750, '3 cups']],
+  ];
+  S.km_mc_rank = () => {
+    const set = pick(RANK_SETS);
+    const down = Math.random() < 0.7;
+    const sorted = [...set].sort((a, b) => (down ? b[0] - a[0] : a[0] - b[0]));
+    const say = (list) => list.map((x) => x[1]).join('; ');
+    const right = say(sorted);
+    const wrong = [say([...sorted].reverse()), say([sorted[1], sorted[0], sorted[2], sorted[3]]), say([sorted[0], sorted[2], sorted[1], sorted[3]])];
+    return mc(`Which list is in ${down ? 'descending order (biggest to smallest)' : 'ascending order (smallest to biggest)'}?`, right, wrong, { hint: 'Change them all to g or mL in your head. Write them the way they were given.', steps: [right, 'Answer with the amounts as they were first written.'] });
+  };
+  const COMPARE = [[`750 mL`, `${fr(3, 4)} L`, 750, 750], [`1 L 250 mL`, `1 200 mL`, 1250, 1200], [`3 kg`, `3 050 g`, 3000, 3050], [`900 g`, `1 kg`, 900, 1000], [`1 L 50 mL`, `1 500 mL`, 1050, 1500], [`2 kg 500 g`, `2 400 g`, 2500, 2400], [`500 g`, `${fr(1, 2)} kg`, 500, 500], [`2 L`, `2 000 mL`, 2000, 2000], [`1 kg 5 g`, `1 050 g`, 1005, 1050], [`4 cups`, `1 L`, 1000, 1000], [`3 cups`, `700 mL`, 750, 700]];
+  S.km_mc_compare = () => {
+    const [a, b, x, y] = pick(COMPARE);
+    const sign = x > y ? '>' : x < y ? '<' : '=';
+    const options = ['>', '<', '='];
+    return { kind: 'mc', keepOrder: true, q: `Which sign goes in the box? ${a} □ ${b}`, options, answer: options.indexOf(sign), correct: sign, hint: 'Change both into g or mL first.', steps: [`${a} is ${fmt(x)}, and ${b} is ${fmt(y)}.`, `So ${a} ${sign} ${b}`] };
+  };
+  // The little marks: each set is a scale he has to count for himself.
+  const JUGS = [[1000, 200, 100], [2000, 500, 100], [1000, 250, 50], [1500, 300, 100], [500, 100, 20], [500, 100, 50], [1000, 200, 50], [2000, 500, 250]];
+  S.km_jug = () => {
+    const [max, big, little] = pick(JUGS);
+    const level = little * ri(1, Math.floor(max / little) - 1);
+    const visual = { type: 'jug', max, big, little, level, unit: 'mL' };
+    const each = big / little;
+    const kinds = [
+      () => num('How much water is in this jug?', level, 'mL', 'Work out what one little jump is worth, then read across from the water level.', [`${big} ÷ ${each} = ${little}, so one little jump is ${little} mL.`, `The water is at ${fmt(level)} mL.`]),
+      () => num('What is the BIG jump between the numbered marks?', big, 'mL', 'Take one numbered mark away from the next one.', [`The numbers go up in ${big}s.`]),
+      () => num('What is one little jump worth?', little, 'mL', 'Big jump ÷ the number of little jumps inside it.', [`There are ${each} little jumps in a big jump of ${big}.`, `${big} ÷ ${each} = ${little}`]),
+      () => num('What is the capacity of this jug?', max, 'mL', 'Capacity is the most that it can hold: look at the top mark.', [`The top mark says ${fmt(max)} mL.`]),
+      () => num('How much more water is needed to fill this jug?', max - level, 'mL', 'Take the water away from the capacity.', [`The water is at ${fmt(level)} mL.`, `${fmt(max)} − ${fmt(level)} = ${fmt(max - level)}`]),
+    ];
+    return Object.assign(pick(kinds)(), { visual });
+  };
+  S.km_mc_words = bank([
+    { q: `Which unit would you use for the mass of a baby?`, a: `kg`, w: [`mL`, `L`, `km`], why: `A baby is weighed in kilograms. mL and L measure liquid.` },
+    { q: `Which unit would you use for the mass of a bag of bricks?`, a: `kg`, w: [`g`, `mL`, `cm`], why: `Heavy things are weighed in kilograms.` },
+    { q: `Which unit would you use for the mass of a tennis ball?`, a: `g`, w: [`kg`, `L`, `mL`], why: `Light things are weighed in grams.` },
+    { q: `Which unit would you use for the capacity of a swimming pool?`, a: `L`, w: [`mL`, `g`, `kg`], why: `A big amount of liquid is measured in litres.` },
+    { q: `Which unit would you use for the capacity of a teaspoon?`, a: `mL`, w: [`L`, `kg`, `g`], why: `A small amount of liquid is measured in millilitres.` },
+    { q: `Which of these measures MASS?`, a: `Kilograms`, w: [`Millilitres`, `Litres`, `Kilometres`], why: `Mass is how heavy something is: g and kg.` },
+    { q: `Which of these measures CAPACITY?`, a: `Litres`, w: [`Grams`, `Kilograms`, `Metres`], why: `Capacity is how much liquid it can hold: mL and L.` },
+    { q: `What is capacity?`, a: `The most that a container can hold`, w: [`How much is inside it right now`, `How heavy the container is`, `How tall the container is`], why: `A 2 L jug has a capacity of 2 L, even if it's half empty.` },
+    { q: `A jug can hold 2 L, but it has 700 mL in it. What is its volume right now?`, a: `700 mL`, w: [`2 L`, `1 300 mL`, `2 700 mL`], why: `Volume is what's inside right now. Its capacity is 2 L.` },
+    { q: `A jug can hold 2 L, but it has 700 mL in it. What is its capacity?`, a: `2 L`, w: [`700 mL`, `1 300 mL`, `2 700 mL`], why: `Capacity is the most that it can hold.` },
+    { q: `How many mL are in 1 teaspoon?`, a: `5 mL`, w: [`15 mL`, `250 mL`, `1 mL`], why: `1 teaspoon = 5 mL.` },
+    { q: `How many mL are in 1 tablespoon?`, a: `15 mL`, w: [`5 mL`, `250 mL`, `50 mL`], why: `1 tablespoon = 15 mL.` },
+    { q: `How many mL are in 1 cup?`, a: `250 mL`, w: [`15 mL`, `5 mL`, `100 mL`], why: `1 cup = 250 mL.` },
+    { q: `How many cups make 1 litre?`, a: `4`, w: [`2`, `10`, `25`], why: `4 × 250 mL = 1 000 mL.` },
+    { q: `How many teaspoons make 1 tablespoon?`, a: `3`, w: [`4`, `5`, `15`], why: `3 × 5 mL = 15 mL.` },
+    { q: `Which holds more: 1 tablespoon or 4 teaspoons?`, a: `4 teaspoons, by 5 mL`, w: [`1 tablespoon, by 5 mL`, `4 teaspoons, by 20 mL`, `They hold the same`], why: `4 × 5 = 20 mL, and 20 − 15 = 5 mL.` },
+    { q: `You take a medicine of 2,5 mL. How full is the teaspoon?`, a: `Half full`, w: [`Quite full`, `A quarter full`, `Overflowing`], why: `A teaspoon holds 5 mL, and half of 5 is 2,5.` },
+    { q: `Which is correct?`, a: `2,5 L = 2 500 mL`, w: [`2,5 L = 25 mL`, `2,5 L = 250 mL`, `2,5 L = 2 050 mL`], why: `Multiply by 1 000: 2,5 × 1 000 = 2 500.` },
+    { q: `Which is correct?`, a: `${fr(3, 4)} of 1 kg = 750 g`, w: [`${fr(3, 4)} of 1 kg = 250 g`, `${fr(3, 4)} of 1 kg = 75 g`, `${fr(3, 4)} of 1 kg = 340 g`], why: `1 000 ÷ 4 = 250, and 250 × 3 = 750.` },
+    { q: `How do you write one thousand five hundred grams in kg?`, a: `1,5 kg`, w: [`15 kg`, `150 kg`, `1,05 kg`], why: `1 500 ÷ 1 000 = 1,5. In South Africa we use a comma, low on the line.` },
+    { q: `Big unit to small unit (kg to g). What do you do?`, a: `× 1 000`, w: [`÷ 1 000`, `× 100`, `+ 1 000`], why: `3 kg = 3 000 g.` },
+    { q: `Small unit to big unit (mL to L). What do you do?`, a: `÷ 1 000`, w: [`× 1 000`, `÷ 100`, `− 1 000`], why: `3 000 mL = 3 L.` },
+  ]);
+
+  // ---------- Area and perimeter ----------
+  S.km_ap_calc = () => {
+    const kinds = [
+      () => { const l = ri(4, 15); const b = ri(2, l - 1); return num(`A rectangle is ${l} cm long and ${b} cm wide. What is its perimeter?`, (l + b) * 2, 'cm', 'P = (L + B) × 2', [`P = (${l} + ${b}) × 2`, `P = ${l + b} × 2 = ${(l + b) * 2} cm`]); },
+      () => { const l = ri(4, 15); const b = ri(2, l - 1); return num(`A rectangle is ${l} cm long and ${b} cm wide. What is its area?`, l * b, 'cm²', 'A = L × B', [`A = ${l} × ${b} = ${l * b} cm²`]); },
+      () => { const s2 = ri(3, 12); return num(`A square has sides of ${s2} cm. What is its perimeter?`, s2 * 4, 'cm', 'P = 4 × S: a square has 4 equal sides.', [`P = 4 × ${s2} = ${s2 * 4} cm`]); },
+      () => { const s2 = ri(3, 12); return num(`A square has sides of ${s2} cm. What is its area?`, s2 * s2, 'cm²', 'A = S × S', [`A = ${s2} × ${s2} = ${s2 * s2} cm²`]); },
+      () => { const l = pick([6, 8, 9, 10, 12]); const b = ri(2, 7); return num(`A rectangle has an area of ${l * b} cm². One side is ${l} cm. How long is the other side?`, b, 'cm', 'Area is L × B, so do the opposite to get back: divide.', [`${l} × ? = ${l * b}`, `${l * b} ÷ ${l} = ${b} cm`]); },
+      () => { const s2 = ri(3, 12); return num(`A square has a perimeter of ${s2 * 4} cm. How long is one side?`, s2, 'cm', 'A square has 4 equal sides, so divide by 4.', [`${s2 * 4} ÷ 4 = ${s2} cm`]); },
+      () => { const a = ri(6, 14); const b = ri(5, 12); const c = ri(4, 10); return num(`A triangle has a perimeter of ${a + b + c} cm. Two sides are ${a} cm and ${b} cm. How long is the third side?`, c, 'cm', 'Perimeter is all the sides added. Take away the two you know.', [`${a + b + c} − ${a} = ${b + c}`, `${b + c} − ${b} = ${c} cm`]); },
+      () => { const l = ri(6, 14); const b = ri(3, l - 1); const p = (l + b) * 2; return num(`A rectangle has a perimeter of ${p} cm. It is ${l} cm long. How wide is it?`, b, 'cm', 'Half the perimeter is L + B. Then take away the length.', [`${p} ÷ 2 = ${l + b}`, `${l + b} − ${l} = ${b} cm`]); },
+      () => { const a = ri(3, 6); const b = ri(4, 8); const c = ri(2, 6); const d = ri(3, 7); return num(`An L-shape is cut into two rectangles. One is ${a} cm by ${b} cm, and the other is ${c} cm by ${d} cm. What is the total area?`, a * b + c * d, 'cm²', 'Find each area, then add them: A1 + A2.', [`A1 = ${a} × ${b} = ${a * b}`, `A2 = ${c} × ${d} = ${c * d}`, `${a * b} + ${c * d} = ${a * b + c * d} cm²`]); },
+    ];
+    return pick(kinds)();
+  };
+  S.km_ap_words = bank([
+    { q: `What is the perimeter of a shape?`, a: `The distance around the shape`, w: [`The space inside the shape`, `The number of sides it has`, `The longest side of the shape`], why: `Think of riding one lap around the edge of a track.` },
+    { q: `What is the area of a shape?`, a: `The space inside the shape`, w: [`The distance around the shape`, `The number of corners it has`, `The longest side of the shape`], why: `Think of how much grass grows inside the track.` },
+    { q: `What is the formula for the perimeter of a rectangle?`, a: `P = (L + B) × 2`, w: [`P = L × B`, `P = 4 × S`, `P = S × S`], why: `Add the length and breadth, then double it.` },
+    { q: `What is the formula for the area of a rectangle?`, a: `A = L × B`, w: [`A = (L + B) × 2`, `A = 4 × S`, `A = L + B`], why: `Length times breadth.` },
+    { q: `What is the formula for the perimeter of a square?`, a: `P = 4 × S`, w: [`P = S × S`, `P = S + S`, `P = 2 × S`], why: `A square has 4 equal sides.` },
+    { q: `What is the formula for the area of a square?`, a: `A = S × S`, w: [`A = 4 × S`, `A = S + S`, `A = 2 × S`], why: `Side times side.` },
+    { q: `Which unit goes with area?`, a: `cm²`, w: [`cm`, `mL`, `kg`], why: `Area counts squares, so it's in square units.` },
+    { q: `Which unit goes with perimeter?`, a: `cm`, w: [`cm²`, `mL`, `g`], why: `Perimeter is a length, so it's in cm or m.` },
+    { q: `A rectangle's area is 48 cm² and one side is 12 cm. What do you do to find the other side?`, a: `48 ÷ 12`, w: [`48 − 12`, `48 + 12`, `48 × 12`], why: `Area is L × B, and the opposite of × is ÷.` },
+    { q: `How do you find the area of an L-shape?`, a: `Cut it into two rectangles and add their areas`, w: [`Multiply all of the sides together`, `Add up all of the sides around it`, `Multiply the two longest sides`], why: `A1 + A2 gives the total area.` },
+    { tf: true, q: `True or false: a shape's opposite sides in a rectangle are equal.`, why: `That's why you can double (L + B).` },
+    { tf: false, q: `True or false: perimeter and area are the same thing.`, why: `Perimeter goes around the shape, and area is the space inside it.` },
+  ]);
+
+  // ---------- Social Sciences: food and farming ----------
+  S.ss_farm = bank([
+    { q: `What is a forager, or food collector?`, a: `Someone who collects food from the wild`, w: [`Someone who drives a tractor on a farm`, `Someone who sells food in a shop`, `Someone who milks cows with a machine`], why: `Foragers find their food in nature, instead of farming it.` },
+    { q: `What is poultry?`, a: `Birds kept for their meat and eggs`, w: [`Cows kept for their milk`, `Sheep kept for their wool`, `Fruit grown on big farms`], why: `Chickens, ducks, turkeys and ostriches are poultry.` },
+    { q: `Which of these is an example of poultry?`, a: `Ostriches`, w: [`Sheep`, `Goats`, `Pigs`], why: `Poultry are birds that farmers keep.` },
+    { q: `What is a stock farm?`, a: `A farm that keeps animals for meat, milk and other products`, w: [`A farm that only grows sugar cane and fruit`, `A shop that sells food to farmers`, `A factory that puts milk in bottles`], why: `Stock farms keep livestock.` },
+    { q: `Which of these does an ostrich NOT give us?`, a: `Wool`, w: [`Eggs`, `Feathers`, `Leather`], why: `Ostriches give us eggs, meat, feathers and leather. Wool comes from sheep.` },
+    { q: `What are dairy products?`, a: `Foods made from milk`, w: [`Foods made from chickens`, `Foods made from wheat`, `Foods made from fruit`], why: `Milk, cheese, butter and yoghurt are dairy products.` },
+    { q: `Which of these is a dairy product?`, a: `Cheese`, w: [`Eggs`, `Bread`, `Biltong`], why: `Cheese is made from milk.` },
+    { q: `Which of these is an unprocessed food?`, a: `A raw potato`, w: [`A packet of chips`, `A loaf of bread`, `A tin of beans`], why: `Unprocessed food hasn't been changed in a factory.` },
+    { q: `Which of these is a processed food?`, a: `A packet of chips`, w: [`A raw potato`, `A fresh apple`, `A raw carrot`], why: `Potatoes are changed in a factory to make chips.` },
+    { q: `Which of these is a tropical fruit?`, a: `Mango`, w: [`Grapes`, `Apples`, `Pears`], why: `Tropical fruit grows where it's hot and wet.` },
+    { q: `Is freshwater the same as seawater?`, a: `No, seawater is salty`, w: [`Yes, they're just the same`, `No, freshwater is salty`, `Yes, but only in winter`], why: `Plants and people need freshwater.` },
+    { q: `Why does sugar cane grow well in KwaZulu-Natal and Mpumalanga?`, a: `They have a hot, wet climate`, w: [`They have a cold, dry climate`, `They have no rain at all`, `They are very close to the Moon`], why: `Sugar cane needs lots of heat and rain.` },
+    { q: `Which crop grows well in the hot, wet parts of KwaZulu-Natal?`, a: `Sugar cane`, w: [`Wheat`, `Apples`, `Grapes`], why: `You can see the sugar cane fields along the KZN coast.` },
+    { q: `Which two provinces grow a lot of wheat?`, a: `Western Cape and Free State`, w: [`KwaZulu-Natal and Mpumalanga`, `Limpopo and Gauteng`, `Gauteng and North West`], why: `Wheat grows well in those provinces.` },
+    { q: `Who usually works on a subsistence farm?`, a: `The family: children, women and old people`, w: [`Only machines and robots`, `Only people from a big factory`, `Only visitors from another town`], why: `A subsistence farm feeds the family that works it.` },
+    { q: `What is a subsistence farm?`, a: `A small farm that feeds the family`, w: [`A huge farm that sells to factories`, `A shop that sells farm food`, `A farm that only keeps ostriches`], why: `The food is mostly for the family, not for selling.` },
+    { q: `How are cows milked on a subsistence farm?`, a: `By hand`, w: [`By a machine`, `By a tractor`, `By a robot`], why: `Big dairy farms use machines.` },
+    { q: `How are cows milked on a big dairy farm?`, a: `By a machine`, w: [`By hand`, `By the children`, `By the vet`], why: `Machines can milk many cows quickly.` },
+    { q: `How does the owner of a dairy farm make money?`, a: `By selling the milk`, w: [`By buying more milk`, `By giving the milk away`, `By washing the machines`], why: `That's why it's a business.` },
+    { q: `Why must the milking machines be kept very clean?`, a: `So that the milk stays clean and doesn't spread illness`, w: [`So that the cows give much more milk each day`, `So that the machines look nice for the visitors`, `So that the farmer can sell the machines later`], why: `Dirty machines could make people sick.` },
+    { q: `Where does the milk go after it leaves the factory?`, a: `To the shops, to be sold`, w: [`Back to the cows`, `Back to the farm`, `Out into the river`], why: `The factory puts it in bottles first.` },
+    { q: `What do dairy cows eat?`, a: `Grass and other feed`, w: [`Meat and fish`, `Chips and bread`, `Only water`], why: `Cows are plant-eaters.` },
+    { tf: false, q: `True or false: grapes are a tropical fruit.`, why: `Grapes like cooler places, such as the Western Cape.` },
+    { tf: true, q: `True or false: a stock farmer keeps animals.`, why: `Livestock means farm animals.` },
+    { q: `People who collect their food from the wild are called ___.`, t: [`foragers`, `forager`, `food collectors`, `food collector`], why: `Foragers don't farm their food.`, h: `It starts with "f".` },
+  ]);
+  pack.subjects.social = {
+    label: 'Social Sciences',
+    source: 'Food and farming',
+    scope: 'Revision of the farming work',
+    note: 'Questions are new',
+    examSize: 15,
+    topics: [
+      noted(RS.section('ss_farm', 0, 'Food and farming', 'Farms, crops and food'), ['A forager collects food from the wild.', 'Poultry are birds kept for meat and eggs. A stock farm keeps animals.', 'A subsistence farm feeds the family. A big farm sells what it makes.']),
+    ],
+  };
+
+  // The starter topics stay as extra practice, so the riding he's already done still counts.
+  const maths = pack.subjects.maths;
+  maths.source = 'His maths books and tests';
+  maths.scope = 'Tables, fractions, length, mass and capacity, area and perimeter';
+  maths.note = 'Questions are new but follow his work';
+  maths.startWith = ['km_tab', 'km_frac', 'km_mass'];
+  maths.focus = ['km_frac_big', 'km_mc_conv', 'km_len_conv'];
+  const oldTopics = maths.topics;
+  maths.topics = [
+    noted(RS.section('km_tab', 0, 'Times tables', 'Up to 12 × 12, with the tricky ones often', ['km_tricky', 'k_tables', 'k_tables_div']), ['6 × 8 = 48. 7 × 8 = 56. 12 × 4 = 48.', 'Check with the opposite: 48 ÷ 6 = 8.']),
+    noted(RS.section('km_frac', 1, 'Fractions', 'Fraction wall, adding, shading, sharing', ['km_frac_big', 'km_frac_order', 'km_frac_add', 'km_frac_strip', 'km_frac_left', 'km_frac_share']), ['Same bottom number: the bigger top number wins.', 'Same top number: the smaller bottom number wins.', 'One piece short of a whole: the smaller missing piece wins, so {7/8} beats {6/7}.', 'Adding: the bottom stays the same. Add the tops.']),
+    noted(RS.section('km_len', 2, 'Length', 'mm, cm, m and km', ['km_len_conv', 'km_len_miss', 'km_len_mix', 'km_len_words']), ['1 cm = 10 mm. 1 m = 100 cm. 1 m = 1 000 mm. 1 km = 1 000 m.', 'Big unit to small unit: multiply. Small unit to big unit: divide.']),
+    noted(RS.section('km_mass', 3, 'Mass and capacity', 'g, kg, mL, L, jugs and baking', ['km_mc_conv', 'km_mc_frac', 'km_mc_word', 'km_mc_rank', 'km_mc_compare', 'km_jug', 'km_mc_words']), ['1 kg = 1 000 g. 1 L = 1 000 mL.', '1 teaspoon = 5 mL. 1 tablespoon = 15 mL. 1 cup = 250 mL.', 'Mass is g and kg. Capacity is mL and L.', 'Reading a jug: big jump ÷ the number of little jumps = one little jump.', 'Ordering: write the amounts the way they were first given.']),
+    noted(RS.section('km_ap', 4, 'Area and perimeter', 'Formulas and missing sides', ['km_ap_calc', 'km_ap_words']), ['Perimeter is the distance around. Area is the space inside.', 'Rectangle: P = (L + B) × 2. A = L × B.', 'Square: P = 4 × S. A = S × S.', 'Missing side: do the opposite. 48 ÷ 12 = 4.']),
+    ...oldTopics.filter((t) => t.id !== 'tables' && t.id !== 'fractions').map((t) => Object.assign(t, { warmup: true, stop: 'Pit lane' })),
+    Object.assign(oldTopics.find((t) => t.id === 'fractions'), { warmup: true, stop: 'Pit lane', title: 'More fractions' }),
+  ];
+
   // He writes weekly tests, not exams, so the home screen says "test".
   pack.testWord = 'test';
-  pack.locked = ['Social Sciences'];
+  pack.locked = [];
   pack.exams = [
     { date: '2026-11-03', subject: 'english', label: 'English' },
     { date: '2026-11-10', subject: 'science', label: 'Science' },
@@ -7403,7 +8122,7 @@ Jordy's Science test, Tuesday 10 November: Planet Earth and Beyond. Written from
   // ---------- staying up to date ----------
   // An open tab or a home screen app keeps running the page it first loaded, old prices and all. So it asks which version
   // is live when it comes back into view and every few minutes, and swaps over between races. build.mjs fills in BUILD.
-  const BUILD = '37688b2d32';
+  const BUILD = '26a9267722';
   const BACK_KEY = 'holeshot.back.v1';
   const TRIED_KEY = 'holeshot.tried.v1';
   let liveBuild = null;
@@ -7420,16 +8139,22 @@ Jordy's Science test, Tuesday 10 November: Planet Earth and Beyond. Written from
     // A new address gets past any saved copy of the page.
     location.replace(`${location.pathname}?v=${liveBuild}`);
   }
+  // Says 'same', 'newer', or 'unknown' when there's no signal to ask with.
   async function checkBuild() {
-    if (!SYNC_ON || navigator.onLine === false) return;
+    if (!SYNC_ON) return 'same';
+    if (navigator.onLine === false) return 'unknown';
     try {
       const res = await fetch(`version.json?t=${Date.now()}`, { cache: 'no-store' });
       const { build } = await res.json();
       if (build && build !== BUILD) {
         liveBuild = build;
         swapToLive();
+        return 'newer';
       }
-    } catch (e) { /* no signal: it asks again later */ }
+      return 'same';
+    } catch (e) {
+      return 'unknown';
+    }
   }
 
   // ---------- family code and progress across devices ----------
@@ -7548,7 +8273,8 @@ Jordy's Science test, Tuesday 10 November: Planet Earth and Beyond. Written from
   const dayLog = (p) => p.days[dayKey()] || (p.days[dayKey()] = { pts: 0, q: 0, ok: 0 });
   const mastery = (p, t) => t.skills.reduce((a, id) => a + ((p.skills[id] && p.skills[id].m) || 0), 0) / t.skills.length;
   const seenTopic = (p, t) => t.skills.some((id) => p.skills[id] && p.skills[id].seen);
-  const isCleared = (p, t) => ((p.topics[t.id] && p.topics[t.id].stars) || 0) >= 2 || mastery(p, t) >= 0.6;
+  // Cleared takes both: a good race, and every kind of question in the section known well.
+  const isCleared = (p, t) => ((p.topics[t.id] && p.topics[t.id].stars) || 0) >= 2 && mastery(p, t) >= 0.8;
   const clearedCount = (p, sub) => racing(sub).filter((t) => isCleared(p, t)).length;
   const nextStop = (p, sub) => racing(sub).find((t) => !isCleared(p, t));
   const topicOf = (skill) => SUB().topics.find((t) => t.skills.includes(skill));
@@ -7602,11 +8328,11 @@ Jordy's Science test, Tuesday 10 November: Planet Earth and Beyond. Written from
   // and the photo's own shadows and shine go on top, so paint, stickers and kit look like they belong to the picture.
   // Positions are in the picture's own pixels. side, front, shirt and logo are corners, running top back, top front, bottom front, bottom back.
   const SEATS = {
-    mini: { w: 720, h: 783, side: [[124, 456], [212, 468], [204, 528], [140, 505]], front: [[447, 345], [487, 338], [517, 406], [482, 413]], shirt: [[148, 262], [210, 276], [205, 322], [142, 312]], logo: [[310, 462], [432, 462], [430, 486], [305, 488]] },
-    mx: { w: 720, h: 671, side: [[152, 352], [234, 360], [232, 404], [162, 392]], front: [[438, 250], [480, 262], [498, 300], [458, 296]], shirt: [[212, 180], [262, 186], [262, 230], [210, 226]], logo: [[352, 350], [445, 356], [442, 374], [352, 368]] },
-    enduro: { w: 720, h: 559, side: [[205, 280], [275, 296], [268, 328], [215, 312]], front: [[486, 178], [514, 190], [538, 246], [509, 236]], frontPatch: true, shirt: [[262, 135], [310, 145], [312, 195], [258, 188]], logo: [[420, 280], [498, 296], [494, 312], [418, 298]] },
-    hard: { w: 720, h: 620, side: [[150, 305], [238, 318], [232, 356], [172, 340]], front: [[452, 222], [486, 212], [512, 276], [481, 282]], frontPatch: true, shirt: [[235, 145], [285, 152], [288, 205], [230, 198]], logo: [[395, 290], [468, 318], [462, 332], [392, 305]] },
-    factory: { w: 720, h: 604, side: [[170, 304], [258, 314], [262, 364], [196, 342]], front: [[468, 213], [504, 219], [526, 268], [493, 274]], frontPatch: true, shirt: [[242, 140], [295, 150], [298, 205], [236, 198]], logo: [[395, 300], [485, 310], [482, 328], [392, 318]] },
+    mini: { w: 720, h: 1221, side: [[80, 628], [140, 628], [136, 688], [90, 684]], front: [[372, 470], [510, 470], [522, 552], [405, 555]], logo: [[470, 595], [625, 640], [618, 660], [462, 617]] },
+    mx: { w: 720, h: 967, side: [[110, 470], [196, 478], [192, 538], [124, 528]], front: [[412, 330], [492, 338], [490, 398], [434, 396]], logo: [[470, 425], [625, 478], [618, 495], [462, 445]] },
+    enduro: { w: 720, h: 846, side: [[120, 420], [215, 442], [215, 490], [148, 475]], front: [[428, 283], [495, 280], [492, 310], [430, 312]], logo: [[490, 392], [625, 432], [618, 450], [485, 412]] },
+    hard: { w: 720, h: 973, side: [[100, 478], [195, 490], [190, 545], [115, 530]], front: [[400, 318], [490, 322], [494, 382], [432, 390]], logo: [[470, 425], [610, 465], [603, 483], [462, 445]] },
+    factory: { w: 720, h: 876, side: [[118, 462], [192, 470], [192, 520], [146, 505]], front: [[410, 296], [484, 298], [484, 352], [432, 350]], logo: [[475, 378], [625, 425], [618, 442], [467, 397]] },
   };
   let svgNo = 0;
   const stickerFill = (s, scale = 1) => {
@@ -7668,8 +8394,7 @@ Jordy's Science test, Tuesday 10 November: Planet Earth and Beyond. Written from
     const num = h(String(p.plate));
     const coat = (part, fill) => (fill ? `<i style="-webkit-mask-image:url(img/${id}-${part}.webp);mask-image:url(img/${id}-${part}.webp);background:${fill}"></i>` : '');
     const alt = label === undefined ? `Rider on a ${BIKES[id].label} bike in ${paint.label}` : label;
-    const patch = spot.frontPatch ? `<path d="M${spot.front[0]}L${spot.front[1]}L${spot.front[2]}L${spot.front[3]}Z" fill="#fff" stroke="#C9CDD4" stroke-width="1.5" stroke-linejoin="round"/>` : '';
-    return `<div class="rig">
+    return `<div class="rig" style="aspect-ratio:${spot.w}/${spot.h}">
       <img class="shot" src="img/photo-${id}.webp" alt="${alt}" width="${spot.w}" height="${spot.h}" decoding="sync">
       ${coat('plastic', paint.coat || paint.hex)}${sticker && sticker.art ? coat('plastic', stickerSheet(sticker, spot)) : ''}
       ${coat('pants', kit.p)}${coat('pants2', kit.c2)}${coat('boots', boots.c)}${coat('boots2', boots.c2)}
@@ -7679,8 +8404,7 @@ Jordy's Science test, Tuesday 10 November: Planet Earth and Beyond. Written from
       ${coat('lens', goggles.look === 'rainbow' ? 'linear-gradient(90deg,#EF4444,#F2C200,#2F8FE8)' : goggles.c)}
       <svg viewBox="0 0 ${spot.w} ${spot.h}" aria-hidden="true">
         ${sticker && sticker.art ? printOn(spot.logo, 'HOLESHOT', { fill: '#fff', stroke: '#15161B', line: 2.5 }) : ''}
-        ${patch}${printOn(spot.side, num)}${printOn(spot.front, num, { squeeze: 0.8 })}
-        ${printOn(spot.shirt, num, { fill: kit.c2, stroke: jersey, line: 4 })}
+        ${printOn(spot.side, num)}${printOn(spot.front, num)}
       </svg>
       <img class="shot-shade" src="img/${id}-shade.webp" alt="" decoding="sync">
     </div>`;
@@ -7961,7 +8685,7 @@ Jordy's Science test, Tuesday 10 November: Planet Earth and Beyond. Written from
       <section class="card">
         <div class="eyebrow">${sub.source}</div>
         <div class="h-sec" style="font-size:24px">The ${sub.label} track</div>
-        <p class="small-t muted" style="margin-bottom:10px">${sub.scope}. ${sub.note}. Ride the sections in any order. Clear one with 2 stars or more.</p>
+        <p class="small-t muted" style="margin-bottom:10px">${sub.scope}. ${sub.note}. Ride the sections in any order. A section is cleared at 2 stars and 80%.</p>
         ${list}
       </section>
       <div class="stops">
@@ -8165,6 +8889,7 @@ Jordy's Science test, Tuesday 10 November: Planet Earth and Beyond. Written from
       <section class="card"><div class="h-sec" style="margin-bottom:10px">Questions to look at again</div><div class="log">${missed.join('') || '<p class="small-t muted">Questions you miss will show here with the working.</p>'}</div></section>
       <section class="card">
         <div class="h-sec" style="margin-bottom:4px">Settings</div>
+        <p class="small-t muted">Version ${BUILD.slice(0, 6)}</p>
         ${toggle('sound', 'Sound effects', 'Dings and fanfares')}
         ${toggle('autoRead', 'Read questions aloud', 'Speaks each question when it appears')}
         <div style="margin-top:10px">${ui.confirmReset
@@ -8595,7 +9320,7 @@ Jordy's Science test, Tuesday 10 November: Planet Earth and Beyond. Written from
   // A bar cut into equal parts, some of them shaded.
   function chartStrip(v) {
     const W = 320, H = 54, each = W / v.parts;
-    const parts = Array.from({ length: v.parts }, (_, i) => `<rect class="${i < v.shaded ? 'bar' : 'dot-land'}" x="${(i * each).toFixed(1)}" y="2" width="${each.toFixed(1)}" height="${H - 4}" stroke="#15161B" stroke-width="2"/>`).join('');
+    const parts = Array.from({ length: v.parts }, (_, i) => `<rect ${i < v.shaded ? 'class="bar"' : 'fill="#F5F6F8"'} x="${(i * each).toFixed(1)}" y="2" width="${each.toFixed(1)}" height="${H - 4}" stroke="#15161B" stroke-width="2"/>`).join('');
     return `<svg class="chart" viewBox="-2 0 ${W + 4} ${H}" style="display:block;width:100%;max-width:${W}px;margin-inline:auto" role="img" aria-label="A bar cut into equal parts, some of them shaded">${parts}</svg>`;
   }
   // A measuring jug, with numbered marks and little marks between them.
@@ -8606,13 +9331,14 @@ Jordy's Science test, Tuesday 10 November: Planet Earth and Beyond. Written from
     for (let m = 0; m <= v.max; m += v.little) {
       const big = m % v.big === 0;
       marks += `<line x1="${L}" x2="${L + (big ? 26 : 13)}" y1="${y(m)}" y2="${y(m)}" stroke="#15161B" stroke-width="${big ? 2 : 1.2}"/>`;
-      if (big) marks += `<text x="${L - 6}" y="${y(m) + 4}" text-anchor="end" style="font-size:13px">${RS.fmt(m)}</text>`;
+      if (big) marks += `<text x="${L - 6}" y="${y(m) + 4}" text-anchor="end" style="font-size:13px;fill:#15161B">${RS.fmt(m)}</text>`;
     }
     return `<svg class="chart" viewBox="0 0 ${W} ${H}" style="display:block;width:100%;max-width:230px;margin-inline:auto" role="img" aria-label="A measuring jug with a scale in ${v.unit}">
+      <rect width="${W}" height="${H}" rx="14" fill="#F5F6F8"/>
       <path d="M${R} ${T + 30}h22q12 0 12 12v70q0 12-12 12h-22" fill="none" stroke="#8C909C" stroke-width="8"/>
       <rect x="${L}" y="${y(v.level)}" width="${R - L}" height="${B - y(v.level)}" fill="#6FB7E8"/>
       <path d="M${L} ${T - 8}V${B}h${R - L}V${T - 8}" fill="none" stroke="#8C909C" stroke-width="3"/>
-      ${marks}<text x="${R - 6}" y="${T + 2}" text-anchor="end" style="font-size:13px">${v.unit}</text>
+      ${marks}<text x="${R - 6}" y="${T + 2}" text-anchor="end" style="font-size:13px;fill:#15161B">${v.unit}</text>
     </svg>`;
   }
   function visual(q) {
@@ -9174,6 +9900,7 @@ Jordy's Science test, Tuesday 10 November: Planet Earth and Beyond. Written from
   });
 
   // ---------- taps ----------
+  let buying = false;
   document.addEventListener('click', (e) => {
     const el = e.target.closest('[data-act]');
     if (!el) return;
@@ -9321,13 +10048,26 @@ Jordy's Science test, Tuesday 10 November: Planet Earth and Beyond. Written from
         break;
       }
       case 'buy-try': {
+        // Prices can change between versions, so nothing is bought until this page is known to be the live one.
+        if (buying) break;
+        buying = true;
         const { tab, id: item } = ui.tryOn;
-        if (!buy(p, { ...shopOf(tab)[item], id: item }, ownedOf(p, tab))) break;
-        wear(p, tab, item);
-        ui.tryOn = null;
-        toast(`${shopOf(tab)[item].label} is yours.`);
-        save();
-        render();
+        checkBuild().then((found) => {
+          buying = false;
+          if (found === 'newer') {
+            toast('The game has just been updated. Try that again in a moment.');
+            ui.tryOn = null;
+            swapToLive();
+          } else if (found === 'unknown') {
+            toast('Buying needs the internet, to check the price is up to date.');
+          } else if (ui.tryOn && !ownedOf(p, tab).includes(item) && buy(p, { ...shopOf(tab)[item], id: item }, ownedOf(p, tab))) {
+            wear(p, tab, item);
+            ui.tryOn = null;
+            toast(`${shopOf(tab)[item].label} is yours.`);
+            save();
+            render();
+          }
+        });
         break;
       }
       case 'try-off':
