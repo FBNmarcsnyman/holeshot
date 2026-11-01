@@ -271,6 +271,8 @@ svg { display: block; }
 .chart text { font-family: var(--body); font-size: 10px; fill: var(--ink-3); }
 .chart .grid { stroke: var(--line); stroke-width: 1; }
 .chart .bar { fill: var(--accent); }
+.chart .line { fill: none; stroke: var(--accent); stroke-width: 2.5; stroke-linejoin: round; }
+.chart .dot { fill: var(--accent); stroke: var(--card); stroke-width: 1.5; }
 .chart .hit { fill: transparent; cursor: pointer; }
 .chart .hit:hover + .bar, .chart .bar.sel { fill: var(--accent-dark); }
 .rows { display: grid; gap: 8px; }
@@ -539,7 +541,7 @@ details ol { margin: 6px 0 0; padding-left: 20px; }
   // ---------- reading what the child typed ----------
   function parseValue(text) {
     let t = String(text).toLowerCase().replace(/ /g, ' ').trim();
-    t = t.replace(/[a-z]+\/[a-z]+/g, ' ').replace(/[a-z%$£€]+\.?/g, ' ').replace(/\s+/g, ' ').trim();
+    t = t.replace(/[a-z]+\/[a-z]+/g, ' ').replace(/[a-z%$£€¥]+\.?/g, ' ').replace(/\s+/g, ' ').trim();
     let m;
     if ((m = t.match(/^(\d+) (\d+)\/(\d+)$/))) {
       if (!+m[3]) return { values: [] };
@@ -672,7 +674,7 @@ details ol { margin: 6px 0 0; padding-left: 20px; }
     t = t.replace(/-/g, ' ').replace(/[?!]/g, ' ').replace(/\s+/g, ' ').trim();
     if (HOMOPHONES[t]) t = HOMOPHONES[t];
     // Speech engines often return digits already: "R450", "3/4", "25%".
-    const digitsOnly = t.replace(/^[r$£€]\s*/, '').replace(/\s*%$/, '').replace(UNIT_WORDS, ' ').replace(/\s+/g, ' ').trim();
+    const digitsOnly = t.replace(/^[r$£€¥]\s*/, '').replace(/\s*%$/, '').replace(UNIT_WORDS, ' ').replace(/\s+/g, ' ').trim();
     if (/^[\d\s.,/]+$/.test(digitsOnly) && /\d/.test(digitsOnly)) return digitsOnly.replace(/\.$/, '');
     // "21 rand 50" and "twenty one rand fifty".
     const randMatch = t.match(/^(.+?)\s+rands?\s+(?:and\s+)?(.+?)(?:\s+cents?)?$/);
@@ -752,6 +754,7 @@ details ol { margin: 6px 0 0; padding-left: 20px; }
       .replace(/\$(\d+)/g, '$1 dollars')
       .replace(/£(\d+)/g, '$1 pounds')
       .replace(/€(\d+)/g, '$1 euros')
+      .replace(/¥(\d+)/g, '$1 yen')
       .replace(/□/g, ' what number ')
       .replace(/×/g, ' times ')
       .replace(/÷/g, ' divided by ')
@@ -793,7 +796,22 @@ details ol { margin: 6px 0 0; padding-left: 20px; }
     return fn;
   }
 
-  Object.assign(RS, { bank, ri, pick, shuffle, gcd, lcm, r2, roundTo, simp, factorsOf, primeFactors, isPrime, distinctDigits, coprimeTop, fmt, money, fr, mixedStr, plain, html, mc, parseValue, check, spoken, matchOption, speakable, wordsToInt, editDistance });
+  /* For the batch files, src/bank-zz-*.js. See ADDING-QUESTIONS.md.
+     addQuestions adds to lists that already exist: {sci_moons: [items], ...}.
+     addSection adds a new track section: {id, photo, title, blurb} plus either
+     items (and opts, for a language list) or skills, the ids of existing generators. */
+  const stamp = (batch, items) => items.map((it) => Object.assign({ batch }, it));
+  function addQuestions(packId, batch, lists) {
+    const skills = RS.packs[packId].skills;
+    for (const [id, items] of Object.entries(lists)) skills[id].items.push(...stamp(batch, items));
+  }
+  function addSection(packId, batch, subject, { id, photo, title, blurb, items, opts, skills }) {
+    const pack = RS.packs[packId];
+    if (items) pack.skills[id] = bank(stamp(batch, items), opts);
+    pack.subjects[subject].topics.push(RS.section(id, photo, title, blurb, skills));
+  }
+
+  Object.assign(RS, { bank, addQuestions, addSection, ri, pick, shuffle, gcd, lcm, r2, roundTo, simp, factorsOf, primeFactors, isPrime, distinctDigits, coprimeTop, fmt, money, fr, mixedStr, plain, html, mc, parseValue, check, spoken, matchOption, speakable, wordsToInt, editDistance });
 })(typeof window !== 'undefined' ? window : globalThis);
 
 /* Jordy: Grade 6 Term 4 maths, NumberSense Workbook 24, pages 1 to 24.
@@ -3931,6 +3949,634 @@ details ol { margin: 6px 0 0; padding-left: 20px; }
     if (MORE[t.id]) t.skills.push(...MORE[t.id].filter((id) => !t.skills.includes(id)));
     if (NOTES[t.id]) t.notes = NOTES[t.id];
   }
+  // ---------- matched to the workbook's pages (original questions, same skills) ----------
+  const WORDS = ['zero', 'one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine'];
+  const ORD = ['', '', 'halves', 'thirds', 'quarters', 'fifths', 'sixths', 'sevenths', 'eighths', 'ninths'];
+  const cap = (s) => s.charAt(0).toUpperCase() + s.slice(1);
+  const PEOPLE = ['Aya', 'Thabo', 'Zinhle', 'Sipho', 'Lerato', 'Dylan', 'Ryan', 'Naledi'];
+
+  // Decimals: pages 1 and 7
+  S.dec_meaning = () => {
+    const w = ri(1, 9);
+    let t;
+    do t = ri(1, 9);
+    while (t === w);
+    const W = cap(WORDS[w]);
+    const T = WORDS[t];
+    const unit = (x, name) => `${x} ${t === 1 ? name : name + 's'}`;
+    if (Math.random() < 0.35) {
+      return mc(`What does ${w},0${t} mean?`, `${W} and ${unit(T, 'hundredth')}`, [`${W} and ${unit(T, 'tenth')}`, `${W} and ${unit(T, 'thousandth')}`, `${cap(T)} and ${WORDS[w]} hundredths`, `${W}${T}`], {
+        hint: 'The first place after the comma is tenths. The second is hundredths.',
+        steps: [`The ${t} is in the hundredths place, so it is ${W.toLowerCase()} and ${unit(T, 'hundredth')}.`],
+      });
+    }
+    return mc(`What does ${w},${t} mean?`, `${W} and ${unit(T, 'tenth')}`, [`${W} and ${unit(T, 'hundredth')}`, `${cap(T)} and ${WORDS[w]} tenths`, t >= 2 ? `${W} ${ORD[t]}` : `${W} wholes`, `${W} and ${unit(T, 'thousandth')}`], {
+      hint: 'The first place after the comma is tenths.',
+      steps: [`The ${t} is in the tenths place, so it is ${W.toLowerCase()} and ${unit(T, 'tenth')}.`],
+    });
+  };
+  S.dec_largest = () => {
+    const w = ri(2, 30);
+    const t = ri(2, 8);
+    const items = [{ s: `${w},${t}`, v: t * 10 }];
+    const d = ri(1, 9);
+    items.push({ s: `${w},0${d}`, v: d });
+    const d2 = ri(1, 9);
+    items.push({ s: `${w},${t - 1}${d2}`, v: (t - 1) * 10 + d2 });
+    if (Math.random() < 0.5) items.push({ s: `${w},10`, v: 10 });
+    else {
+      const d3 = ri(1, 9);
+      items.push({ s: `${w},${t}${d3}`, v: t * 10 + d3 });
+    }
+    if (new Set(items.map((x) => x.v)).size < 4) return S.dec_largest();
+    const big = Math.random() < 0.7;
+    const right = items.reduce((b, x) => ((big ? x.v > b.v : x.v < b.v) ? x : b));
+    return mc(`Which number is the ${big ? 'largest' : 'smallest'}?`, right.s, items.filter((x) => x !== right).map((x) => x.s), {
+      hint: 'A longer decimal is not always bigger. Write them all with two decimals, then compare.',
+      steps: [`With two decimals: ${items.map((x) => fmt(w + x.v / 100, 2)).join('; ')}`, `So ${right.s} is the ${big ? 'largest' : 'smallest'}.`],
+    });
+  };
+  S.dec_closest = () => {
+    const T = ri(12, 98);
+    const off = pick([1, 2]) * pick([1, -1]);
+    const far1 = T - Math.sign(off) * (Math.abs(off) + 2);
+    const far2 = T + Math.sign(off) * (Math.abs(off) + 3);
+    return mc(`Which number is closest in value to ${fmt(T / 100)}?`, fmt((T + off) / 100), [fmt(far1 / 100), fmt(far2 / 100), fmt(T), fmt(T / 10)], {
+      hint: 'Write them all with two decimals and find the smallest gap.',
+      steps: [`${fmt((T + off) / 100, 2)} is only ${fmt(Math.abs(off) / 100)} away from ${fmt(T / 100, 2)}.`, 'The others are further away.'],
+    });
+  };
+  S.dec_fill = () => {
+    const B = ri(101, 9899);
+    const add = pick([2, 5, 20, 50, 100, 300]);
+    const up = Math.random() < 0.5;
+    return {
+      kind: 'number',
+      q: up ? `${fmt(B / 1000)} + □ = ${fmt((B + add) / 1000)}` : `${fmt((B + add) / 1000)} − □ = ${fmt(B / 1000)}`,
+      answer: add / 1000,
+      correct: fmt(add / 1000),
+      hint: 'Line up the commas. Which place has changed?',
+      steps: [`With three decimals: ${fmt(B / 1000, 3)} and ${fmt((B + add) / 1000, 3)}`, `The difference is ${fmt(add / 1000, 3)}.`],
+    };
+  };
+  S.dec_seq = () => {
+    const w = ri(2, 9);
+    const step = pick([2, 3, 4, 5]);
+    const r = ri(1, step - 1);
+    const up = Math.random() < 0.5;
+    const last = up ? w * 100 - r : w * 100 + r;
+    const list = [3, 2, 1, 0].map((i) => (up ? last - i * step : last + i * step));
+    const next = up ? last + step : last - step;
+    return {
+      kind: 'number',
+      q: `What comes next? ${list.map((x) => fmt(x / 100, 2)).join('; ')}; ___`,
+      answer: next / 100,
+      correct: fmt(next / 100, 2),
+      hint: `Each number goes ${up ? 'up' : 'down'} by ${fmt(step / 100, 2)}. Watch what happens when you pass a whole number.`,
+      steps: [`Each number goes ${up ? 'up' : 'down'} by ${fmt(step / 100, 2)}.`, `${fmt(last / 100, 2)} ${up ? '+' : '−'} ${fmt(step / 100, 2)} = ${fmt(next / 100, 2)}`],
+    };
+  };
+  S.dec_bigger = () => {
+    let a, b;
+    do {
+      a = ri(1, 9);
+      b = ri(1, 9);
+    } while (a === b);
+    const A = `0,${a}${b}`;
+    const kind = pick(['small', 'zero', 'same']);
+    const B = kind === 'small' ? `0,0${a}${b}` : kind === 'zero' ? `0,${a}0${b}` : `0,${a}${b}0`;
+    const C = 'They are the same';
+    const options = [...shuffle([A, B]), C];
+    const right = kind === 'same' ? C : A;
+    return {
+      kind: 'mc',
+      keepOrder: true,
+      q: `Which is bigger: ${options[0]} or ${options[1]}?`,
+      options,
+      answer: options.indexOf(right),
+      correct: right,
+      hint: 'Write both with three decimals, then compare.',
+      steps: [`With three decimals: ${A}0 and ${B}`, kind === 'same' ? 'They are equal. A zero on the end changes nothing.' : `${A} is bigger.`],
+    };
+  };
+  S.dec_fact = () => {
+    let x, y;
+    do x = ri(101, 499);
+    while (x % 10 === 0);
+    do y = ri(11, 49);
+    while (y % 10 === 0);
+    const [a, b] = pick([[1, 0], [2, 0], [0, 1], [1, 1], [2, 1]]);
+    const ans = +((x * y) / 10 ** (a + b)).toFixed(3);
+    return {
+      kind: 'number',
+      q: `Use the fact that ${x} × ${y} = ${fmt(x * y)} to work out ${fmt(x / 10 ** a)} × ${fmt(y / 10 ** b)}.`,
+      answer: ans,
+      correct: fmt(ans),
+      hint: 'Count the digits after the comma in the sum. The answer has that many too.',
+      steps: [`There ${a + b === 1 ? 'is 1 digit' : `are ${a + b} digits`} after the comma altogether.`, `So ${fmt(x * y)} becomes ${fmt(ans)}.`],
+    };
+  };
+
+  // Multiplying: page 6
+  S.mul_parts = () =>
+    pick([
+      () => {
+        const a = ri(201, 899);
+        const n = ri(2, 9);
+        const h = a - (a % 100);
+        const r = a % 100;
+        return { kind: 'number', q: Math.random() < 0.5 ? `${a} × ${n}` : `${n} × ${a}`, answer: a * n, correct: fmt(a * n), hint: 'Multiply the hundreds, then the rest, and add.', steps: [`${h} × ${n} = ${fmt(h * n)}`, `${r} × ${n} = ${r * n}`, `${fmt(h * n)} + ${r * n} = ${fmt(a * n)}`] };
+      },
+      () => {
+        const whole = ri(2, 19);
+        const cents = ri(1, 19) * 5;
+        const n = ri(2, 9);
+        const ans = ((whole * 100 + cents) * n) / 100;
+        return { kind: 'number', q: `${money(whole + cents / 100)} × ${n}`, prefix: 'R', answer: ans, correct: money(ans), hint: 'Multiply the rands, then the cents, and add.', steps: [`R${whole} × ${n} = R${whole * n}`, `${cents}c × ${n} = ${money((cents * n) / 100)}`, `Together: ${money(ans)}`] };
+      },
+      () => {
+        const t = ri(11, 99);
+        const n = ri(2, 9);
+        const ans = (t * n) / 10;
+        return { kind: 'number', q: `${fmt(t / 10)} × ${n}`, answer: ans, correct: fmt(ans), hint: 'Multiply the whole part, then the tenths, and add.', steps: [`${t} × ${n} = ${t * n}`, `Put the comma back: ${fmt(ans)}`] };
+      },
+    ])();
+  S.mul_compensate = () => {
+    const B = pick([40000, 30000, 25000, 50000, 300, 1000, 1200, 250, 150, 800]);
+    const off = B >= 10000 ? pick([100, 200]) : pick([1, 2, 3]);
+    const price = B - off;
+    const n = ri(2, 8);
+    const ans = (price * n) / 100;
+    return {
+      kind: 'number',
+      q: `Round and adjust: ${money(price / 100)} × ${n}`,
+      prefix: 'R',
+      answer: ans,
+      correct: money(ans),
+      hint: `${money(price / 100)} is very close to ${money(B / 100)}. Use that, then fix it.`,
+      steps: [`${money(B / 100)} × ${n} = ${money((B * n) / 100)}`, `You added ${money(off / 100)} too much, ${n} times: ${money((off * n) / 100)}`, `${money((B * n) / 100)} − ${money((off * n) / 100)} = ${money(ans)}`],
+    };
+  };
+
+  // Percentages and money: pages 2, 3, 6, 13 and 17
+  S.pct_money = () => {
+    const units = { 50: 2, 25: 4, 75: 4, 10: 10, 20: 10, 5: 20, 15: 20, 90: 10 };
+    const p = pick(Object.keys(units).map(Number));
+    const c = units[p] * ri(Math.ceil(1000 / units[p]), Math.floor(90000 / units[p]));
+    const ans = (c * p) / 10000;
+    const steps = p === 50 ? [`50% is half: ${money(c / 100)} ÷ 2 = ${money(ans)}`] : p === 25 ? [`25% is a quarter: ${money(c / 100)} ÷ 4 = ${money(ans)}`] : p === 75 ? [`25% is ${money(c / 400)}.`, `75% is 3 lots of that: ${money(ans)}`] : [`10% of ${money(c / 100)} is ${money(c / 1000)}.`, `So ${p}% is ${money(ans)}.`];
+    return { kind: 'number', q: `What is ${p}% of ${money(c / 100)}?`, prefix: 'R', answer: ans, correct: money(ans), hint: p === 50 || p === 25 || p === 75 ? 'Find a half or a quarter first.' : 'Find 10% first by dividing by 10.', steps };
+  };
+  S.frac_money = () => {
+    const d = pick([2, 4, 5, 10]);
+    const c = d * ri(Math.ceil(800 / d), Math.floor(80000 / d));
+    const ans = c / d / 100;
+    return { kind: 'number', q: Math.random() < 0.5 ? `${fr(1, d)} × ${money(c / 100)}` : `${money(c / 100)} × ${fr(1, d)}`, prefix: 'R', answer: ans, correct: money(ans), hint: `× ${fr(1, d)} is the same as ÷ ${d}.`, steps: [`${fmt(c / 100, 2)} ÷ ${d} = ${fmt(ans, 2)}`] };
+  };
+  S.pct_vat = () => {
+    const price = pick([ri(21, 99), ri(11, 99) * 10, ri(11, 99) * 100]);
+    const vat = (price * 15) / 100;
+    const inc = Math.random() < 0.5;
+    const ten = price / 10;
+    return {
+      kind: 'number',
+      q: inc ? `A set of tyres costs ${money(price)} before VAT. VAT is 15%. What is the price with VAT?` : `A bike service costs ${money(price)} before VAT. VAT is 15%. How much is the VAT?`,
+      prefix: 'R',
+      answer: inc ? price + vat : vat,
+      correct: money(inc ? price + vat : vat),
+      hint: 'Find 10%, then half of that for 5%, then add them.',
+      steps: [`10% = ${money(ten)} and 5% = ${money(ten / 2)}`, `15% = ${money(vat)}`, ...(inc ? [`${money(price)} + ${money(vat)} = ${money(price + vat)}`] : [])],
+    };
+  };
+  S.pct_one = () => {
+    const pay = ri(100, 900) * 10;
+    return { kind: 'number', q: `An employer pays 1% of a salary into the UIF fund. How much is that on a salary of ${money(pay)}?`, prefix: 'R', answer: pay / 100, correct: money(pay / 100), hint: '1% means divide by 100.', steps: [`${fmt(pay)} ÷ 100 = ${fmt(pay / 100, 2)}`] };
+  };
+  S.pct_big = () => {
+    const p = pick([15, 20, 25, 30, 35, 40, 45]);
+    const pay = ri(12, 90) * 10000;
+    const ans = (pay * p) / 100;
+    return { kind: 'number', q: `A rider earns ${money(pay)} a year and pays ${p}% in tax. How much tax is that?`, prefix: 'R', answer: ans, correct: money(ans), hint: 'Find 10% first by dividing by 10, then build up.', steps: [`10% of ${fmt(pay)} = ${fmt(pay / 10)}`, `${p}% = ${fmt(ans)}`] };
+  };
+  const PROFIT = [10, 20, 25, 50, 75, 100];
+  S.pct_profit = () => {
+    if (Math.random() < 0.3) {
+      const k = ri(2, 30);
+      const cost = 300 * k;
+      const sell = 400 * k;
+      return mc(`A shop buys a helmet for ${money(cost)} and sells it for ${money(sell)}. What is the percentage profit?`, `33${fr(1, 3)}%`, ['25%', '50%', '75%'], {
+        hint: 'Find the profit in rand. Then compare it with what the shop PAID, not what it sold for.',
+        steps: [`Profit: ${fmt(sell)} − ${fmt(cost)} = ${fmt(100 * k)}`, `Compare with the cost: ${fr(100 * k, cost)} = ${fr(1, 3)} = 33${fr(1, 3)}%`, 'If you got 25%, you compared it with the selling price by mistake.'],
+      });
+    }
+    const p = pick(PROFIT);
+    const cost = ri(2, 40) * 100;
+    const profit = (cost * p) / 100;
+    const sell = cost + profit;
+    return {
+      kind: 'number',
+      q: `A shop buys a helmet for ${money(cost)} and sells it for ${money(sell)}. What is the percentage profit?`,
+      suffix: '%',
+      answer: p,
+      correct: `${p}%`,
+      hint: 'Find the profit in rand. Then compare it with what the shop PAID, not what it sold for.',
+      steps: [`Profit: ${fmt(sell)} − ${fmt(cost)} = ${fmt(profit)}`, `Compare with the cost: ${fr(profit, cost)} = ${p}%`],
+    };
+  };
+  S.pct_loss = () => {
+    const p = pick([10, 20, 25, 50]);
+    const cost = ri(2, 90) * 1000;
+    const loss = (cost * p) / 100;
+    return {
+      kind: 'number',
+      q: `A rider buys a bike for ${money(cost)} and sells it a year later for ${money(cost - loss)}. What is the percentage loss?`,
+      suffix: '%',
+      answer: p,
+      correct: `${p}%`,
+      hint: 'Find the loss in rand. Then compare it with what the rider PAID.',
+      steps: [`Loss: ${fmt(cost)} − ${fmt(cost - loss)} = ${fmt(loss)}`, `Compare with the cost: ${fr(loss, cost)} = ${p}%`],
+    };
+  };
+  S.pct_part = () => {
+    const p = pick([10, 20, 25, 30, 40, 50, 60, 75, 80, 90]);
+    const whole = ri(2, 30) * 20;
+    const part = (whole * p) / 100;
+    return {
+      kind: 'number',
+      q: `A track covers ${part} m² of a ${whole} m² plot. What percentage of the plot is that?`,
+      suffix: '%',
+      answer: p,
+      correct: `${p}%`,
+      hint: 'Write it as a fraction, then make the bottom number 100.',
+      steps: [`${fr(part, whole)} of the plot`, `That is the same as ${fr(p, 100)} = ${p}%`],
+    };
+  };
+
+  // Fractions: pages 11, 20 and 24
+  S.frac_of_mixed = () => {
+    const total = pick([20, 30, 36, 48, 50, 60]);
+    const d = pick([4, 7, 8, 9, 11, 16].filter((x) => total % x !== 0));
+    const s = RS.simp(total, d);
+    return {
+      kind: 'fraction',
+      q: `A box has ${total} sweets. What is ${fr(1, d)} of the box? Your answer may be a mixed number.`,
+      answer: { n: s.n, d: s.d },
+      correct: RS.mixedStr(total, d),
+      hint: 'Divide by the bottom number. The remainder becomes a fraction.',
+      steps: [`${total} ÷ ${d} = ${Math.floor(total / d)} remainder ${total % d}`, `So ${fr(1, d)} of ${total} = ${RS.mixedStr(total, d)}`],
+    };
+  };
+  S.frac_rest = () => {
+    const [d1, d2] = pick([[3, 4], [2, 3], [2, 4], [4, 6], [3, 6]]);
+    const total = RS.lcm(d1, d2) * ri(2, 8);
+    const a = total / d1;
+    const b = total / d2;
+    const left = total - a - b;
+    return {
+      kind: 'number',
+      q: `A rider has a box of ${total} energy bars. The rider eats ${fr(1, d1)} of them and gives ${fr(1, d2)} of them to a friend. How many are left?`,
+      answer: left,
+      correct: String(left),
+      hint: 'Work out each fraction of the whole box, then take both away.',
+      steps: [`${fr(1, d1)} of ${total} = ${a}`, `${fr(1, d2)} of ${total} = ${b}`, `${total} − ${a} − ${b} = ${left}`],
+    };
+  };
+
+  // Division: pages 10, 12, 15, 18 and 21
+  S.div_zero = () => {
+    const d = ri(3, 9);
+    const a = ri(1, 9);
+    const b = ri(1, 9);
+    const q = a * 100 + b;
+    return {
+      kind: 'number',
+      q: `${fmt(d * q)} ÷ ${d}`,
+      answer: q,
+      correct: String(q),
+      hint: `Break it into parts that ${d} goes into easily. Watch for a zero in the answer.`,
+      steps: [`Break it up: ${fmt(d * a * 100)} + ${d * b}`, `${fmt(d * a * 100)} ÷ ${d} = ${a * 100}`, `${d * b} ÷ ${d} = ${b}`, `Add them: ${q}`],
+    };
+  };
+  S.div_cents = () => {
+    const r = ri(2, 40);
+    const k = ri(1, 9);
+    const d = ri(2, 9);
+    const each = r * 100 + k;
+    return {
+      kind: 'number',
+      q: `${money((each * d) / 100)} ÷ ${d}`,
+      prefix: 'R',
+      answer: each / 100,
+      correct: money(each / 100),
+      hint: 'Divide the rands first, then the cents. Watch for a zero after the comma.',
+      steps: [`R${r * d} ÷ ${d} = R${r}`, `${k * d}c ÷ ${d} = ${k}c`, `So the answer is ${money(each / 100)}, because ${k}c is written ,0${k}.`],
+    };
+  };
+
+  // Exchange rates: page 19
+  const CROSS = [{ s: '£', name: 'pounds', r: 24 }, { s: '€', name: 'euros', r: 21 }, { s: '$', name: 'dollars', r: 19 }, { s: '$', name: 'dollars', r: 18 }, { s: '€', name: 'euros', r: 20 }, { s: '£', name: 'pounds', r: 25 }];
+  S.ex_yen = () => {
+    const rc = pick([10, 20]);
+    const rate = money(rc / 100);
+    if (Math.random() < 0.5) {
+      const rand = ri(3, 90) * 5;
+      const yen = (rand * 100) / rc;
+      return { kind: 'number', q: `¥1 = ${rate}. How many yen do you get for ${money(rand)}?`, prefix: '¥', answer: yen, correct: `¥${fmt(yen)}`, hint: 'Rand to foreign money means divide by the rate.', steps: [`${fmt(rand)} ÷ ${fmt(rc / 100, 2)} = ${fmt(yen)}`, 'Your answer is in yen, so it has a ¥ and not an R.'] };
+    }
+    const yen = ri(5, 90) * 100;
+    const rand = (yen * rc) / 100;
+    return { kind: 'number', q: `¥1 = ${rate}. How much is ¥${fmt(yen)} in rand?`, prefix: 'R', answer: rand, correct: money(rand), hint: 'Foreign money to rand means multiply by the rate.', steps: [`${fmt(yen)} × ${fmt(rc / 100, 2)} = ${fmt(rand)}`] };
+  };
+  S.ex_cross = () => {
+    let a, b;
+    do {
+      a = pick(CROSS);
+      b = pick(CROSS);
+    } while (a.s === b.s);
+    const amt = (RS.lcm(a.r, b.r) / a.r) * ri(1, 4);
+    const rand = amt * a.r;
+    const ans = rand / b.r;
+    return {
+      kind: 'number',
+      q: `${a.s}1 = R${a.r} and ${b.s}1 = R${b.r}. How many ${b.name} is ${a.s}${amt} worth?`,
+      prefix: b.s,
+      answer: ans,
+      correct: `${b.s}${ans}`,
+      hint: `Go through rand: change the ${a.name} into rand, then the rand into ${b.name}.`,
+      steps: [`${a.s}${amt} = ${amt} × ${a.r} = R${fmt(rand)}`, `R${fmt(rand)} ÷ ${b.r} = ${b.s}${ans}`],
+    };
+  };
+  S.ex_gifts = () => {
+    const [p1, p2] = shuffle(PEOPLE);
+    const pound = 24;
+    const euro = 21;
+    const dollar = 19;
+    const a = [ri(2, 9), ri(2, 9)];
+    const b = [ri(2, 9), ri(2, 9)];
+    const A = a[0] * euro + a[1] * pound;
+    const B = b[0] * dollar + b[1] * euro;
+    if (A === B) return S.ex_gifts();
+    const options = [p1, p2];
+    const right = A > B ? p1 : p2;
+    return {
+      kind: 'mc',
+      keepOrder: true,
+      q: `£1 = R24, €1 = R21 and $1 = R19. ${p1} is given €${a[0]} and £${a[1]}. ${p2} is given $${b[0]} and €${b[1]}. Who gets more money?`,
+      options,
+      answer: options.indexOf(right),
+      correct: right,
+      hint: 'Change all of it into rand first.',
+      steps: [`${p1}: ${a[0]} × 21 + ${a[1]} × 24 = R${A}`, `${p2}: ${b[0]} × 19 + ${b[1]} × 21 = R${B}`, `${right} gets more.`],
+    };
+  };
+
+  // Journeys and timetables: page 22
+  S.rate_journey = () => {
+    const v = pick([80, 90, 100, 110, 120]);
+    const h = ri(2, 9);
+    const half = Math.random() < 0.6;
+    const d = v * h + (half ? v / 2 : 0);
+    const say = (n, withHalf) => (withHalf ? `${n}${fr(1, 2)} hours` : `${n} hours`);
+    return mc(`A team's bakkie averages ${v} km/h. How long will a trip of ${fmt(d)} km take?`, say(h, half), [say(h, !half), say(h + 1, half), say(h - 1, half), say(h + 1, !half)], {
+      hint: `Count in ${v}s until you reach the distance. Half an hour covers ${v / 2} km.`,
+      steps: [`${v} × ${h} = ${fmt(v * h)} km`, half ? `Half an hour more covers ${v / 2} km, which makes ${fmt(d)} km.` : `That is the whole trip.`],
+    });
+  };
+  S.rate_leave_arrive = () => {
+    const start = ri(6 * 12, 9 * 12) * 5;
+    const driveHalves = ri(6, 18);
+    const stops = pick([30, 60, 90, 120]);
+    const end = start + driveHalves * 30 + stops;
+    const v = pick([80, 90, 100, 110]);
+    const km = (v * driveHalves) / 2;
+    return {
+      kind: 'number',
+      q: `A team leaves at ${clock(start)} and arrives at ${clock(end)}. It stops for ${hm(stops)} on the way and averages ${v} km/h while driving. How far does it drive?`,
+      suffix: 'km',
+      answer: km,
+      correct: `${fmt(km)} km`,
+      hint: 'Find the whole trip time, take off the stops, then multiply by the speed.',
+      steps: [`The whole trip takes ${hm(end - start)}.`, `Take off the stops: ${hm(driveHalves * 30)} of driving.`, `${v} × ${fmt(driveHalves / 2)} = ${fmt(km)} km`],
+    };
+  };
+  S.t_stops = () => {
+    const drive = ri(12, 40) * 15;
+    const n = ri(2, 4);
+    const each = pick([10, 15, 20]);
+    const total = drive + n * each;
+    return mc(`The driving takes ${hm(drive)}. The team also makes ${n} stops of ${each} min each. How long does the whole trip take?`, hm(total), [hm(drive - n * each), hm(drive), hm(total + 60), hm(drive + each)], {
+      hint: 'Stops make a trip longer, so add them on.',
+      steps: [`Stops: ${n} × ${each} = ${n * each} min`, `${hm(drive)} + ${n * each} min = ${hm(total)}`],
+    });
+  };
+  S.t_timetable = () => {
+    const names = ['Start gate', 'Rock garden', 'River', 'Log hop', 'Hill climb', 'Finish'];
+    let m = ri(9 * 12, 13 * 12) * 5 + ri(0, 4);
+    const rows = names.map((n, i) => {
+      if (i) m += ri(3, 15);
+      return [n, clock(m), m];
+    });
+    const i = ri(0, 3);
+    const j = ri(i + 1, 5);
+    const mins = rows[j][2] - rows[i][2];
+    return {
+      kind: 'number',
+      q: `How many minutes does the rider take from ${rows[i][0]} to ${rows[j][0]}?`,
+      visual: { type: 'table', head: ['Section', 'Time'], rows: rows.map((r) => [r[0], r[1]]) },
+      suffix: 'minutes',
+      answer: mins,
+      correct: `${mins} minutes`,
+      hint: 'Count on from the first time to the second. Don\'t subtract as if it were a normal number.',
+      steps: [`${rows[i][1]} to ${rows[j][1]} is ${mins} minutes.`],
+    };
+  };
+
+  // Ratio: scale plans and enlargements, page 20
+  S.ratio_plan = () => {
+    const s = pick([50, 100, 200]);
+    if (Math.random() < 0.5) {
+      const cm = ri(2, 20) * 2;
+      const m = (cm * s) / 100;
+      return { kind: 'number', q: `A plan has a scale of 1 : ${s}. A wall is ${cm} cm on the plan. How long is it on the ground, in metres?`, suffix: 'm', answer: m, correct: `${fmt(m)} m`, hint: `1 cm on the plan is ${s} cm on the ground. Then change cm to metres.`, steps: [`${cm} × ${s} = ${fmt(cm * s)} cm`, `${fmt(cm * s)} cm = ${fmt(m)} m`] };
+    }
+    const plan = ri(2, 30);
+    const g = (plan * s) / 100;
+    return { kind: 'number', q: `A plan has a scale of 1 : ${s}. A room is ${fmt(g)} m long on the ground. How long is it on the plan, in cm?`, suffix: 'cm', answer: plan, correct: `${plan} cm`, hint: `Change the metres to cm, then divide by ${s}.`, steps: [`${fmt(g)} m = ${fmt(plan * s)} cm`, `${fmt(plan * s)} ÷ ${s} = ${plan} cm`] };
+  };
+  S.ratio_enlarge = () => {
+    const a = ri(2, 9);
+    let b;
+    do b = ri(2, 12);
+    while (b === a);
+    const k = pick([2, 3, 4]);
+    const add = ri(1, 5);
+    const yes = Math.random() < 0.5;
+    const c = yes ? a * k : a + add;
+    const e = yes ? b * k : b + add;
+    if (!yes && c * b === e * a) return S.ratio_enlarge();
+    return {
+      kind: 'mc',
+      keepOrder: true,
+      q: `Rectangle A is ${a} cm by ${b} cm. Rectangle B is ${c} cm by ${e} cm. Is B an enlargement of A?`,
+      options: ['Yes', 'No'],
+      answer: yes ? 0 : 1,
+      correct: yes ? 'Yes' : 'No',
+      hint: 'Both sides must be MULTIPLIED by the same number.',
+      steps: yes ? [`${a} × ${k} = ${c} and ${b} × ${k} = ${e}`, 'Both sides are multiplied by the same number.'] : [`${a} to ${c} and ${b} to ${e} both add ${add}.`, 'Adding the same amount does not make an enlargement. You must multiply.'],
+    };
+  };
+
+  // Big numbers: page 23
+  S.big_million = () => {
+    if (Math.random() < 0.25) {
+      const t = ri(11, 99);
+      const n = (t * 1000000) / 10;
+      return { kind: 'number', q: `Write ${fmt(t / 10)} million in numbers.`, answer: n, correct: fmt(n), hint: 'A million has six zeros. Move the comma to fit.', steps: [`${fmt(t / 10)} × 1 000 000 = ${fmt(n)}`] };
+    }
+    const m = ri(2, 999);
+    return { kind: 'number', q: `Write ${m} million in numbers.`, answer: m * 1000000, correct: fmt(m * 1000000), hint: 'A million has six zeros.', steps: [`${m} × 1 000 000 = ${fmt(m * 1000000)}`] };
+  };
+  S.big_times = () => {
+    const b = pick([4, 5, 8, 10, 20, 25, 50]);
+    const k = ri(2, 12);
+    return { kind: 'number', q: `Country A has ${b * k} million people. Country B has ${b} million people. How many times as many people does Country A have?`, answer: k, correct: String(k), hint: `How many lots of ${b} make ${b * k}?`, steps: [`${b * k} ÷ ${b} = ${k}`] };
+  };
+  S.big_sum3 = () => {
+    const a = ri(1200, 9800);
+    const b = ri(1200, 9800);
+    const c = ri(1200, 9800);
+    return { kind: 'number', q: `${fmt(a)} + ${fmt(b)} + ${fmt(c)}`, answer: a + b + c, correct: fmt(a + b + c), hint: 'Add the thousands, then the hundreds, tens and units, then put them together.', steps: [`${fmt(a)} + ${fmt(b)} = ${fmt(a + b)}`, `${fmt(a + b)} + ${fmt(c)} = ${fmt(a + b + c)}`] };
+  };
+
+  // Patterns: pages 4 and 5
+  S.pat_which_picture = () => {
+    const a = ri(2, 4);
+    const b = ri(1, 3);
+    const p = ri(7, 40);
+    const val = a * p + b;
+    const thing = pick(['matches', 'tiles', 'cones']);
+    return {
+      kind: 'number',
+      q: `This pattern keeps growing the same way. Which picture number uses ${val} ${thing}?`,
+      visual: { type: 'table', head: ['Picture', 1, 2, 3, 4], rows: [[cap(thing), a + b, 2 * a + b, 3 * a + b, 4 * a + b]] },
+      answer: p,
+      correct: String(p),
+      hint: `Find the rule first. Then work backwards: undo the last step first.`,
+      steps: [`The rule is: picture number × ${a} + ${b}.`, `Work backwards: ${val} − ${b} = ${val - b}`, `${val - b} ÷ ${a} = ${p}`],
+    };
+  };
+
+  // Graphs: pages 9 and 16
+  const MONTHS_SHORT = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+  S.graph_bars = () => {
+    const from = ri(0, 6);
+    const labels = MONTHS_SHORT.slice(from, from + 6);
+    const values = labels.map(() => ri(1, 14) * 10);
+    const visual = { type: 'bars', title: 'Rainfall (mm)', labels, values, max: 150, step: 10, labelEvery: 50 };
+    const i = ri(0, 5);
+    let j;
+    do j = ri(0, 5);
+    while (j === i);
+    const mode = pick(['read', 'read', 'total', 'gap', 'most']);
+    if (mode === 'most') {
+      const max = Math.max(...values);
+      if (values.filter((v) => v === max).length > 1) return S.graph_bars();
+      const right = labels[values.indexOf(max)];
+      return mc('Which month had the most rain?', right, labels.filter((l) => l !== right), { visual, hint: 'Find the tallest bar.', steps: [`The tallest bar is ${right}, at ${max} mm.`] });
+    }
+    if (mode === 'total') return { kind: 'number', q: `How much rain fell in ${labels[i]} and ${labels[j]} altogether?`, visual, suffix: 'mm', answer: values[i] + values[j], correct: `${values[i] + values[j]} mm`, hint: 'Read each bar against the scale, then add.', steps: [`${labels[i]}: ${values[i]} mm and ${labels[j]}: ${values[j]} mm`, `${values[i]} + ${values[j]} = ${values[i] + values[j]}`] };
+    if (mode === 'gap' && values[i] !== values[j]) {
+      const gap = Math.abs(values[i] - values[j]);
+      return { kind: 'number', q: `How much more rain fell in ${values[i] > values[j] ? labels[i] : labels[j]} than in ${values[i] > values[j] ? labels[j] : labels[i]}?`, visual, suffix: 'mm', answer: gap, correct: `${gap} mm`, hint: 'Read each bar, then take the smaller from the bigger.', steps: [`${Math.max(values[i], values[j])} − ${Math.min(values[i], values[j])} = ${gap}`] };
+    }
+    return { kind: 'number', q: `How much rain fell in ${labels[i]}?`, visual, suffix: 'mm', answer: values[i], correct: `${values[i]} mm`, hint: 'Go up to the top of the bar, then across to the scale.', steps: [`The ${labels[i]} bar reaches ${values[i]} mm.`] };
+  };
+  S.graph_line = () => {
+    const ys = [100];
+    for (let i = 1; i <= 8; i++) ys.push(Math.min(350, Math.max(50, ys[i - 1] + pick([-100, -50, 50, 100, 50]))));
+    const points = ys.map((y, x) => [x, y]);
+    const visual = { type: 'line', title: 'Height of the enduro route (m)', xLabel: 'Distance (km)', points, max: 350, step: 50 };
+    const rises = [];
+    for (let i = 0; i < 8; i++) if (ys[i + 1] > ys[i]) rises.push(i);
+    const mode = pick(['height', 'height', 'climb', 'highest', 'steep']);
+    if (mode === 'climb' && rises.length) {
+      const i = pick(rises);
+      return { kind: 'number', q: `How many metres do you climb from the ${i} km mark to the ${i + 1} km mark?`, visual, suffix: 'm', answer: ys[i + 1] - ys[i], correct: `${ys[i + 1] - ys[i]} m`, hint: 'Read both heights, then find the difference.', steps: [`${ys[i + 1]} − ${ys[i]} = ${ys[i + 1] - ys[i]}`] };
+    }
+    if (mode === 'highest') {
+      const max = Math.max(...ys);
+      if (ys.filter((y) => y === max).length === 1) return { kind: 'number', q: 'After how many km do you reach the highest point?', visual, suffix: 'km', answer: ys.indexOf(max), correct: `${ys.indexOf(max)} km`, hint: 'Find the top of the graph, then go straight down to the distance.', steps: [`The highest point is ${max} m, at ${ys.indexOf(max)} km.`] };
+    }
+    if (mode === 'steep' && rises.length) {
+      const size = (i) => ys[i + 1] - ys[i];
+      const top = Math.max(...rises.map(size));
+      const best = rises.filter((i) => size(i) === top);
+      if (best.length === 1) {
+        const label = (i) => `${i} km to ${i + 1} km`;
+        const lesser = [0, 1, 2, 3, 4, 5, 6, 7].filter((i) => i !== best[0]);
+        return mc('Which of these sections is the steepest climb?', label(best[0]), shuffle(lesser).map(label), { visual, hint: 'The steepest climb goes up the most in the same distance.', steps: [`It climbs ${top} m in 1 km, more than any other section.`] });
+      }
+    }
+    const k = ri(0, 8);
+    return { kind: 'number', q: `How high is the route at the ${k} km mark?`, visual, suffix: 'm', answer: ys[k], correct: `${ys[k]} m`, hint: 'Go up from the distance to the line, then across to the height.', steps: [`At ${k} km the line is at ${ys[k]} m.`] };
+  };
+
+  // Put every section in book order, with the book's page numbers on it.
+  {
+    const maths = RS.packs.jordy.subjects.maths;
+    const byId = Object.fromEntries(maths.topics.map((t) => [t.id, t]));
+    const take = (ids) => {
+      for (const t of maths.topics) t.skills = t.skills.filter((s) => !ids.includes(s));
+      return ids;
+    };
+    const multiply = RS.section('multiply', 1, 'Multiplying', 'Pages 6, 7 and 22', take(['mul_parts', 'mul_compensate', 'dec_fact', 'dec_times', 'mul_2d']));
+    const patterns = RS.section('patterns', 8, 'Patterns and flow diagrams', 'Pages 4 and 5', take(['pat_flow_out', 'pat_flow_in', 'pat_rule_pick', 'pat_far', 'pat_next', 'pat_which_picture']));
+    const graphs = RS.section('graphs', 9, 'Graphs and tables', 'Pages 9 and 16', take(['graph_bars', 'graph_line']));
+    const bignum = RS.section('bignum', 0, 'Big numbers and sums', 'Page 23', take(['big_million', 'big_times', 'big_sum3', 'add_big', 'sub_big', 'estimate']));
+    const extra = {
+      decimals: ['dec_meaning', 'dec_largest', 'dec_closest', 'dec_fill', 'dec_seq', 'dec_bigger'],
+      percent: ['pct_money', 'pct_vat', 'pct_one', 'pct_big', 'pct_profit', 'pct_loss', 'pct_part'],
+      fractions: ['frac_money', 'frac_of_mixed', 'frac_rest'],
+      division: ['div_zero', 'div_cents'],
+      exchange: ['ex_yen', 'ex_cross', 'ex_gifts'],
+      time: ['t_stops', 't_timetable', 'rate_journey', 'rate_leave_arrive'],
+      ratio: ['ratio_plan', 'ratio_enlarge'],
+    };
+    for (const [id, list] of Object.entries(extra)) byId[id].skills.push(...list);
+    let decimalsImg = byId.decimals.img;
+    const pages = { decimals: 'Pages 1, 3 and 7', percent: 'Pages 2, 3, 6, 13 and 17', fractions: 'Pages 3, 6, 11, 20 and 24', fdp: 'Changing from one to another', divis: 'Pages 8, 14 and 21', division: 'Pages 10, 12, 15, 18 and 21', exchange: 'Page 19', time: 'Page 22', ratio: 'Pages 20 and 37', order: 'Page 1' };
+    for (const [id, text] of Object.entries(pages)) byId[id].blurb = text;
+    // Fourteen sections share ten photos, but every section keeps its own name on the track.
+    [decimalsImg, bignum.img] = [bignum.img, byId.decimals.img];
+    byId.decimals.img = decimalsImg;
+    byId.decimals.stop = 'Start gate';
+    bignum.stop = 'Log hop';
+    byId.fdp.stop = 'Double jump';
+    byId.exchange.stop = 'Sand wash';
+    byId.time.stop = 'Forest trail';
+    byId.order.stop = 'Last corner';
+    byId.warmup.stop = 'Pit lane';
+    byId.warmup.blurb = 'Extra practice: place value, factors, multiples and primes';
+    byId.time.title = 'Time and journeys';
+    byId.ratio.title = 'Ratio, rate and scale';
+    byId.percent.title = 'Percentages, profit and VAT';
+    multiply.notes = ['Multiply the parts: 611 × 5 = 600 × 5 + 11 × 5', 'Round and adjust: R399 × 4 = R400 × 4 − R4 = R1 596', 'Use a fact you know: if 162 × 21 = 3 402, then 1,62 × 2,1 = 3,402. Count the digits after the comma.'];
+    patterns.notes = ['Find the jump between pictures. That is what you multiply by.', 'Rule example: picture number × 2 + 1', 'To find the picture number, work backwards: undo + 1, then undo × 2.'];
+    graphs.notes = ['Read the labels and the scale first. What does each line stand for?', 'To read a value, go up to the bar or line, then across to the scale.', 'The steepest part of a line graph climbs the most in the same distance.'];
+    bignum.notes = ['A million has six zeros: 1 000 000.', 'How many times as many? Divide the bigger number by the smaller.'];
+    byId.percent.notes = [...byId.percent.notes, 'Profit = selling price − cost. Percentage profit compares the profit with the COST.', 'VAT is 15%: find 10%, then 5%, then add them.', '1% means divide by 100.'];
+    byId.exchange.notes = [...byId.exchange.notes, 'Going between two foreign moneys? Go through rand.', 'An answer in dollars has a $, not an R.'];
+    byId.time.notes = [...byId.time.notes, 'Speed: distance = speed × time. Time = distance ÷ speed.', 'Stops make a trip longer, so add them on.'];
+    byId.ratio.notes = [...byId.ratio.notes, 'Scale 1 : 50 means 1 cm on the plan is 50 cm on the ground.', 'An enlargement multiplies every side by the same number. Adding doesn\'t count.'];
+    byId.decimals.notes = [...byId.decimals.notes, 'Going past a whole number: 2,98 + 0,03 = 3,01, not 2,101.'];
+    maths.topics = ['decimals', multiply, 'percent', 'fractions', 'fdp', patterns, 'divis', graphs, 'division', 'exchange', 'time', bignum, 'ratio', 'order', 'warmup'].map((x) => (typeof x === 'string' ? byId[x] : x));
+    maths.examSize = 30;
+    maths.source = 'Number Sense, matched to the book';
+    maths.note = 'Questions are new but follow the book';
+    // These come up more often until they are strong.
+    maths.focus = ['dec_seq', 'dec_bigger', 'dec_meaning', 'dec_largest', 'dec_closest', 'dec_fact', 'mul_parts', 'mul_compensate', 'pct_money', 'frac_money', 'frac_of_mixed', 'pct_profit', 'pct_big', 'div_zero', 'div_cents', 'ex_cross', 'ex_from_rand', 't_stops'];
+    maths.startWith = ['decimals', 'percent', 'exchange'];
+  }
 })(typeof window !== 'undefined' ? window : globalThis);
 
 /* Jordy's Science test, Tuesday 10 November: Planet Earth and Beyond. Written from the school's
@@ -4266,7 +4912,10 @@ details ol { margin: 6px 0 0; padding-left: 20px; }
     const doneToday = p.dailyBy[ui.subject] === dayKey();
     const best = p.examBy[ui.subject];
     const weak = main.filter((t) => seenTopic(p, t)).map((t) => ({ t, m: mastery(p, t) })).sort((a, b) => a.m - b.m).filter((x) => x.m < 0.85).slice(0, 3);
-    const coach = weak.length
+    const first = !main.some((t) => seenTopic(p, t)) ? (sub.startWith || []).map((id) => main.find((t) => t.id === id)).filter(Boolean) : [];
+    const coach = first.length
+      ? `<p class="small-t" style="padding-inline:4px">Start with these three sections.</p>${first.map((t, i) => `<div class="coach-item"><div class="coach-row"><span class="rank">${i + 1}</span><h3>${t.title}</h3><button class="btn dark small" data-act="start" data-mode="topic" data-topic="${t.id}">Practise</button></div></div>`).join('')}`
+      : weak.length
       ? weak.map((x, i) => `<div class="coach-item"><div class="coach-row"><span class="rank">${i + 1}</span><h3>${x.t.title}</h3><button class="btn dark small" data-act="start" data-mode="topic" data-topic="${x.t.id}">Practise</button></div><div class="meter" role="img" aria-label="${Math.round(x.m * 100)} percent"><i style="width:${Math.round(x.m * 100)}%"></i></div></div>`).join('')
       : `<div class="coach-item"><p class="small-t">${seenTopic(p, main[0]) ? 'Nothing needs fixing right now. Try the main event.' : 'Finish one moto and your coach will find what to practise next.'}</p></div>`;
     return shell(`
@@ -4486,7 +5135,8 @@ details ol { margin: 6px 0 0; padding-left: 20px; }
     while (out.length < n) {
       const weights = pool.map((id) => {
         const s = p.skills[id];
-        const base = s ? 0.25 + (1 - s.m) : 1.3;
+        // Focus skills come up more often until they are strong.
+        const base = (s ? 0.25 + (1 - s.m) : 1.3) * ((sub.focus || []).includes(id) && (!s || s.m < 0.8) ? 2 : 1);
         // One-section banks may repeat the skill; the asked list stops the same question repeating.
         return base * 0.35 ** (used[id] || 0) * (pool.length > 1 && out[out.length - 1] === id ? 0 : 1);
       });
@@ -4692,6 +5342,36 @@ details ol { margin: 6px 0 0; padding-left: 20px; }
     if (!m) return s;
     return RS.fmt(+m[1]) + (m[2] || '');
   }
+  // Question graphs: a light grid against one scale, and the labels a child needs to read a value.
+  function chartFrame(v, w, h, left, bottom, top) {
+    const plot = h - bottom - top;
+    const y = (val) => top + plot - (val / v.max) * plot;
+    let lines = '';
+    const every = v.labelEvery || v.step;
+    for (let t = 0; t <= v.max; t += v.step) lines += `<line class="grid" x1="${left}" x2="${w}" y1="${y(t)}" y2="${y(t)}"/>${t % every === 0 ? `<text x="${left - 4}" y="${y(t) + 3}" text-anchor="end">${t}</text>` : ''}`;
+    return { y, plot, lines };
+  }
+  function chartBars(v) {
+    const W = 340, H = 190, L = 30, B = 20, T = 8;
+    const { y, lines } = chartFrame(v, W, H, L, B, T);
+    const step = (W - L) / v.values.length;
+    const bars = v.values.map((val, i) => {
+      const x = L + i * step + step / 2 - 12;
+      const h = y(0) - y(val);
+      return `<path class="bar" d="M${x} ${y(0)}v${-(h - 4)}q0-4 4-4h16q4 0 4 4v${h - 4}z"/><text x="${L + i * step + step / 2}" y="${H - 5}" text-anchor="middle">${v.labels[i]}</text>`;
+    }).join('');
+    return `<div><div class="small-t muted">${h(v.title)}</div><svg class="chart" viewBox="0 0 ${W} ${H}" width="100%" role="img" aria-label="${h(v.title)}: ${v.labels.map((l, i) => l + ' ' + v.values[i]).join(', ')}">${lines}${bars}</svg></div>`;
+  }
+  function chartLine(v) {
+    const W = 340, H = 190, L = 30, B = 32, T = 8;
+    const { y, lines } = chartFrame(v, W, H, L, B, T);
+    const last = v.points[v.points.length - 1][0];
+    const x = (k) => L + 4 + (k / last) * (W - L - 12);
+    const path = v.points.map(([k, val]) => `${x(k)},${y(val)}`).join(' ');
+    const ticks = v.points.map(([k]) => `<text x="${x(k)}" y="${H - 19}" text-anchor="middle">${k}</text>`).join('');
+    const dots = v.points.map(([k, val]) => `<circle class="dot" cx="${x(k)}" cy="${y(val)}" r="3"/>`).join('');
+    return `<div><div class="small-t muted">${h(v.title)}</div><svg class="chart" viewBox="0 0 ${W} ${H}" width="100%" role="img" aria-label="${h(v.title)}: ${v.points.map(([k, val]) => k + ' km ' + val + ' m').join(', ')}">${lines}<polyline class="line" points="${path}"/>${dots}${ticks}<text x="${(L + W) / 2}" y="${H - 4}" text-anchor="middle">${h(v.xLabel)}</text></svg></div>`;
+  }
   function visual(q) {
     const v = q.visual;
     if (!v) return '';
@@ -4699,6 +5379,8 @@ details ol { margin: 6px 0 0; padding-left: 20px; }
       const arrow = ic('next', 16);
       return `<div class="flow">${v.items.map((it, i) => `<span class="${i === 0 || i === v.items.length - 1 ? 'end' : ''}">${h(it)}</span>`).join(arrow)}</div>`;
     }
+    if (v.type === 'bars') return chartBars(v);
+    if (v.type === 'line') return chartLine(v);
     return `<div class="tbl-wrap"><table class="tbl"><thead><tr>${v.head.map((x) => `<th scope="col">${h(String(x))}</th>`).join('')}</tr></thead><tbody>${v.rows.map((row) => `<tr>${row.map((x) => `<td>${h(String(x))}</td>`).join('')}</tr>`).join('')}</tbody></table></div>`;
   }
   const voiceReady = () => !ui.voiceBlocked && !!(window.SpeechRecognition || window.webkitSpeechRecognition);
