@@ -3739,8 +3739,8 @@ details ol { margin: 6px 0 0; padding-left: 20px; }
 })(typeof window !== 'undefined' ? window : globalThis);
 
 /* Jordy's History test, Thursday 5 November. The racing sections follow the book's pages on his test
-   list, with new questions on the same facts. Except for his_heart, the first lists came before the
-   pages arrived and go beyond them, so they are extra practice only. */
+   list, with new questions on the same facts. The first lists came before the pages arrived and go
+   beyond them, so they are extra practice only. */
 (function (root) {
   'use strict';
   const RS = root.RS;
@@ -3837,14 +3837,7 @@ details ol { margin: 6px 0 0; padding-left: 20px; }
     { q: 'Tiny living things that cause disease are often called ___.', t: ['germs', 'germ', 'bacteria', 'microbes', 'microorganisms', 'pathogens'], why: 'Pasteur showed that germs cause disease.', h: 'It starts with "g".' },
   ]);
 
-  S.his_heart = bank([
-    { q: 'Who performed the world\'s first human heart transplant?', a: 'Dr Christiaan Barnard', w: ['Dr Edward Jenner', 'Dr Alexander Fleming', 'Dr Joseph Lister'], why: 'Chris Barnard, a South African surgeon, led the operation.' },
-    { q: 'On what date was the first human heart transplant done?', a: '3 December 1967', w: ['27 April 1994', '16 June 1976', '1 January 1950'], why: 'It was done on 3 December 1967.' },
-    { q: 'In which hospital was the first human heart transplant done?', a: 'Groote Schuur Hospital', w: ['Baragwanath Hospital', 'Addington Hospital', 'St Mary\'s in London'], why: 'It was done at Groote Schuur Hospital in Cape Town.' },
-    { q: 'In which city is Groote Schuur Hospital?', a: 'Cape Town', w: ['Durban', 'Johannesburg', 'Pretoria'], why: 'Groote Schuur is in Cape Town.' },
-    { q: 'Who received the first transplanted human heart?', a: 'Louis Washkansky', w: ['Denise Darvall', 'Chris Barnard', 'Philip Blaiberg'], why: 'Louis Washkansky was the patient.' },
-    { q: 'How long did Louis Washkansky live after the transplant?', a: '18 days', w: ['18 hours', '18 months', '18 years'], why: 'The heart worked, but he died of pneumonia 18 days later.' },
-    { q: 'Who was the donor of the first transplanted heart?', a: 'Denise Darvall', w: ['Louis Washkansky', 'Hamilton Naki', 'Marius Barnard'], why: 'Denise Darvall died after a road accident, and her family agreed to donate her heart.' },
+  S.his_heart_more = bank([
     { q: 'Who was Dr Barnard\'s second heart transplant patient, who lived for about 19 months?', a: 'Philip Blaiberg', w: ['Louis Washkansky', 'Hamilton Naki', 'Nelson Mandela'], why: 'Philip Blaiberg\'s operation in January 1968 showed that transplants could work for longer.' },
     { q: 'Which man, with no formal medical training, became a skilled surgical assistant in Barnard\'s laboratory?', a: 'Hamilton Naki', w: ['Louis Washkansky', 'Enoch Sontonga', 'Steve Biko'], why: 'Hamilton Naki worked in the research laboratory at the University of Cape Town. Apartheid limited the recognition he received.' },
     { q: 'Who showed that the heart pumps blood around the body?', a: 'William Harvey', w: ['Wilhelm Röntgen', 'Edward Jenner', 'Louis Pasteur'], why: 'William Harvey described blood circulation in 1628.' },
@@ -3852,10 +3845,6 @@ details ol { margin: 6px 0 0; padding-left: 20px; }
     { q: 'What keeps blood moving while surgeons stop the heart?', a: 'The heart-lung machine', w: ['The X-ray machine', 'The dialysis machine', 'The ventilator alone'], why: 'It pumps and adds oxygen to the blood, so surgeons can stop the heart to work on it.' },
     { q: 'Who built the first successful heart-lung machine, used in 1953?', a: 'John Gibbon', w: ['Chris Barnard', 'William Harvey', 'Joseph Lister'], why: 'John Gibbon used it for the first successful open-heart operation of its kind in 1953.' },
     { q: 'Why did transplant patients need drugs after surgery?', a: 'To stop the body rejecting the new heart', w: ['To make the heart bigger', 'To clean their teeth', 'To help them see better'], why: 'The immune system attacks anything it sees as foreign, so anti-rejection drugs are needed.' },
-    { q: 'How did antibiotics help make heart surgery safer?', a: 'They kept germs from spreading in the wound', w: ['They pumped the blood', 'They took pictures of the heart', 'They replaced the lungs'], why: 'Without control of infection, patients would die after major surgery.' },
-    { q: 'How did anaesthetics help make heart surgery possible?', a: 'Patients could sleep without pain through long operations', w: ['Patients could be sure that no germs got into the wound', 'Patients could be given blood that matched their own', 'Patients could be given a healthy heart from a donor'], why: 'Long, careful surgery is only possible when the patient feels nothing.' },
-    { tf: true, q: 'True or false: the first human heart transplant was done in South Africa.', why: 'It was done at Groote Schuur Hospital in Cape Town in 1967.' },
-    { q: 'What surname is missing? The first human heart transplant was led by Dr Christiaan ___.', t: ['barnard'], why: 'Dr Chris Barnard led the operation.', h: 'It starts with "B".' },
   ]);
 
   // ---------- Term 3, pages 144 and 145 ----------
@@ -4200,6 +4189,80 @@ details ol { margin: 6px 0 0; padding-left: 20px; }
     { q: `Dr Christiaan ___ did the world's first heart transplant.`, t: [`barnard`], why: `He did it in 1967.`, h: `It starts with "B".` },
   ]);
 
+  // ---------- Term 4, pages 186 and 187: transfusions, X-rays and what each discovery does ----------
+  S.his_aids = bank([
+    { q: `What is a blood transfusion?`, a: `Giving a patient blood that someone donated`, w: [`Taking blood out to test it for germs`, `Washing a wound with clean water`, `Taking an X-ray of a patient's veins`], why: `The donated blood goes into the patient's body.` },
+    { q: `Why might a patient need a blood transfusion during an operation?`, a: `They have lost too much blood`, w: [`They have caught a lung infection`, `They can feel too much pain`, `They have a broken bone`], why: `Operations can cost a patient a lot of blood, and a transfusion replaces it.` },
+    { q: `Where does the blood for a transfusion come from?`, a: `People who donate it`, w: [`Animals on farms`, `A factory that makes it`, `Plants from a herbalist`], why: `People give their blood so that it can be used for patients.` },
+    { q: `How is donated blood kept until it is needed?`, a: `In special bags`, w: [`In wooden boxes`, `In paper envelopes`, `In open buckets`], why: `It waits in the bags until a patient needs it.` },
+    { q: `How does donated blood get into a patient during an operation?`, a: `It is pumped into the body`, w: [`It is swallowed as a drink`, `It is rubbed onto the skin`, `It is sprayed onto the wound`], why: `The blood is pumped from the bag into the patient.` },
+    { q: `What are X-rays?`, a: `Pictures that let doctors see inside the body`, w: [`Drugs that put a patient into a deep sleep`, `Soaps that keep a doctor's hands free of germs`, `Bags that hold blood from people who donate it`], why: `An X-ray shows what can't be seen from the outside, such as a bone.` },
+    { q: `When is the part of the body being operated on usually X-rayed?`, a: `Before the operation`, w: [`A year after the operation`, `Once the patient is home`, `Never, as it isn't needed`], why: `The doctors look at it first, so they know what they are dealing with.` },
+    { q: `How does an X-ray help the doctors before an operation?`, a: `They can plan what needs to be done`, w: [`They can stop the patient feeling pain`, `They can keep germs out of the wound`, `They can replace blood that was lost`], why: `Seeing inside the body first helps them plan the operation.` },
+    { q: `Besides before an operation, when else do doctors use X-rays?`, a: `During the operation`, w: [`While scrubbing their hands`, `While donating their blood`, `While choosing a hospital`], why: `The pictures also help them while they are operating.` },
+    { q: `What could an X-ray show a doctor?`, a: `A break in a bone`, w: [`A germ on the skin`, `How much you weigh`, `What you ate today`], why: `Bones show up clearly on an X-ray.` },
+    { q: `Which discovery helps doctors plan an operation?`, a: `X-rays`, w: [`Anaesthetics`, `Blood transfusions`, `Antibiotics`], why: `X-rays show them what is inside the body before they start.` },
+    { q: `Which discovery stops a patient feeling pain during an operation?`, a: `Anaesthetics`, w: [`X-rays`, `Blood transfusions`, `Antibiotics`], why: `The patient is put into a very deep sleep.` },
+    { q: `Which discovery replaces blood a patient has lost in an operation?`, a: `Blood transfusions`, w: [`X-rays`, `Anaesthetics`, `Antibiotics`], why: `Blood from a donor makes up for what was lost.` },
+    { q: `How does a clean operating theatre help an operation?`, a: `It keeps germs out of the wound`, w: [`It stops the patient feeling pain`, `It shows doctors inside the body`, `It replaces blood that was lost`], why: `Germs in a wound can cause a dangerous infection.` },
+    { q: `How do anaesthetics help an operation?`, a: `The patient sleeps and feels no pain`, w: [`The wound stays free of all germs`, `The doctors can see inside the body`, `The lost blood is quickly replaced`], why: `Before anaesthetics, operations were terribly sore.` },
+    { q: `How do blood transfusions help an operation?`, a: `They replace blood the patient has lost`, w: [`They show the doctors a broken bone`, `They keep the patient deeply asleep`, `They stop germs reaching the wound`], why: `A patient who loses too much blood is in danger.` },
+    { q: `How do X-rays help an operation?`, a: `They show doctors what is inside the body`, w: [`They keep the patient deeply asleep`, `They replace the blood that was lost`, `They keep the operating theatre clean`], why: `Doctors use them to plan, and during the operation too.` },
+    { tf: true, q: `True or false: a patient can lose a lot of blood during an operation.`, why: `That is why blood transfusions are used.` },
+    { tf: false, q: `True or false: X-rays are pictures of the outside of the body.`, why: `They show the inside of the body.` },
+    { q: `Giving a patient blood from a donor is called a blood ___.`, t: [`transfusion`], why: `It replaces blood the patient has lost.`, h: `It starts with "t".` },
+    { q: `Pictures that let doctors see inside the body are called ___.`, t: [`x-rays`, `x-ray`, `xrays`, `xray`, `x rays`, `x ray`], why: `Doctors use them to plan operations.`, h: `It starts with "X".` },
+  ]);
+
+  // ---------- Term 4, pages 187 and 188: the operation ----------
+  S.his_heart = bank([
+    { q: `Who led the team that did the world's first heart transplant?`, a: `Professor Christiaan Barnard`, w: [`Professor Robert Koch`, `Doctor Edward Jenner`, `Doctor Alexander Fleming`], why: `He led a team of doctors and nurses.` },
+    { q: `When did the first heart transplant take place?`, a: `December 1967`, w: [`April 1994`, `October 1928`, `May 1796`], why: `It was in December 1967.` },
+    { q: `On what day of the week does the story of the transplant begin?`, a: `A Saturday`, w: [`A Monday`, `A Wednesday`, `A Friday`], why: `It began on a Saturday afternoon. By the Monday the news was everywhere.` },
+    { q: `Which hospital was Professor Barnard from?`, a: `Groote Schuur Hospital`, w: [`Baragwanath Hospital`, `Addington Hospital`, `Tygerberg Hospital`], why: `Groote Schuur Hospital is in Cape Town.` },
+    { q: `In which city is Groote Schuur Hospital?`, a: `Cape Town`, w: [`Durban`, `Johannesburg`, `Pretoria`], why: `The first heart transplant made Cape Town famous.` },
+    { q: `Who received the new heart?`, a: `Louis Washkansky`, w: [`Denise Darvall`, `Christiaan Barnard`, `James Phipps`], why: `He was the patient. His heart was failing.` },
+    { q: `What was wrong with Louis Washkansky before the operation?`, a: `His heart was failing and he was dying`, w: [`He had been badly hurt in a car crash`, `He had caught smallpox from a cow`, `He had broken a bone in his arm`], why: `Only a new heart could give him a chance.` },
+    { q: `Whose heart was given to Louis Washkansky?`, a: `Denise Darvall's`, w: [`Christiaan Barnard's`, `James Phipps's`, `Robert Koch's`], why: `She was a young woman who was not going to survive a car accident.` },
+    { q: `What happened to Denise Darvall?`, a: `She was badly hurt in a car crash`, w: [`She caught TB from a relative`, `She was bitten by a rabid dog`, `She got smallpox as a child`], why: `She was not going to survive.` },
+    { q: `What did Denise Darvall have that Louis Washkansky needed?`, a: `A healthy heart`, w: [`A healthy kidney`, `A rare blood group`, `A pair of strong lungs`], why: `Her heart could try to save his life.` },
+    { q: `Who gave permission for Denise Darvall's heart to be used?`, a: `Her father`, w: [`Her school principal`, `Louis Washkansky`, `The government`], why: `Professor Barnard asked her father.` },
+    { q: `What did the medical team do in the operation?`, a: `Moved Denise's heart into Louis's body`, w: [`Moved Louis's heart into Denise's body`, `Mended Louis's heart without removing it`, `Gave Louis medicine to strengthen his heart`], why: `Moving a healthy heart into a patient's body is a transplant.` },
+    { q: `How long did Louis Washkansky live after the operation?`, a: `18 days`, w: [`18 hours`, `18 months`, `18 years`], why: `He lived for 18 more days.` },
+    { q: `What did Louis Washkansky die of?`, a: `A lung infection`, w: [`A car accident`, `Smallpox`, `Losing too much blood`], why: `It was an infection in his lungs that killed him, 18 days later.` },
+    { q: `Why was the operation called a success, even though Louis Washkansky died?`, a: `The transplant worked, and an infection killed him later`, w: [`He went on to live for many years with the new heart`, `Denise Darvall made a full recovery after the accident`, `Doctors decided that they would never try one again`], why: `His death 18 days later came from a lung infection.` },
+    { q: `How did the first heart transplant help other heart doctors?`, a: `They could learn new things from it`, w: [`They could stop washing their hands`, `They no longer needed anaesthetics`, `They no longer had to go to hospital`], why: `Doctors all over the world learned from it.` },
+    { q: `What are heart transplants like today?`, a: `Many work well, and patients can live for years`, w: [`They are against the law in nearly every country`, `Most patients die within a few days of the operation`, `They are only ever done on very young children`], why: `Doctors have learned a lot since 1967.` },
+    { q: `Why was the first human heart transplant big news around the world?`, a: `It had never been done before`, w: [`It was the first ever operation`, `It was the first use of X-rays`, `It took place in a famous city`], why: `It made Professor Barnard famous almost overnight.` },
+    { q: `What did Professor Barnard say the transplant did for him?`, a: `It made him world famous in two days`, w: [`It made him leave South Africa for good`, `It made him stop working as a surgeon`, `It made him decide to study smallpox`], why: `Few people knew him on the Saturday, and by the Monday the whole world did.` },
+    { q: `Which book by Chris Barnard is his words about becoming famous taken from?`, a: `One Life`, w: [`Long Walk to Freedom`, `The Cape Times`, `Medicine Through Time`], why: `The quote is adapted from his book, One Life.` },
+    { tf: true, q: `True or false: Professor Barnard got permission before using Denise Darvall's heart.`, why: `He asked her father.` },
+    { tf: false, q: `True or false: Louis Washkansky lived for many years with his new heart.`, why: `He died 18 days later. Patients today can live for many years.` },
+    { tf: false, q: `True or false: the first heart transplant took place in Durban.`, why: `It was done by a team from Groote Schuur Hospital in Cape Town.` },
+    { q: `The man who received the first new heart was Louis ___.`, t: [`washkansky`], why: `Louis Washkansky was dying of heart failure.`, h: `It starts with "W".` },
+    { q: `The young woman whose heart was used was Denise ___.`, t: [`darvall`], why: `Denise Darvall had a healthy heart.`, h: `It starts with "D".` },
+    { q: `Professor Barnard was from Groote ___ Hospital.`, t: [`schuur`], why: `Groote Schuur Hospital is in Cape Town.`, h: `It starts with "S".` },
+  ]);
+
+  // ---------- Term 4, page 188: points of view in the newspapers ----------
+  S.his_views = bank([
+    { q: `What is a point of view?`, a: `What someone thinks about something`, w: [`A fact that everybody agrees on`, `The date printed on a newspaper`, `A high place with a good view`], why: `Two people can have different points of view about the same event.` },
+    { q: `Newspaper story 1 says doctors should leave the heart alone. What is its point of view on the transplant?`, a: `Negative: it was wrong to do`, w: [`Positive: it was a great success`, `Positive: more should be done`, `It gives no point of view at all`], why: `It says that putting one person's heart into another is wrong.` },
+    { q: `Which words best sum up the point of view of newspaper story 1?`, a: `Doctors have gone too far`, w: [`A proud day for Cape Town`, `Money very well spent`, `A great step forward`], why: `It thinks medical science should not go this far.` },
+    { q: `What is the main complaint in newspaper story 2?`, a: `Too much money was spent on one man`, w: [`The hospital was much too small`, `The doctors had not been trained`, `The new heart came from overseas`], why: `It calls the transplant a big waste of money.` },
+    { q: `Why does newspaper story 2 think the money should have gone elsewhere?`, a: `Thousands of people were going hungry`, w: [`Thousands of doctors were out of work`, `The hospital needed new X-ray machines`, `The country wanted to build more roads`], why: `It compares one man's operation with all the hungry people.` },
+    { q: `Is newspaper story 2 positive or negative about the transplant?`, a: `Negative`, w: [`Positive`, `Neither`, `It doesn't mention it`], why: `It calls the transplant a waste of money.` },
+    { q: `In the headline about a big waste of money, which word shows most clearly that the writer disapproves?`, a: `Waste`, w: [`Big`, `Money`, `Of`], why: `Calling something a waste shows a negative point of view.` },
+    { q: `What do newspaper stories 1 and 2 have in common?`, a: `Both are against the transplant`, w: [`Both are in favour of the transplant`, `One is for it and the other against it`, `Both only report the facts of the day`], why: `They give different reasons, but neither approves.` },
+    { q: `Why can two newspapers write such different things about one event?`, a: `Their writers have different points of view`, w: [`Only one of them was ever really printed`, `The event happened on two different days`, `Newspapers are not allowed to agree`], why: `A newspaper's opinion depends on what its writer thinks.` },
+    { q: `Which of these is an opinion, not a fact?`, a: `It is wrong to give one person another's heart`, w: [`The first transplant took place in December 1967`, `Louis Washkansky died 18 days after the operation`, `Professor Barnard led the team of doctors and nurses`], why: `An opinion is what someone thinks. A fact can be checked.` },
+    { q: `Which of these is a fact, not an opinion?`, a: `The transplant was done by a Cape Town team`, w: [`Medical science has gone much too far`, `The money for it was completely wasted`, `Doctors should leave the heart alone`], why: `A fact can be checked. The others are what someone thinks.` },
+    { q: `Which of these headlines shows a positive point of view of the transplant?`, a: `Cape Town doctors make history`, w: [`Doctors should leave hearts alone`, `Too much money spent on one man`, `Transplant was a terrible mistake`], why: `Making history is high praise. The others disapprove.` },
+    { tf: true, q: `True or false: two people can read about the same event and have different opinions.`, why: `That is what a point of view is.` },
+    { tf: false, q: `True or false: in 1967 everybody agreed that the heart transplant was a good thing.`, why: `Some newspapers were against it.` },
+    { q: `What someone thinks about an event is their point of ___.`, t: [`view`], why: `Newspapers can have one too.`, h: `It starts with "v".` },
+  ]);
+
   pack.subjects.history = {
     label: 'History',
     source: 'Social Sciences, History Topics 3 and 4',
@@ -4217,8 +4280,9 @@ details ol { margin: 6px 0 0; padding-left: 20px; }
       RS.section('his_germs', 7, 'Pasteur, Koch and TB', 'Term 4, pages 179 and 180'),
       RS.section('his_jenner', 8, 'Jenner and smallpox', 'Term 4, pages 182 and 183'),
       RS.section('his_fleming', 9, 'Fleming and penicillin', 'Term 4, page 184'),
-      Object.assign(RS.section('his_transplant', 2, 'The first heart transplant', 'Term 4, pages 185 to 188', ['his_surgery', 'his_heart']), { stop: 'Last corner' }),
-      Object.assign(RS.section('his_extra', 0, 'Beyond the book', 'Extra practice: ancient medicine, how courts work and more. Not on his test list', ['his_democracy', 'his_justice', 'his_anthem', 'his_medicine', 'his_modern']), { warmup: true, stop: 'Pit lane' }),
+      Object.assign(RS.section('his_ops', 1, 'Surgery and safer operations', 'Term 4, pages 185 to 187', ['his_surgery', 'his_aids']), { stop: 'Final straight' }),
+      Object.assign(RS.section('his_transplant', 2, 'The first heart transplant', 'Term 4, pages 187 and 188', ['his_heart', 'his_views']), { stop: 'Last corner' }),
+      Object.assign(RS.section('his_extra', 0, 'Beyond the book', 'Extra practice: ancient medicine, how courts work and more. Not on his test list', ['his_democracy', 'his_justice', 'his_anthem', 'his_medicine', 'his_modern', 'his_heart_more']), { warmup: true, stop: 'Pit lane' }),
     ],
   };
 })(typeof window !== 'undefined' ? window : globalThis);
@@ -6623,9 +6687,7 @@ Jordy's Science test, Tuesday 10 November: Planet Earth and Beyond. Written from
       { q: `Which scientist discovered radium and won two Nobel Prizes?`, a: `Marie Curie`, w: [`Florence Nightingale`, `Rosalind Franklin`, `Mary Seacole`], why: `Marie Curie's work on radioactivity later helped doctors to treat cancer.` },
       { q: `A medicine that kills bacteria is called an ___.`, t: [`antibiotic`, `antibiotics`, `antibacterial`], why: `Penicillin was the first widely used antibiotic.`, h: `It starts with "anti".` },
     ],
-    his_heart: [
-      { q: `What is a blood transfusion?`, a: `Giving a patient blood from another person`, w: [`Taking out a person's heart`, `Cleaning a wound with alcohol`, `Using X-rays to see the blood`], why: `Knowing about blood groups made transfusions safe, which long operations depend on.` },
-      { q: `Why was the first human heart transplant big news around the world?`, a: `Nobody had ever given a person a new human heart before`, w: [`It was the first time a surgeon had ever cut open a human chest`, `The patient lived for another fifty years afterwards`, `It was the first operation in which a patient was put to sleep`], why: `Chris Barnard's team did it for the first time in Cape Town in 1967.` },
+    his_heart_more: [
       { tf: true, q: `True or false: Dr Chris Barnard was born in South Africa.`, why: `He was born in Beaufort West, in the Karoo, in 1922.` },
     ],
 
