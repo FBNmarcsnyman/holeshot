@@ -4694,6 +4694,179 @@ details ol { margin: 6px 0 0; padding-left: 20px; }
   };
 })(typeof window !== 'undefined' ? window : globalThis);
 
+/* Batch of 1 November 2026: three new questions for every written list.
+   Original questions, written without the textbooks. See ADDING-QUESTIONS.md. */
+(function (root) {
+  'use strict';
+  root.RS.addQuestions('jordy', '2026-11-01', {
+    dv_tf: [
+      { tf: true, q: `True or false: a number that divides by both 3 and 4 also divides by 12.`, why: `True. 3 and 4 share no factors except 1, and 3 × 4 = 12.` },
+      { tf: false, q: `True or false: a number that divides by both 4 and 6 must also divide by 24.`, why: `False. 12 divides by 4 and by 6, but not by 24.` },
+      { tf: true, q: `True or false: if the digits of a number add up to 18, the number divides by 9.`, why: `True. A number divides by 9 when its digits add up to a multiple of 9, and 18 = 2 × 9.` },
+    ],
+
+    afr_past: [
+      { q: `Skryf in die verlede tyd: Die ryer spring oor die hobbel.`, a: `Die ryer het oor die hobbel gespring.`, w: [`Die ryer het gespring oor die hobbel.`, `Die ryer spring het oor die hobbel.`, `Die ryer sal oor die hobbel spring.`], why: `het + ge- + verb, and the verb goes to the end: gespring.` },
+      { q: `Skryf in die verlede tyd: Ons vergeet die helm.`, a: `Ons het die helm vergeet.`, w: [`Ons het die helm gevergeet.`, `Ons het vergeet die helm.`, `Ons sal die helm vergeet.`], why: `Verbs starting with ver- do not take ge-, so "vergeet" stays as it is.`, h: `Look at how "vergeet" starts. Some beginnings do not take "ge-".` },
+      { q: `Verlede tyd van "wen": Hy het die wedren ___.`, t: [`gewen`], why: `"Wen" takes ge- in the past tense: Hy het die wedren gewen.`, h: `Put "ge-" on the verb.` },
+    ],
+    afr_future: [
+      { q: `Skryf in die toekomende tyd: Die ryer was sy fiets.`, a: `Die ryer sal sy fiets was.`, w: [`Die ryer sal was sy fiets.`, `Die ryer het sy fiets gewas.`, `Die ryer was sal sy fiets.`], why: `"Sal" comes straight after the subject and the verb goes to the end.` },
+      { q: `Skryf in die toekomende tyd: Sy trek haar handskoene aan.`, a: `Sy sal haar handskoene aantrek.`, w: [`Sy sal trek haar handskoene aan.`, `Sy het haar handskoene aangetrek.`, `Sy sal haar handskoene trek aan.`], why: `The two parts of "aantrek" join up again at the end of the sentence.`, h: `Where do "trek" and "aan" go?` },
+      { q: `Watter sin is in die toekomende tyd?`, a: `Ons sal Saterdag op die baan ry.`, w: [`Ons ry elke dag op die baan.`, `Ons het Saterdag op die baan gery.`, `Ons was Saterdag op die baan.`], why: `"Sal" with the verb at the end shows that it still has to happen.` },
+    ],
+    afr_stompi: [
+      { q: `Watter sin is reg volgens STOMPI?`, a: `Die ryers oefen vandag hard op die baan.`, w: [`Die ryers oefen hard vandag op die baan.`, `Die ryers oefen op die baan vandag hard.`, `Vandag die ryers oefen hard op die baan.`], why: `Time first (vandag), then manner (hard), then place (op die baan).` },
+      { q: `In die sin "Pa sal môre die ketting in die motorhuis skoonmaak", wat is die infinitief?`, a: `skoonmaak`, w: [`Pa`, `môre`, `in die motorhuis`], why: `The infinitive is the verb at the very end of the sentence.` },
+      { q: `In die sin "Thabo ry elke Saterdag stadig deur die modder", wat is die manier?`, a: `stadig`, w: [`elke Saterdag`, `deur die modder`, `Thabo`], why: `Manner tells you how he rides: stadig.` },
+    ],
+    afr_conj: [
+      { q: `Verbind met "want": Ek ry stadig. Die baan is glad.`, a: `Ek ry stadig, want die baan is glad.`, w: [`Ek ry stadig, want die baan glad is.`, `Ek ry stadig, want is die baan glad.`, `Want ek ry stadig, die baan is glad.`], why: `"Want" keeps the normal word order: die baan is glad.` },
+      { q: `Verbind met "omdat": Hy wen die wedren. Hy oefen elke dag.`, a: `Hy wen die wedren omdat hy elke dag oefen.`, w: [`Hy wen die wedren omdat hy oefen elke dag.`, `Hy wen die wedren, omdat oefen hy elke dag.`, `Hy wen die wedren en omdat hy elke dag oefen.`], why: `After "omdat" the verb goes to the end: oefen.` },
+      { q: `Kies die regte woord: Dit reën, ___ ry ons nie.`, a: `daarom`, w: [`omdat`, `want`, `terwyl`], why: `After "daarom" the verb comes straight next: daarom ry ons nie.` },
+    ],
+    afr_prep: [
+      { q: `Ons ry ___ Durban. (to)`, a: `na`, w: [`by`, `uit`, `onder`], why: `"Na" means "to" when you travel towards a place.` },
+      { q: `Ek wag ___ die hek. (at)`, a: `by`, w: [`oor`, `na`, `onder`], why: `"By" means "at": Ek wag by die hek.` },
+      { q: `Die ryers jaag ___ die baan. (around)`, t: [`om`, `rondom`], why: `"Om" means "around": Die ryers jaag om die baan.`, h: `It is a very short word.` },
+    ],
+    afr_pron: [
+      { q: `Die fietse behoort aan die seuns. Dit is ___ fietse.`, a: `hulle`, w: [`hom`, `ons`, `hy`], why: `"Hulle" (or "hul") shows that the bikes belong to them.` },
+      { q: `Ek sien jou en Piet. Ek sien ___.`, a: `julle`, w: [`hulle`, `ons`, `hom`], why: `"Julle" is "you" when you talk to more than one person.` },
+      { q: `Die helm behoort aan julle. Die helm is ___.`, t: [`julle s'n`], why: `"Julle s'n" means "yours" when it belongs to more than one person.`, h: `Think of "ons s'n".` },
+    ],
+    afr_plural: [
+      { q: `Wat is die meervoud van "wiel"?`, t: [`wiele`], why: `Add -e: wiel, wiele.`, h: `Add one letter to the end.` },
+      { q: `Wat is die meervoud van "klip"?`, t: [`klippe`], why: `The short vowel means the last letter doubles: klip, klippe.`, h: `The vowel sound is short.` },
+      { q: `Wat is die meervoud van "vlag"?`, a: `vlae`, w: [`vlagte`, `vlagge`, `vlags`], why: `The g falls away: vlag becomes vlae, just as dag becomes dae.` },
+    ],
+    afr_dim: [
+      { q: `Wat is die verkleining van "skoen"?`, t: [`skoentjie`], why: `After a long sound and "n", add -tjie: skoentjie.`, h: `Listen to the sound before the "n". Is it long or short?` },
+      { q: `Wat is die verkleining van "helm"?`, t: [`helmpie`], why: `Words ending in "lm" or "rm" take -pie, just like arm becomes armpie.`, h: `Think of how "arm" changes.` },
+      { q: `Wat is die verkleining van "son"?`, a: `sonnetjie`, w: [`sontjie`, `sonnie`, `sonpie`], why: `Short vowel and "n": double the n and add -etjie.` },
+    ],
+    afr_adverb: [
+      { q: `Vind die bywoord: Die ryer draai versigtig.`, a: `versigtig`, w: [`ryer`, `draai`, `die`], why: `"Versigtig" tells you how the rider turns.` },
+      { q: `Vind die bywoord: Die fietse staan daar.`, a: `daar`, w: [`fietse`, `staan`, `die`], why: `"Daar" tells you where the bikes stand.` },
+      { q: `Vertaal: today`, t: [`vandag`], why: `"Vandag" is an adverb of time.`, h: `It starts with "v".` },
+    ],
+
+    eng_punct: [
+      { q: `Which sentence is punctuated correctly?`, a: `Thabo, my cousin, rides an old enduro bike.`, w: [`Thabo my cousin, rides an old enduro bike.`, `Thabo my cousin rides an old enduro bike.`, `thabo, my cousin, rides an old enduro bike.`], why: `Extra information in the middle of a sentence has a comma on each side, and a name takes a capital letter.` },
+      { q: `Which sentence uses capital letters correctly?`, a: `On Saturday we rode near Pietermaritzburg.`, w: [`On saturday we rode near Pietermaritzburg.`, `On Saturday we rode near pietermaritzburg.`, `on Saturday we Rode near Pietermaritzburg.`], why: `Days and places are proper nouns, and the first word of a sentence takes a capital.` },
+      { q: `What is the short form of "she will"?`, t: [`she'll`, `she’ll`], why: `The apostrophe stands in for the missing letters "wi".`, h: `An apostrophe takes the place of the missing letters.` },
+    ],
+    eng_parts: [
+      { q: `What part of speech is **muddy**? The muddy track was slow.`, a: `Adjective`, w: [`Noun`, `Verb`, `Adverb`], why: `"Muddy" describes the noun "track", so it is an adjective.` },
+      { q: `Find the auxiliary verb: The riders were waiting at the gate.`, a: `were`, w: [`riders`, `waiting`, `gate`], why: `"Were" helps the main verb "waiting".` },
+      { q: `A word that takes the place of a noun is called a ___.`, t: [`pronoun`], why: `Words such as "she", "he" and "they" are pronouns.`, h: `It ends in "noun".` },
+    ],
+    eng_figures: [
+      { q: `What figure of speech is this? The chain snapped with a loud clang.`, a: `Onomatopoeia`, w: [`Simile`, `Metaphor`, `Hyperbole`], why: `"Clang" sounds like the noise it describes.` },
+      { q: `What figure of speech is this? The old bike coughed and refused to start.`, a: `Personification`, w: [`Simile`, `Alliteration`, `Hyperbole`], why: `Coughing and refusing are things people do, not machines.` },
+      { q: `Which sentence has a metaphor?`, a: `The track was a river of mud.`, w: [`The track was as wet as a river.`, `The track looked like a river.`, `The track was very muddy.`], why: `A metaphor says one thing is another, with no "like" or "as".` },
+    ],
+    eng_speech: [
+      { q: `Change to indirect speech: Zinhle said, "I am fixing my bike."`, a: `Zinhle said that she was fixing her bike.`, w: [`Zinhle said that she is fixing my bike.`, `Zinhle said that I was fixing my bike.`, `Zinhle said, she was fixing her bike.`], why: `"I" becomes "she", "am" becomes "was" and "my" becomes "her".` },
+      { q: `Change to direct speech: Sipho said that he had a flat tyre.`, a: `Sipho said, "I have a flat tyre."`, w: [`Sipho said, "he had a flat tyre."`, `Sipho said that "I have a flat tyre."`, `Sipho said, I have a flat tyre.`], why: `"He" becomes "I", "had" becomes "have" and the spoken words go in inverted commas.` },
+      { q: `In indirect speech, "today" becomes "that ___".`, t: [`day`, `that day`], why: `"Today" becomes "that day".`, h: `"Today" means "this day". What does "this" become?` },
+    ],
+    eng_syn: [
+      { q: `Which is a synonym for **difficult**?`, a: `hard`, w: [`easy`, `quick`, `soft`], why: `"Difficult" and "hard" mean nearly the same here.` },
+      { q: `Which is an antonym of **victory**?`, a: `defeat`, w: [`triumph`, `win`, `success`], why: `A defeat is the opposite of a victory.` },
+      { q: `Give an antonym of **dirty**.`, t: [`clean`, `spotless`], why: `After a muddy ride the bike is dirty. After a wash it is clean.`, h: `What is a bike like after a good wash?` },
+    ],
+    eng_affix: [
+      { q: `What does the prefix **un-** mean?`, a: `Not`, w: [`Again`, `Before`, `Under`], why: `"Unsafe" means "not safe".` },
+      { q: `What does the suffix **-er** show in the word **rider**?`, a: `A person who does something`, w: [`Without something`, `Full of something`, `Doing it again`], why: `A rider is a person who rides.` },
+      { q: `Add the suffix -able to **comfort**.`, t: [`comfortable`], why: `comfort + able = comfortable.`, h: `Keep all of "comfort" and add the ending.` },
+    ],
+    eng_subject: [
+      { q: `Find the subject: The mud on my boots is drying.`, a: `The mud on my boots`, w: [`is drying`, `my boots`, `The mud on`], why: `The sentence is about the mud on my boots.` },
+      { q: `Find the predicate: Sipho cleaned his goggles after the race.`, a: `cleaned his goggles after the race`, w: [`Sipho`, `Sipho cleaned`, `after the race`], why: `The predicate is everything that says what Sipho did.` },
+      { tf: true, q: `True or false: in the command "Run!", the subject "you" is understood even though it isn't written.`, why: `A command is spoken to "you", so the subject doesn't need to be written.` },
+    ],
+    eng_abstract: [
+      { q: `What is the abstract noun from **weak**?`, t: [`weakness`], why: `Add -ness: weak, weakness.`, h: `Think of how "kind" changes.` },
+      { q: `What is the abstract noun from **grow**?`, t: [`growth`], why: `Add -th: grow, growth.`, h: `Think of "strong" and "strength". This one ends the same way.` },
+      { q: `Which word is an abstract noun?`, a: `patience`, w: [`helmet`, `rider`, `track`], why: `You can't touch patience. It is a quality.` },
+    ],
+
+    geo_pop: [
+      { q: `5 000 people live on 50 km² of land. What is the population density?`, a: `100 people per km²`, w: [`10 people per km²`, `5 people per km²`, `250 000 people per km²`], why: `Divide the people by the area: 5 000 ÷ 50 = 100 people per km².`, h: `Divide the number of people by the area.` },
+      { q: `Which of these is a physical factor that affects where people live?`, a: `Climate`, w: [`Jobs`, `Shops`, `Schools`], why: `Physical factors come from nature. Jobs, shops and schools are made by people.` },
+      { tf: true, q: `True or false: a country can have many people and still have a low population density.`, why: `Density depends on the area too. A huge country can have many people who are spread out.` },
+    ],
+    geo_live: [
+      { q: `Why do people in hot, dry places often wear loose, light clothes?`, a: `The clothes keep them cool and protect them from the sun`, w: [`The clothes keep out the snow`, `The clothes soak up more heat`, `The clothes are heavier to carry`], why: `Loose, light clothes let air move and shade the skin. It is one way people adapt to climate.` },
+      { q: `Which of these is an example of commercial farming?`, a: `A big sugar cane farm that sells to a mill`, w: [`A family growing maize just for themselves`, `A small vegetable patch behind a home`, `Three chickens that lay eggs for one family`], why: `Commercial farming grows crops or animals to sell for profit.` },
+      { q: `Changing how you live so that you can cope in your environment is called ___.`, t: [`adapting`, `adaptation`], why: `People adapt by changing their homes, clothes, food and work.`, h: `It starts with "a".` },
+    ],
+    geo_rural: [
+      { q: `Which of these are you more likely to find close by in a city than on a remote farm?`, a: `A big hospital`, w: [`A cattle dip`, `A borehole`, `A grain silo`], why: `Cities have enough people to support big services such as hospitals.` },
+      { q: `What is an informal settlement?`, a: `An area of homes built without official planning or services`, w: [`A farm that grows only maize`, `A business area with tall offices`, `A national park`], why: `Informal settlements can grow quickly when a city does not have enough houses.` },
+      { tf: true, q: `True or false: people in remote rural areas often have to travel far to reach a hospital.`, why: `Rural areas have fewer people, so big services are usually farther away.` },
+    ],
+    geo_world: [
+      { q: `Which animals do the Sami people of northern Europe traditionally herd?`, a: `Reindeer`, w: [`Camels`, `Cattle`, `Llamas`], why: `Reindeer give the Sami meat and hides, and they cope well with the cold.` },
+      { q: `How did the San people of Southern Africa traditionally get their food?`, a: `By hunting animals and gathering wild plants`, w: [`By fishing through Arctic ice`, `By growing rice in flooded fields`, `By buying it from factories`], why: `The San were hunter-gatherers who knew the land and its plants very well.` },
+      { tf: false, q: `True or false: the Bedouin people traditionally live in the Arctic.`, why: `The Bedouin live in deserts in the Middle East and North Africa. The Inuit live in the Arctic.` },
+    ],
+
+    his_democracy: [
+      { q: `Who can vote in a South African national election?`, a: `South African citizens aged 18 or older who have registered`, w: [`Only people who own land`, `Only men over the age of 21`, `Anyone in the country from age 12`], why: `Since 1994, every adult citizen can register and vote, whatever their race, gender or wealth.` },
+      { q: `What does the Freedom Day public holiday on 27 April remember?`, a: `South Africa's first democratic election in 1994`, w: [`The first human heart transplant`, `The end of the Second World War`, `The Union of South Africa in 1910`], why: `On 27 April 1994, South Africans of all races voted together for the first time.` },
+      { q: `A person who stands in an election, hoping to be chosen, is called a ___.`, t: [`candidate`], why: `Voters choose from the candidates.`, h: `It starts with "c".` },
+    ],
+    his_justice: [
+      { q: `What is a magistrate?`, a: `A person who decides cases in a lower court`, w: [`A police officer who arrests people`, `A lawyer who speaks for the accused`, `A member of Parliament`], why: `Magistrates hear many everyday cases. More serious cases can go to the High Court.` },
+      { q: `What did apartheid laws do?`, a: `They treated people differently because of their race`, w: [`They gave every adult an equal vote`, `They closed every school in the country`, `They applied only to visitors`], why: `Apartheid laws took rights away from people because of their race. Today the Constitution forbids this.` },
+      { tf: true, q: `True or false: the law must treat a rich person and a poor person the same.`, why: `Equality before the law means that money makes no difference.` },
+    ],
+    his_anthem: [
+      { q: `Which four languages are in the national anthem besides English?`, a: `isiXhosa, isiZulu, Sesotho and Afrikaans`, w: [`isiZulu, Setswana, Tshivenda and Afrikaans`, `isiXhosa, isiNdebele, Sepedi and Xitsonga`, `isiXhosa, isiZulu, siSwati and Sepedi`], why: `The anthem moves from isiXhosa to isiZulu, Sesotho, Afrikaans and then English.` },
+      { q: `Which language comes straight before English in the national anthem?`, a: `Afrikaans`, w: [`Sesotho`, `isiZulu`, `isiXhosa`], why: `The Afrikaans part comes from "Die Stem", and the English part follows it.` },
+      { tf: true, q: `True or false: "Die Stem van Suid-Afrika" began as a poem.`, why: `C.J. Langenhoven wrote it as a poem in 1918, and it was set to music later.` },
+    ],
+    his_medicine: [
+      { q: `What did doctors in ancient Greece believe about the "four humours"?`, a: `Too much or too little of four body fluids caused illness`, w: [`Illness came only from eating four foods`, `Four gods looked after every hospital`, `Every person had four hearts`], why: `This idea was wrong, but doctors in Europe followed it for well over 1 000 years.` },
+      { q: `What is herbal medicine?`, a: `Treating illness with plants`, w: [`Treating illness with X-rays`, `Treating illness with magnets`, `Treating illness with surgery only`], why: `Healers in many cultures use leaves, roots and bark.` },
+      { tf: true, q: `True or false: the ancient Egyptians wrote down medical knowledge on papyrus.`, why: `Medical papyrus scrolls from ancient Egypt survive today and describe illnesses and treatments.` },
+    ],
+    his_modern: [
+      { q: `Who developed the first widely used polio vaccine, in the 1950s?`, a: `Jonas Salk`, w: [`Edward Jenner`, `Louis Pasteur`, `Alexander Fleming`], why: `Jonas Salk's vaccine was announced as safe and effective in 1955.` },
+      { q: `Which scientist discovered radium and won two Nobel Prizes?`, a: `Marie Curie`, w: [`Florence Nightingale`, `Rosalind Franklin`, `Mary Seacole`], why: `Marie Curie's work on radioactivity later helped doctors to treat cancer.` },
+      { q: `A medicine that kills bacteria is called an ___.`, t: [`antibiotic`, `antibiotics`, `antibacterial`], why: `Penicillin was the first widely used antibiotic.`, h: `It starts with "anti".` },
+    ],
+    his_heart: [
+      { q: `What is a blood transfusion?`, a: `Giving a patient blood from another person`, w: [`Taking out a person's heart`, `Cleaning a wound with alcohol`, `Using X-rays to see the blood`], why: `Knowing about blood groups made transfusions safe, which long operations depend on.` },
+      { q: `Why was the first human heart transplant big news around the world?`, a: `Nobody had ever given a person a new human heart before`, w: [`It was done in space`, `The patient was a president`, `It took only five minutes`], why: `Chris Barnard's team did it for the first time in Cape Town in 1967.` },
+      { tf: true, q: `True or false: Dr Chris Barnard was born in South Africa.`, why: `He was born in Beaufort West, in the Karoo, in 1922.` },
+    ],
+
+    sci_planets: [
+      { q: `Which planet is tilted so far that it seems to spin on its side?`, a: `Uranus`, w: [`Mars`, `Saturn`, `Venus`], why: `Uranus is tilted by about 98 degrees, so it rolls around the Sun on its side.` },
+      { q: `Which planet has the Great Red Spot, a giant storm?`, a: `Jupiter`, w: [`Mars`, `Neptune`, `Saturn`], why: `The Great Red Spot is a storm on Jupiter that is wider than the Earth.` },
+      { q: `The planet next to Earth that is closer to the Sun is ___.`, t: [`Venus`], why: `The order goes Mercury, Venus, Earth.`, h: `It starts with "V".` },
+    ],
+    sci_moons: [
+      { q: `Which moon of Jupiter has the most active volcanoes?`, a: `Io`, w: [`Titan`, `Phobos`, `Ganymede`], why: `Io has more volcanic activity than anywhere else in the solar system.` },
+      { q: `Which of these planets has the most known moons?`, a: `Saturn`, w: [`Earth`, `Mars`, `Mercury`], why: `Saturn has more known moons than any other planet, well over 100.` },
+      { tf: true, q: `True or false: footprints left on the Moon can last a very long time because there is no wind there.`, why: `The Moon has no wind or rain to wear the footprints away.` },
+    ],
+    sci_earth: [
+      { q: `Around midday in South Africa, in which direction do you look to see the Sun?`, a: `North`, w: [`South`, `East`, `West`], why: `Almost all of South Africa lies south of the Tropic of Capricorn, so the midday Sun is nearly always in the northern part of the sky.` },
+      { q: `Which line divides the Earth into a northern half and a southern half?`, a: `The equator`, w: [`The axis`, `The orbit`, `The horizon`], why: `The equator runs around the middle of the Earth.` },
+      { q: `A year with 366 days is called a ___ year.`, t: [`leap`, `leap year`], why: `A leap year has one extra day, 29 February.`, h: `It is something a bike does off a big jump.` },
+    ],
+    sci_moonspin: [
+      { q: `Which phase comes straight after a new moon?`, a: `Waxing crescent`, w: [`Full moon`, `Waning crescent`, `Waning gibbous`], why: `After a new moon the lit part starts to grow, as a thin crescent.` },
+      { q: `What do we call the side of the Moon that we never see from Earth?`, a: `The far side`, w: [`The new side`, `The north side`, `The waxing side`], why: `The far side gets sunlight too. We just can't see it from Earth.` },
+      { tf: true, q: `True or false: at full moon, the Moon is on the opposite side of the Earth from the Sun.`, why: `The Sun lights up the whole face we can see, so it looks like a full circle.` },
+    ],
+  });
+})(typeof window !== 'undefined' ? window : globalThis);
+
 /* Holeshot: the game screens. Progress saves on this device. */
 (function () {
   'use strict';
