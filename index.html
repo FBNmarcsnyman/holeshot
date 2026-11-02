@@ -566,6 +566,13 @@ details ol { margin: 6px 0 0; padding-left: 20px; }
 .sheet-head { display: flex; align-items: center; gap: 8px; }
 .sheet-head h2 { flex: 1; }
 
+/* The side track */
+.side-card { display: grid; gap: 8px; }
+.side-tiles { display: grid; gap: 8px; }
+.side-tile { display: flex; align-items: center; gap: 10px; justify-content: space-between; background: var(--card-2); border-radius: 16px; padding: 12px; }
+.side-tile.locked { opacity: .7; }
+.side-host { position: fixed; inset: 0; z-index: 30; background: #0F1116; touch-action: none; overscroll-behavior: none; }
+
 </style>
 <div id="app"></div>
 <div id="toast" class="toast" role="status" aria-live="polite" hidden></div>
@@ -11706,6 +11713,1895 @@ Jordy's Science test, Tuesday 10 November: Planet Earth and Beyond. Written from
   };
 })(typeof window !== 'undefined' ? window : globalThis);
 
+/* Big Air: a short ramp-and-tricks side game, opened by the day's pit pass.
+   Hold to rev, launch off the kicker, trick in the air, lean to match the landing slope.
+   Scores are style points for his own records only. It never earns shop points. */
+(function (root) {
+  'use strict';
+  const RS = (root.RS = root.RS || {});
+  const D2R = Math.PI / 180, TAU = Math.PI * 2;
+  const clamp = (v, a, b) => (v < a ? a : v > b ? b : v);
+  const wrap = (a) => Math.atan2(Math.sin(a), Math.cos(a));
+  const num = (n) => String(Math.round(n)).replace(/\B(?=(\d{3})+(?!\d))/g, '\u00a0');
+  const dec = (n, d) => n.toFixed(d).replace('.', ',');
+  const times = (n) => '×' + (n % 1 ? dec(n, 1) : n);
+  const ease = (p) => (p < 0.5 ? 2 * p * p : 1 - 2 * (1 - p) * (1 - p));
+  const env = (p) => Math.sin(Math.PI * clamp(p, 0, 1));
+  const FD = '"Bricolage Grotesque","Trebuchet MS",system-ui,sans-serif', FB = 'Lexend,"Segoe UI",system-ui,sans-serif';
+
+  // ---------- the course, in metres: x to the right, y up, the kicker lip at x = 0 ----------
+  const G = 14; // a little stronger than real gravity, so jumps feel snappy
+  const LIP = 48 * D2R, KR = 8.5, KX = -KR * Math.sin(LIP), LIPY = KR * (1 - Math.cos(LIP)); // kicker: an arc ending at the lip angle
+  const START = -62, DROP = -50, TOPY = 3.4; // a short roll-in from the start gate
+  const PIT = -7, WALL = 9, KY = 1.5, KNUCK = 11, TAN = Math.tan(36 * D2R), VAL = -24;
+  const BOT = KNUCK + (KY - VAL) / TAN, FR = 2.2, BR = 5; // rounded knuckle and bottom
+  function ground(x) {
+    if (x < DROP) return x <= START ? TOPY : TOPY * (0.5 + 0.5 * Math.cos((Math.PI * (x - START)) / (DROP - START)));
+    if (x < KX) return 0;
+    if (x <= 0) return KR - Math.sqrt(KR * KR - (x - KX) * (x - KX));
+    if (x < 1.4) return LIPY + (PIT - LIPY) * (x / 1.4);
+    if (x < WALL - 1.6) return PIT;
+    if (x < WALL) return PIT + (KY - PIT) * ((x - WALL + 1.6) / 1.6);
+    if (x < KNUCK - FR) return KY;
+    if (x < KNUCK + FR) { const d = x - KNUCK + FR; return KY - (TAN * d * d) / (4 * FR); }
+    if (x < BOT - BR) return KY - TAN * (x - KNUCK);
+    if (x < BOT + BR) { const d = BOT + BR - x; return VAL + (TAN * d * d) / (4 * BR); }
+    return VAL;
+  }
+  // Up the kicker the front wheel carries on along the lip's line, so the bike leaves at the lip angle.
+  const rideY = (x) => (x > 0 ? LIPY + Math.tan(LIP) * x : ground(x));
+  const angAt = (f, x) => Math.atan2(f(x + 0.08) - f(x - 0.08), 0.16);
+  const V_MIN = 12, V_TOP = 18.6, POP = 1.07, RED = 0.86;
+
+  // ---------- tricks and landings ----------
+  const TRICKS = {
+    superman: { n: 'Superman', d: 0.8, p: 180, i: '↑' },
+    cancan: { n: 'Can-can', d: 0.6, p: 120, i: '↓' },
+    nacnac: { n: 'Nac-nac', d: 0.65, p: 130, i: '←' },
+    whip: { n: 'Whip', d: 0.55, p: 110, i: '→' },
+    heelclicker: { n: 'Heel clicker', d: 0.5, p: 100, i: '✦' },
+    backflip: { n: 'Backflip', d: 1.2, p: 400 },
+  };
+  const FLIP_NEEDS = TRICKS.backflip.d + 0.5; // seconds of air left, so a bogged jump is too small to flip
+  const BY_DIR = { up: 'superman', down: 'cancan', left: 'nacnac', right: 'whip' };
+  const GRADES = {
+    perfect: { n: 'Perfect landing!', s: 'Perfect', m: 1.5, c: '#C8F031' },
+    clean: { n: 'Clean landing', s: 'Clean', m: 1, c: '#7FD3FF' },
+    sketchy: { n: 'Sketchy landing', s: 'Sketchy', m: 0.5, c: '#FFC83D' },
+    crash: { n: 'Washout!', s: 'Washout', m: 0, c: '#FF9A7A' },
+  };
+  const WORSE = { perfect: 'clean', clean: 'sketchy', sketchy: 'crash', crash: 'crash' };
+  const gradeFor = (deg) => (deg <= 8 ? 'perfect' : deg <= 18 ? 'clean' : deg <= 33 ? 'sketchy' : 'crash');
+  // Each trick changes the sprite: tilt, squash, a hop or a wobble. The backflip is real rotation.
+  function trickLook(id, p, k) {
+    const e = env(p), o = { rot: 0, sx: 1, sy: 1, dx: 0, dy: 0 };
+    if (id === 'whip') Object.assign(o, { sx: 1 - 0.55 * e, rot: -0.14 * e * k, dy: 0.03 * e });
+    if (id === 'superman') Object.assign(o, { sx: 1 + 0.07 * e * k, sy: 1 - 0.05 * e * k, rot: -0.1 * e * k, dy: 0.06 * e, dx: -0.03 * e * k });
+    if (id === 'nacnac') Object.assign(o, { rot: 0.08 * e * k + 0.05 * Math.sin(p * TAU * 2) * e, dx: -0.04 * e * k });
+    if (id === 'cancan') Object.assign(o, { rot: -0.07 * e * k, dy: 0.05 * e, sy: 1 + 0.04 * e * k, dx: 0.03 * e * k });
+    if (id === 'heelclicker') Object.assign(o, { dy: 0.07 * e * k, sy: 1 - 0.07 * e * k, rot: 0.07 * e * k });
+    return o;
+  }
+
+  // ---------- paint: the colour maths a CSS filter uses, for browsers without ctx.filter (older Safari) ----------
+  function filterMats(str) {
+    const out = [], re = /(hue-rotate|saturate|brightness|grayscale)\(\s*(-?[\d.]+)(deg|%|turn|rad)?\s*\)/g;
+    for (let a; (a = re.exec(str || ''));) {
+      let v = parseFloat(a[2]);
+      if (a[1] === 'hue-rotate') {
+        const r = a[3] === 'turn' ? v * TAU : a[3] === 'rad' ? v : v * D2R, c = Math.cos(r), s = Math.sin(r);
+        out.push([0.213 + c * 0.787 - s * 0.213, 0.715 - c * 0.715 - s * 0.715, 0.072 - c * 0.072 + s * 0.928, 0.213 - c * 0.213 + s * 0.143, 0.715 + c * 0.285 + s * 0.14, 0.072 - c * 0.072 - s * 0.283, 0.213 - c * 0.213 - s * 0.787, 0.715 - c * 0.715 + s * 0.715, 0.072 + c * 0.928 + s * 0.072]);
+        continue;
+      }
+      if (a[3] === '%') v /= 100;
+      if (a[1] === 'brightness') { out.push([v, 0, 0, 0, v, 0, 0, 0, v]); continue; }
+      const s = a[1] === 'grayscale' ? 1 - clamp(v, 0, 1) : v;
+      out.push([0.213 + 0.787 * s, 0.715 - 0.715 * s, 0.072 - 0.072 * s, 0.213 - 0.213 * s, 0.715 + 0.285 * s, 0.072 - 0.072 * s, 0.213 - 0.213 * s, 0.715 - 0.715 * s, 0.072 + 0.928 * s]);
+    }
+    return out;
+  }
+  function tintRGB(mats, r, g, b) {
+    for (const m of mats) [r, g, b] = [0, 3, 6].map((i) => clamp(m[i] * r + m[i + 1] * g + m[i + 2] * b, 0, 255));
+    return [r, g, b];
+  }
+  let filterOK = null;
+  function canvasFilterWorks() {
+    if (filterOK !== null) return filterOK;
+    filterOK = false;
+    try {
+      const x = Object.assign(document.createElement('canvas'), { width: 2, height: 2 }).getContext('2d');
+      if (!('filter' in x)) return false;
+      x.filter = 'invert(1)';
+      x.fillRect(0, 0, 2, 2);
+      filterOK = x.getImageData(0, 0, 1, 1).data[0] > 200;
+    } catch (e) { /* no filter support */ }
+    return filterOK;
+  }
+
+  const CSS = `.ba{position:absolute;inset:0;overflow:hidden;background:#8CC8EE;touch-action:none;user-select:none;-webkit-user-select:none;-webkit-touch-callout:none;-webkit-tap-highlight-color:transparent;font-family:${FB};color:#fff;--b:clamp(48px,14vw,64px);--fd:${FD};--glass:rgba(14,16,22,.58)}
+.ba [hidden]{display:none!important}.ba canvas{position:absolute;inset:0;width:100%;height:100%;display:block;touch-action:none}
+.ba-hud{position:absolute;left:0;right:0;top:0;display:flex;align-items:flex-start;gap:8px;padding:calc(10px + env(safe-area-inset-top,0px)) 10px 0;pointer-events:none}
+.ba-plate{min-width:44px;height:40px;padding:0 8px;border-radius:9px;background:#fff;color:#111;display:grid;place-items:center;font:26px/1 Anton,Impact,"Arial Narrow",sans-serif;box-shadow:0 2px 8px rgba(0,0,0,.25)}
+.ba-jn,.ba-sc{background:var(--glass);border-radius:14px;padding:6px 11px}.ba-jn{font:800 18px/1.1 var(--fd)}.ba-jn small{font:500 12px var(--fd);opacity:.85}
+.ba-sc{margin-left:auto;text-align:right;min-width:120px}.ba-sv{font:800 24px/1 var(--fd);font-variant-numeric:tabular-nums}
+.ba-bar{position:relative;height:7px;margin-top:6px;border-radius:9px;background:rgba(255,255,255,.22)}.ba-bar i{position:absolute;inset:0 auto 0 0;border-radius:9px;background:#fff;transition:width .5s}
+.ba-bar b{position:absolute;top:-4px;width:3px;height:15px;margin-left:-1px;border-radius:2px;background:#C8F031}.ba-bl{font-size:12px;margin-top:3px;opacity:.9}
+.ba-pad{position:absolute;bottom:calc(12px + env(safe-area-inset-bottom,0px));display:grid;gap:8px;transition:opacity .2s}.ba-pad.l{left:12px;grid-template-columns:repeat(2,var(--b))}.ba-pad.r{right:12px;grid-template-columns:repeat(3,var(--b))}.ba-pad.hide{opacity:0!important;pointer-events:none}
+.ba-b{width:var(--b);height:var(--b);margin:0;padding:2px;border:0;border-radius:16px;background:var(--glass);color:#fff;font:600 10px/1.05 ${FB};letter-spacing:-.02em;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;touch-action:none;box-shadow:inset 0 0 0 1.5px rgba(255,255,255,.18)}
+.ba-b i{font-style:normal;font-size:19px;line-height:1}.ba-b svg{width:24px;height:24px}.ba-b.on{background:#E9501C}.ba-b.dim{opacity:.38}
+.ba-keys{position:absolute;left:0;right:0;bottom:calc(10px + env(safe-area-inset-bottom,0px));text-align:center;font-size:12.5px;pointer-events:none;text-shadow:0 1px 3px rgba(0,0,0,.6);padding:0 12px}.ba-keys kbd{font:600 11.5px ${FB};padding:2px 6px;border-radius:5px;background:var(--glass)}
+.ba-ov{position:absolute;inset:0;display:grid;place-items:end center;padding:12px 12px calc(14px + env(safe-area-inset-bottom,0px));touch-action:manipulation;overflow:auto}.ba-ov.mid{place-items:center;background:rgba(8,10,14,.45)}
+.ba-card{width:min(440px,100%);box-sizing:border-box;background:rgba(17,19,25,.92);border-radius:24px;padding:18px 18px 16px;box-shadow:0 18px 50px rgba(0,0,0,.4);animation:ba-in .28s ease-out}@keyframes ba-in{from{transform:translateY(14px);opacity:0}}
+.ba-k{font-size:12px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;opacity:.7}.ba-card h2{margin:4px 0 8px;font:800 30px/1.05 var(--fd);letter-spacing:-.02em}.ba-card p,.ba-how{margin:0 0 10px;font-size:14.5px;line-height:1.45;color:#D9DCE3}
+.ba-how{display:grid;gap:8px;padding:0;list-style:none}.ba-how b,.ba-rows b{color:#fff}.ba-rows{display:grid;gap:5px;margin:6px 0 12px;font-size:14px;color:#D9DCE3}.ba-rows div{display:flex;justify-content:space-between;gap:12px}.ba-rows b{font-variant-numeric:tabular-nums}
+.ba-tot{display:flex;align-items:baseline;justify-content:space-between;border-top:1px solid rgba(255,255,255,.14);padding-top:10px;margin-bottom:12px}.ba-tot span{font-weight:600;opacity:.8}.ba-tot b{font:800 34px/1 var(--fd);font-variant-numeric:tabular-nums}
+.ba-go{display:block;width:100%;min-height:58px;border:0;border-radius:18px;background:#E9501C;color:#fff;font:800 21px/1 var(--fd);cursor:pointer;touch-action:manipulation}.ba-go:focus-visible{outline:3px solid #fff;outline-offset:3px}
+.ba-tag{display:inline-block;padding:4px 10px;border-radius:99px;background:#C8F031;color:#1C2400;font-weight:700;font-size:13px;margin:0 6px 8px 0}
+.ba-list{list-style:none;margin:6px 0 10px;padding:0;display:grid;gap:8px}.ba-list li{display:grid;grid-template-columns:auto 1fr auto;gap:10px;align-items:center;padding:10px 12px;border-radius:14px;background:rgba(255,255,255,.07);font-size:13.5px;color:#D9DCE3}.ba-list li span:first-child{font-weight:700;color:#fff}.ba-list b{font:800 20px var(--fd);color:#fff;font-variant-numeric:tabular-nums}`;
+  const ARC = (flip) => `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"${flip ? ' style="transform:scaleX(-1)"' : ''}><path d="M5 13a7 7 0 1 0 2.2-5.1"/><path d="M4 4v5h5"/></svg>`;
+
+  function start(host, opts) {
+    opts = opts || {};
+    const sfx = (k) => { try { if (typeof opts.sfx === 'function') opts.sfx(k); } catch (e) { /* sound is optional */ } };
+    const RUNS = clamp(Math.round(+opts.runs) || 3, 1, 9);
+    const best0 = isFinite(opts.best) && opts.best > 0 ? +opts.best : null;
+    const known = new Set(Array.isArray(opts.bestTricks) ? opts.bestTricks : []);
+    const reduce = !!opts.reduceMotion;
+    const bike = /^[a-z0-9-]+$/.test(opts.bike || '') ? opts.bike : 'mx';
+    const filter = typeof opts.filter === 'string' && opts.filter.trim() !== 'none' ? opts.filter.trim() : '';
+    const mats = filterMats(filter);
+    const plate = String(opts.plate == null ? '' : opts.plate).replace(/[^\w ]/g, '').slice(0, 4);
+    const paint = `rgb(${tintRGB(mats, 233, 80, 28).map(Math.round)})`;
+    let touchUI = !!(root.matchMedia && root.matchMedia('(pointer: coarse)').matches);
+
+    // ---------- the page ----------
+    const el = document.createElement('div');
+    el.className = 'ba';
+    if (getComputedStyle(host).position === 'static') el.style.position = 'fixed';
+    const tb = (id) => `<button class="ba-b" data-t="${id}"><i>${TRICKS[id].i || ARC(false)}</i>${TRICKS[id].n}</button>`;
+    el.innerHTML = `<style>${CSS}</style><canvas></canvas><div class="ba-hud">${plate ? `<div class="ba-plate">${plate}</div>` : ''}<div class="ba-jn"></div><div class="ba-sc"><div class="ba-sv">0</div><div class="ba-bar"><i></i><b hidden></b></div><div class="ba-bl"></div></div></div>
+<div class="ba-pad l hide"><button class="ba-b" data-lean="1">${ARC(false)}Lean back</button><button class="ba-b" data-lean="-1">${ARC(true)}Lean fwd</button></div>
+<div class="ba-pad r hide">${['heelclicker', 'superman', 'backflip', 'nacnac', 'cancan', 'whip'].map(tb).join('')}</div><div class="ba-keys" hidden></div><div class="ba-ov" hidden></div>`;
+    host.appendChild(el);
+    const $ = (s) => el.querySelector(s);
+    const cv = $('canvas'), ctx = cv.getContext('2d');
+    const hud = { jn: $('.ba-jn'), sv: $('.ba-sv'), fill: $('.ba-bar i'), ghost: $('.ba-bar b'), bl: $('.ba-bl') };
+    const padL = $('.ba-pad.l'), padR = $('.ba-pad.r'), keysEl = $('.ba-keys'), ov = $('.ba-ov'), flipBtn = $('[data-t="backflip"]');
+    let flipOn = true;
+    const setFlip = (on) => { if (on !== flipOn) flipBtn.classList.toggle('dim', !(flipOn = on)); };
+
+    let W = 1, H = 1, dpr = 1, ready = false, sky = null;
+    function resize() {
+      const r = el.getBoundingClientRect();
+      W = Math.max(1, r.width);
+      H = Math.max(1, r.height);
+      dpr = Math.min(2, root.devicePixelRatio || 1);
+      const cw = Math.round(W * dpr), chh = Math.round(H * dpr);
+      if (cv.width === cw && cv.height === chh) return;
+      cv.width = cw;
+      cv.height = chh;
+      // The sky and sun only change with the size, so they are painted once here.
+      sky = Object.assign(document.createElement('canvas'), { width: cw, height: chh });
+      const x = sky.getContext('2d'), g = x.createLinearGradient(0, 0, 0, chh), R = Math.max(cw, chh);
+      [[0, '#3F8FD8'], [0.55, '#93CBEE'], [1, '#E7F1EC']].forEach((s) => g.addColorStop(s[0], s[1]));
+      x.fillStyle = g;
+      x.fillRect(0, 0, cw, chh);
+      const sun = x.createRadialGradient(cw * 0.82, chh * 0.16, 0, cw * 0.82, chh * 0.16, R * 0.35);
+      [[0, 'rgba(255,248,220,.95)'], [0.08, 'rgba(255,240,200,.6)'], [1, 'rgba(255,240,200,0)']].forEach((s) => sun.addColorStop(s[0], s[1]));
+      x.fillStyle = sun;
+      x.fillRect(0, 0, cw, chh);
+      if (ready) draw(1); // a resized canvas is blank until drawn again
+    }
+    resize();
+
+    // ---------- the bike picture: side-on photo, then the small bike photo, then a drawn bike. Never fails. ----------
+    let dead = false;
+    const spr = { c: null, rider: false, bw: 2.4, bh: 1.55 };
+    function prep(im, side) {
+      const w = im.naturalWidth, h = im.naturalHeight;
+      if (!w || !h) throw new Error('empty image');
+      const c = Object.assign(document.createElement('canvas'), { width: w, height: h }), x = c.getContext('2d');
+      const live = filter && canvasFilterWorks();
+      if (live) x.filter = filter; // the paint is applied once here, not every frame
+      x.drawImage(im, 0, 0);
+      x.filter = 'none';
+      let box = [0, 0, w, h];
+      try {
+        const d = x.getImageData(0, 0, w, h), p = d.data;
+        let x0 = w, y0 = h, x1 = 0, y1 = 0;
+        for (let i = 0, o = 0; i < w * h; i++, o += 4) {
+          if (!side && p[o + 3] < 110) p[o + 3] = 0; // the small bike photos carry a soft floor shadow
+          if (p[o + 3] > 150) {
+            const px = i % w, py = (i / w) | 0;
+            x0 = Math.min(x0, px); x1 = Math.max(x1, px); y0 = Math.min(y0, py); y1 = Math.max(y1, py);
+          }
+          if (!live && mats.length && p[o + 3]) [p[o], p[o + 1], p[o + 2]] = tintRGB(mats, p[o], p[o + 1], p[o + 2]);
+        }
+        x.putImageData(d, 0, 0);
+        if (x1 > x0 && y1 > y0) box = [x0, y0, x1 - x0 + 1, y1 - y0 + 1];
+      } catch (e) { /* an unreadable picture keeps its whole frame */ }
+      const out = Object.assign(document.createElement('canvas'), { width: box[2], height: box[3] });
+      out.getContext('2d').drawImage(c, box[0], box[1], box[2], box[3], 0, 0, box[2], box[3]);
+      Object.assign(spr, { c: out, rider: side, bw: side ? 2.6 : 2.4 });
+      spr.bh = spr.bw * (box[3] / box[2]);
+    }
+    (function load(list, i) {
+      if (dead || i >= list.length) return;
+      const im = new Image();
+      im.onload = () => { if (!dead) try { prep(im, i === 0); } catch (e) { load(list, i + 1); } };
+      im.onerror = () => load(list, i + 1);
+      im.src = list[i];
+    })([`img/side-${bike}.webp`, `img/bike-${bike}.webp`], 0);
+    const BW = () => (spr.c ? spr.bw : 2.4), BH = () => (spr.c ? spr.bh : 1.5);
+    const COMH = () => BH() * (spr.rider ? 0.42 : 0.5), WXH = () => BW() * 0.33;
+
+    // ---------- state ----------
+    let phase = 'intro', paused = false, simT = 0, total = 0, shake = 0, flash = 0, J = null;
+    let gateT = -1, cardAt = 0, passedBest = false, doneSent = false;
+    const jumps = [], newTricks = [], pops = [], dust = [], b = {}, prev = {};
+    const cam = { x: 0, y: 0, s: 40, px: 0, py: 0, ps: 40 };
+    function placeOnGround() {
+      const wx = WXH(), r = rideY(b.s - wx), f = rideY(b.s + wx);
+      b.ang = Math.atan2(f - r, 2 * wx);
+      b.x = b.s - Math.sin(b.ang) * COMH();
+      b.y = (r + f) / 2 + Math.cos(b.ang) * COMH();
+    }
+    function newJump() {
+      Object.assign(b, { s: START - 1, v: 0, rpm: 0.15, redT: 0, bog: false, vx: 0, vy: 0, nat: 0, leanOff: 0, leanV: 0, flipOff: 0, spin: 0, airT: 0, wob: 0, rot: 0, hop: 0, hopV: 0, tumble: 0, upright: false });
+      placeOnGround();
+      J = { tricks: [], cur: null, queue: null, peak: 0, pop: false, landT: 9, landX: 20, landY: 0, relT: -9, grade: '', why: '', t: 0, mode: '', shown: false };
+      gateT = -1;
+      pops.length = dust.length = 0;
+      phase = 'ready';
+      Object.assign(prev, { x: b.x, y: b.y, ang: b.ang });
+      camGoal(true);
+      setPads();
+    }
+
+    // ---------- input: touch and mouse through pointer events, plus the keyboard ----------
+    const ptrs = new Map(), keys = new Set();
+    let pendDir = null;
+    const revHeld = () => keys.has('rev') || [...ptrs.values()].some((p) => p.rev);
+    const leanIn = () => clamp((keys.has('back') ? 1 : 0) - (keys.has('fwd') ? 1 : 0) + [...ptrs.values()].reduce((n, p) => n + (p.lean || 0), 0), -1, 1);
+    function revDown() {
+      if (phase !== 'ready') return;
+      phase = 'run';
+      gateT = simT;
+      sfx('tap');
+    }
+    const revUp = () => { if (phase === 'run' && !revHeld()) J.relT = simT; };
+    function trick(id) {
+      if (phase !== 'air' || !TRICKS[id]) return;
+      if (J.cur) J.queue = id; // one waits its turn, so tricks chain into a combo
+      else startTrick(id);
+    }
+    function startTrick(id) {
+      if (id === 'backflip' && J.landT - b.airT < FLIP_NEEDS) return popup('Need more air to flip', '', '#FFC83D', 0.8);
+      J.cur = { id, t: 0 };
+      popup(TRICKS[id].n + '!', '', '#fff', 1);
+      sfx('tap');
+    }
+    function onDown(e) {
+      if (e.pointerType === 'touch' && !touchUI) {
+        touchUI = true;
+        setPads();
+        const how = phase === 'intro' && ov.querySelector('.ba-how');
+        if (how) how.innerHTML = howTo(true); // a touch screen laptop: show the touch controls instead
+      }
+      if (dead || e.target.closest('.ba-ov')) return;
+      const btn = e.target.closest('[data-t],[data-lean]');
+      if (btn) try { btn.setPointerCapture(e.pointerId); } catch (er) { /* fine */ }
+      if (paused) return;
+      if (phase === 'ready' || phase === 'run') { ptrs.set(e.pointerId, { rev: true }); revDown(); return; }
+      if (phase !== 'air') return;
+      if (!btn) return ptrs.set(e.pointerId, { x0: e.clientX, y0: e.clientY, t0: performance.now(), swipe: true });
+      btn.classList.add('on');
+      ptrs.set(e.pointerId, { btn, lean: +btn.dataset.lean || 0 });
+      if (btn.dataset.t) trick(btn.dataset.t);
+    }
+    function onMove(e) {
+      const p = ptrs.get(e.pointerId);
+      if (!p || !p.swipe || p.done || phase !== 'air') return;
+      const dx = e.clientX - p.x0, dy = e.clientY - p.y0;
+      if (Math.hypot(dx, dy) < Math.max(26, Math.min(W, H) * 0.05)) return;
+      p.done = true;
+      trick(BY_DIR[Math.abs(dx) > Math.abs(dy) ? (dx > 0 ? 'right' : 'left') : dy > 0 ? 'down' : 'up']);
+    }
+    function onUp(e) {
+      const p = ptrs.get(e.pointerId);
+      if (!p) return;
+      ptrs.delete(e.pointerId);
+      if (p.btn) p.btn.classList.remove('on');
+      if (p.rev) revUp();
+      if (p.swipe && !p.done && performance.now() - p.t0 < 300) trick('heelclicker'); // a tap
+    }
+    const KEYS = { ' ': 'space', Spacebar: 'space', ArrowUp: 'up', ArrowDown: 'down', ArrowLeft: 'left', ArrowRight: 'right', w: 'w', a: 'back', q: 'back', d: 'fwd', e: 'fwd', f: 'flip', b: 'flip', h: 'heel', Enter: 'enter' };
+    function onKey(e) {
+      const k = KEYS[e.key] || KEYS[String(e.key).toLowerCase()];
+      if (dead || !k || e.ctrlKey || e.metaKey || e.altKey) return;
+      e.preventDefault();
+      const down = e.type === 'keydown', rev = k === 'space' || k === 'up' || k === 'w';
+      if (!ov.hidden) {
+        if (down && !e.repeat && (k === 'enter' || k === 'space') && simT >= cardAt) { const go = ov.querySelector('.ba-go'); if (go) go.click(); }
+        return;
+      }
+      if (!down) {
+        if (rev && keys.delete('rev')) revUp();
+        keys.delete(k);
+        return;
+      }
+      if (e.repeat || paused) return;
+      if ((phase === 'ready' || phase === 'run') && rev) { keys.add('rev'); revDown(); }
+      else if (k === 'back' || k === 'fwd') keys.add(k);
+      else if (phase !== 'air') return;
+      else if (BY_DIR[k]) {
+        // Two arrows together make a backflip, so a single arrow waits a moment for a second one.
+        if (pendDir && simT - pendDir.t < 0.1) { pendDir = null; trick('backflip'); }
+        else pendDir = { d: k, t: simT };
+      } else if (k === 'space' || k === 'heel') trick('heelclicker');
+      else if (k === 'flip') trick('backflip');
+    }
+    const stopTouch = (e) => { if (!e.target.closest('.ba-ov')) e.preventDefault(); };
+    const noDefault = (e) => e.preventDefault();
+    function releaseAll() {
+      for (const p of ptrs.values()) if (p.btn) p.btn.classList.remove('on');
+      ptrs.clear();
+      keys.clear();
+      pendDir = null;
+    }
+    function onVis() {
+      if (!document.hidden || paused || !['ready', 'run', 'air', 'ride', 'crash'].includes(phase)) return;
+      paused = true;
+      releaseAll();
+      overlay('<div class="ba-card"><div class="ba-k">Big Air</div><h2>Paused</h2><p>Your jump is waiting right where you left it.</p><button class="ba-go">Carry on</button></div>', () => { paused = false; hideOverlay(); }, true);
+    }
+    const LISTEN = [[el, 'pointerdown', onDown], [el, 'pointermove', onMove], [el, 'pointerup', onUp], [el, 'pointercancel', onUp], [el, 'lostpointercapture', onUp], [el, 'contextmenu', noDefault], [el, 'gesturestart', noDefault],
+      [el, 'touchstart', stopTouch], [el, 'touchmove', stopTouch], [el, 'touchend', stopTouch], [root, 'keydown', onKey], [root, 'keyup', onKey], [root, 'blur', releaseAll], [document, 'visibilitychange', onVis]];
+    for (const [t, n, f] of LISTEN) t.addEventListener(n, f, { passive: false });
+    let ro = null;
+    if (root.ResizeObserver) (ro = new ResizeObserver(resize)).observe(el);
+    else root.addEventListener('resize', resize);
+
+    // ---------- cards: how-to, each jump, the end ----------
+    function overlay(html, act, mid) {
+      ov.innerHTML = html;
+      ov.className = 'ba-ov' + (mid ? ' mid' : '');
+      ov.hidden = false;
+      cardAt = simT + (mid ? 0 : 0.45); // a beat before a jump card's button works, so a late tap can't skip it
+      setPads();
+      const go = ov.querySelector('.ba-go');
+      go.addEventListener('click', () => { if (simT >= cardAt) act(); });
+      try { go.focus({ preventScroll: true }); } catch (e) { /* fine */ }
+    }
+    function hideOverlay() {
+      ov.hidden = true;
+      ov.innerHTML = '';
+      setPads();
+    }
+    const howTo = (t) => `<li><b>Rev:</b> ${t ? 'hold anywhere on the screen' : 'hold <b>Space</b> or <b>↑</b>'}. Keep the needle in the green. Too much and the engine bogs.</li>
+<li><b>Pop:</b> let go just before the lip for extra lift.</li>
+<li><b>Tricks:</b> ${t ? 'swipe up, down, left or right, tap for a heel clicker, or use the buttons. A backflip needs big air.' : '<b>↑ ↓ ← →</b>, <b>Space</b> for a heel clicker, <b>F</b> or two arrows together for a backflip.'}</li>
+<li><b>Land:</b> ${t ? '<b>Lean back</b> and <b>Lean fwd</b>' : '<b>A</b> and <b>D</b>'} tilt the bike. Match the slope and finish your trick before you touch down.</li>
+${t && H > W && W < 600 ? '<li>Tip: turn your phone sideways for a bigger view.</li>' : ''}`;
+    function intro() {
+      overlay(`<div class="ba-card"><div class="ba-k">Side track · ${RUNS} ${RUNS === 1 ? 'jump' : 'jumps'}</div><h2>Big Air</h2><ul class="ba-how">${howTo(touchUI)}</ul><button class="ba-go">Ride!</button></div>`, () => { sfx('tap'); hideOverlay(); newJump(); }, true);
+    }
+    const names = (list, sep) => list.map((t) => TRICKS[t].n).join(sep);
+    function jumpCard() {
+      const j = jumps[jumps.length - 1], g = GRADES[j.landing], last = jumps.length >= RUNS;
+      const row = (a, v) => `<div><span>${a}</span><b>${v}</b></div>`;
+      const rows = [row(`Air: ${dec(j.height, 1)} m`, '+' + num(j.air))];
+      if (!j.tricks.length) rows.push(row('No tricks this time', '–'));
+      else {
+        rows.push(row(names(j.tricks, ' + '), num(j.pts)));
+        if (j.combo > 1) rows.push(row('Combo', times(j.combo)));
+        rows.push(row('Height bonus', '×' + dec(j.hMul, 1)), row('Landing: ' + g.s, times(g.m)));
+      }
+      const why = j.landing === 'crash' ? `${J.why} Rider's fine, dusted off and ready.` : J.why;
+      overlay(`<div class="ba-card"><div class="ba-k">Jump ${jumps.length} of ${RUNS}</div><h2 style="color:${g.c}">${g.n}</h2>${why ? `<p>${why}</p>` : ''}${j.fresh.map((t) => `<span class="ba-tag">New trick: ${TRICKS[t].n}</span>`).join('')}
+<div class="ba-rows">${rows.join('')}</div><div class="ba-tot"><span>Jump score</span><b>${num(j.score)}</b></div><button class="ba-go">${last ? 'See how you did' : j.landing === 'crash' ? 'Again!' : 'Next jump'}</button></div>`, () => {
+        hideOverlay();
+        if (last) end();
+        else newJump();
+      });
+    }
+    function end() {
+      phase = 'end';
+      const best = Math.max(best0 || 0, total), isNew = total > 0 && (best0 === null || total > best0);
+      sfx(isNew ? 'fanfare' : 'right');
+      const list = jumps.map((j, i) => `<li><span>Jump ${i + 1}</span><span>${GRADES[j.landing].s}${j.tricks.length ? ' · ' + names(j.tricks, ', ') : ''}</span><b>${num(j.score)}</b></li>`).join('');
+      overlay(`<div class="ba-card"><div class="ba-k">Big Air · pit pass done</div><h2>${isNew ? 'New best!' : 'Nice riding'}</h2>${newTricks.map((t) => `<span class="ba-tag">New trick: ${TRICKS[t].n}</span>`).join('')}
+<ol class="ba-list">${list}</ol><div class="ba-tot"><span>Total</span><b>${num(total)}</b></div>
+<p>${isNew ? (best0 ? `Your old best was ${num(best0)}.` : 'Your first Big Air record. Beat it next time.') : `Your best is ${num(best)}. ${num(best - total)} more to beat it.`}</p><button class="ba-go">Back to the pits</button></div>`, () => {
+        if (doneSent) return;
+        doneSent = true;
+        cancelAnimationFrame(raf);
+        const out = { best, total, jumps: jumps.map((j) => ({ score: j.score, tricks: j.tricks.slice(), landing: j.landing })), newTricks: newTricks.slice() };
+        try { if (typeof opts.onDone === 'function') opts.onDone(out); } catch (e) { if (root.console) console.error(e); }
+      }, true);
+    }
+
+    // ---------- HUD ----------
+    function setPads() {
+      const air = phase === 'air' && ov.hidden && !paused, show = touchUI && ov.hidden && (air || phase === 'ride' || phase === 'crash');
+      for (const p of [padL, padR]) { p.classList.toggle('hide', !show); p.style.opacity = show && !air ? '0.35' : ''; }
+      keysEl.hidden = !air || touchUI;
+      keysEl.innerHTML = keysEl.hidden ? '' : '<kbd>↑</kbd> <kbd>↓</kbd> <kbd>←</kbd> <kbd>→</kbd> tricks · <kbd>Space</kbd> heel clicker · <kbd>F</kbd> backflip · <kbd>A</kbd> <kbd>D</kbd> lean';
+    }
+    let lastHUD = '';
+    function updateHUD() {
+      const n = Math.min(jumps.length + (['intro', 'ready', 'run', 'air'].includes(phase) ? 1 : 0), RUNS), key = n + '|' + total;
+      if (key === lastHUD) return;
+      lastHUD = key;
+      hud.jn.innerHTML = `Jump ${n} <small>of ${RUNS}</small>`;
+      hud.sv.textContent = num(total);
+      const top = Math.max(best0 || 0, total, 1) * 1.12, past = best0 && total > best0;
+      hud.fill.style.width = (100 * total) / top + '%';
+      hud.fill.style.background = past ? '#C8F031' : '#fff';
+      hud.ghost.hidden = !best0;
+      if (best0) hud.ghost.style.left = (100 * best0) / top + '%';
+      hud.bl.textContent = !best0 ? 'No best yet: set one' : past ? 'Past your best!' : `Best ${num(best0)}`;
+    }
+
+    // ---------- camera ----------
+    const playRect = () => { const t = H < 500 ? 58 : 70; return { l: 8, r: W - 8, t, b: Math.max(t + 80, H - (touchUI && H > W ? Math.min(160, H * 0.24) : H < 500 ? 16 : 50)) }; };
+    function camGoal(snap) {
+      const pr = playRect(), pw = pr.r - pr.l, ph = pr.b - pr.t;
+      const maxS = H > W ? Math.min(W / 10, ph / 12) : Math.min(W / 16, ph / 9);
+      const pts = [[b.x - 2.6, b.y - 2.2], [b.x + 3, b.y + 2.6]];
+      if (phase === 'air') { const k = clamp(0.35 + b.airT * 0.25, 0.35, 0.8); pts.push([b.x + (J.landX + 2 - b.x) * k, b.y + (J.landY - 1 - b.y) * k]); }
+      else if (phase === 'ride' || phase === 'crash' || phase === 'card') pts.push([b.x + 8, b.y]);
+      else {
+        const ahead = clamp(b.v * 0.75, 5, 14);
+        pts.push([b.x + ahead, ground(b.x + ahead) + 1]);
+        if (b.s > KX - 14) pts.push([2, LIPY + 1]);
+      }
+      const xs = pts.map((p) => p[0]), ys = pts.map((p) => p[1]);
+      const x0 = Math.min(...xs), x1 = Math.max(...xs), y0 = Math.min(...ys), y1 = Math.max(...ys);
+      const s = clamp(Math.min(pw / (x1 - x0), ph / (y1 - y0)), Math.min(maxS, Math.max(maxS * (H > W ? 0.6 : 0.5), 64 / BW())), maxS);
+      // When the whole view won't fit, the bike itself stays well inside the picture.
+      const hw = Math.max(0.5, (pw * 0.3) / s), hh = Math.max(0.5, (ph * 0.28) / s);
+      const g = { x: clamp((x0 + x1) / 2, b.x - hw, b.x + hw), y: clamp((y0 + y1) / 2, b.y - hh, b.y + hh), s };
+      if (snap) Object.assign(cam, { x: g.x, y: g.y, s, px: g.x, py: g.y, ps: s });
+      return g;
+    }
+    function stepCam(dt) {
+      const g = camGoal(false), k = Math.min(1, dt * (phase === 'run' ? 6 : 3.2));
+      Object.assign(cam, { px: cam.x, py: cam.y, ps: cam.s });
+      cam.x += (g.x - cam.x) * k;
+      cam.y += (g.y - cam.y) * k;
+      cam.s *= Math.exp((Math.log(g.s) - Math.log(cam.s)) * Math.min(1, dt * 2.2));
+      const pr = playRect(), hw = Math.max(0.5, (pr.r - pr.l) / 2 / cam.s - BW() * 0.7), hh = Math.max(0.5, (pr.b - pr.t) / 2 / cam.s - BH() * 1.1);
+      cam.x = clamp(cam.x, b.x - hw, b.x + hw); // whatever the smoothing does, the bike never leaves the picture
+      cam.y = clamp(cam.y, b.y - hh, b.y + hh);
+    }
+
+    // ---------- physics, in fixed steps of 1/120 s ----------
+    function stepRun(dt) {
+      const hold = revHeld(), was = b.bog;
+      b.rpm = hold ? Math.min(1.08, b.rpm + 1.25 * dt) : Math.max(0.15, b.rpm - 2 * dt);
+      b.redT = hold && b.rpm > RED ? b.redT + dt : Math.max(0, b.redT - 3 * dt);
+      b.bog = b.redT > 0.3; // held in the red too long: the engine bogs
+      if (b.bog && !was) popup('Bogging! Ease off', '', '#FF9A7A', 0.9);
+      if (b.bog) b.rpm = 0.93 + Math.sin(simT * 47) * 0.06;
+      const phi = angAt(rideY, b.s);
+      let a = hold ? (b.bog ? -6 : 1.5 + 7.5 * b.rpm) : -1.5;
+      if (b.s < DROP) a -= G * Math.sin(phi) * 0.9;
+      b.v += a * dt;
+      const floor = b.s >= DROP ? V_MIN : 5; // the bike always rolls on, even when it bogs
+      if (b.v < floor) b.v = Math.min(floor, b.v + 6 * dt - Math.min(0, a) * dt);
+      b.v = clamp(b.v, 0, V_TOP);
+      b.s += b.v * Math.cos(phi) * dt;
+      placeOnGround();
+      if (hold && !b.bog && Math.random() < dt * 30) kick(b.s - WXH(), rideY(b.s - WXH()), -b.v * 0.15, 1.2, 0.18);
+      if (b.bog && Math.random() < dt * 14) kick(b.x - BW() * 0.4, b.y, -1, 1.5, 0.25, '120,120,128');
+      if (b.s - WXH() >= 0) launch(hold);
+    }
+    function launch(hold) {
+      let v = b.v;
+      if (!hold && simT - J.relT < 0.32) { v *= POP; J.pop = true; popup('Pop!', '', '#C8F031', 0.7); }
+      Object.assign(b, { ang: LIP, nat: LIP, vx: v * Math.cos(LIP), vy: v * Math.sin(LIP), airT: 0 });
+      J.speed = v;
+      phase = 'air';
+      // Where it will land, ignoring tricks: for the camera and to know if a backflip fits.
+      let x = b.x, y = b.y, vy = b.vy, t = 0;
+      do { vy -= G / 60; x += b.vx / 60; y += vy / 60; t += 1 / 60; } while (t < 6 && (t < 0.15 || y - COMH() > ground(x)));
+      Object.assign(J, { landT: t, landX: x, landY: ground(x) });
+      setPads();
+      setFlip(t >= FLIP_NEEDS);
+    }
+    function stepAir(dt) {
+      b.airT += dt;
+      b.vy -= G * dt;
+      b.x += b.vx * dt;
+      b.y += b.vy * dt;
+      J.peak = Math.max(J.peak, b.y - COMH() - LIPY);
+      // Left alone the nose drops a little behind the arc. Leaning sets the landing angle.
+      b.nat += (Math.atan2(b.vy, b.vx) * 0.45 - b.nat) * Math.min(1, dt * 2.2);
+      const li = leanIn();
+      b.leanV = li ? clamp(b.leanV + li * 7 * dt, -3.6, 3.6) : b.leanV * Math.max(0, 1 - 10 * dt);
+      b.leanOff += b.leanV * dt;
+      b.spin += b.leanV * dt;
+      if (pendDir && simT - pendDir.t >= 0.1) { const d = pendDir.d; pendDir = null; trick(BY_DIR[d]); }
+      if (J.cur) {
+        const T = TRICKS[J.cur.id], flip = J.cur.id === 'backflip';
+        J.cur.t += dt;
+        if (flip) b.flipOff = TAU * ease(Math.min(1, J.cur.t / T.d));
+        if (J.cur.t >= T.d) {
+          if (flip) b.flipOff = 0;
+          J.tricks.push(J.cur.id);
+          J.cur = null;
+          if (J.queue) { const q = J.queue; J.queue = null; startTrick(q); }
+        }
+      }
+      b.ang = b.nat + b.leanOff + b.flipOff;
+      setFlip(!J.cur && J.landT - b.airT >= FLIP_NEEDS);
+      if (b.airT < 0.12) return;
+      // Touchdown: either tyre, or the rider's back if he's upside down.
+      const c = Math.cos(b.ang), s = Math.sin(b.ang), ch = COMH(), wx = WXH();
+      for (const [lx, ly] of [[-wx, -ch], [wx, -ch], [0, BH() - ch]]) {
+        const X = b.x + lx * c - ly * s, Y = b.y + lx * s + ly * c;
+        if (Y <= ground(X)) return land(X, ly > 0);
+      }
+    }
+    function land(X, onBack) {
+      const slope = angAt(ground, X), off = wrap(b.ang - slope);
+      let g = gradeFor(Math.abs(off) / D2R);
+      J.why = { perfect: 'Bike matched the slope.', sketchy: off > 0 ? 'Nose was a bit high. Lean forward sooner.' : 'Nose was a bit low. Lean back sooner.', crash: Math.abs(off) > 1.3 ? 'Spun too far. Let go of lean sooner.' : off > 0 ? 'Landed on the back wheel.' : 'Nose-dived the landing.' }[g] || '';
+      if (J.cur) {
+        // Still mid-trick at touchdown: nearly done costs a grade, early is a washout.
+        if (J.cur.t / TRICKS[J.cur.id].d < 0.6) { g = 'crash'; J.why = `Still mid-${TRICKS[J.cur.id].n.toLowerCase()}! Start tricks earlier.`; }
+        else { g = WORSE[g]; J.why = 'Only just finished the trick.'; J.tricks.push(J.cur.id); }
+      }
+      if (onBack) { g = 'crash'; J.why = 'Upside down at touchdown.'; }
+      if (X < WALL - 0.3) { g = 'crash'; J.why = 'Came up short. Rev harder next time.'; }
+      if (b.spin > TAU * 0.85 && g !== 'crash' && !J.tricks.includes('backflip')) J.tricks.push('backflip'); // leaned all the way round
+      J.cur = J.queue = pendDir = null;
+      J.grade = g;
+      // Score: air, plus tricks × combo × height × landing. A repeat in the same jump counts half.
+      let pts = 0;
+      J.tricks.forEach((t, i) => { pts += TRICKS[t].p * (J.tricks.indexOf(t) < i ? 0.5 : 1); });
+      const n = J.tricks.length, combo = n > 1 ? Math.min(3, 1 + 0.5 * (n - 1)) : 1;
+      const height = Math.max(0, J.peak), hMul = 1 + height / 10, air = Math.round(height * 10);
+      const score = air + Math.round(pts * combo * hMul * GRADES[g].m);
+      const fresh = g === 'crash' ? [] : [...new Set(J.tricks)].filter((t) => !known.has(t) && !newTricks.includes(t));
+      newTricks.push(...fresh);
+      const passNow = best0 && !passedBest && total <= best0 && total + score > best0;
+      total += score;
+      jumps.push({ score, tricks: g === 'crash' ? [] : J.tricks.slice(), landing: g, height, air, pts: Math.round(pts), combo, hMul, fresh });
+      for (let i = 0; i < (g === 'crash' ? 26 : 16); i++) kick(X + (Math.random() - 0.5) * 2, ground(X), (Math.random() - 0.3) * 6, 2 + Math.random() * 3, 0.35 + Math.random() * 0.3, g === 'crash' ? '160,110,80' : '190,140,100');
+      popup(GRADES[g].s.toUpperCase() + '!', score ? '+' + num(score) : '', GRADES[g].c, 1.6, true);
+      if (!reduce) { shake = g === 'crash' ? 0.6 : g === 'perfect' ? 0.35 : 0.25; flash = g === 'perfect' ? 1 : 0; }
+      if (passNow) { passedBest = true; popup('Past your best!', '', '#C8F031', 1.6); }
+      if (fresh.length) popup('New trick: ' + names(fresh, ', '), '', '#C8F031', 1.8);
+      sfx(fresh.length || passNow ? 'fanfare' : { perfect: 'combo', clean: 'right', sketchy: 'tap', crash: 'wrong' }[g]);
+      // Ride away down the slope, or tumble.
+      const sa = angAt(ground, X);
+      Object.assign(b, { s: X, v: Math.max(4, b.vx * Math.cos(sa) + b.vy * Math.sin(sa)), leanV: 0, flipOff: 0, leanOff: 0, ang: wrap(b.ang) });
+      b.nat = b.rot = b.ang;
+      J.mode = g === 'crash' ? 'crash' : 'ride';
+      J.t = 0;
+      phase = J.mode;
+      if (g === 'crash') Object.assign(b, { tumble: 0, hop: 0.2, hopV: 4.5, v: b.v * 0.55 });
+      else b.wob = g === 'sketchy' ? 1 : g === 'clean' ? 0.3 : 0;
+      setPads();
+    }
+    function stepGround(dt) {
+      J.t += dt;
+      const phi = angAt(ground, b.s), wx = WXH(), level = Math.atan2(ground(b.s + wx) - ground(b.s - wx), 2 * wx);
+      const settle = (comp) => { const by = (ground(b.s + wx) + ground(b.s - wx)) / 2; b.x = b.s - Math.sin(b.ang) * (COMH() - comp); b.y = by + Math.cos(b.ang) * (COMH() - comp); };
+      if (J.mode === 'ride') {
+        b.v = Math.max(0, b.v + (-G * Math.sin(phi) * 0.75 - (phi > -0.05 ? 7 : 1.5)) * dt);
+        b.s += b.v * Math.cos(phi) * dt;
+        b.nat += (level - b.nat) * Math.min(1, dt * 12);
+        b.wob *= Math.max(0, 1 - 2.2 * dt); // a sketchy landing wobbles
+        b.ang = b.nat + Math.sin(J.t * 17) * 0.12 * b.wob;
+        settle(Math.max(0, 0.18 - J.t) * 0.9);
+        if (J.t > 1.35 && !J.shown) cardOpen();
+        return;
+      }
+      // A cartoon tumble down the slope, a puff of dust, and the rider is back up.
+      b.tumble += dt;
+      b.v = Math.max(0, b.v - 6 * dt);
+      b.s += b.v * Math.cos(phi) * dt;
+      b.hopV -= G * dt;
+      b.hop = Math.max(0, b.hop + b.hopV * dt);
+      if (b.hop === 0 && b.hopV < 0) b.hopV *= -0.45;
+      if (b.tumble < 1.1) {
+        b.rot -= dt * (8 - b.tumble * 5);
+        b.ang = b.rot;
+        b.x = b.s;
+        b.y = ground(b.s) + BH() * 0.5 + b.hop;
+        if (Math.random() < dt * 20) kick(b.s, ground(b.s), (Math.random() - 0.5) * 3, 1.5, 0.3, '170,120,90');
+        return;
+      }
+      if (!b.upright) {
+        b.upright = true;
+        b.v = 0;
+        for (let i = 0; i < 22; i++) kick(b.s + (Math.random() - 0.5) * 2.5, ground(b.s) + Math.random() * 1.5, (Math.random() - 0.5) * 3, 1 + Math.random() * 2, 0.6 + Math.random() * 0.4, '210,180,150');
+      }
+      b.ang = level;
+      settle(0);
+      if (b.tumble > 1.55 && !J.shown) cardOpen();
+    }
+    function cardOpen() {
+      J.shown = true;
+      phase = 'card';
+      jumpCard();
+    }
+    function step(dt) {
+      simT += dt;
+      Object.assign(prev, { x: b.x, y: b.y, ang: b.ang });
+      if (phase === 'run') stepRun(dt);
+      else if (phase === 'air') stepAir(dt);
+      else if (J && J.mode && (phase === 'ride' || phase === 'crash' || (phase === 'card' && J.t < 6))) stepGround(dt);
+      for (let i = dust.length - 1; i >= 0; i--) {
+        const d = dust[i];
+        d.t += dt;
+        d.x += d.vx * dt;
+        d.y += (d.vy -= 1.5 * dt) * dt;
+        d.vx *= 1 - 1.5 * dt;
+        if (d.t > d.life) dust.splice(i, 1);
+      }
+      for (let i = pops.length - 1; i >= 0; i--) if ((pops[i].t += dt) > pops[i].life) pops.splice(i, 1);
+      shake = Math.max(0, shake - dt);
+      flash = Math.max(0, flash - dt * 4);
+      stepCam(dt);
+    }
+    const kick = (x, y, vx, vy, life, rgb) => { if (dust.length < 90) dust.push({ x, y, vx, vy, t: 0, life, r: 0.25 + Math.random() * 0.35, rgb: rgb || '196,140,98' }); };
+    function popup(text, sub, col, life, big) {
+      pops.push({ text, sub, col, life, t: 0, big: !!big, low: phase === 'air' && sy(b.y) < H * 0.45 });
+      if (pops.length > 5) pops.shift();
+    }
+
+    // ---------- drawing ----------
+    let view = { x: 0, y: 0, s: 40, cx: 0, cy: 0 };
+    const sx = (x) => view.cx + (x - view.x) * view.s, sy = (y) => view.cy - (y - view.y) * view.s;
+    const HILLS = [[0.05, 0.05, 0.5, 0.11, '#A6C0D2', 1.3], [0.12, 0.1, 0.58, 0.08, '#98AF77', 4.1, '#6F8650'], [0.24, 0.17, 0.66, 0.06, '#7E9A55', 7.7, '#58703A']];
+    const hillF = (u, s) => Math.sin(u * 0.0031 + s) * 0.55 + Math.sin(u * 0.0077 + s * 2.1) * 0.3 + Math.sin(u * 0.019 + s * 3.3) * 0.12;
+    const hash = (n) => { const v = Math.sin(n * 127.1 + 311.7) * 43758.5453; return v - Math.floor(v); };
+    const font = (w, px, f) => (ctx.font = `${w} ${px.toFixed(1)}px ${f || FD}`);
+    function poly(pts, col) {
+      ctx.fillStyle = col;
+      ctx.beginPath();
+      pts.forEach((p, i) => (i ? ctx.lineTo(p[0], p[1]) : ctx.moveTo(p[0], p[1])));
+      ctx.fill();
+    }
+    function line(pts, w, col) {
+      ctx.strokeStyle = col;
+      ctx.lineWidth = w;
+      if (pts.length) ctx.beginPath();
+      pts.forEach((p, i) => (i ? ctx.lineTo(p[0], p[1]) : ctx.moveTo(p[0], p[1])));
+      ctx.stroke();
+    }
+    function drawBack() {
+      ctx.drawImage(sky, 0, 0, W, H);
+      const K = H / 40;
+      ctx.fillStyle = 'rgba(255,255,255,.85)';
+      for (let i = 0; i < 4; i++) {
+        const span = W + 500, x = ((((hash(i) * span - view.x * K * 0.03 - simT * (6 + i * 2)) % span) + span) % span) - 250;
+        const y = H * (0.1 + 0.09 * i) + view.y * K * 0.02, r = H * (0.035 + hash(i + 9) * 0.025);
+        ctx.beginPath();
+        ctx.ellipse(x, y, r * 2.6, r * 0.75, 0, 0, TAU);
+        ctx.ellipse(x - r * 0.9, y - r * 0.35, r * 1.1, r * 0.8, 0, 0, TAU);
+        ctx.ellipse(x + r * 0.6, y - r * 0.6, r * 1.2, r, 0, 0, TAU);
+        ctx.fill();
+      }
+      // Three bands of veld hills, further ones slower, with flat-topped acacias on the nearer two.
+      for (const [p, pv, base0, amp0, col, seed, tree] of HILLS) {
+        const off = view.x * p * K * 2.2, base = H * base0 + view.y * pv * K, amp = H * amp0, hy = (x) => base - hillF(x + off, seed) * amp - amp;
+        const pts = [[0, H]];
+        for (let x = 0; x <= W + 12; x += 12) pts.push([x, hy(x)]);
+        pts.push([W, H]);
+        poly(pts, col);
+        if (!tree) continue;
+        ctx.fillStyle = tree;
+        for (let k = Math.floor(off / 140) - 1; k * 140 - off < W + 140; k++) {
+          if (hash(k + seed) < 0.55) continue;
+          const tx = k * 140 + hash(k * 3.1) * 90 - off, ty = hy(tx) + 2, h = p * K * 6 * (0.8 + hash(k * 7) * 0.5);
+          line([[tx, ty], [tx + h * 0.08, ty - h * 0.75]], Math.max(1, h * 0.07), tree);
+          ctx.beginPath();
+          ctx.ellipse(tx + h * 0.08, ty - h * 0.82, h * 0.85, h * 0.2, 0, 0, TAU);
+          ctx.fill();
+        }
+      }
+    }
+    function drawGround() {
+      const x0 = view.x - view.cx / view.s - 1, x1 = view.x + (W - view.cx) / view.s + 1, xs = [];
+      for (let x = x0; x < x1; x += Math.max(0.12, 5 / view.s)) xs.push(x);
+      xs.push(x1);
+      for (const k of [KX, 0, 1.4, WALL - 1.6, WALL]) if (k > x0 && k < x1) xs.push(k - 0.001, k + 0.001); // keep the sharp edges sharp
+      xs.sort((a, c) => a - c);
+      const pts = xs.map((x) => [sx(x), sy(ground(x))]), top = Math.min(...pts.map((p) => p[1]));
+      const g = ctx.createLinearGradient(0, Math.max(0, top), 0, Math.max(top + 1, sy(VAL - 10)));
+      [[0, '#B4673B'], [0.5, '#93512E'], [1, '#6A3820']].forEach((s) => g.addColorStop(s[0], s[1]));
+      poly([[pts[0][0], H + 10], ...pts, [pts[pts.length - 1][0], H + 10]], g);
+      ctx.lineJoin = 'round';
+      const S = view.s, at = (dy) => pts.map((p) => [p[0], p[1] + dy]);
+      line(at(S * 0.9), Math.max(1, S * 0.08), 'rgba(70,30,10,.18)');
+      line(at(S * 0.16), Math.max(3, S * 0.3), '#C9804F');
+      line(pts, Math.max(1.5, S * 0.06), '#E4A877');
+    }
+    function drawProps() {
+      const S = view.s, on = (x) => sx(x) > -60 && sx(x) < W + 60;
+      const text = (t, x, y, px, col) => { ctx.fillStyle = col; font(800, px); ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.fillText(t, x, y); };
+      if (on(START - 2) || on(START + 6)) {
+        // The start arch, and the gate that drops when he first revs.
+        ctx.fillStyle = '#2B2F38';
+        for (const px of [START - 2, START + 6]) ctx.fillRect(sx(px) - S * 0.1, sy(TOPY + 5.2), S * 0.2, S * 5.2);
+        ctx.fillStyle = '#16181E';
+        ctx.fillRect(sx(START - 2.4), sy(TOPY + 5.6), S * 8.8, S * 1.2);
+        ctx.fillStyle = '#E9501C';
+        ctx.fillRect(sx(START - 2.4), sy(TOPY + 4.5), S * 8.8, S * 0.12);
+        text('BIG AIR', sx(START + 2), sy(TOPY + 5), Math.max(8, S * 0.8), '#fff');
+        ctx.save();
+        ctx.translate(sx(START - 1 + WXH() + 0.35), sy(TOPY));
+        ctx.rotate((Math.PI / 2) * (gateT < 0 ? 0 : clamp((simT - gateT) / 0.25, 0, 1)));
+        ctx.fillStyle = '#E8EAEE';
+        ctx.fillRect(-S * 0.06, -S * 0.75, S * 0.12, S * 0.75);
+        ctx.restore();
+      }
+      for (let x = -46; x < KX - 2; x += 8) {
+        if (!on(x)) continue;
+        ctx.fillStyle = '#3A3F49';
+        ctx.fillRect(sx(x) - 1, sy(1.7), 2.2, S * 1.7);
+        poly([[sx(x) + 1, sy(1.7)], [sx(x + 0.8), sy(1.5)], [sx(x) + 1, sy(1.3)]], '#E9501C');
+      }
+      if (S > 9) for (let d = 15; d <= 45; d += 5) {
+        if (!on(d)) continue;
+        const y = ground(d);
+        ctx.fillStyle = '#E8EAEE';
+        ctx.fillRect(sx(d) - 1, sy(y + 1.4), 2, S * 1.4);
+        ctx.fillRect(sx(d) - S * 0.42, sy(y + 1.75), S * 0.84, S * 0.5);
+        text(d + ' m', sx(d), sy(y + 1.5), Math.max(7, S * 0.3), '#2B2F38');
+      }
+    }
+    function drawDust() {
+      for (const d of dust) {
+        ctx.fillStyle = `rgba(${d.rgb},${((1 - d.t / d.life) * 0.55).toFixed(3)})`;
+        ctx.beginPath();
+        ctx.arc(sx(d.x), sy(d.y), d.r * view.s * (1 + d.t * 2), 0, TAU);
+        ctx.fill();
+      }
+    }
+    function drawShadow(x, y) {
+      const gy = ground(x), h = y - COMH() - gy;
+      if (h < 0.2 || h > 30) return;
+      ctx.save();
+      ctx.translate(sx(x), sy(gy));
+      ctx.rotate(-angAt(ground, x));
+      ctx.fillStyle = `rgba(40,20,10,${clamp(0.32 - h * 0.012, 0.06, 0.32).toFixed(3)})`;
+      ctx.beginPath();
+      ctx.ellipse(0, 0, BW() * view.s * clamp(0.45 - h * 0.008, 0.2, 0.45), Math.max(2, view.s * 0.1), 0, 0, TAU);
+      ctx.fill();
+      ctx.restore();
+    }
+    function drawnBike(u, ch) {
+      // Used only if neither bike picture loads: wheels, forks and the plastics in his paint.
+      const P = (p) => [p[0] * u, ch - p[1] * u];
+      for (const wx of [-0.33, 0.33]) {
+        ctx.beginPath();
+        ctx.arc(wx * u, ch - 0.15 * u, 0.12 * u, 0, TAU);
+        line([], 0.055 * u, '#1A1C21');
+      }
+      line([P([0.33, 0.15]), P([0.22, 0.62]), P([0.1, 0.66])], 0.04 * u, '#C9CDD3');
+      poly([[-0.5, 0.48], [0.04, 0.54], [0.18, 0.52], [0.08, 0.3], [-0.1, 0.2], [-0.33, 0.15], [-0.26, 0.38]].map(P), paint);
+      poly([[-0.2, 0.5], [0.05, 0.57], [0.06, 0.53], [-0.18, 0.47]].map(P), '#1D1F24');
+    }
+    function drawBike(x, y, ang) {
+      const S = view.s, bw = BW() * S, bh = BH() * S, ch = COMH() * S, tr = phase === 'air' && J.cur ? J.cur : null;
+      const look = tr && tr.id !== 'backflip' ? trickLook(tr.id, tr.t / TRICKS[tr.id].d, spr.rider ? 1.6 : 1) : { rot: 0, sx: 1, sy: 1, dx: 0, dy: 0 };
+      ctx.save();
+      ctx.translate(sx(x) + look.dx * bw, sy(y) - look.dy * bw);
+      ctx.rotate(-(ang + look.rot));
+      ctx.scale(look.sx, look.sy);
+      if (spr.c) ctx.drawImage(spr.c, -bw / 2, ch - bh, bw, bh);
+      else drawnBike(bw, ch);
+      ctx.restore();
+    }
+    function roundRect(x, y, w, h, r) {
+      ctx.beginPath();
+      ctx.moveTo(x + r, y);
+      ctx.arcTo(x + w, y, x + w, y + h, r);
+      ctx.arcTo(x + w, y + h, x, y + h, r);
+      ctx.arcTo(x, y + h, x, y, r);
+      ctx.arcTo(x, y, x + w, y, r);
+      ctx.fillStyle = 'rgba(14,16,22,.55)';
+      ctx.fill();
+    }
+    function drawHUD(x, y) {
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      if (phase === 'air' && J.landT - b.airT < 1.1) {
+        // A small level by the bike as touchdown nears: white is the slope, the coloured line is the bike.
+        const slope = angAt(ground, J.landX), col = GRADES[gradeFor(Math.abs(wrap(b.ang - slope)) / D2R)].c;
+        const cx = sx(x), cy = sy(y + BH() * 1.05) - 16, r = 22;
+        ctx.globalAlpha = clamp((1.1 - J.landT + b.airT) / 0.3, 0, 1);
+        ctx.beginPath();
+        ctx.arc(cx, cy, r + 6, 0, TAU);
+        ctx.fillStyle = 'rgba(14,16,22,.55)';
+        ctx.fill();
+        ctx.lineCap = 'round';
+        for (const [a, c, w] of [[slope, 'rgba(255,255,255,.75)', 3], [b.ang, col, 4]]) line([[cx - Math.cos(a) * r, cy + Math.sin(a) * r], [cx + Math.cos(a) * r, cy - Math.sin(a) * r]], w, c);
+        ctx.globalAlpha = 1;
+      }
+      if (flash > 0) { ctx.fillStyle = `rgba(255,255,255,${(flash * 0.35).toFixed(3)})`; ctx.fillRect(0, 0, W, H); }
+      const pr = playRect();
+      if (phase === 'air' && J.tricks.length) {
+        // The jump's tricks so far, with the combo.
+        const n = J.tricks.length, t = names(J.tricks, ' + ') + (n > 1 ? `   ${times(Math.min(3, 1 + 0.5 * (n - 1)))} combo` : '');
+        font(700, 15, FB);
+        const w = Math.min(W - 24, ctx.measureText(t).width + 28);
+        roundRect((W - w) / 2, pr.b - 24, w, 32, 16);
+        ctx.fillStyle = '#fff';
+        ctx.fillText(t, W / 2, pr.b - 8, W - 40);
+      }
+      const ph = pr.b - pr.t, yb = { false: pr.t + ph * 0.12, true: pr.t + ph * 0.58 };
+      for (const p of pops) {
+        const k = p.t / p.life, grow = reduce ? 1 : p.t < 0.12 ? 0.6 + (p.t / 0.12) * 0.5 : 1.1 - Math.min(0.1, (p.t - 0.12) * 0.5);
+        const px = (p.big ? Math.min(54, W * 0.11) : Math.min(30, W * 0.068)) * grow, yy = p.big ? pr.t + ph * (p.low ? 0.66 : 0.3) : yb[p.low];
+        ctx.globalAlpha = clamp(k < 0.75 ? 1 : 1 - (k - 0.75) / 0.25, 0, 1);
+        ctx.strokeStyle = 'rgba(12,14,20,.55)';
+        for (const [t, size, col, dy] of [[p.text, px, p.col, 0], [p.sub, px * 0.62, '#fff', px * 0.85]]) {
+          if (!t) continue;
+          font(800, size);
+          ctx.lineWidth = Math.max(3, size * 0.14);
+          ctx.strokeText(t, W / 2, yy + dy);
+          ctx.fillStyle = col;
+          ctx.fillText(t, W / 2, yy + dy);
+        }
+        if (!p.big) yb[p.low] += px * 1.15;
+      }
+      ctx.globalAlpha = 1;
+      if (phase !== 'ready' && phase !== 'run') return;
+      // The rev gauge: grey, the green power band, then the red over-rev.
+      const w = Math.min(260, W * 0.62), h = 16, gx = (W - w) / 2, gy = H - 70, at = (v) => gx + (w * v) / 1.08;
+      roundRect(gx - 10, gy - 46, w + 20, h + 74, 18);
+      roundRect(gx, gy, w, h, 8);
+      ctx.fillStyle = '#5BD07A';
+      ctx.fillRect(at(0.6), gy, at(RED) - at(0.6), h);
+      ctx.fillStyle = '#FF5A4A';
+      ctx.fillRect(at(RED), gy, at(1.08) - at(RED) - 4, h);
+      ctx.fillStyle = '#fff';
+      ctx.fillRect(at(clamp(b.rpm, 0, 1.08)) - 2.5, gy - 6, 5, h + 12);
+      font(800, 26);
+      ctx.fillText(Math.round(b.v * 3.6) + ' km/h', W / 2, gy - 24);
+      font(600, 13, FB);
+      ctx.fillStyle = b.bog ? '#FF9A7A' : '#E8EAEE';
+      ctx.fillText(phase === 'ready' ? (touchUI ? 'Hold anywhere to rev' : 'Hold Space or ↑ to rev') : b.bog ? 'Bogging! Let go a moment' : b.s > KX - 10 ? 'Let go at the lip to pop' : 'Keep the needle in the green', W / 2, gy + h + 16);
+    }
+    function draw(al) {
+      const ix = prev.x + (b.x - prev.x) * al, iy = prev.y + (b.y - prev.y) * al, ia = prev.ang + wrap(b.ang - prev.ang) * al, pr = playRect();
+      view = { x: cam.px + (cam.x - cam.px) * al, y: cam.py + (cam.y - cam.py) * al, s: cam.ps + (cam.s - cam.ps) * al, cx: (pr.l + pr.r) / 2, cy: (pr.t + pr.b) / 2 };
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      drawBack();
+      if (shake > 0) ctx.translate((Math.random() - 0.5) * shake * 14, (Math.random() - 0.5) * shake * 14);
+      drawGround();
+      drawProps();
+      if (phase === 'air') drawShadow(ix, iy);
+      drawDust();
+      drawBike(ix, iy, ia);
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      drawHUD(ix, iy);
+    }
+
+    // ---------- the loop: fixed physics steps, drawn once per screen frame ----------
+    const STEP = 1 / 120;
+    let raf = 0, last = 0, acc = 0;
+    function frame(now) {
+      if (dead) return;
+      raf = requestAnimationFrame(frame);
+      const dt = last ? Math.min(0.1, (now - last) / 1000) : 0;
+      last = now;
+      if (!paused) {
+        acc += dt;
+        let n = 0;
+        while (acc >= STEP && n++ < 14) { step(STEP); acc -= STEP; }
+        if (acc >= STEP) acc = 0;
+      }
+      updateHUD();
+      draw(paused ? 1 : acc / STEP);
+    }
+    newJump();
+    phase = 'intro';
+    intro();
+    if (typeof opts.debug === 'function') opts.debug({ b, cam, spr, get J() { return J; }, get phase() { return phase; } }); // for tests only
+    ready = true;
+    raf = requestAnimationFrame(frame);
+
+    function stop() {
+      if (dead) return;
+      dead = true;
+      cancelAnimationFrame(raf);
+      for (const [t, n, f] of LISTEN) t.removeEventListener(n, f, { passive: false });
+      if (ro) ro.disconnect();
+      else root.removeEventListener('resize', resize);
+      el.remove();
+    }
+    return { stop };
+  }
+
+  RS.sideGames = RS.sideGames || {};
+  RS.sideGames.bigair = { id: 'bigair', title: 'Big Air', blurb: 'Hit the ramp, pull a trick, stick the landing.', start };
+})(typeof window !== 'undefined' ? window : globalThis);
+
+/* Holeshot side game: Lane Dash. A four-lane race from a gate drop against three riders and his own ghost.
+   Canvas 2D, fixed 120 Hz steps, no network, no storage. It earns records only, never shop points.
+   A ghost is one sample every 100 ms: [x, lane x10, height, tilt], trailing zeros dropped.
+   The first sample also carries the track number at index 4, so a ghost replays on its own track. */
+(function (root) {
+  'use strict';
+  const RS = root.RS || (root.RS = {});
+  RS.sideGames = RS.sideGames || {};
+  const { PI, sin, cos, atan, min, max, abs, round, floor, hypot, random } = Math;
+  const DEG = 180 / PI, cl = (v, a, b) => (v < a ? a : v > b ? b : v), rnd = (a, b) => a + random() * (b - a), ang = (s) => atan(s) * DEG;
+  const DT = 1 / 120;
+  // World units. A lane is LANE deep on screen and each lane further back sits SKL to the right, which gives the slight angle.
+  const LANE = 54, SKL = 16, BW = 112, TB = 406, SH = 480, G = 760, KJ = 1.15, FIN = 24000;
+  const V_RIDE = 430, V_TURBO = 560, V_BOOST = 620, V_MUD = 210, V_HOT = 150;
+  const H_RIDE = 0.045, H_TURBO = 0.3, H_COOL = 0.25, HOT = 2, PERFECT = 9, CLEAN = 30;
+  const FD = '"Bricolage Grotesque","Trebuchet MS",system-ui,sans-serif', FN = 'Anton,Impact,"Arial Narrow",sans-serif';
+  const LIME = '#C8F031', AMBER = '#FFC247', RED = '#FF6B57', BLUE = '#7FD3FF', INK = '#15161B', CHALK = '#F4F4F2', DIM = 'rgba(255,255,255,.72)', SHADE = 'rgba(12,14,20,.62)';
+
+  // Jumps as [distance, height] points: k kicker, j jump to flat, t tabletop, d double, w whoops.
+  const SHAPES = {
+    k: [[0, 0], [48, 17], [80, 0]],
+    j: [[0, 0], [70, 34], [88, 34], [160, 0]],
+    t: [[0, 0], [80, 40], [330, 40], [450, 0]],
+    d: [[0, 0], [80, 42], [100, 42], [170, 0], [340, 0], [364, 44], [384, 44], [514, 0]],
+    w: [[0, 0], [32, 10], [64, 0], [96, 10], [128, 0], [160, 10], [192, 0], [224, 10], [256, 0]],
+  };
+  // Hand-made layouts of the same length, so times compare. "x type lanes [length]": b hay bale, m mud, c cool-down water.
+  const TRACKS = [
+    { name: 'Bushveld', sky: ['#6FAEE0', '#F3DDB2'], sun: [0.8, 46, 20], far: '#97AEC4', mid: '#7A8A50', tree: '#4C5A2E',
+      dirt: ['#A9693D', '#C68A58', '#7B4A2A'], ramp: ['#C98E5A', '#B27646', '#8F5935', '#6E4127'],
+      f: '700 k 0123,1350 b 1,1500 b 3,2000 j 0123,2750 m 01 320,3000 b 2,3500 t 0123,4500 c 0123,5100 j 01,5100 k 23,5800 w 0123,6500 b 0,6650 b 2,7100 d 0123,8000 m 23 340,8300 b 0,8900 c 03,9300 j 0123,10000 b 1,10150 b 3,10600 t 0123,11650 m 012 260,12250 c 12,12800 d 0123,13800 k 0123,14400 b 0,14550 b 2,15000 w 0123,15800 m 12 300,16400 j 0123,17100 c 0123,17700 t 0123,18800 b 3,18900 b 1,19400 k 0123,19950 j 0123' },
+    { name: 'Coast', sky: ['#4FA3E6', '#E4F1F6'], sun: [0.2, 42, 18], sea: '#2E86B8', far: '#7FA7B8', mid: '#D8C08C',
+      dirt: ['#C29A62', '#D8B57E', '#97734A'], ramp: ['#D6AE74', '#C39A60', '#A27C4A', '#82603A'],
+      f: '600 k 0123,1200 m 0123 200,1700 d 0123,2700 b 0,2700 b 3,3200 j 12,3200 k 03,3900 c 0123,4400 t 0123,5500 b 1,5700 b 2,6200 w 0123,6900 m 23 400,7000 b 1,7500 d 0123,8500 c 01,9000 k 0123,9500 j 0123,10200 b 2,10350 b 0,10800 t 0123,11900 m 01 300,12000 b 3,12500 c 23,13000 d 0123,14000 w 0123,14800 b 1,14950 b 3,15400 j 0123,16100 m 0123 220,16600 c 0123,17200 t 0123,18300 k 0123,18800 b 0,18800 b 2,19400 d 0123' },
+    { name: 'Sundown', sky: ['#3C3F7E', '#F7A35C'], sun: [0.62, 98, 30], far: '#5E4A78', mid: '#3E3A4E', tree: '#26222F',
+      dirt: ['#8E5A3A', '#A9714B', '#663F28'], ramp: ['#B07A50', '#996541', '#7A4E31', '#5C3A24'],
+      f: '800 j 0123,1500 b 2,1650 b 0,2100 t 0123,3100 m 12 360,3200 b 3,3700 k 0123,4200 c 0123,4800 d 0123,5800 b 1,5800 b 3,6300 w 0123,7100 j 01,7100 t 23,8100 m 0123 240,8700 c 03,9200 d 0123,10200 b 0,10350 b 2,10800 k 0123,11300 j 0123,12000 m 23 320,12100 b 0,12600 c 12,13200 t 0123,14300 w 0123,15100 b 1,15250 b 3,15800 d 0123,16800 c 0123,17400 j 0123,18000 m 01 300,18100 b 2,18700 t 0123,19800 k 0123' },
+  ];
+  // Rivals: speed, turbo habit, how hot they let it run, landing error in degrees, how often they dodge mud, colour.
+  const AI = [{ sk: 0.87, tw: 0.2, tm: 0.6, err: 14, mud: 0.5, c: '#17504E' }, { sk: 0.9, tw: 0.3, tm: 0.68, err: 12, mud: 0.7, c: '#2C2766' }, { sk: 0.93, tw: 0.42, tm: 0.75, err: 10, mud: 0.9, c: '#5A391B' }];
+  const BOARDS = ['HOLESHOT', 'FULL GAS', 'LANE DASH', 'GATE DROP', 'BRAAP', 'MOTO'];
+  const BOARD_C = [['#E9501C', '#fff'], [INK, LIME], [CHALK, INK], ['#1F5FE0', '#fff']];
+  const SHIRTS = ['#E9501C', '#1F5FE0', '#F2C200', CHALK, '#0B8457', '#D4262F', '#2B2E35', '#2FA8E8', '#D81B7C', LIME];
+  const SKIN = ['#8D5524', '#C68642', '#E0AC69', '#F1C27D', '#5C3A1E'];
+
+  const CSS = `.ld{position:absolute;inset:0;overflow:hidden;background:#0F1116;user-select:none;-webkit-user-select:none;-webkit-touch-callout:none;font-family:Lexend,"Segoe UI",system-ui,sans-serif}
+.ld-cv{position:absolute;inset:0;width:100%;height:100%;display:block;touch-action:none}
+.ld-pr{position:absolute;visibility:hidden;pointer-events:none;padding:env(safe-area-inset-top,0px) env(safe-area-inset-right,0px) env(safe-area-inset-bottom,0px) env(safe-area-inset-left,0px)}
+.ld-ov{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;padding:16px;background:rgba(8,10,14,.5)}
+.ld-ov[hidden]{display:none}
+.ld-card{background:var(--card,#fff);color:var(--ink,#15161B);border-radius:24px;padding:22px 20px 18px;width:min(430px,100%);max-height:100%;overflow:auto;box-shadow:0 20px 50px rgba(0,0,0,.35);text-align:center;box-sizing:border-box}
+.ld-eb{font-size:12px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-2,#565A65)}
+.ld-h{font:800 34px/1.05 ${FD};margin:6px 0 2px;letter-spacing:-.02em}
+.ld-t{font:800 44px/1.1 ${FD};font-variant-numeric:tabular-nums;letter-spacing:-.02em}
+.ld-p{margin:6px 0;color:var(--ink-2,#565A65);font-size:15px;line-height:1.45}
+.ld-new{display:inline-block;background:var(--lime,#C8F031);color:var(--lime-ink,#1F2A00);font-weight:700;border-radius:999px;padding:5px 14px;margin:4px 0}
+.ld-list{text-align:left;margin:12px 0 4px;padding:0;list-style:none}
+.ld-list li{display:flex;gap:12px;align-items:flex-start;margin:10px 0;font-size:15px;line-height:1.4}
+.ld-k{flex:none;min-width:64px;text-align:center;font-weight:700;font-size:12px;border-radius:9px;padding:5px 6px;background:var(--card-2,#F2F3F5);color:var(--ink,#15161B)}
+.ld-b{display:block;width:100%;min-height:58px;border:0;border-radius:16px;font:800 19px ${FD};margin-top:14px;cursor:pointer;background:var(--accent,#E9501C);color:#fff;touch-action:manipulation}
+.ld-b.ld-b2{background:var(--card-2,#F2F3F5);color:var(--ink,#15161B);min-height:50px;font-size:16px;margin-top:10px}
+.ld-b:focus-visible{outline:3px solid var(--violet,#5238E0);outline-offset:2px}
+@media (max-height:500px){.ld-card{padding:14px 18px;width:min(560px,100%)}.ld-h{font-size:26px}.ld-t{font-size:34px}.ld-p{margin:3px 0;font-size:14px}.ld-list{margin:6px 0 0}.ld-list li{margin:5px 0;font-size:13px}.ld-b{min-height:50px;margin-top:8px}.ld-b.ld-b2{min-height:46px;margin-top:6px}}`;
+
+  const mk = (w, h) => { const c = document.createElement('canvas'); c.width = max(1, Math.ceil(w)); c.height = max(1, Math.ceil(h)); return c; };
+  const ord = (n) => n + (n === 1 ? 'st' : n === 2 ? 'nd' : n === 3 ? 'rd' : 'th');
+  const p2 = (n) => String(n).padStart(2, '0');
+  // South African style: 0:52,34
+  const fmtT = (s) => { const c = max(0, round(s * 100)); return `${floor(c / 6000)}:${p2(floor(c / 100) % 60)},${p2(c % 100)}`; };
+  const fmtS = (s) => s.toFixed(2).replace('.', ',');
+
+  // ---------- his paint ----------
+  // ctx.filter where it works, otherwise the same CSS filter maths applied to the pixels once.
+  let fok = null;
+  function filterWorks() {
+    if (fok === null) try { const x = mk(1, 1).getContext('2d'); x.filter = 'brightness(0)'; x.fillStyle = '#fff'; x.fillRect(0, 0, 1, 1); fok = x.getImageData(0, 0, 1, 1).data[0] < 50; } catch (e) { fok = false; }
+    return fok;
+  }
+  const satM = (s) => [0.213 + 0.787 * s, 0.715 - 0.715 * s, 0.072 - 0.072 * s, 0.213 - 0.213 * s, 0.715 + 0.285 * s, 0.072 - 0.072 * s, 0.213 - 0.213 * s, 0.715 - 0.715 * s, 0.072 + 0.928 * s];
+  function mat(f) {
+    let m = [1, 0, 0, 0, 1, 0, 0, 0, 1], q;
+    const re = /(hue-rotate|saturate|grayscale|brightness)\(\s*(-?[\d.]+)(%?)/g;
+    while ((q = re.exec(f || ''))) {
+      const a = parseFloat(q[2]) / (q[3] ? 100 : 1), c = cos(a / DEG), s = sin(a / DEG);
+      const n = q[1] === 'saturate' ? satM(a) : q[1] === 'grayscale' ? satM(1 - min(1, a)) : q[1] === 'brightness' ? [a, 0, 0, 0, a, 0, 0, 0, a]
+        : [0.213 + c * 0.787 - s * 0.213, 0.715 - c * 0.715 - s * 0.715, 0.072 - c * 0.072 + s * 0.928, 0.213 - c * 0.213 + s * 0.143, 0.715 + c * 0.285 + s * 0.14, 0.072 - c * 0.072 - s * 0.283, 0.213 - c * 0.213 - s * 0.787, 0.715 - c * 0.715 + s * 0.715, 0.072 + c * 0.928 + s * 0.072];
+      const r = [];
+      for (let i = 0; i < 3; i++) for (let j = 0; j < 3; j++) r.push(n[i * 3] * m[j] + n[i * 3 + 1] * m[3 + j] + n[i * 3 + 2] * m[6 + j]);
+      m = r;
+    }
+    return m;
+  }
+  const apply = (m, r, g, b) => [0, 1, 2].map((i) => m[i * 3] * r + m[i * 3 + 1] * g + m[i * 3 + 2] * b);
+  // His colour for the screen: the base orange through his filter.
+  const colourOf = (f) => '#' + apply(mat(f), 233, 80, 28).map((v) => round(cl(v, 0, 255)).toString(16).padStart(2, '0')).join('');
+  // A copy of a sprite through a filter, or washed with a colour (riders and the ghost).
+  function tint(b, f, col, a) {
+    const c = mk(b.c.width, b.c.height), x = c.getContext('2d');
+    try {
+      if (col) { x.drawImage(b.c, 0, 0); x.globalCompositeOperation = 'source-atop'; x.globalAlpha = a; x.fillStyle = col; x.fillRect(0, 0, c.width, c.height); }
+      else if (!f) return b;
+      else if (filterWorks()) { x.filter = f; x.drawImage(b.c, 0, 0); }
+      else {
+        x.drawImage(b.c, 0, 0);
+        const im = x.getImageData(0, 0, c.width, c.height), d = im.data, m = mat(f);
+        for (let i = 0; i < d.length; i += 4) if (d[i + 3]) { const v = apply(m, d[i], d[i + 1], d[i + 2]); d[i] = v[0]; d[i + 1] = v[1]; d[i + 2] = v[2]; }
+        x.putImageData(im, 0, 0);
+      }
+    } catch (e) { return b; }
+    return { c, ox: b.ox, by: b.by, bw: b.bw };
+  }
+
+  // ---------- the bike picture ----------
+  function abox(img) {
+    const w = img.naturalWidth, h = img.naturalHeight;
+    try {
+      const x = mk(w, h).getContext('2d');
+      x.drawImage(img, 0, 0);
+      const d = x.getImageData(0, 0, w, h).data;
+      let x0 = w, y0 = h, x1 = -1, y1 = -1;
+      for (let y = 0; y < h; y += 2) for (let i = 0; i < w; i += 2) if (d[(y * w + i) * 4 + 3] > 24) { x0 = min(x0, i); x1 = max(x1, i); y0 = min(y0, y); y1 = max(y1, y); }
+      if (x1 > x0 && y1 > y0) return [x0, y0, min(w - x0, x1 - x0 + 2), min(h - y0, y1 - y0 + 2)];
+    } catch (e) { /* pixels unreadable: use the whole picture */ }
+    return [0, 0, w, h];
+  }
+  function pen(x, X, Y, w, h) {
+    const P = (p) => [X + p[0] * w, Y + p[1] * h];
+    return {
+      poly(pts, c) { x.fillStyle = c; x.beginPath(); for (const p of pts) x.lineTo(...P(p)); x.fill(); },
+      ln(a, b, c, lw) { x.strokeStyle = c; x.lineWidth = lw * w; x.lineCap = 'round'; x.beginPath(); x.moveTo(...P(a)); x.lineTo(...P(b)); x.stroke(); },
+      dot(p, r, c) { x.fillStyle = c; x.beginPath(); x.arc(...P(p), r * w, 0, 7); x.fill(); },
+    };
+  }
+  // A drawn bike in the base orange, used until a picture loads (or if none ever does).
+  function vecBike(x, X, Y, w, h) {
+    const { poly, ln, dot } = pen(x, X, Y, w, h);
+    for (const c of [0.155, 0.83]) { dot([c, 0.78], 0.155, '#121317'); dot([c, 0.78], 0.112, '#30333A'); dot([c, 0.78], 0.03, '#B9BEC6'); }
+    ln([0.155, 0.78], [0.44, 0.6], '#9AA0A8', 0.035);
+    ln([0.62, 0.06], [0.83, 0.78], '#C9CED6', 0.04);
+    poly([[0.36, 0.45], [0.58, 0.42], [0.6, 0.68], [0.4, 0.7]], '#2B2E35');
+    ln([0.52, 0.56], [0.22, 0.38], '#7D838C', 0.03);
+    poly([[0.08, 0.3], [0.3, 0.33], [0.28, 0.43], [0.08, 0.39]], '#B8BDC4');
+    poly([[0, 0.2], [0.5, 0.24], [0.42, 0.42], [0.18, 0.37]], '#E9501C');
+    poly([[0.21, 0.27], [0.38, 0.28], [0.34, 0.38], [0.22, 0.36]], CHALK);
+    poly([[0.12, 0.17], [0.52, 0.2], [0.5, 0.25], [0.14, 0.23]], '#17181C');
+    poly([[0.5, 0.2], [0.66, 0.12], [0.7, 0.32], [0.55, 0.44]], '#E9501C');
+    poly([[0.7, 0.3], [0.99, 0.27], [0.86, 0.37]], '#E9501C');
+    poly([[0.6, 0], [0.67, -0.05], [0.7, 0.2], [0.64, 0.22]], CHALK);
+    ln([0.58, 0.03], [0.66, -0.03], '#202227', 0.022);
+  }
+  // A plain rider for pictures that have none.
+  function rider(x, X, Y, w, h) {
+    const { poly, ln, dot } = pen(x, X, Y, w, h), kit = '#3A404C', legs = '#2B2F38';
+    ln([0.4, -0.02], [0.55, -0.42], kit, 0.11);
+    ln([0.42, -0.08], [0.5, -0.33], '#E9501C', 0.025);
+    ln([0.4, -0.02], [0.56, 0.28], legs, 0.075);
+    ln([0.56, 0.28], [0.46, 0.58], legs, 0.065);
+    poly([[0.4, 0.5], [0.52, 0.54], [0.53, 0.66], [0.4, 0.66]], '#1A1B1F');
+    ln([0.55, -0.42], [0.67, -0.24], kit, 0.058);
+    ln([0.67, -0.24], [0.62, 0.02], kit, 0.052);
+    dot([0.6, -0.56], 0.095, '#E9501C');
+    poly([[0.6, -0.6], [0.7, -0.6], [0.7, -0.5], [0.62, -0.5]], '#1C1E24');
+    poly([[0.53, -0.67], [0.72, -0.66], [0.66, -0.62], [0.53, -0.62]], '#E9501C');
+  }
+  function compose(img, side) {
+    const S = 320, bb = img ? abox(img) : [0, 0, 640, 440], bh = S * bb[3] / bb[2], top = side ? 4 : Math.ceil(bh * 0.74) + 4;
+    const c = mk(S + 8, top + bh + 4), x = c.getContext('2d');
+    if (img) x.drawImage(img, bb[0], bb[1], bb[2], bb[3], 4, top, S, bh); else vecBike(x, 4, top, S, bh);
+    if (!side) rider(x, 4, top, S, bh);
+    return { c, ox: 4 + S / 2, by: top + bh, bw: S };
+  }
+
+  // ---------- track ----------
+  function build(ti) {
+    const T = TRACKS[ti], tr = Object.assign({ i: ti, ramps: [], bales: [], mud: [], cool: [] }, T);
+    for (const e of T.f.split(',')) {
+      const [xs, t, ls, len] = e.split(' '), x = round(xs * 1.15), l = [0, 1, 2, 3].map((n) => ls.includes(n));
+      if (t === 'b') tr.bales.push({ x, lane: +ls });
+      else if (t === 'm') tr.mud.push({ x, len: +len, l, a: +ls[0], b: +ls[ls.length - 1] });
+      else if (t === 'c') tr.cool.push({ x, len: 60, l, id: tr.cool.length });
+      else { const p = SHAPES[t]; tr.ramps.push({ x, p, len: p[p.length - 1][0], l, soft: t === 'w', n: 0 }); }
+    }
+    return tr;
+  }
+  let gh = 0, gs = 0, gr = null; // ground height, slope and ramp from the last ground() call
+  function ground(tr, lane, x) {
+    gh = gs = 0; gr = null;
+    for (const r of tr.ramps) {
+      if (!r.l[lane] || x < r.x || x >= r.x + r.len) continue;
+      const p = r.p, u = x - r.x;
+      for (let j = 1; j < p.length; j++) if (u < p[j][0]) { const a = p[j - 1], b = p[j]; gs = (b[1] - a[1]) / (b[0] - a[0]); gh = a[1] + (u - a[0]) * gs; gr = r; return; }
+    }
+  }
+  const okGhost = (g) => (Array.isArray(g) && g.length > 9 && g.every((s) => Array.isArray(s) && isFinite(s[0]) && isFinite(s[1] || 0)) ? g.slice(0, 2000) : null);
+
+  function run(host, o) {
+    const RM = !!o.reduceMotion, RUNS = cl(o.runs | 0 || 3, 1, 9);
+    const sfx = (kind) => { try { if (typeof o.sfx === 'function') o.sfx(kind); } catch (e) { /* sound is optional */ } };
+    const plate = String(o.plate == null ? '' : o.plate).replace(/[^0-9A-Za-z]/g, '').slice(0, 3);
+    const bikeId = /^[a-z]{2,12}$/.test(o.bike || '') ? o.bike : 'mx';
+    const filt = typeof o.filter === 'string' && o.filter.trim() !== 'none' ? o.filter.trim() : '';
+    const prevBest = +o.best > 0 ? +o.best : null, myCol = colourOf(filt);
+    const oG = okGhost(o.ghost), oGT = oG && TRACKS[oG[0][4]] ? oG[0][4] : -1;
+    let touchUI = (root.matchMedia && matchMedia('(pointer: coarse)').matches) || 'ontouchstart' in root;
+
+    const wrap = document.createElement('div');
+    wrap.className = 'ld';
+    wrap.innerHTML = `<style>${CSS}</style><canvas class="ld-cv" aria-label="Lane Dash race"></canvas><div class="ld-pr"></div><div class="ld-ov" hidden></div>`;
+    host.appendChild(wrap);
+    const cv = wrap.querySelector('canvas'), ctx = cv.getContext('2d'), ov = wrap.querySelector('.ld-ov'), probe = wrap.querySelector('.ld-pr');
+
+    // ---------- sprites: side picture, else the small bike picture plus a rider, else drawn ----------
+    const SPR = {}, imgs = [];
+    let base = compose(null, false), dead = false;
+    const sprites = () => { SPR.me = tint(base, filt); SPR.gh = tint(base, '', '#fff', 0.55); SPR.ai = AI.map((a) => tint(base, '', a.c, 0.72)); };
+    sprites();
+    const load = (src, ok, bad) => {
+      const im = new Image();
+      imgs.push(im);
+      im.onload = () => { if (dead) return; try { ok(im); } catch (e) { if (bad) bad(); } };
+      im.onerror = () => { if (!dead && bad) bad(); };
+      im.src = src;
+    };
+    load(`img/side-${bikeId}.webp`, (im) => { base = compose(im, true); sprites(); }, () => load(`img/bike-${bikeId}.webp`, (im) => { base = compose(im, false); sprites(); }));
+
+    // ---------- layout ----------
+    let W = 1, H = 1, dpr = 1, k = 1, oy = 0, visW = 1, fx = 0.3, u = 1, camX = 0, shX = 0, shY = 0;
+    let ins = [0, 0, 0, 0], crowdT = null, dirtT = null, tileKey = '';
+    const btn = {};
+    function layout() {
+      W = max(200, wrap.clientWidth); H = max(200, wrap.clientHeight);
+      dpr = min(2, root.devicePixelRatio || 1);
+      cv.width = round(W * dpr); cv.height = round(H * dpr);
+      const cs = getComputedStyle(probe);
+      ins = ['Top', 'Right', 'Bottom', 'Left'].map((s) => parseFloat(cs['padding' + s]) || 0);
+      k = min(W / (W > H ? 960 : 540), H / SH);
+      visW = W / k; fx = W > H ? 0.3 : 0.18; u = cl(min(W, H) / 420, 0.8, 1.3);
+      oy = (H - SH * k) * 0.45;
+      const R = max(28, 34 * u), RG = max(36, 46 * u), pd = 12 + 6 * u, bot = H - ins[2] - pd;
+      btn.up = { x: ins[3] + pd + R, y: bot - R * 3.3, r: R };
+      btn.dn = { x: ins[3] + pd + R, y: bot - R, r: R };
+      btn.gas = { x: W - ins[1] - pd - RG, y: bot - RG, r: RG };
+      btn.tb = { x: btn.gas.x, y: btn.gas.y - RG - R - 14, r: R };
+      btn.ps = { x: W - ins[1] - 36, y: ins[0] + 36, r: 24 };
+      tiles();
+    }
+    // The crowd and the dirt are drawn once into tiles, then repeated as the track scrolls.
+    function tiles() {
+      const key = [k, dpr, tr.i].join();
+      if (key === tileKey) return;
+      tileKey = key;
+      let seed = 11 + tr.i * 97;
+      const R = () => (seed = (seed * 16807) % 2147483647) / 2147483647, pick = (a) => a[floor(R() * a.length)], s = k * dpr;
+      crowdT = mk(512 * s, 56 * s);
+      let x = crowdT.getContext('2d');
+      x.scale(s, s);
+      x.fillStyle = '#525866'; x.fillRect(0, 12, 512, 44);
+      x.fillStyle = 'rgba(255,255,255,.08)';
+      for (let y = 18; y < 56; y += 13) x.fillRect(0, y, 512, 2);
+      for (let row = 0; row < 3; row++) for (let px = 4 + row * 4; px < 508; px += 8 + R() * 6) {
+        const by = 24 + row * 13;
+        x.fillStyle = pick(SHIRTS); x.fillRect(px - 3.5, by - 1, 7, 11);
+        if (R() < 0.14) x.fillRect(px + 2, by - 11, 2, 10);
+        x.fillStyle = pick(SKIN); x.beginPath(); x.arc(px, by - 4.5, 3.2, 0, 7); x.fill();
+      }
+      dirtT = mk(256 * s, 4 * LANE * s);
+      x = dirtT.getContext('2d');
+      x.scale(s, s);
+      x.fillStyle = tr.dirt[0]; x.fillRect(0, 0, 256, 4 * LANE);
+      for (let i = 0; i < 480; i++) { x.fillStyle = R() < 0.5 ? tr.dirt[1] : tr.dirt[2]; x.globalAlpha = 0.25 + R() * 0.45; x.fillRect(R() * 256, R() * 4 * LANE, 1 + R() * 2.6, 1 + R() * 1.6); }
+      x.globalAlpha = 0.18; x.fillStyle = tr.dirt[2];
+      for (let i = 0; i < 8; i++) x.fillRect(0, (floor(i / 2) + (i % 2 ? 0.62 : 0.32)) * LANE, 256, 1.6);
+    }
+
+    // ---------- game state ----------
+    let tr = null, bikes = [], me = null, phase = 'intro', pt = 0, gateWait = 2, rt = 0, dT = 0, T = 0, raceN = 0, jump = false, dropA = 0;
+    let paused = false, done = false, cardUp = false, cardAt = 0, fps = 60, shake = 0, msg = null, meTop = 0, hudB = 0, boardB = 0;
+    let ghost = null, gSame = false, gp = 1, rec = [], nextS = 0;
+    const t0 = oGT >= 0 ? oGT : floor(random() * TRACKS.length), runs = [], st = {}, seen = {}, parts = [], keys = new Set(), touches = new Map();
+    const mkB = (lane, i) => ({ i, cpu: i > 0, x: -64, xp: -64, v: 0, lane, lf: lane, y: 0, vy: 0, air: false, at: 0, soft: false, pitch: 0, ls: 0, rr: null, jr: null, heat: 0, hot: 0, wash: 0, boost: 0, hold: 0, wait: false, fin: 0, cool: -1, bz: null, want: null, aim: 0, tbOn: false, look: 0, sk: 1, inp: { gas: false, tb: false, lean: 0 } });
+    function setupRace(n) {
+      raceN = n;
+      tr = build((t0 + n) % TRACKS.length);
+      bikes = [mkB(2, 0), mkB(0, 1), mkB(1, 2), mkB(3, 3)];
+      me = bikes[0];
+      Object.assign(st, { perfect: 0, wash: 0, hot: 0, holeshot: false, react: null, jump: false, warned: false });
+      pt = rt = dT = dropA = nextS = 0; jump = false; rec = []; parts.length = 0; msg = null;
+      // His fastest ghost on this track, else his fastest anywhere as a pace marker.
+      const all = runs.slice();
+      if (oG) all.push({ ms: prevBest || 1e9, tr: oGT, g: oG });
+      let same = null, any = null;
+      for (const c of all) { if (c.tr === tr.i && (!same || c.ms < same.ms)) same = c; if (!any || c.ms < any.ms) any = c; }
+      ghost = (same || any || {}).g || null; gSame = !!same; gp = 1;
+      if (W > 1) tiles();
+    }
+
+    // ---------- messages and dust ----------
+    const say = (text, sub, col, d) => { msg = { text, sub: sub || '', col: col || '#fff', d: d || 1.1, t: 0 }; };
+    const sayOnce = (kind, text, sub, col, d) => { seen[kind] = (seen[kind] || 0) + 1; say(text, seen[kind] <= 2 ? sub : '', col, d); };
+    const FX = {
+      dust: () => ({}),
+      mud: () => ({ vx: rnd(-160, -40), vh: rnd(60, 150), g: 520, s: rnd(1.6, 3.4), gr: 0, c: '#3A2516', l: 0.6 }),
+      water: () => ({ vx: rnd(-90, 60), vh: rnd(90, 210), g: 620, s: rnd(1.6, 3.6), gr: 0, c: '#BFE8FF', l: 0.7 }),
+      smoke: () => ({ vx: rnd(-50, -10), vh: rnd(25, 60), g: -20, s: rnd(5, 9), c: '#9BA0A8', l: rnd(0.7, 1.1) }),
+      cloud: () => ({ vx: rnd(-70, 70), vh: rnd(10, 70), s: rnd(10, 22), gr: 0.6, l: rnd(0.8, 1.3) }),
+      spark: () => ({ vx: rnd(-200, -60), vh: rnd(-20, 60), g: 0, s: rnd(1.5, 3), gr: 0, c: LIME, l: 0.35 }),
+    };
+    function puff(x, D, h, n, kind) {
+      for (let i = 0; i < (RM ? Math.ceil(n * 0.35) : n) && parts.length < (RM ? 60 : 220); i++) {
+        const p = Object.assign({ x, D: D + rnd(-0.15, 0.15), h, vx: rnd(-60, 20), vh: rnd(10, 50), g: -10, l: rnd(0.4, 0.8), s: rnd(3, 7), gr: 0.9, c: tr.dirt[1] }, FX[kind]());
+        p.m = p.l;
+        parts.push(p);
+      }
+    }
+    const near = (b) => abs(b.x - me.x) < visW;
+
+    // ---------- riding ----------
+    const inMud = (lane, x) => tr.mud.some((m) => m.l[lane] && x > m.x && x < m.x + m.len);
+    const blocked = (lane, x, ahead) => (tr.bales.some((z) => z.lane === lane && z.x > x && z.x < x + ahead) ? 2 : tr.mud.some((m) => m.l[lane] && m.x + m.len > x && m.x < x + ahead) ? 1 : 0);
+    function canShift(b, d) {
+      const t = b.lane + d;
+      if (t < 0 || t > 3 || b.air || b.wash > 0 || b.hold > 0) return false;
+      ground(tr, b.lane, b.x);
+      const h1 = gh;
+      ground(tr, t, b.x);
+      return abs(h1 - gh) < 1;
+    }
+    // The slope he will land on, found by running the jump forward.
+    function predict(b) {
+      let x = b.x, y = b.y, vy = b.vy;
+      for (let i = 0; i < 300; i++) { vy -= G * 0.01; y += vy * 0.01; x += b.v * 0.01; ground(tr, b.lane, x); if (y <= gh && vy < 0) return ang(gs); }
+      return 0;
+    }
+    function ev(b, kind) {
+      if (kind === 'wash' && near(b)) puff(b.x, 3.5 - b.lf, 6, 22, 'cloud');
+      if (kind === 'cool' && near(b)) puff(b.x, 3.5 - b.lf, 2, 14, 'water');
+      if (b.cpu) return;
+      if (kind === 'perfect') { st.perfect++; sfx('combo'); say('Perfect!', 'Speed boost', LIME, 0.9); puff(b.x - 40, 3.5 - b.lf, b.y + 20, 10, 'spark'); }
+      else if (kind === 'clean') { sfx('right'); say('Clean', '', '#fff', 0.6); }
+      else if (kind === 'wash') { st.wash++; sfx('wrong'); shake = 9; sayOnce(kind, 'Washout!', touchUI ? 'Tilt with ▲ ▼ to match the lines' : 'Tilt with ↑ ↓ to match the lines', AMBER, 1.3); }
+      else if (kind === 'case') { sfx('wrong'); shake = 6; sayOnce(kind, 'Cased it!', 'More speed clears the gap', AMBER); }
+      else if (kind === 'bump') { sfx('wrong'); shake = 5; sayOnce(kind, 'Bump!', 'Change lanes to miss hay bales', AMBER); }
+      else if (kind === 'hot') { st.hot++; sfx('wrong'); sayOnce(kind, 'Overheated!', 'Cooling down. Ease off sooner', RED, 1.6); }
+      else if (kind === 'cool') { sfx('tap'); say('Cooled', '', BLUE, 0.6); }
+    }
+    function land(b) {
+      b.air = false; b.y = gh; b.vy = 0; b.ls = gs; b.rr = gr;
+      // Little hops and slow rolls over a jump are never marked.
+      if (b.soft || b.at < 0.3 || b.v < 260) { b.soft = false; return; }
+      if (gs > 0.25) { b.v *= 0.5; ev(b, 'case'); return; }
+      // After three washouts off the same jump, he quietly gets more room on it.
+      const d = abs(b.pitch - ang(gs)), ex = !b.cpu && b.jr && b.jr.n >= 3 ? 12 : 0;
+      if (d <= PERFECT + ex / 2) { b.boost = b.cpu ? 0.4 : 0.9; b.v = max(b.v, 480); ev(b, 'perfect'); }
+      else if (d <= CLEAN + ex) { b.v *= 0.93; ev(b, 'clean'); }
+      else { b.wash = 1.1; b.v *= 0.45; if (b.jr && !b.cpu) b.jr.n++; ev(b, 'wash'); }
+    }
+    function stepBike(b) {
+      const inp = b.inp, show = near(b), D = 3.5 - b.lf;
+      b.xp = b.x;
+      if (b.hold > 0) { b.hold -= DT; return; }
+      if (b.wash > 0) {
+        b.wash -= DT; b.v = max(0, b.v - 420 * DT); b.x += b.v * DT;
+        ground(tr, b.lane, b.x); b.y = gh; b.ls = gs;
+        if (b.wash <= 0) { b.pitch = ang(gs); if (!b.cpu) say('Back on!', '', '#fff', 0.5); }
+        return;
+      }
+      let gas = inp.gas || inp.tb, tb = inp.tb && gas;
+      if (b.hot > 0) { b.hot -= DT; b.heat = cl(b.hot / HOT, 0, 1); gas = tb = false; }
+      else {
+        b.heat = cl(b.heat + (b.air ? -0.06 : tb ? H_TURBO : gas ? H_RIDE : -H_COOL) * DT, 0, 1);
+        if (b.heat >= 1) { b.hot = HOT; ev(b, 'hot'); }
+      }
+      if (b.boost > 0) b.boost -= DT;
+      if (!b.air) {
+        const vmax = b.boost > 0 ? V_BOOST : (tb ? V_TURBO : V_RIDE) * b.sk;
+        if (b.hot > 0) b.v += (V_HOT - b.v) * 2.5 * DT;
+        else if (gas) b.v += (vmax - b.v) * (b.v > vmax ? 1.2 : tb || b.boost > 0 ? 2.3 : 1.7) * DT;
+        else b.v = max(0, b.v - 170 * DT);
+        if (inMud(b.lane, b.x)) { if (b.v > V_MUD) b.v -= (b.v - V_MUD) * 4 * DT; if (show && gas && random() < 0.5) puff(b.x - BW * 0.38, D, 3, 1, 'mud'); }
+        else if (show && gas && b.v > 60 && random() < (RM ? 0.1 : 0.35)) puff(b.x - BW * 0.38, D, 3, 1, 'dust');
+        b.v = max(0, b.v - b.ls * 110 * DT);
+      } else b.v -= b.v * 0.02 * DT;
+      if (b.hot > 0 && show && random() < 0.25) puff(b.x - BW * 0.1, D, 30, 1, 'smoke');
+      b.x += b.v * DT;
+      b.lf += cl(b.lane - b.lf, -7 * DT, 7 * DT);
+      ground(tr, b.lane, b.x);
+      if (!b.air) {
+        if (b.ls > 0.12 && gs < b.ls - 0.1) {
+          // Off the lip: a jump, as high as his speed allows.
+          b.air = true; b.at = 0; b.jr = b.rr; b.soft = !!(b.rr && b.rr.soft);
+          b.vy = b.v * min(b.ls, 0.62) * (b.soft ? 0.7 : KJ);
+          b.pitch = ang(b.ls);
+          if (b.cpu) { const a = AI[b.i - 1]; b.aim = predict(b) + (random() < 0.05 ? rnd(30, 40) * (random() < 0.5 ? -1 : 1) : rnd(-a.err, a.err)); }
+        } else { b.y = gh; b.pitch += (ang(gs) - b.pitch) * min(1, 16 * DT); b.ls = gs; b.rr = gr; }
+      }
+      if (b.air) {
+        b.at += DT; b.vy -= G * DT; b.y += b.vy * DT;
+        // Left alone the nose settles a little high (a clean landing, never a perfect one); the tilt buttons turn it fast.
+        b.pitch = cl(b.pitch + (inp.lean ? inp.lean * 150 * DT : cl(10 - b.pitch, -30 * DT, 30 * DT)), -75, 75);
+        ground(tr, b.lane, b.x);
+        if (b.y <= gh && b.vy < 0) land(b);
+      }
+      const fr = b.x + BW * 0.42;
+      for (const z of tr.bales) if (z !== b.bz && z.lane === b.lane && fr > z.x && fr < z.x + 44 && b.y < 24) {
+        b.bz = z; b.v = cl(b.v * 0.3, 110, 140); b.air = b.soft = true; b.at = 0; b.vy = 240; b.x = z.x - BW * 0.42 - 1;
+        ev(b, 'bump');
+        break;
+      }
+      if (!b.air) for (const c of tr.cool) if (c.l[b.lane] && b.x > c.x && b.x < c.x + c.len && b.cool !== c.id) { b.cool = c.id; if (b.heat > 0.02 || b.hot > 0) { b.heat = b.hot = 0; ev(b, 'cool'); } }
+      if (!b.fin && b.x >= FIN) { b.fin = max(0.01, rt - DT + DT * cl((FIN - b.xp) / (b.x - b.xp || 1), 0, 1)); if (!b.cpu) finished(); }
+    }
+    function think(b) {
+      const a = AI[b.i - 1], inp = b.inp, gap = b.x - me.x;
+      b.sk = a.sk * (gap > 700 ? 0.95 : gap < -700 ? 1.02 : 1);
+      if (b.fin && b.x > FIN + 900) { inp.gas = inp.tb = false; return; }
+      inp.gas = true;
+      if (b.tbOn) { if (b.heat > a.tm || b.hot > 0) b.tbOn = false; } else if (b.heat < 0.3 && random() < a.tw * DT) b.tbOn = true;
+      inp.tb = b.tbOn;
+      inp.lean = b.air ? (abs(b.pitch - b.aim) < 2.5 ? 0 : b.pitch < b.aim ? 1 : -1) : 0;
+      if (b.air || rt < b.look || abs(b.lf - b.lane) > 0.05) return;
+      b.look = rt + 0.3;
+      const here = blocked(b.lane, b.x, 420), coolIn = (l) => tr.cool.some((c) => c.l[l] && c.x > b.x && c.x < b.x + 700);
+      const want = here === 2 || (here === 1 && random() < a.mud) ? 1 : b.heat > 0.55 && !coolIn(b.lane) ? 2 : 0;
+      if (!want) return;
+      const opts = [b.lane - 1, b.lane + 1].filter((l) => l >= 0 && l < 4 && !blocked(l, b.x, 420) && canShift(b, l - b.lane) && (want === 1 || coolIn(l)));
+      if (opts.length) b.lane = opts[floor(random() * opts.length)];
+    }
+    function place() {
+      let p = 1;
+      for (const b of bikes) if (b !== me && ((b.fin && (!me.fin || b.fin < me.fin)) || (!b.fin && !me.fin && b.x > me.x))) p++;
+      return p;
+    }
+    function sample() {
+      const s = [round(me.x), round(me.lf * 10), round(me.y), round(me.pitch)];
+      if (!rec.length) s.push(tr.i); else while (s.length > 2 && !s[s.length - 1]) s.pop();
+      return s;
+    }
+    function ghostAt(t) {
+      const f = max(0, t) * 10, i = floor(f), a = ghost && ghost[i], b = ghost && ghost[i + 1];
+      if (!b) return null;
+      const L = (j) => (a[j] || 0) + ((b[j] || 0) - (a[j] || 0)) * (f - i);
+      return { x: L(0), lf: cl(L(1) / 10, 0, 3), y: L(2), p: L(3) };
+    }
+    // Seconds behind (+) or ahead (-) of the ghost at his spot on the track.
+    function ghostGap() {
+      if (!ghost || phase !== 'race') return null;
+      while (gp < ghost.length - 1 && ghost[gp][0] < me.x) gp++;
+      while (gp > 1 && ghost[gp - 1][0] > me.x) gp--;
+      const a = ghost[gp - 1], b = ghost[gp];
+      return !a || !b || b[0] < me.x ? null : rt - (gp - 1 + cl((me.x - a[0]) / (b[0] - a[0] || 1), 0, 1)) * 0.1;
+    }
+
+    // ---------- race flow ----------
+    const KEYS = { Space: 'gas', ArrowRight: 'gas', KeyD: 'gas', ShiftLeft: 'tb', ShiftRight: 'tb', KeyX: 'tb', ArrowUp: 'up', KeyW: 'up', ArrowDown: 'dn', KeyS: 'dn', ArrowLeft: 'lb', KeyA: 'lb' };
+    const held = (r) => { for (const c of keys) if (KEYS[c] === r) return true; for (const t of touches.values()) if (t.role === r) return true; return false; };
+    const gasHeld = () => held('gas') || held('tb');
+    function drop() {
+      phase = 'race'; rt = 0; sfx('right');
+      for (const b of bikes) if (b.cpu) b.hold = rnd(0.24, 0.5);
+      if (jump) { me.hold = 1; st.jump = true; say('Jump start!', 'Held at the gate for a second', AMBER, 1.2); }
+      // Holding the gas through the drop bogs the start: no penalty, but no holeshot either.
+      else if (gasHeld()) { me.hold = st.react = 0.4; sayOnce('bog', 'Slow start', 'Let go, then hit the gas as the gate drops', '#fff', 1.2); }
+      else me.wait = true;
+    }
+    function gasEdge() {
+      if (paused || cardUp) return;
+      if (phase === 'board') say('Not yet', 'Wait for the gate to drop', '#fff', 0.9);
+      else if (phase === 'gate' && !jump) { jump = true; sfx('wrong'); say('Too early!', 'That is a jump start', AMBER); }
+      else if (phase === 'race' && me.wait) {
+        me.wait = false; st.react = rt;
+        if (rt <= 0.33) { st.holeshot = true; me.boost = 1.2; me.v = 160; sfx('combo'); say('Holeshot!', `Reaction ${fmtS(rt)} s`, LIME, 1.2); }
+        else if (rt < 0.6) say('Good start', `Reaction ${fmtS(rt)} s`, '#fff', 0.8);
+      }
+    }
+    function laneEdge(d) {
+      if (paused || cardUp || phase !== 'race' || me.wait) return;
+      // On the ground a press waits a moment if a jump blocks the move; in the air the same buttons only tilt.
+      if (canShift(me, d)) { me.lane += d; sfx('tap'); } else if (!me.air) me.want = { d, t: T };
+    }
+    function finished() {
+      phase = 'done'; dT = 0;
+      const ms = round(me.fin * 1000), before = min(prevBest || Infinity, ...runs.map((r) => r.ms)), pl = place();
+      runs.push({ ms, tr: tr.i, g: rec.slice(), place: pl, isNew: ms < before, stats: Object.assign({}, st) });
+      sfx(pl === 1 || ms < before ? 'fanfare' : 'right');
+      say('Finish!', `${ord(pl)} place`, pl === 1 ? LIME : '#fff', 1.4);
+    }
+    function step() {
+      T += DT;
+      if (phase === 'board' && (pt += DT) >= 1.5) { phase = 'gate'; pt = 0; gateWait = rnd(1.1, 2.4); sfx('tap'); if (gasHeld()) say('Let go of the gas', 'Wait for the gate', '#fff', 1); }
+      else if (phase === 'gate' && (pt += DT) >= gateWait) drop();
+      else if (phase === 'race' || phase === 'done') {
+        rt += DT;
+        if (phase === 'done' && (dT += DT) > 1.6 && !cardUp) result();
+        const pi = me.inp, up = held('up') || held('lb'), dn = held('dn');
+        if (phase === 'done') { pi.gas = me.x < FIN + 260; pi.tb = false; pi.lean = 0; }
+        else { pi.gas = !me.wait && gasHeld(); pi.tb = pi.gas && held('tb'); pi.lean = up === dn ? 0 : up ? 1 : -1; }
+        if (me.want && T - me.want.t < 0.22) { if (canShift(me, me.want.d)) { me.lane += me.want.d; me.want = null; sfx('tap'); } } else me.want = null;
+        for (const b of bikes) { if (b.cpu && rt > 0) think(b); stepBike(b); }
+        if (phase === 'race') {
+          while (rt >= nextS && rec.length < 1600) { rec.push(sample()); nextS += 0.1; }
+          if (me.heat > 0.8 && !me.hot && !st.warned) { st.warned = true; sayOnce('warn', 'Engine hot!', 'Ease off or find blue water', AMBER, 1); }
+          if (me.air && !me.soft && me.at > 0.12 && !seen.tip) { seen.tip = 1; say('Match the lines!', touchUI ? 'Tilt with ▲ ▼' : 'Tilt with ↑ ↓', '#fff', 1.1); }
+        }
+      }
+      for (let i = parts.length - 1; i >= 0; i--) {
+        const p = parts[i];
+        if ((p.l -= DT) <= 0) { parts.splice(i, 1); continue; }
+        p.vh -= p.g * DT; p.x += p.vx * DT; p.h = max(0, p.h + p.vh * DT); p.s *= 1 + p.gr * DT;
+      }
+      if (phase === 'race' || phase === 'done') dropA = min(1, dropA + DT * 7);
+      shake = max(0, shake - 30 * DT);
+      if (msg && (msg.t += DT) > msg.d) msg = null;
+    }
+
+    // ---------- drawing ----------
+    const sx = (x, D) => (x - camX + D * SKL) * k + shX;
+    const sy = (D, h) => oy + (TB - D * LANE - h) * k + shY;
+    const vis = (a, b) => b + 4 * SKL > camX - 40 && a < camX + visW + 40;
+    function poly(pts, c) { ctx.fillStyle = c; ctx.beginPath(); for (const p of pts) ctx.lineTo(sx(p[0], p[1]), sy(p[1], p[2])); ctx.fill(); }
+    function rr(x, y, w, h, r) { ctx.beginPath(); ctx.moveTo(x + r, y); ctx.arcTo(x + w, y, x + w, y + h, r); ctx.arcTo(x + w, y + h, x, y + h, r); ctx.arcTo(x, y + h, x, y, r); ctx.arcTo(x, y, x + w, y, r); ctx.closePath(); }
+    function txt(s, x, y, size, col, al, w, f) { ctx.font = `${w || 800} ${size}px ${f || FD}`; ctx.textAlign = al || 'center'; ctx.fillStyle = col; ctx.fillText(s, x, y); }
+    const pill = (x, y, w, h, c) => { ctx.fillStyle = c || SHADE; rr(x, y, w, h, min(14 * u, h / 2)); ctx.fill(); };
+    const disc = (x, y, r, c) => { ctx.fillStyle = c; ctx.beginPath(); ctx.arc(x, y, r, 0, 7); ctx.fill(); };
+    const wrapX = (v, m) => -(((v % m) + m) % m);
+    const hillY = (wx, base, amp, sd) => oy + (base - amp * (0.55 * sin(wx * 0.0021 + sd) + 0.3 * sin(wx * 0.0057 + sd * 2) + 0.15 * sin(wx * 0.013 + sd * 3))) * k;
+    function hills(par, base, amp, col, sd, tree) {
+      ctx.fillStyle = col; ctx.beginPath(); ctx.moveTo(0, H);
+      for (let X = 0; X <= W + 16; X += 16) ctx.lineTo(X, hillY(X / k + camX * par, base, amp, sd));
+      ctx.lineTo(W, H); ctx.fill();
+      if (!tree) return;
+      ctx.fillStyle = ctx.strokeStyle = tree;
+      const off = camX * par, i0 = floor(off / 170) - 1;
+      // Flat-topped thorn trees along the ridge.
+      for (let i = i0; i < i0 + visW / 170 + 3; i++) {
+        const q = abs(sin(i * 12.9898) * 43758.5) % 1;
+        if (q < 0.3) continue;
+        const wx = i * 170 + q * 90, X = (wx - off) * k, Y = hillY(wx, base, amp, sd) + 4 * k, s = (0.6 + q * 0.5) * k;
+        ctx.lineWidth = 2.4 * s; ctx.beginPath(); ctx.moveTo(X, Y); ctx.lineTo(X + 2 * s, Y - 18 * s); ctx.stroke();
+        ctx.beginPath(); ctx.ellipse(X + 2 * s, Y - 20 * s, 19 * s, 4.5 * s, 0, 0, 7); ctx.ellipse(X + 6 * s, Y - 24 * s, 11 * s, 3.5 * s, 0, 0, 7); ctx.fill();
+      }
+    }
+    function background() {
+      let g = ctx.createLinearGradient(0, 0, 0, oy + 150 * k);
+      g.addColorStop(0, tr.sky[0]); g.addColorStop(1, tr.sky[1]);
+      ctx.fillStyle = g; ctx.fillRect(0, 0, W, H);
+      const s = tr.sun, X = W * s[0], Y = oy + s[1] * k, R = s[2] * k;
+      disc(X, Y, R * 2.4, 'rgba(255,240,200,.18)'); disc(X, Y, R * 1.5, 'rgba(255,240,200,.25)'); disc(X, Y, R, '#FFF4D6');
+      if (tr.sea) { ctx.fillStyle = tr.sea; ctx.fillRect(0, oy + 96 * k, W, H); hills(0.12, 108, 22, tr.far, 1.3); }
+      else hills(0.1, 104, 40, tr.far, 1.3);
+      hills(0.32, 130, 22, tr.mid, 4.1, tr.tree);
+      // Crowd, then the fence boards.
+      const cw = 512 * k;
+      for (let x = wrapX(camX * 0.96 * k, cw); x < W; x += cw) ctx.drawImage(crowdT, x, sy(4.06, 20) - 56 * k, cw + 0.5, 56 * k);
+      const b0 = floor((camX - 260) / 420);
+      for (let i = b0; i < b0 + visW / 420 + 3; i++) {
+        const c = BOARD_C[((i % 4) + 4) % 4], x = sx(i * 420, 4.06), y = sy(4.06, 20);
+        ctx.fillStyle = c[0]; ctx.fillRect(x, y, 190 * k, 20 * k);
+        txt(BOARDS[((i % 6) + 6) % 6], x + 95 * k, y + 15 * k, 13 * k, c[1]);
+      }
+      // Dirt and lane ruts.
+      const dw = 256 * k;
+      for (let x = wrapX(camX * k, dw); x < W; x += dw) ctx.drawImage(dirtT, x, sy(4, 0), dw + 0.5, 4 * LANE * k);
+      for (let D = 1; D < 4; D++) { const y = sy(D, 0); ctx.fillStyle = 'rgba(0,0,0,.16)'; ctx.fillRect(0, y - 1.6 * k, W, 1.6 * k); ctx.fillStyle = 'rgba(255,255,255,.13)'; ctx.fillRect(0, y, W, 1.3 * k); }
+      // Grass verge with course tape.
+      const fy = sy(0, 0), ty = sy(-0.45, 11), tp = 140 * k;
+      g = ctx.createLinearGradient(0, fy, 0, H);
+      g.addColorStop(0, '#5F7A3A'); g.addColorStop(0.12, '#4B6230'); g.addColorStop(1, '#22291A');
+      ctx.fillStyle = g; ctx.fillRect(0, fy, W, H - fy);
+      ctx.fillStyle = CHALK; ctx.fillRect(0, ty, W, 2.4 * k);
+      for (let x = wrapX(camX * k, tp); x < W; x += tp) { ctx.fillStyle = '#E9501C'; ctx.fillRect(x + 30 * k, ty, 40 * k, 2.4 * k); ctx.fillStyle = '#2B2E35'; ctx.fillRect(x, ty - 3 * k, 2.6 * k, 15 * k); }
+    }
+    const band = (x0, x1, Df, Db, h, c) => poly([[x0, Db, h], [x1, Db, h], [x1, Df, h], [x0, Df, h]], c);
+    function flats() {
+      for (const m of tr.mud) {
+        if (!vis(m.x, m.x + m.len)) continue;
+        const Df = 3 - m.b + 0.1, Db = 4 - m.a - 0.1, edge = (j, D) => [m.x + m.len * j / 10 + (j === 0 ? 14 : j === 10 ? -14 : 0), D, 0], pts = [];
+        for (let j = 0; j <= 10; j++) pts.push(edge(j, Db + sin(j * 1.7 + m.x) * 0.1));
+        for (let j = 10; j >= 0; j--) pts.push(edge(j, Df - cos(j * 1.3 + m.x) * 0.1));
+        poly(pts, '#4A2E1C');
+        ctx.fillStyle = 'rgba(255,255,255,.13)';
+        for (let j = 1; j < 5; j++) { const D = Df + (Db - Df) * ((j * 0.37) % 1); ctx.beginPath(); ctx.ellipse(sx(m.x + m.len * j / 5, D), sy(D, 0), 16 * k, 2.2 * k, 0, 0, 7); ctx.fill(); }
+      }
+      for (const c of tr.cool) {
+        if (!vis(c.x, c.x + c.len)) continue;
+        for (let i = 0; i < 4; i++) {
+          if (!c.l[i]) continue;
+          band(c.x, c.x + c.len, 3 - i + 0.05, 4 - i - 0.05, 0, '#3FA6DD');
+          ctx.strokeStyle = 'rgba(214,242,255,.75)'; ctx.lineWidth = 1.4 * k;
+          for (let j = 1; j < 4; j++) { const D = 3 - i + j * 0.25, w = RM ? 0 : sin(T * 4 + j) * 4; ctx.beginPath(); ctx.moveTo(sx(c.x + 8 + w, D), sy(D, 0)); ctx.lineTo(sx(c.x + c.len - 8 + w, D), sy(D, 0)); ctx.stroke(); }
+        }
+        // A blue flag at the back of the track marks the water.
+        const X = sx(c.x + 30, 4.25), Y = sy(4.25, 0);
+        ctx.fillStyle = '#2B2E35'; ctx.fillRect(X - 1.2 * k, Y - 40 * k, 2.4 * k, 40 * k);
+        ctx.fillStyle = '#3FA6DD'; ctx.beginPath(); ctx.moveTo(X, Y - 40 * k); ctx.lineTo(X + 22 * k, Y - 34 * k); ctx.lineTo(X, Y - 27 * k); ctx.fill();
+      }
+      if (vis(-10, 10)) band(-6, 0, 0, 4, 0, 'rgba(255,255,255,.8)');
+      if (vis(FIN, FIN + 40)) {
+        for (let r = 0; r < 8; r++) for (let c = 0; c < 2; c++) band(FIN + c * 18, FIN + c * 18 + 18, 3.5 - r * 0.5, 4 - r * 0.5, 0, (r + c) % 2 ? INK : CHALK);
+        const X = sx(FIN + 18, 4.3), Y = sy(4.3, 0);
+        ctx.fillStyle = '#2B2E35'; ctx.fillRect(X - 2 * k, Y - 112 * k, 4 * k, 112 * k);
+        ctx.fillStyle = INK; rr(X - 78 * k, Y - 150 * k, 156 * k, 42 * k, 6 * k); ctx.fill();
+        txt('FINISH', X, Y - 120 * k, 24 * k, '#fff');
+      }
+    }
+    // One lane's share of a jump: the faces from above, then its front side where no lane is in front.
+    function slice(r, i) {
+      const Db = 4 - i, Df = 3 - i, p = r.p, X = r.x, c = tr.ramp;
+      for (let j = 1; j < p.length; j++) {
+        const a = p[j - 1], b = p[j], s = (b[1] - a[1]) / (b[0] - a[0]);
+        if (a[1] || b[1]) poly([[X + a[0], Db, a[1]], [X + b[0], Db, b[1]], [X + b[0], Df, b[1]], [X + a[0], Df, a[1]]], s > 0.05 ? c[0] : s < -0.05 ? c[2] : c[1]);
+      }
+      const edge = (D) => { ctx.beginPath(); for (const q of p) ctx.lineTo(sx(X + q[0], D), sy(D, q[1])); };
+      ctx.strokeStyle = 'rgba(0,0,0,.13)'; ctx.lineWidth = 3 * k; edge(Df + 0.5); ctx.stroke();
+      if (r.l[i + 1]) return;
+      poly([[X, Df, 0], ...p.map((q) => [X + q[0], Df, q[1]])], c[3]);
+      ctx.strokeStyle = 'rgba(255,255,255,.22)'; ctx.lineWidth = 1.4 * k; edge(Df); ctx.stroke();
+    }
+    function bale(z) {
+      const i = z.lane, Db = 4 - i - 0.18, Df = 3 - i + 0.18, x0 = z.x, x1 = z.x + 40, h = 24;
+      band(x0, x1, Df, Db, h, '#EBC862');
+      poly([[x1, Df, 0], [x1, Db, 0], [x1, Db, h], [x1, Df, h]], '#B88A2E');
+      poly([[x0, Df, 0], [x1, Df, 0], [x1, Df, h], [x0, Df, h]], '#D5A843');
+      for (const f of [11, 27]) poly([[x0 + f, Df, 0], [x0 + f + 2, Df, 0], [x0 + f + 2, Df, h], [x0 + f, Df, h]], 'rgba(90,60,10,.45)');
+    }
+    // The start gate: a steel panel per lane that falls forward when it drops.
+    function gate(i) {
+      if (!vis(-20, 40)) return;
+      const Db = 4 - i - 0.06, Df = 3 - i + 0.06, a = dropA * PI / 2, hx = 30 * sin(a), hh = 30 * cos(a), P = (x, f, D) => [x + hx * f, D, hh * f];
+      poly([P(6, 0, Df), P(6, 0, Db), P(6, 1, Db), P(6, 1, Df)], '#8E949C');
+      poly([P(0, 0, Df), P(6, 0, Df), P(6, 1, Df), P(0, 1, Df)], '#D5D9DE');
+      poly([P(0, 0.62, Df), P(6, 0.62, Df), P(6, 0.82, Df), P(0, 0.82, Df)], '#E9501C');
+      poly([P(0, 1, Df), P(6, 1, Df), P(6, 1, Db), P(0, 1, Db)], '#EEF0F2');
+    }
+    function drawBike(spr, alpha, x, lf, y, p, lane) {
+      const D = 3.5 - lf, X = sx(x, D), Y = sy(D, y), sc = BW * k / spr.bw;
+      ground(tr, lane, x);
+      const lift = max(0, y - gh);
+      ctx.globalAlpha = alpha * 0.28 * (1 - min(0.7, lift / 300)); ctx.fillStyle = '#000';
+      ctx.beginPath(); ctx.ellipse(X, sy(D, gh), BW * k * 0.42 * (1 - min(0.6, lift / 260)), 5 * k, 0, 0, 7); ctx.fill();
+      ctx.globalAlpha = alpha;
+      ctx.save(); ctx.translate(X, Y); ctx.rotate(-p / DEG);
+      ctx.drawImage(spr.c, -spr.ox * sc, -spr.by * sc, spr.c.width * sc, spr.c.height * sc);
+      ctx.restore(); ctx.globalAlpha = 1;
+      return Y - spr.by * sc;
+    }
+    function bikeDraw(b) {
+      if (!vis(b.x - BW, b.x + BW)) return;
+      let p = b.pitch, y = b.y;
+      // A washout tips the bike forward into the dust, then it is back up.
+      if (b.wash > 0) { const q = min(1, (1.1 - b.wash) / 0.25); p = ang(b.ls) - 32 * sin(q * PI / 2) * min(1, b.wash / 0.3); y -= 4 * q; }
+      const top = drawBike(b.cpu ? SPR.ai[b.i - 1] : SPR.me, b === me && b.hold > 0 && phase === 'race' ? 0.55 + 0.45 * sin(T * 20) : 1, b.x, b.lf, y, p, b.lane);
+      if (b === me) meTop = top;
+    }
+    function scene() {
+      background();
+      flats();
+      const g = ghostAt(phase === 'race' || phase === 'done' ? rt : 0);
+      for (let i = 0; i < 4; i++) {
+        for (const r of tr.ramps) if (r.l[i] && vis(r.x, r.x + r.len)) slice(r, i);
+        for (const z of tr.bales) if (z.lane === i && vis(z.x, z.x + 44)) bale(z);
+        gate(i);
+        if (g && round(g.lf) === i && vis(g.x - BW, g.x + BW)) {
+          if (!gSame) { ground(tr, i, g.x); g.y = gh; g.p = ang(gs); }
+          drawBike(SPR.gh, 0.4, g.x, g.lf, g.y, g.p, i);
+        }
+        for (const b of bikes) if (round(b.lf) === i) bikeDraw(b);
+      }
+      for (const q of parts) {
+        if (!vis(q.x - 20, q.x + 20)) continue;
+        ctx.globalAlpha = cl(q.l / q.m, 0, 1) * (q.c === LIME ? 1 : 0.7);
+        disc(sx(q.x, q.D), sy(q.D, q.h), q.s * k, q.c);
+      }
+      ctx.globalAlpha = 1;
+    }
+    const heatCol = (h) => (me.hot > 0 || h >= 0.8 ? RED : h < 0.55 ? '#2CC9A6' : '#F5B83D');
+    // Over his bike: his number and a small heat bar, and in the air the two lines to match.
+    function overBike() {
+      if (!vis(me.x - BW, me.x + BW) || me.wash > 0) return;
+      let X = sx(me.x, 3.5 - me.lf);
+      if (me.air && !me.soft && me.at > 0.05 && phase === 'race') {
+        const tgt = predict(me), d = me.pitch - tgt, ad = abs(d), r = 25 * u, col = ad <= PERFECT ? LIME : ad <= CLEAN ? AMBER : RED;
+        // Above the bike, or beside it when a big jump would push it under the scoreboard.
+        let cy = meTop - r - 6 * u;
+        if (cy - r < hudB) { cy = max(hudB + r + 4, meTop + r); X += BW * k * 0.55 + r; }
+        disc(X, cy, r, SHADE);
+        ctx.strokeStyle = col; ctx.lineWidth = 2.5 * u; ctx.stroke();
+        const line = (a, c, w, dash) => { const ca = cos(a / DEG) * r * 0.82, sa = sin(a / DEG) * r * 0.82; ctx.strokeStyle = c; ctx.lineWidth = w; ctx.setLineDash(dash); ctx.beginPath(); ctx.moveTo(X - ca, cy + sa); ctx.lineTo(X + ca, cy - sa); ctx.stroke(); ctx.setLineDash([]); };
+        line(tgt, '#fff', 2.5 * u, [4 * u, 3 * u]);
+        line(me.pitch, col, 4.5 * u, []);
+        // An arrow says which way to tilt.
+        if (ad > PERFECT) { const s = d < 0 ? 1 : -1, ax = X + r + 12 * u; ctx.fillStyle = col; ctx.beginPath(); ctx.moveTo(ax - 7 * u, cy + s * 4 * u); ctx.lineTo(ax + 7 * u, cy + s * 4 * u); ctx.lineTo(ax, cy - s * 7 * u); ctx.fill(); }
+        return;
+      }
+      const t = plate || 'YOU', fs = 13 * u;
+      ctx.font = `800 ${fs}px ${FD}`;
+      const w = max(30 * u, ctx.measureText(t).width + 14 * u), h = 20 * u, y = meTop - h;
+      pill(X - w / 2, y, w, h, myCol);
+      ctx.beginPath(); ctx.moveTo(X - 5 * u, y + h); ctx.lineTo(X + 5 * u, y + h); ctx.lineTo(X, y + h + 6 * u); ctx.fill();
+      ctx.textBaseline = 'middle'; txt(t, X, y + h / 2 + 1, fs, '#fff'); ctx.textBaseline = 'alphabetic';
+      ctx.fillStyle = SHADE; ctx.fillRect(X - w / 2, y - 7 * u, w, 4 * u);
+      ctx.fillStyle = heatCol(me.heat); ctx.fillRect(X - w / 2, y - 7 * u, w * me.heat, 4 * u);
+    }
+    function hud() {
+      const top = ins[0] + 10, pd = ins[3] + 12, ph = 50 * u, b = btn.ps, pl = place();
+      ctx.textBaseline = 'middle';
+      pill(pd, top, 86 * u, ph);
+      txt(ord(pl), pd + 43 * u, top + ph * 0.42, 26 * u, pl === 1 ? LIME : '#fff');
+      txt('of 4', pd + 43 * u, top + ph * 0.8, 11 * u, DIM, 'center', 600);
+      let lx = pd + 92 * u;
+      if (plate) {
+        pill(lx, top, 50 * u, ph, CHALK);
+        ctx.strokeStyle = myCol; ctx.lineWidth = 3 * u; ctx.stroke();
+        txt(plate, lx + 25 * u, top + ph / 2 + 2 * u, (plate.length > 2 ? 22 : 28) * u, INK, 'center', 400, FN);
+        lx += 56 * u;
+      }
+      disc(b.x, b.y, b.r, SHADE);
+      ctx.fillStyle = '#fff'; ctx.fillRect(b.x - 7, b.y - 8, 5, 16); ctx.fillRect(b.x + 2, b.y - 8, 5, 16);
+      // Clock, with the gap to his ghost under it.
+      // One row when it all fits, otherwise the engine bar gets a row of its own.
+      const tw = 150 * u, wide = lx + tw + 200 * u + 2 * b.r + 30 < W - ins[1], end = b.x - b.r - 8, hx0 = end - 2 - 190 * u;
+      const tx = max(lx, wide ? (lx + hx0 - tw) / 2 : min((lx + end - tw) / 2, end - tw)), cx = tx + tw / 2, gg = ghostGap(), showG = gg !== null && rt > 1;
+      pill(tx, top, tw, ph);
+      ctx.font = `800 ${24 * u}px ${FD}`; ctx.fillStyle = '#fff'; ctx.textAlign = 'center';
+      ctx.fillText(fmtT(phase === 'race' ? rt : phase === 'done' ? me.fin : 0), cx, top + ph * 0.42);
+      txt(showG ? `Ghost ${gg > 0 ? '+' : '−'}${fmtS(abs(gg))}` : `Race ${raceN + 1} of ${RUNS}`, cx, top + ph * 0.8, 11 * u, !showG ? DIM : gg > 0 ? '#FFB4A8' : LIME, 'center', 600);
+      // Engine heat.
+      const narrow = !wide, hw = narrow ? W - pd - ins[1] - 12 : 190 * u, hh = narrow ? 30 * u : ph, hx = narrow ? pd : hx0, hy = narrow ? top + ph + 8 * u : top;
+      const hot = me.hot > 0, bx = hx + (narrow ? 84 : 12) * u, bw = hw - (narrow ? 96 : 24) * u, bh = 12 * u, by = narrow ? hy + hh / 2 - bh / 2 : hy + hh * 0.56;
+      pill(hx, hy, hw, hh);
+      txt(hot ? 'COOLING' : 'ENGINE', hx + 12 * u, narrow ? hy + hh / 2 : hy + hh * 0.3, 11 * u, hot ? RED : DIM, 'left', 700);
+      pill(bx, by, bw, bh, 'rgba(255,255,255,.14)');
+      if (me.heat > 0.01) {
+        const g = ctx.createLinearGradient(bx, 0, bx + bw, 0);
+        g.addColorStop(0, '#2CC9A6'); g.addColorStop(0.55, '#F5B83D'); g.addColorStop(1, '#EF4B3A');
+        pill(bx, by, max(bh, bw * me.heat), bh, hot ? RED : g);
+      }
+      if ((hot || me.heat > 0.8) && (RM || sin(T * 14) > 0)) { ctx.strokeStyle = RED; ctx.lineWidth = 2 * u; rr(bx - 2, by - 2, bw + 4, bh + 4, bh / 2 + 2); ctx.stroke(); }
+      ctx.fillStyle = 'rgba(12,14,20,.5)';
+      for (const f of [0.25, 0.5, 0.75]) ctx.fillRect(bx + bw * f - 0.75, by, 1.5, bh);
+      // Track map: blue water, the finish, his ghost, the riders and him.
+      const my = (narrow ? hy + hh : top + ph) + 14 * u, mx = pd + 8 * u, mw = W - pd - ins[1] - 20 * u - mx, MX = (x) => mx + mw * cl(x / FIN, 0, 1);
+      pill(mx - 8 * u, my - 7 * u, mw + 16 * u, 14 * u, 'rgba(12,14,20,.45)');
+      ctx.fillStyle = 'rgba(255,255,255,.35)'; ctx.fillRect(mx, my - 1, mw, 2);
+      ctx.fillStyle = '#3FA6DD'; for (const c of tr.cool) ctx.fillRect(MX(c.x) - 1.5, my - 4 * u, 3, 8 * u);
+      ctx.fillStyle = '#fff'; ctx.fillRect(MX(FIN) - 1.5, my - 6 * u, 3, 12 * u);
+      const g = ghostAt(phase === 'race' ? rt : 0);
+      ctx.lineWidth = 2;
+      if (g) { ctx.strokeStyle = '#fff'; ctx.beginPath(); ctx.arc(MX(g.x), my, 4.5 * u, 0, 7); ctx.stroke(); }
+      ctx.strokeStyle = '#C3C8CF';
+      for (const q of bikes) if (q !== me) { disc(MX(q.x), my, 4 * u, '#2B2E35'); ctx.stroke(); }
+      ctx.strokeStyle = '#fff'; disc(MX(me.x), my, 6 * u, myCol); ctx.stroke();
+      ctx.textBaseline = 'alphabetic';
+      return my + 10 * u;
+    }
+    function button(b, on, label, sub, ring) {
+      disc(b.x, b.y, b.r, on ? 'rgba(233,80,28,.85)' : 'rgba(12,14,20,.4)');
+      ctx.strokeStyle = ring || 'rgba(255,255,255,.55)'; ctx.lineWidth = ring ? 4 : 2; ctx.stroke();
+      ctx.textBaseline = 'middle';
+      if (label.length > 1) txt(label, b.x, b.y + 1, b.r * 0.4, '#fff');
+      else { const s = b.r * 0.42, d = label === '▲' ? -1 : 1; ctx.fillStyle = '#fff'; ctx.beginPath(); ctx.moveTo(b.x - s, b.y - d * s * 0.5); ctx.lineTo(b.x + s, b.y - d * s * 0.5); ctx.lineTo(b.x, b.y + d * s * 0.7); ctx.fill(); }
+      if (sub) txt(sub, b.x, b.y + b.r * 0.62, 10 * u, DIM, 'center', 600);
+      ctx.textBaseline = 'alphabetic';
+    }
+    function controls() {
+      ctx.textBaseline = 'middle';
+      if (touchUI) {
+        const air = me.air && !me.soft ? 'tilt' : '';
+        button(btn.up, held('up'), '▲', air);
+        button(btn.dn, held('dn'), '▼', air);
+        button(btn.tb, held('tb'), 'TURBO', '', me.heat > 0.55 || me.hot > 0 ? heatCol(me.heat) : '');
+        button(btn.gas, gasHeld(), 'GAS', '');
+      } else if (raceN === 0 && (phase === 'board' || phase === 'gate' || (phase === 'race' && rt < 6))) {
+        const s = 'Space or → gas  ·  Shift turbo  ·  ↑ ↓ lanes, tilt in the air  ·  Esc pause', y = H - ins[2] - 40 * u;
+        ctx.font = `600 ${13 * u}px ${FD}`;
+        const f = 13 * u * min(1, (W - 60) / ctx.measureText(s).width), w = ctx.measureText(s).width * f / (13 * u) + 28 * u;
+        pill(W / 2 - w / 2, y, w, 28 * u);
+        txt(s, W / 2, y + 14 * u, f, '#fff', 'center', 600);
+      }
+      ctx.textBaseline = 'alphabetic';
+    }
+    // The start board: 30 seconds, then the amber light while the gate is up, then GO.
+    function startBoard(y0) {
+      boardB = 0;
+      if (phase !== 'board' && phase !== 'gate' && !(phase === 'race' && rt < 0.7)) return;
+      const cx = W / 2, cy = max(y0 + 64 * u, oy + 70 * k), bw = 132 * u, bh = 96 * u, lit = phase === 'race' ? LIME : RM || sin(T * 9) > -0.3 ? AMBER : '#6B5420';
+      boardB = cy + bh / 2 + (phase === 'race' ? 10 : 80) * u;
+      ctx.fillStyle = '#2B2E35'; ctx.fillRect(cx - 3 * u, cy + bh / 2, 6 * u, 40 * u);
+      pill(cx - bw / 2, cy - bh / 2, bw, bh, 'rgba(12,14,20,.86)');
+      ctx.textBaseline = 'middle';
+      if (phase === 'board') { txt('30', cx, cy - 6 * u, 54 * u, '#fff', 'center', 400, FN); txt('SECONDS', cx, cy + 32 * u, 11 * u, DIM, 'center', 700); }
+      else { disc(cx, cy - 10 * u, 22 * u, lit); txt(phase === 'race' ? 'GO!' : 'GATE UP', cx, cy + 30 * u, 14 * u, phase === 'race' ? LIME : AMBER); }
+      if (phase !== 'race') {
+        const s = touchUI ? 'Hit GAS the moment the gate drops' : 'Press Space the moment the gate drops';
+        ctx.font = `700 ${14 * u}px ${FD}`;
+        const w = ctx.measureText(s).width + 24 * u;
+        pill(cx - w / 2, cy + bh / 2 + 46 * u, w, 30 * u);
+        txt(s, cx, cy + bh / 2 + 61 * u, 14 * u, '#fff', 'center', 700);
+      }
+      ctx.textBaseline = 'alphabetic';
+    }
+    function message(y0) {
+      if (!msg) return;
+      const a = cl(min(msg.t / 0.1, (msg.d - msg.t) / 0.25), 0, 1), s = RM ? 1 : 0.75 + 0.25 * min(1, msg.t / 0.12);
+      ctx.save(); ctx.globalAlpha = a; ctx.translate(W / 2, max(y0 + 50 * u, H * 0.3, boardB + 34 * u)); ctx.scale(s, s);
+      ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.lineJoin = 'round'; ctx.strokeStyle = 'rgba(12,14,20,.7)';
+      const line = (t, size, y, c) => { ctx.font = `800 ${size * u}px ${FD}`; ctx.lineWidth = size * u / 5; ctx.strokeText(t, 0, y); ctx.fillStyle = c; ctx.fillText(t, 0, y); };
+      line(msg.text, 36, 0, msg.col);
+      if (msg.sub) line(msg.sub, 15, 30 * u, '#fff');
+      ctx.restore();
+    }
+    function draw() {
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      shX = shake && !RM ? rnd(-shake, shake) : 0; shY = shX * 0.6;
+      camX = me.x - visW * fx;
+      scene();
+      overBike();
+      const y0 = (hudB = hud());
+      startBoard(y0);
+      message(y0);
+      controls();
+    }
+
+    // ---------- cards ----------
+    function card(html) {
+      ov.innerHTML = `<div class="ld-card" role="dialog" aria-modal="true">${html}</div>`;
+      ov.hidden = false; cardUp = true; cardAt = performance.now(); touches.clear();
+      const b = ov.querySelector('.ld-b');
+      setTimeout(() => { if (!dead && cardUp && b) b.focus({ preventScroll: true }); }, 400);
+    }
+    function hideCard() { ov.hidden = true; ov.innerHTML = ''; cardUp = false; }
+    const btnH = (a, label, two) => `<button class="ld-b${two ? ' ld-b2' : ''}" data-a="${a}">${label}</button>`;
+    function intro() {
+      const t = touchUI, li = (key, s) => `<li><span class="ld-k">${key}</span><span>${s}</span></li>`;
+      card(`<div class="ld-eb">Side track</div><div class="ld-h">Lane Dash</div><p class="ld-p">${RUNS} ${RUNS === 1 ? 'race' : 'races'} against three riders${oG ? ' and your ghost' : ''}. Just for fun: beat your own best time.</p>
+<ul class="ld-list">${li(t ? 'GAS' : 'Space', 'Hold to ride. Wait for the gate to drop, then go for the holeshot.')}${li(t ? 'TURBO' : 'Shift', 'Faster, but the engine heats up. Too hot and you slow right down. Blue water cools it.')}${li(t ? '▲ ▼' : '↑ ↓', `Change lanes${t ? ' (or swipe)' : ''} to miss hay bales and mud. In the air they tilt the bike: match the lines to land with a boost.`)}</ul>${btnH('go', 'Line up at the gate')}`);
+    }
+    function result() {
+      const r = runs[runs.length - 1], s = r.stats, more = raceN + 1 < RUNS, best = min(prevBest || Infinity, ...runs.map((q) => q.ms)), n = (c, w) => `${c} ${w}${c === 1 ? '' : 's'}`;
+      const bits = [s.holeshot ? 'Holeshot!' : s.jump ? 'Jump start' : s.react !== null ? `Start ${fmtS(s.react)} s` : ''];
+      if (s.perfect) bits.push(n(s.perfect, 'perfect landing'));
+      if (s.hot) bits.push(n(s.hot, 'overheat'));
+      if (s.wash) bits.push(n(s.wash, 'washout'));
+      card(`<div class="ld-eb">Race ${raceN + 1} of ${RUNS} · ${tr.name}</div><div class="ld-h">${ord(r.place)} place</div><div class="ld-t">${fmtT(r.ms / 1000)}</div>${r.isNew ? '<div class="ld-new">New best!</div>' : ''}
+<p class="ld-p">Best ${fmtT(best / 1000)}</p><p class="ld-p">${bits.filter(Boolean).join(' · ')}</p>${more ? btnH('next', `Next race (${raceN + 2} of ${RUNS})`) + btnH('pits', 'Back to the pits', 1) : btnH('pits', 'Back to the pits')}`);
+    }
+    function pause() {
+      if (paused || cardUp || dead || phase === 'intro') return;
+      paused = true; keys.clear(); touches.clear();
+      card(`<div class="ld-h">Paused</div><p class="ld-p">${phase === 'done' ? 'Your time is in.' : 'Leaving now means this race doesn\'t count.'}</p>${btnH('resume', 'Keep riding')}${btnH('pits', 'Back to the pits', 1)}`);
+    }
+    function resume() { hideCard(); paused = false; last = performance.now(); acc = 0; }
+    function leave() {
+      if (done) return;
+      done = true;
+      const best = runs.reduce((a, r) => (!a || r.ms < a.ms ? r : a), null);
+      ov.querySelectorAll('button').forEach((b) => { b.disabled = true; });
+      try { if (typeof o.onDone === 'function') o.onDone({ best: best ? best.ms : null, times: runs.map((r) => r.ms), ghost: best ? best.g : null }); } catch (e) { if (root.console) console.error(e); }
+    }
+    function onCard(e) {
+      const b = e.target.closest && e.target.closest('[data-a]');
+      // A thumb still mashing GAS when the card appears mustn't press its button.
+      if (!b || done || performance.now() - cardAt < 450) return;
+      const a = b.getAttribute('data-a');
+      sfx('tap');
+      if (a === 'go') { hideCard(); phase = 'board'; pt = 0; }
+      else if (a === 'next') { hideCard(); setupRace(raceN + 1); phase = 'board'; }
+      else if (a === 'resume') resume();
+      else leave();
+    }
+
+    // ---------- input ----------
+    function onKey(e) {
+      const down = e.type === 'keydown', c = KEYS[e.code], tag = e.target && e.target.tagName;
+      if (dead || tag === 'INPUT' || tag === 'TEXTAREA') return;
+      if (cardUp) {
+        // A key held through the finish mustn't press the card's button when it's let go.
+        if (!down && keys.delete(e.code)) e.preventDefault();
+        if (down && e.code === 'Escape' && paused) resume();
+        return;
+      }
+      if (down && (e.code === 'Escape' || e.code === 'KeyP')) { e.preventDefault(); pause(); return; }
+      if (!c) return;
+      e.preventDefault();
+      if (!down) { keys.delete(e.code); return; }
+      touchUI = false;
+      if (e.repeat || keys.has(e.code)) return;
+      keys.add(e.code);
+      if (c === 'gas' || c === 'tb') gasEdge(); else if (c !== 'lb') laneEdge(c === 'up' ? -1 : 1);
+    }
+    const hit = (b, x, y, s) => hypot(x - b.x, y - b.y) <= b.r * (s || 1.18);
+    function press(id, x, y) {
+      if (hit(btn.ps, x, y, 1.3)) { pause(); return; }
+      const role = touchUI && hit(btn.up, x, y) ? 'up' : touchUI && hit(btn.dn, x, y) ? 'dn' : touchUI && hit(btn.tb, x, y) ? 'tb' : hit(btn.gas, x, y) || x > W / 2 ? 'gas' : 'sw';
+      // Swipes on open ground change lanes, even while the same thumb holds the gas.
+      touches.set(id, { role, x0: x, y0: y, sw: role === 'sw' || (role === 'gas' && !hit(btn.gas, x, y)) });
+      if (role === 'gas' || role === 'tb') gasEdge();
+      else if (role !== 'sw') laneEdge(role === 'up' ? -1 : 1);
+    }
+    function move(id, x, y) {
+      const t = touches.get(id);
+      if (!t) return;
+      if (touchUI && (t.role === 'gas' || t.role === 'tb')) { if (hit(btn.tb, x, y, 1)) { t.role = 'tb'; t.sw = false; } else if (hit(btn.gas, x, y, 1)) t.role = 'gas'; }
+      const dy = y - t.y0;
+      if (t.sw && abs(dy) > 36 && abs(dy) > abs(x - t.x0) * 0.8) { laneEdge(dy < 0 ? -1 : 1); t.y0 = y; t.x0 = x; }
+    }
+    const pos = (t) => { const r = cv.getBoundingClientRect(); return [t.clientX - r.left, t.clientY - r.top]; };
+    function onTouch(e) {
+      if (e.cancelable) e.preventDefault();
+      if (dead || cardUp) return;
+      touchUI = true;
+      for (let i = 0; i < e.changedTouches.length; i++) {
+        const t = e.changedTouches[i], [x, y] = pos(t);
+        if (e.type === 'touchstart') press(t.identifier, x, y); else if (e.type === 'touchmove') move(t.identifier, x, y); else touches.delete(t.identifier);
+      }
+    }
+    let mouseDown = false;
+    function onMouse(e) {
+      if (dead || cardUp) return;
+      const [x, y] = pos(e);
+      if (e.type === 'mousedown') { if (!e.button) { mouseDown = true; e.preventDefault(); press('m', x, y); } }
+      else if (e.type === 'mousemove') { if (mouseDown) move('m', x, y); }
+      else { mouseDown = false; touches.delete('m'); }
+    }
+    const onBlur = () => { keys.clear(); touches.clear(); mouseDown = false; };
+    const onVis = () => { if (document.hidden) { onBlur(); pause(); } };
+    const TOUCH = ['touchstart', 'touchmove', 'touchend', 'touchcancel'], tOpt = { passive: false };
+    const WIN = [['mousemove', onMouse], ['mouseup', onMouse], ['keydown', onKey], ['keyup', onKey], ['blur', onBlur]];
+    TOUCH.forEach((n) => cv.addEventListener(n, onTouch, tOpt));
+    cv.addEventListener('mousedown', onMouse);
+    WIN.forEach(([n, f]) => root.addEventListener(n, f));
+    document.addEventListener('visibilitychange', onVis);
+    ov.addEventListener('click', onCard);
+
+    // ---------- loop: fixed 120 Hz steps, drawn once per screen refresh ----------
+    let raf = 0, last = performance.now(), acc = 0, lw = 0, lh = 0, ld = 0;
+    function frame(now) {
+      if (dead) return;
+      raf = requestAnimationFrame(frame);
+      const dt = min(0.25, max(0, (now - last) / 1000));
+      last = now;
+      if (dt > 0) fps += (1 / dt - fps) * 0.05;
+      // Checking the size each frame catches rotations and resizes, including ones that send no event.
+      if (wrap.clientWidth !== lw || wrap.clientHeight !== lh || root.devicePixelRatio !== ld) { lw = wrap.clientWidth; lh = wrap.clientHeight; ld = root.devicePixelRatio; layout(); }
+      if (!paused) { acc += dt; let n = 0; while (acc >= DT && n++ < 40) { step(); acc -= DT; } }
+      try { draw(); } catch (e) { if (root.console) console.error(e); }
+    }
+    setupRace(0);
+    intro();
+    raf = requestAnimationFrame(frame);
+    // For a test page only: read the race and see the landing he's heading for.
+    if (typeof o.debug === 'function') o.debug({ get state() { return { phase, rt, fps, me, bikes, tr, runs, paused, done }; }, aim: () => predict(me) });
+
+    return {
+      stop() {
+        if (dead) return;
+        dead = true;
+        cancelAnimationFrame(raf);
+        TOUCH.forEach((n) => cv.removeEventListener(n, onTouch, tOpt));
+        cv.removeEventListener('mousedown', onMouse);
+        WIN.forEach(([n, f]) => root.removeEventListener(n, f));
+        document.removeEventListener('visibilitychange', onVis);
+        ov.removeEventListener('click', onCard);
+        for (const im of imgs) im.onload = im.onerror = null;
+        parts.length = 0; keys.clear(); touches.clear();
+        wrap.remove();
+      },
+    };
+  }
+
+  RS.sideGames.lanedash = {
+    id: 'lanedash',
+    title: 'Lane Dash',
+    blurb: 'Four lanes, big jumps, keep the engine cool.',
+    start(host, opts) { return run(host, opts || {}); },
+  };
+})(typeof window !== 'undefined' ? window : globalThis);
+
 /* Holeshot: the game screens. Progress saves on this device. */
 (function () {
   'use strict';
@@ -11766,9 +13662,14 @@ Jordy's Science test, Tuesday 10 November: Planet Earth and Beyond. Written from
   // A bike takes points, a rank, and proof of learning: a share of all the sections cleared, and main events passed at 80%.
   const BIKES = {
     mini: { label: 'Mini MX', cost: 0 },
+    // Four more bikes added on 2 November 2026, priced between the existing ones; no existing price changed.
+    pit: { label: 'Pit bike', cost: 1200 },
     mx: { label: 'Motocross', cost: 2500 },
+    two: { label: '125 two-stroke', cost: 4000, rank: 2, cleared: 0.05 },
     enduro: { label: 'Enduro', cost: 6000, rank: 2, cleared: 0.1 },
+    electric: { label: 'Electric MX', cost: 9000, rank: 2, cleared: 0.2 },
     hard: { label: 'Hard enduro', cost: 14000, rank: 3, cleared: 0.3 },
+    rally: { label: 'Rally raid', cost: 20000, rank: 4, cleared: 0.4, exams: 2 },
     factory: { label: 'Factory racer', cost: 30000, rank: 5, cleared: 0.5, exams: 3 },
   };
   // Earned points never go down when you spend, so a rank can't be lost.
@@ -12028,12 +13929,12 @@ Jordy's Science test, Tuesday 10 November: Planet Earth and Beyond. Written from
   // ---------- staying up to date ----------
   // An open tab or a home screen app keeps running the page it first loaded, old prices and all. So it asks which version
   // is live when it comes back into view and every few minutes, and swaps over between races. build.mjs fills in BUILD.
-  const BUILD = 'd9c39eef04';
+  const BUILD = '68c563fbd6';
   const BACK_KEY = 'holeshot.back.v1';
   const TRIED_KEY = 'holeshot.tried.v1';
   let liveBuild = null;
   function swapToLive() {
-    if (!liveBuild || ui.run || ui.result || ui.parents || ui.tryOn || ui.walk || ui.pin) return;
+    if (!liveBuild || ui.run || ui.side || ui.result || ui.parents || ui.tryOn || ui.walk || ui.pin) return;
     // Right after a release the site can still hand out the old page, so each version only gets one try every five minutes.
     const [tried, when] = String(getKey(TRIED_KEY) || '').split(' ');
     if (tried === liveBuild && Date.now() - +when < 300000) return;
@@ -12305,6 +14206,10 @@ Jordy's Science test, Tuesday 10 November: Planet Earth and Beyond. Written from
     mx: { w: 720, h: 995, side: [[122, 534], [204, 541], [206, 606], [140, 590]], front: [[412, 425], [495, 420], [497, 485], [430, 490]], logo: [[450, 520], [630, 570], [622, 585], [445, 540]] },
     enduro: { w: 720, h: 945, side: [[110, 468], [195, 476], [197, 538], [130, 525]], front: [[410, 342], [492, 340], [492, 378], [420, 382]], logo: [[450, 455], [628, 510], [620, 528], [445, 475]] },
     hard: { w: 720, h: 963, side: [[100, 482], [178, 488], [195, 552], [130, 545]], front: [[392, 348], [478, 348], [478, 425], [412, 420]], logo: [[440, 450], [625, 505], [618, 522], [435, 470]] },
+    pit: { w: 720, h: 1098, side: [[104, 622], [176, 642], [180, 700], [122, 694]], front: [[420, 482], [505, 476], [516, 560], [452, 566]], logo: [[480, 612], [640, 668], [634, 684], [474, 630]] },
+    two: { w: 720, h: 1105, side: [[84, 572], [150, 566], [152, 640], [86, 642]], front: [[390, 428], [460, 406], [493, 492], [404, 500]], logo: [[470, 545], [600, 548], [598, 565], [468, 563]] },
+    electric: { w: 720, h: 944, side: [[95, 455], [165, 462], [168, 525], [110, 520]], front: [[412, 370], [484, 358], [499, 440], [458, 447]], logo: [[480, 478], [620, 515], [615, 530], [475, 494]] },
+    rally: { w: 720, h: 975, side: [[95, 482], [175, 478], [178, 560], [100, 552]], front: [[462, 312], [540, 310], [548, 386], [466, 390]], logo: [[480, 478], [630, 515], [625, 530], [475, 494]] },
     factory: { w: 720, h: 954, side: [[105, 465], [190, 478], [205, 550], [135, 528]], front: [[402, 358], [492, 358], [492, 435], [420, 428]], logo: [[452, 455], [640, 515], [632, 530], [445, 475]] },
   };
   let svgNo = 0;
@@ -12619,7 +14524,7 @@ Jordy's Science test, Tuesday 10 November: Planet Earth and Beyond. Written from
       awaySince = Date.now();
       return;
     }
-    if (SYNC_ON && awaySince && ui.who && !ui.run && !ui.result && Date.now() - awaySince > 600000) {
+    if (SYNC_ON && awaySince && ui.who && !ui.run && !ui.side && !ui.result && Date.now() - awaySince > 600000) {
       ui.who = null;
       ui.tryOn = null;
       ui.walk = null;
@@ -12737,6 +14642,7 @@ Jordy's Science test, Tuesday 10 November: Planet Earth and Beyond. Written from
             <button class="btn full" data-act="start" data-mode="exam">Line up</button>
           </section>
           ${lapCard(p)}
+          ${sideCard(p)}
         </div>
       </div>`);
   }
@@ -12819,6 +14725,89 @@ Jordy's Science test, Tuesday 10 November: Planet Earth and Beyond. Written from
         <div class="small-t muted num">${x.right} of ${x.target} this week · ${wins[x.id] || 0} ${wins[x.id] === 1 ? 'week' : 'weeks'} won</div>
       </div>`).join('')}</div>
     </section>`;
+  }
+  // The side track is a reward behind a clear daily rule, never the main event (research in
+  // C:\Dev\Kids\Holeshot research\reports\Holeshot side games and tutorials.md). Today's pit pass is earned by doing
+  // the comeback lap (or having nothing due) and one proper race of at least 5 questions at 70%, or by a fix-it lap at 70%
+  // on a hard day. It opens 3 runs that can't be saved up, earn no shop points and end back at Home.
+  const PASS_RUNS = 3;
+  // Lane Dash opens as a surprise once three sections show "Still remembered", so new games follow learning that lasted.
+  const SIDE_OPEN = { bigair: 0, lanedash: 3 };
+  const heldSections = (p) => Object.values(PK().subjects).reduce((n, sub) => n + racing(sub).filter((t) => heldTopic(p, t)).length, 0);
+  const allDue = (p) => Object.values(PK().subjects).reduce((n, sub) => n + dueList(p, sub).length, 0);
+  function passJobs(p) {
+    const today = dayKey();
+    const runs = p.runs.filter((r) => r.when === today);
+    const comeback = runs.some((r) => r.mode === 'review') || allDue(p) === 0;
+    const race = runs.some((r) => r.mode !== 'lap' && r.total >= 5 && r.pct >= 70);
+    const fixDay = runs.some((r) => r.mode === 'fix' && r.total >= 3 && r.pct >= 70);
+    return { comeback, race, fixDay, earned: (comeback && race) || fixDay };
+  }
+  const passLeft = (p) => (p.side && p.side.day === dayKey() ? Math.max(0, PASS_RUNS - (p.side.used || 0)) : PASS_RUNS);
+  function sideCard(p) {
+    const games = Object.values(RS.sideGames || {});
+    if (!games.length) return '';
+    const jobs = passJobs(p);
+    const left = passLeft(p);
+    const held = heldSections(p);
+    const tick = (ok, text) => `<li class="${ok ? 'done' : ''}"><span class="plan-tick">${ok ? ic('check', 16) : '·'}</span><span class="plan-text">${text}</span></li>`;
+    const tiles = games.map((g) => {
+      const need = SIDE_OPEN[g.id] || 0;
+      const open = held >= need;
+      const rec = (p.sideRec || {})[g.id] || {};
+      const best = g.id === 'lanedash' ? (rec.best ? lapText(rec.best) : '–') : rec.best ? RS.fmt(rec.best) : '–';
+      return `<div class="side-tile ${open ? '' : 'locked'}"><div><div class="h-sec" style="font-size:18px">${open ? '' : ic('lock', 14)} ${g.title}</div><div class="small-t muted">${open ? g.blurb : `Opens when ${need} sections show "Still remembered" (${held} so far)`}</div>${open ? `<div class="small-t num">Best: ${best}</div>` : ''}</div>${open && jobs.earned && left ? `<button class="btn primary small" data-act="side" data-id="${g.id}">Ride</button>` : ''}</div>`;
+    }).join('');
+    const head = !jobs.earned ? 'Earn today\'s pit pass' : left ? `Pit pass: ${left} ${left === 1 ? 'run' : 'runs'} left today` : 'Pit pass used for today';
+    const body = !jobs.earned
+      ? `<ol class="plan-list">${tick(jobs.comeback, 'Ride the comeback lap (or have nothing due)')}${tick(jobs.race, 'One race of 5 or more questions at 70% or better')}</ol><p class="small-t muted">Or clear a fix-it lap at 70% on a tough day. The side track opens for ${PASS_RUNS} runs.</p>`
+      : left ? '<p class="small-t muted">Just for fun: no shop points, just your own records to beat.</p>' : '<p class="small-t muted">Back tomorrow with a new pass. Your records are waiting.</p>';
+    return `<section class="card side-card" aria-label="Side track"><div class="eyebrow">Side track</div><div class="h-sec">${head}</div>${body}<div class="side-tiles">${tiles}</div></section>`;
+  }
+  function startSide(id) {
+    const p = P();
+    const g = (RS.sideGames || {})[id];
+    if (!g || ui.run || !passJobs(p).earned || !passLeft(p) || heldSections(p) < (SIDE_OPEN[id] || 0)) return render();
+    stopSpeaking();
+    audio();
+    const rec = (p.sideRec = p.sideRec || {})[id] || {};
+    // The session takes the day's runs as it starts, so closing the page part way can't buy extra goes.
+    const runs = passLeft(p);
+    p.side = { day: dayKey(), used: PASS_RUNS };
+    save();
+    $('#app').innerHTML = '<div class="side-host" id="side-host"></div>';
+    window.scrollTo(0, 0);
+    const paint = PAINTS[p.paint] || PAINTS.orange;
+    ui.side = {
+      id,
+      handle: g.start($('#side-host'), {
+        bike: p.bike,
+        filter: paint.filter && paint.filter !== 'none' ? paint.filter : '',
+        plate: String(p.plate),
+        runs,
+        best: rec.best || null,
+        bestTricks: rec.tricks || [],
+        ghost: rec.ghost || null,
+        sfx: (kind) => sfx(kind),
+        reduceMotion: matchMedia('(prefers-reduced-motion: reduce)').matches,
+        onDone: (res) => endSide(id, res || {}),
+      }),
+    };
+  }
+  function endSide(id, res) {
+    const p = P();
+    const rec = (p.sideRec = p.sideRec || {})[id] || (p.sideRec[id] = {});
+    // Records only. A lower lap time is better; a higher score is better.
+    if (id === 'lanedash') {
+      if (res.best && (!rec.best || res.best < rec.best)) Object.assign(rec, { best: res.best, ghost: res.ghost || null });
+    } else if (res.best && (!rec.best || res.best > rec.best)) rec.best = res.best;
+    if (res.newTricks && res.newTricks.length) rec.tricks = [...new Set([...(rec.tricks || []), ...res.newTricks])];
+    if (ui.side && ui.side.handle && ui.side.handle.stop) ui.side.handle.stop();
+    ui.side = null;
+    ui.tab = 'home';
+    save();
+    render();
+    window.scrollTo(0, 0);
   }
   function guideCard(p) {
     if (p.guided || p.runsDone > 3) return '';
@@ -14743,6 +16732,7 @@ Jordy's Science test, Tuesday 10 November: Planet Earth and Beyond. Written from
     else if (ui.parents) app.innerHTML = viewParents();
     else if (ui.pin) app.innerHTML = viewPin();
     else if (!ui.who) app.innerHTML = viewPick();
+    else if (ui.side) return;
     else if (ui.run) drawRun();
     else if (ui.result) app.innerHTML = viewResult();
     else if (ui.walk) app.innerHTML = viewWalk();
@@ -15004,6 +16994,9 @@ Jordy's Science test, Tuesday 10 November: Planet Earth and Beyond. Written from
         if (tab === 'voice') sayAs(id, GEAR.voice.items[id].sample);
         break;
       }
+      case 'side':
+        startSide(id);
+        break;
       case 'resume': {
         const x = savedRun();
         dropRun();
