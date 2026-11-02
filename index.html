@@ -523,6 +523,29 @@ details ol { margin: 6px 0 0; padding-left: 20px; }
 .plan-text { flex: 1; min-width: 0; font-weight: 700; }
 .stop-cue { border: 2px solid var(--good); }
 
+/* His own rider on Home and on the results */
+.hero-photo.mine, .result-photo.mine { position: relative; background: #fff; }
+.hero-photo.mine .rig, .result-photo.mine .rig { position: absolute; inset: 0; margin: auto; height: 100%; width: auto; max-width: 100%; }
+/* Saving for something */
+.goal { display: grid; gap: 8px; }
+/* What moved */
+.moved { display: flex; justify-content: space-between; gap: 10px; font-weight: 600; }
+.moved .up { color: var(--good); }
+.moved .down { color: var(--bad); }
+/* Big moments */
+.moment, .moment-card { border: 3px solid var(--accent); }
+.moment { display: grid; gap: 10px; text-align: center; justify-items: center; }
+.moment h1 { font-family: var(--display); font-weight: 800; font-size: clamp(28px, 8vw, 44px); line-height: 1.05; letter-spacing: -.02em; }
+.moment .stage { width: 100%; }
+.moment .rig { height: 280px; }
+/* The ghost and the gate drop */
+.ghost { display: block; font-size: 11px; font-weight: 700; color: var(--ink-3); white-space: nowrap; }
+.ghost.ahead { color: var(--good); }
+.gate-drop { position: absolute; inset: 0; display: grid; place-items: center; pointer-events: none; z-index: 5; }
+.gate-drop span { font-family: var(--display); font-weight: 800; font-size: clamp(34px, 10vw, 64px); color: var(--accent); background: var(--card); padding: 8px 22px; border-radius: 18px; box-shadow: var(--shadow); animation: gate 1.1s ease-out forwards; }
+@keyframes gate { 0% { transform: translateY(-40px); opacity: 0; } 25% { transform: none; opacity: 1; } 70% { opacity: 1; } 100% { opacity: 0; transform: scale(1.08); } }
+@media (prefers-reduced-motion: reduce) { .gate-drop { display: none; } }
+
 </style>
 <div id="app"></div>
 <div id="toast" class="toast" role="status" aria-live="polite" hidden></div>
@@ -8234,6 +8257,227 @@ Jordy's Science test, Tuesday 10 November: Planet Earth and Beyond. Written from
   });
 })(typeof window !== 'undefined' ? window : globalThis);
 
+/* Teaching for the eight English language sections: a rule card (notes), a Track walk (walk),
+   and a line for each written list that is shown after a wrong answer (not). */
+(function (root) {
+  'use strict';
+  const RS = root.RS;
+  const T = (id) => RS.packs.jordy.subjects.english.topics.find((t) => t.id === id);
+  const S = RS.packs.jordy.skills;
+
+  // ---------- Punctuation rules ----------
+  T('eng_punct').notes = [
+    `Capitals start a sentence and every proper noun (names, places, days and months): Sipho rode in Bloemfontein in March.`,
+    `Commas separate items in a list, and "and" replaces the last comma: boots, gloves and goggles.`,
+    `One owner: the apostrophe goes before the s (the rider's bike). Many owners: after the s (the riders' bikes).`,
+    `An apostrophe also marks missing letters: do not → don't. it's means "it is", but its shows ownership: the bike and its chain.`,
+    `Speech marks hold the exact words, with the comma or question mark inside: "Wait for me," said Ayanda.`,
+  ];
+  T('eng_punct').walk = [
+    { card: `Who owns it?`, say: `An apostrophe and an s show that something belongs to someone. Count the owners first, then place the apostrophe.`, eg: `One rider: the rider's gloves. Two riders: the riders' gloves.`, more: `If a plural doesn't end in s, just add 's: the children's gloves, the men's race.` },
+    { tap: `The mechanic fixed the rider's broken lever.`, find: `rider's`, ask: `Tap the word that shows something belongs to someone.`, got: `One rider owns the lever, so the apostrophe goes before the s: rider's.` },
+    { match: [[`will not`, `won't`], [`they are`, `they're`], [`it is`, `it's`], [`cannot`, `can't`], [`I have`, `I've`]], ask: `The apostrophe sits where letters are missing. Tap the long form, then tap the short form.` },
+    { tap: `It's a long climb, so the bike needs its low gear.`, find: `it's`, ask: `Tap the word that means "it is".`, got: `It's = it is. The other one, its, shows that the low gear belongs to the bike, like "his" or "her".` },
+    { card: `Speech marks`, say: `Speech marks, also called inverted commas, go around the exact words someone says. The comma, question mark or exclamation mark that ends those words goes inside the marks.`, eg: `"Wait for me," shouted Ayanda.`, more: `When a different person starts speaking, start a new line.` },
+    { sort: [`Correct`, `Needs fixing`], ask: `Is the punctuation right?`, items: [
+      [`The riders' helmets were muddy.`, 0, `More than one rider owns the helmets, so the apostrophe goes after the s.`],
+      [`The marshal's waved their flags.`, 1, `Nothing belongs to the marshals here. A plain plural takes no apostrophe: The marshals waved their flags.`],
+      [`My tent lost it's pegs in the wind.`, 1, `"lost it is pegs" makes no sense, so it needs "its", with no apostrophe.`],
+      [`"Who has my goggles?" asked Lerato.`, 0, `The question mark belongs to Lerato's words, so it goes inside the speech marks.`],
+      [`We packed, boots, gloves and goggles.`, 1, `Commas go between the items, not before the first one: We packed boots, gloves and goggles.`],
+      [`"My tyre is flat," said Musa.`, 0, `The sentence carries on after Musa's words, so a comma ends them, inside the speech marks.`],
+      [`We raced in kokstad on sunday.`, 1, `Kokstad is a place and Sunday is a day, so both need capital letters.`],
+    ] },
+  ];
+  S.eng_punct.not = `It's easy to spot one mark and miss another, so check each mark against its rule: capitals, end marks, commas between list items, apostrophes only for owners or missing letters, and speech marks around the exact words.`;
+
+  // ---------- Parts of speech ----------
+  T('eng_parts').notes = [
+    `Ask what job the word does: in "The fast rider braked hard", fast describes a noun (adjective) and hard tells how (adverb).`,
+    `Compound words join words together: headlight (compound noun), a two-stroke engine (compound adjective).`,
+    `A proper adjective comes from a proper noun and keeps its capital: Australia → an Australian rider.`,
+    `"the" is the definite article; "a" and "an" are indefinite. "an" goes before a vowel sound: an hour, but a uniform.`,
+    `An auxiliary (helping) verb helps the main verb: She is riding. They have finished. He will race.`,
+  ];
+  T('eng_parts').walk = [
+    { card: `A or an?`, say: `Use "an" before a word that starts with a vowel sound, and "a" before a consonant sound. Listen to the sound, not the letter.`, eg: `an hour, an engine, a hill, a uniform`, more: `"a" and "an" are the indefinite articles. "the" is the definite article, because it points to one particular thing.` },
+    { sort: [`a`, `an`], ask: `Say it out loud. Does it take "a" or "an"?`, items: [
+      [`___ honest marshal`, 1, `The h is silent, so "honest" starts with a vowel sound: an honest marshal.`],
+      [`___ useful tool`, 0, `"useful" starts with a "y" sound, which is a consonant sound: a useful tool.`],
+      [`___ orange bib`, 1, `"orange" starts with a vowel sound: an orange bib.`],
+      [`___ one-way track`, 0, `"one" starts with a "w" sound, which is a consonant sound: a one-way track.`],
+      [`___ huge jump`, 0, `You can hear the h in "huge", so it takes "a": a huge jump.`],
+      [`___ enduro bike`, 1, `"enduro" starts with a vowel sound: an enduro bike.`],
+    ] },
+    { card: `Helping verbs`, say: `An auxiliary verb helps the main verb. The main verb shows the action, and the helper comes before it.`, eg: `She is riding. They have finished. He will race. We did not stop.`, more: `With no other verb to help, the same word is the main verb: "He has a spanner." But in "He has found a spanner", has is the helper.` },
+    { tap: `The mechanic has fitted a new chain.`, find: `has`, ask: `Tap the auxiliary verb: the one that helps the main verb.`, got: `"has" helps the main verb "fitted".` },
+    { card: `Joined words and name words`, say: `A compound word joins two or more words. A compound noun names one thing. A compound adjective, usually joined with a hyphen, describes a noun.`, eg: `head + light = headlight. a two-stroke engine`, more: `A proper adjective comes from a proper noun and keeps its capital letter: Australia → an Australian rider.` },
+    { match: [[`the new **toolbox**`, `Compound noun`], [`a **last-minute** change`, `Compound adjective`], [`a **Brazilian** rider`, `Proper adjective`], [`we drove to **Polokwane**`, `Proper noun`], [`**the** start gate`, `Definite article`]], ask: `Tap a phrase, then tap what the word in bold is.` },
+  ];
+  S.eng_parts.not = `A word doesn't always do the same job, so read the whole sentence and ask what it does right there, and for "a" or "an", listen to the first sound, not the first letter.`;
+
+  // ---------- Figures of speech ----------
+  T('eng_figures').notes = [
+    `Simile: compares two things using "like" or "as": The quad was as loud as a jet.`,
+    `Metaphor: says one thing IS another, with no "like" or "as": The berm was a wall.`,
+    `Personification: gives a thing a human action: The fence grabbed my sleeve.`,
+    `Hyperbole: a huge exaggeration that can't be true: I fell off a thousand times today.`,
+    `Alliteration repeats the first sound: big brown bikes. Onomatopoeia is a word that sounds like its noise: vroom, splat, hiss.`,
+  ];
+  T('eng_figures').walk = [
+    { card: `Simile or metaphor?`, say: `Both compare two different things. A simile uses "like" or "as". A metaphor says one thing IS the other.`, eg: `Simile: Ayanda was as quick as a cheetah. Metaphor: Ayanda was a cheetah.`, more: `Careful: "I like riding" isn't a simile. There "like" means enjoy, and nothing is compared.` },
+    { tap: `After the rain the track was as slippery as soap.`, find: `soap`, ask: `What is the track compared to? Tap it.`, got: `Soap. The comparing word "as" makes this a simile.` },
+    { card: `Four more to know`, say: `Personification gives a thing a human action. Hyperbole is a huge exaggeration. Alliteration repeats the first sound. Onomatopoeia is a word that sounds like its noise.`, eg: `The fence grabbed my sleeve. I fell off a million times. Sipho's shiny silver scooter. Vroom!`, more: `One sentence can use two at once: "Sneaky stones stole my grip" has alliteration and personification.` },
+    { tap: `The old bakkie complained all the way up the pass.`, find: `complained`, ask: `Tap the human action. A bakkie can't really do this.`, got: `Only people complain. Giving a thing a human action is personification.` },
+    { match: [[`The dust was as thick as fog.`, `Simile`], [`The dam was a mirror.`, `Metaphor`], [`The rain refused to stop all weekend.`, `Personification`], [`I queued for a hundred years.`, `Hyperbole`], [`Brave Bongi bounced over the berm.`, `Alliteration`]], ask: `Tap a sentence, then tap its figure of speech.` },
+    { sort: [`Simile`, `Metaphor`], ask: `Look for "like" or "as". Simile or metaphor?`, items: [
+      [`The berm was a wall of sand.`, 1, `It says the berm WAS a wall, with no "like" or "as".`],
+      [`The rider shot out of the gate like a bullet.`, 0, `It compares the rider to a bullet using "like".`],
+      [`My brother is a fish in the dam.`, 1, `It says he IS a fish, with no "like" or "as". He just swims very well.`],
+      [`The engine was as loud as thunder.`, 0, `It compares the engine to thunder using "as".`],
+      [`Our garage is a jungle.`, 1, `It says the garage IS a jungle, with no "like" or "as".`],
+      [`Her bike was as clean as a new plate.`, 0, `It compares the bike to a plate using "as".`],
+    ] },
+  ];
+  S.eng_figures.not = `It's easy to mix them up, so check in order: "like" or "as" means simile, "is" without them means metaphor, a thing acting like a person is personification, and a huge exaggeration is hyperbole.`;
+
+  // ---------- Direct and indirect speech ----------
+  T('eng_speech').notes = [
+    `Direct speech keeps the exact words in inverted commas: Musa said, "I am tired." Indirect speech reports them: Musa said that he was tired.`,
+    `Change the pronouns to suit the person telling it: I → he or she, we → they, my → his or her.`,
+    `Move each verb one step back: am → was, are → were, will → would, can → could, have → had, fell → had fallen.`,
+    `Change time and place words: now → then, today → that day, tomorrow → the next day, yesterday → the day before, here → there, this → that.`,
+    `Questions lose the question mark, and yes-or-no ones use "if": She asked if I had fuel. Commands use "told ... to": He told us to stop.`,
+  ];
+  T('eng_speech').walk = [
+    { card: `Two ways to tell it`, say: `Direct speech gives someone's exact words inside inverted commas. Indirect speech reports what they said, with no inverted commas.`, eg: `Direct: Lwazi said, "I am ready." Indirect: Lwazi said that he was ready.`, more: `When you report speech, three things change: the pronouns (I → he), the verbs (am → was), and the time and place words (today → that day).` },
+    { match: [[`am`, `was`], [`are`, `were`], [`will`, `would`], [`can`, `could`], [`have`, `had`]], ask: `Each verb moves one step back. Tap a verb from direct speech, then tap what it becomes.` },
+    { tap: `Zanele said that her bike was fast.`, find: `her`, ask: `Zanele said, "My bike is fast." Tap the word that took the place of "My".`, got: `"My" becomes "her", because it is Zanele's bike and someone else is telling it. "is" moved back to "was" too.` },
+    { match: [[`now`, `then`], [`today`, `that day`], [`tomorrow`, `the next day`], [`yesterday`, `the day before`], [`here`, `there`]], ask: `Tap a word from direct speech, then tap what it becomes in indirect speech.` },
+    { card: `Questions and commands`, say: `A reported question loses its question mark, and the words go back to statement order. A yes-or-no question uses "if" or "whether".`, eg: `Thandi asked, "Do you have fuel?" → Thandi asked if I had fuel.`, more: `A command becomes "told ... to": The marshal said, "Slow down!" → The marshal told us to slow down. "Don't" becomes "told ... not to".` },
+    { sort: [`Right`, `Needs fixing`], ask: `Is the indirect speech right?`, items: [
+      [`"I can fix it," said Sbu. → Sbu said that he could fix it.`, 0, `"can" moved back to "could", and "I" became "he".`],
+      [`"I am hungry," said Ayanda. → Ayanda said that she is hungry.`, 1, `"am" must move back to "was": Ayanda said that she was hungry.`],
+      [`"We will win," said the twins. → The twins said that they would win.`, 0, `"we" became "they", and "will" moved back to "would".`],
+      [`"I crashed yesterday," said Kyle. → Kyle said that he had crashed the day before.`, 0, `"crashed" moved back to "had crashed", and "yesterday" became "the day before".`],
+      [`"Where is the tap?" asked Mpho. → Mpho asked where the tap was?`, 1, `A reported question has no question mark: Mpho asked where the tap was.`],
+      [`"Stop here!" said the marshal. → The marshal told us to stop here.`, 1, `"here" must become "there": The marshal told us to stop there.`],
+      [`"My chain is loose," said Kabelo. → Kabelo said that my chain was loose.`, 1, `It is Kabelo's chain, so "my" becomes "his": Kabelo said that his chain was loose.`],
+    ] },
+  ];
+  S.eng_speech.not = `It's easy to change only one part, so check all of them: the pronouns, each verb one step back, the time and place words, and no question mark on a reported question.`;
+
+  // ---------- Synonyms and antonyms ----------
+  T('eng_syn').notes = [
+    `A synonym (think "same") has the same or a similar meaning: big and large, fast and quick.`,
+    `An antonym (think "anti", against) has the opposite meaning: early and late, arrive and depart.`,
+    `Some words have more than one meaning, so read the sentence: a light toolbox → heavy, but a light colour → dark.`,
+    `A prefix can make an antonym: happy → unhappy, honest → dishonest.`,
+    `Test a synonym by swapping it in: "Shut the gate" and "Close the gate" mean the same.`,
+  ];
+  T('eng_syn').walk = [
+    { card: `Same or opposite?`, say: `Synonyms have the same or a similar meaning. Antonyms have opposite meanings.`, eg: `Synonyms: fast and quick. Antonyms: fast and slow.`, more: `Memory trick: synonym and same both start with s. Antonym sounds like "anti", which means against.` },
+    { tap: `We arrived at sunrise and left at sunset.`, find: `sunset`, ask: `Tap the antonym of "sunrise".`, got: `Sunset is the opposite of sunrise. Did you spot that "arrived" and "left" are antonyms too?` },
+    { match: [[`quick`, `rapid`], [`scared`, `afraid`], [`huge`, `enormous`], [`finish`, `end`], [`mend`, `repair`]], ask: `Tap a word, then tap its synonym.` },
+    { sort: [`Synonyms`, `Antonyms`], ask: `Same meaning or opposite?`, items: [
+      [`tight and loose`, 1, `A tight chain is the opposite of a loose one.`],
+      [`brave and fearless`, 0, `Both describe someone who isn't afraid.`],
+      [`buy and sell`, 1, `You buy from a shop, and the shop sells to you. They are opposites.`],
+      [`smart and clever`, 0, `Both mean quick to learn and understand.`],
+      [`push and pull`, 1, `Push moves something away, and pull brings it closer.`],
+      [`under and below`, 0, `Both mean lower down than something.`],
+      [`float and sink`, 1, `Float stays on top of the water, and sink goes down.`],
+    ] },
+    { card: `Read the sentence`, say: `Some words have more than one meaning. Read the sentence to see which meaning is used, then find the synonym or antonym for that meaning.`, eg: `a light bag → a heavy bag. a light room → a dark room.`, more: `To test a synonym, swap it into the sentence. "Shut the gate" and "Close the gate" mean the same, so shut and close are synonyms.` },
+    { tap: `The new helmet is light, but my old one was heavy.`, find: `heavy`, ask: `Here "light" is about weight. Tap its antonym.`, got: `Heavy is the opposite of light when it is about weight. About colour, the antonym would be dark.` },
+  ];
+  S.eng_syn.not = `It's easy to swap the two names, so remember that synonym and same both start with s, and check which meaning the word has in this sentence.`;
+
+  // ---------- Prefixes and suffixes ----------
+  T('eng_affix').notes = [
+    `A prefix goes at the beginning of a word and a suffix at the end: un + safe = unsafe, care + less = careless.`,
+    `Prefix meanings: re- again (redo), pre- before (preview), sub- under (subway), mis- wrongly (misspell), over- too much (overcook).`,
+    `un-, dis-, in-, im-, il- and ir- mean "not". Use il- before l, ir- before r and im- before p: illegal, irregular, impatient.`,
+    `Suffix meanings: -less means without (hopeless) and -ful means full of (hopeful). -ness and -ment make nouns (kindness, payment).`,
+    `Spelling: y changes to i (happy → happiness), a silent e drops before -ing (ride → riding), and skid → skidding doubles the d.`,
+  ];
+  T('eng_affix').walk = [
+    { card: `Front and back`, say: `A prefix is added to the beginning of a word, and a suffix to the end. Both change the word's meaning or its job.`, eg: `un + fair = unfair. fear + less = fearless.`, more: `What's left must be a real word: take "un" off "uncle" and "cle" isn't a word, so there is no prefix there.` },
+    { tap: `The marshal had to restart the race.`, find: `restart`, ask: `Tap the word that has a prefix.`, got: `re + start. re- means again, so the marshal started the race again.` },
+    { match: [[`re-`, `again`], [`pre-`, `before`], [`sub-`, `under`], [`mis-`, `wrongly`], [`bi-`, `two`]], ask: `Tap a prefix, then tap what it means.` },
+    { sort: [`im-`, `il-`, `ir-`], ask: `To make the opposite, use il- before l, ir- before r and im- before p. Which one fits?`, items: [
+      [`patient`, 0, `It starts with p, so im-: impatient.`],
+      [`logical`, 1, `It starts with l, so il-: illogical.`],
+      [`relevant`, 2, `It starts with r, so ir-: irrelevant.`],
+      [`polite`, 0, `It starts with p, so im-: impolite.`],
+      [`replaceable`, 2, `It starts with r, so ir-: irreplaceable.`],
+      [`perfect`, 0, `It starts with p, so im-: imperfect.`],
+    ] },
+    { card: `Suffix spelling`, say: `Most suffixes just go on the end: quick → quickly, enjoy → enjoyment. Watch for three changes.`, eg: `y to i: heavy → heaviness. Drop the silent e: race → racing. Double the last letter: grip → gripping.`, more: `-less means without and -ful means full of. In South African spelling, skill + ful = skilful, with one l in the middle.` },
+    { sort: [`Just add it`, `Change y to i`, `Drop the e`], ask: `What happens when the suffix goes on?`, items: [
+      [`hope + less`, 0, `hopeless. Nothing changes.`],
+      [`lazy + ness`, 1, `laziness. The y changes to i.`],
+      [`make + ing`, 2, `making. The silent e drops before -ing.`],
+      [`angry + ly`, 1, `angrily. The y changes to i.`],
+      [`care + ful`, 0, `careful. The e usually stays when the ending starts with a consonant, like -ful.`],
+      [`smile + ing`, 2, `smiling. The silent e drops before -ing.`],
+    ] },
+  ];
+  S.eng_affix.not = `Pull the word apart first: find the root word, then look at what was added to the front or the end, and check whether the spelling changes when it joins.`;
+
+  // ---------- Subject and predicate ----------
+  T('eng_subject').notes = [
+    `The subject is who or what the sentence is about. Find the verb and ask "who?" or "what?": The gate dropped. What dropped? The gate.`,
+    `The predicate is the rest: it says what the subject does or is. In "The riders lined up", it is "lined up".`,
+    `A subject can be several words: in "Lindiwe and her dad loaded the trailer", the subject is "Lindiwe and her dad".`,
+    `The subject doesn't always come first: Over the last jump flew the leader. Who flew? The leader.`,
+    `In a question, turn it into a statement first: Is the gate down? → The gate is down.`,
+  ];
+  T('eng_subject').walk = [
+    { card: `Two parts`, say: `Every complete sentence has a subject and a predicate. The subject is who or what the sentence is about. The predicate says what the subject does or is.`, eg: `My cousin crashed into the hay bales. Subject: My cousin. Predicate: crashed into the hay bales.`, more: `To find the subject, find the verb and ask "who?" or "what?". Who crashed? My cousin.` },
+    { tap: `My brother and I washed the bikes after the race.`, find: `washed`, ask: `The verb is the heart of the predicate. Tap it.`, got: `"washed" is the action. The subject is "My brother and I", and the predicate is "washed the bikes after the race".` },
+    { sort: [`Subject`, `Predicate`], ask: `Could it be the subject or the predicate of a sentence?`, items: [
+      [`the muddy quad`, 0, `It names a thing and has no verb.`],
+      [`skidded into the fence`, 1, `It has a verb and says what someone did.`],
+      [`my best friend`, 0, `It names a person.`],
+      [`is very fast`, 1, `It says what the subject is, with the verb "is".`],
+      [`the riders in the pits`, 0, `It names who. "in the pits" only tells you which riders.`],
+      [`fixed the chain`, 1, `It has a verb and says what someone did.`],
+      [`Lindiwe and her dad`, 0, `Two people together can make one subject.`],
+    ] },
+    { tap: `The box of tools is in the bakkie.`, find: `box`, ask: `What is in the bakkie, the box or the tools? Tap it.`, got: `The box. So the subject is "The box of tools", and one box takes "is". "of tools" only tells you which box.` },
+    { card: `Not always first`, say: `The subject usually comes first, but not always. Find the verb, then ask who or what did it.`, eg: `Over the last jump flew the leader. Who flew? The leader.`, more: `In a question, turn it into a statement first. Is the gate down? → The gate is down. The subject is "the gate".` },
+    { match: [[`After lunch, the marshals walked the track.`, `the marshals`], [`Through the river splashed the riders.`, `the riders`], [`Is your helmet clean?`, `your helmet`], [`My dad and my uncle loaded the trailer.`, `My dad and my uncle`], [`The bag of gloves fell off the bike.`, `The bag of gloves`]], ask: `Tap a sentence, then tap its subject.` },
+  ];
+  S.eng_subject.not = `The subject isn't always the first words, so find the verb, ask "who?" or "what?" did it, and take every word that names that person or thing.`;
+
+  // ---------- Forming abstract nouns ----------
+  T('eng_abstract').notes = [
+    `An abstract noun names a feeling, idea or quality that you can't see or touch: joy, courage, friendship.`,
+    `Many are made with an ending: kind → kindness, friend → friendship, child → childhood, free → freedom, enjoy → enjoyment.`,
+    `Watch the spelling: happy → happiness (y to i), wise → wisdom (the e falls away), strong → strength, long → length.`,
+    `Some change a lot, so learn them: proud → pride, angry → anger, believe → belief, choose → choice, decide → decision.`,
+    `Only the noun counts: brave (adjective) and bravely (adverb) aren't nouns, but bravery is.`,
+  ];
+  T('eng_abstract').walk = [
+    { card: `Things you can't touch`, say: `A common noun names something you can see or touch, like a helmet. An abstract noun names a feeling, idea or quality, like courage.`, eg: `You can hold a trophy, but you can't hold pride.`, more: `Ask: can I see it or touch it? If not, and it is a naming word, it is an abstract noun.` },
+    { tap: `Thabo felt great relief when he crossed the line.`, find: `relief`, ask: `Tap the abstract noun.`, got: `Relief is a feeling, so you can't see or touch it. Thabo and the line are things you can see.` },
+    { match: [[`ill`, `illness`], [`leader`, `leadership`], [`adult`, `adulthood`], [`free`, `freedom`], [`warm`, `warmth`]], ask: `Each ending makes an abstract noun. Tap a word, then tap its abstract noun.` },
+    { card: `Spelling changes`, say: `Some words change a little before the ending, and some change a lot.`, eg: `happy → happiness, wise → wisdom, strong → strength, proud → pride`, more: `Learn the big changes: angry → anger, believe → belief, choose → choice, decide → decision, know → knowledge.` },
+    { sort: [`Abstract noun`, `Not an abstract noun`], ask: `Is it an abstract noun?`, items: [
+      [`kindness`, 0, `It names a quality you can't touch.`],
+      [`angrily`, 1, `It is an adverb: it tells you how someone does something. The abstract noun is anger.`],
+      [`honesty`, 0, `It names a quality you can't touch.`],
+      [`honest`, 1, `It is an adjective that describes someone: an honest rider. The abstract noun is honesty.`],
+      [`trophy`, 1, `You can see and touch a trophy, so it is a common noun.`],
+      [`courage`, 0, `It names a quality you can't see or touch.`],
+      [`strength`, 0, `It names a quality. It comes from strong.`],
+    ] },
+    { tap: `The wise old marshal shared his wisdom with the new riders.`, find: `wisdom`, ask: `Tap the abstract noun.`, got: `Wisdom comes from wise. "wise" is the adjective that describes the marshal, and "wisdom" is the noun.` },
+  ];
+  S.eng_abstract.not = `An abstract noun is a naming word for something you can't see or touch, so make sure your answer isn't the describing word (brave) or the how word (bravely), and remember that some change a lot, like proud → pride.`;
+})(typeof window !== 'undefined' ? window : globalThis);
+
 /* Social Sciences, Geography, Topic 4: Population (pages 76 to 92): a rule card and a track walk
    for each racing section, and short reasons a child reads straight after a wrong answer (not).
    Facts come only from the questions already in bank-geography.js. See ADDING-QUESTIONS.md. */
@@ -8368,6 +8612,482 @@ Jordy's Science test, Tuesday 10 November: Planet Earth and Beyond. Written from
   S.geo_move.not = `Think about why people move: poorer rural areas lack jobs and services, so people head to the cities, and then the cities get busier in every way.`;
   S.geo_globe.not = `People are spread very unevenly, so picture the dots on the world map: most are north of the equator, and they crowd where there is water and thin out where it is far too cold or dry.`;
   S.geo_climate.not = `People settle where life is easier, so think of a mild climate, water nearby and resources that bring jobs, with pipes and fuel helping in harsh places.`;
+})(typeof window !== 'undefined' ? window : globalThis);
+
+/* History, Term 3 and Term 4 test pages: a rule card and a track walk for each racing section, and a short
+   reason a child reads straight after a wrong answer (not) for each written list. Every fact comes from the
+   questions in bank-history.js, which follow the book, so nothing here should disagree with them. */
+(function (root) {
+  'use strict';
+  const RS = root.RS;
+  const { fmt } = RS;
+  const T = (id) => RS.packs.jordy.subjects.history.topics.find((t) => t.id === id);
+  const S = RS.packs.jordy.skills;
+
+  // ---------- Democracy and voting, pages 144 and 145 ----------
+  T('his_vote').notes = [
+    `In a democracy, all the people have a say in who leads them, and they choose their leaders by voting.`,
+    `Before 1994, the apartheid government ruled, and most people in South Africa could not vote and lost many other rights too.`,
+    `In 1994 South Africa held its first democratic elections, and every adult citizen could vote at last.`,
+    `Political parties campaign with posters, flyers and meetings, and on election day you mark one party on your ballot paper.`,
+    `The votes are counted and the results are shared on TV, radio and in the papers. National elections come every five years.`,
+  ];
+  T('his_vote').walk = [
+    { card: `Power to the people`, say: `In a democracy, all the people have a say in who leads them. They choose their leaders by voting, and the leaders with the most votes form the biggest part of the government.`, eg: `Think of a motocross club choosing who will run it. Every member gets one vote, and the votes decide who leads.`, more: `We say a democracy is government "by the people", because the people choose the leaders, and "for the people", because it must work for the good of all.` },
+    { tap: `On election day, each voter marks one party on a ballot paper.`, find: `ballot`, ask: `Which word goes with the form you mark when you vote? Tap it.`, got: `A ballot paper. You make your mark next to one party only.` },
+    { card: `Before 1994`, say: `Before 1994, the apartheid government ruled South Africa. Most people were not allowed to vote, and many of their other rights were taken away too.`, eg: `Imagine being told that only a few learners in your class may choose the class captain, and everyone else must just accept it.`, more: `Many who fought against the apartheid government were jailed or forced to leave the country, and many lost their lives. In 1994 every adult citizen could vote at last, and people were so excited that they queued for hours.` },
+    { sort: [`Democracy`, `Not a democracy`], ask: `Is this how a democracy works?`, items: [
+      [`All adult citizens may vote.`, 0, `A democratic election is free and fair, and open to every adult citizen.`],
+      [`Only rich people may vote.`, 1, `Money doesn't decide who gets a vote in a democracy.`],
+      [`The winner is chosen before voting starts.`, 1, `Then the vote would mean nothing. Elections must be free and fair.`],
+      [`People may disagree with the leaders without being jailed.`, 0, `Being free to disagree is part of a democracy.`],
+      [`One ruler stays in power for decades, and anyone who disagrees is jailed.`, 1, `People can't choose their leaders or disagree freely, so it isn't a democracy.`],
+      [`The votes are counted and the results are made public.`, 0, `Everyone gets to know how many votes each party got.`],
+    ] },
+    { match: [[`1994`, `South Africa's first democratic elections`], [`Every five years`, `How often national elections are held`], [`Ballot paper`, `The form you mark to choose a party`], [`Political party`, `People who share views and try to win votes`], [`Citizens`, `The people of a country`]], ask: `Tap one on the left, then tap what goes with it.` },
+  ];
+
+  // ---------- The 1994 election and the Constitution, page 146 ----------
+  T('his_new_sa').notes = [
+    `Until 1994 the National Party ruled South Africa, but most of the people had not chosen it.`,
+    `The 1994 elections made South Africa a democracy. Over 19 million people voted.`,
+    `The ANC won 63% of the votes, almost two-thirds. Next came the NP with 20% and the IFP with 11%.`,
+    `The Constitution is the country's top set of laws, and every other law must fit with it. It sets out people's rights and responsibilities, and how the government should work.`,
+    `It was passed into law in December 1996. Nobody is above it, not even the president, and it is protected from quick changes.`,
+  ];
+  T('his_new_sa').walk = [
+    { card: `South Africa votes`, say: `Until 1994, the National Party ruled South Africa undemocratically. The 1994 elections turned South Africa into a democracy, and over 19 million people voted.`, eg: `Write 19 million out in full: ${fmt(19000000)}. Six zeros after the 19 means millions, not thousands.`, more: `The African National Congress (ANC) got the most votes: 63%, which is almost two-thirds.` },
+    { match: [[`ANC`, `African National Congress`], [`NP`, `National Party`], [`IFP`, `Inkatha Freedom Party`], [`DP`, `Democratic Party`]], ask: `Tap the short name, then tap what it stands for.` },
+    { sort: [`More than 10% of the votes`, `Less than 10% of the votes`], ask: `How did this party do in 1994?`, items: [
+      [`ANC`, 0, `It got 63%, almost two-thirds of all the votes.`],
+      [`NP`, 0, `It came second, with 20%.`],
+      [`IFP`, 0, `It came third, with 11%, just over 10%.`],
+      [`Freedom Front`, 1, `It got 2%.`],
+      [`DP`, 1, `It got 2%.`],
+      [`PAC`, 1, `It got 1%.`],
+    ] },
+    { card: `The Constitution`, say: `A constitution is a country's most important set of laws, and every other law must fit with it. South Africa's sets out people's rights and responsibilities, and how the government should work.`, eg: `Think of the rule book for a motocross series. A club can add its own rules for race day, but none of them may go against the main rule book.`, more: `South Africa needed a new Constitution after 1994 to protect everybody's rights. Everyone could send in comments, and it was passed into law in December 1996.` },
+    { tap: `Nobody is above the Constitution, not even the president.`, find: `president`, ask: `Even the most powerful person in the country must obey it. Tap who that is.`, got: `The president must obey the Constitution, just like everyone else.` },
+    { sort: [`True`, `False`], ask: `Is this true of South Africa's Constitution?`, items: [
+      [`It was passed into law in December 1996.`, 0, `That was more than two years after the first democratic elections.`],
+      [`The winning party can rewrite it whenever it likes.`, 1, `It is protected from quick changes, so people's rights can't simply be taken away.`],
+      [`Ordinary people could send in comments while it was written.`, 0, `There were many meetings and discussions as well.`],
+      [`It covers how people should behave towards each other.`, 0, `It covers rights and responsibilities too.`],
+      [`Judges don't have to follow it.`, 1, `No one is excused from following it.`],
+      [`Every other law must fit with it.`, 0, `It is the country's top set of laws.`],
+    ] },
+  ];
+
+  // ---------- Justice and equality, pages 151 and 152 ----------
+  T('his_equal').notes = [
+    `Justice means fair treatment, as the law requires, and the justice system makes sure nobody is treated unfairly.`,
+    `During apartheid, the justice system favoured some people over others, and people who opposed the government could not properly argue their side.`,
+    `Today the Constitution says everyone is equal under the law: the same laws apply in the same way to everybody.`,
+    `Money, gender, faith, culture, fame or a disability must not change how a court treats you, and everyone has the right to be heard.`,
+    `Judges, the police and the president must obey the law too, and nobody may tell a court what to decide.`,
+  ];
+  T('his_equal').walk = [
+    { card: `What justice means`, say: `Justice means fair treatment, as the law requires. The justice system steps in when people disagree, or when someone is suspected of a crime, and it makes sure nobody is treated unfairly.`, eg: `If two riders argue about a pass, the officials should hear both of them before they decide, whoever the riders are.`, more: `During apartheid, the justice system favoured some people over others. People who opposed the government could not properly argue their side, and many were jailed and beaten.` },
+    { tap: `The same laws apply in the same way to everybody.`, find: `everybody`, ask: `Who do the laws apply to? Tap the word.`, got: `Everybody. That is what "equal under the law" means.` },
+    { sort: [`Fair under the law`, `Not fair under the law`], ask: `Is this fair, the way the Constitution says it must be?`, items: [
+      [`A poor woman gets the same hearing in court as a rich man.`, 0, `Being poor doesn't change how a court treats her.`],
+      [`A famous soccer star is let off because he has many fans.`, 1, `Fame and money make no difference in court.`],
+      [`A police officer who breaks the law has to answer for it.`, 0, `Police must obey the law too.`],
+      [`The president phones a judge to say how a case must end.`, 1, `Nobody may interfere with the courts, not even the president.`],
+      [`A man on crutches who hurt someone must answer for it like anyone else.`, 0, `Equal under the law includes people living with a disability.`],
+      [`A court treats someone worse because of their faith.`, 1, `Faith or culture must not change how a court treats someone.`],
+    ] },
+    { card: `Nobody is above the law`, say: `The same laws apply to judges, the police and the president. Nobody, not even the president, may tell a court what to decide.`, eg: `A marshal can't let a rider skip a section of the track just because he is famous. The rules are the same for everyone.`, more: `Everyone has the right to have a court listen to their side, whatever their money, gender, faith or culture.` },
+    { match: [[`Justice`, `Fair treatment, as the law requires`], [`Equal under the law`, `The same laws apply to everybody`], [`Apartheid courts`, `Favoured some people over others`], [`The justice system`, `Steps in when people disagree or a crime is suspected`], [`The president`, `May not tell a court what to decide`]], ask: `Tap one on the left, then tap what goes with it.` },
+  ];
+
+  // ---------- The national anthem, pages 168 and 169 ----------
+  T('his_song').notes = [
+    `A national anthem is the song a country has formally chosen as its own. When it is sung, stand up and join in or listen quietly.`,
+    `South Africa's anthem joins parts of Nkosi Sikelel' iAfrika (God bless Africa) and Die Stem van Suid-Afrika (The call of South Africa), with new English words.`,
+    `Enoch Sontonga, a teacher and choir master, wrote Nkosi Sikelel' iAfrika as a hymn in 1897, and many opponents of apartheid sang it.`,
+    `CJ Langenhoven wrote Die Stem as a poem in 1918, ML de Villiers made it a song, and before 1994 it was the apartheid government's anthem.`,
+    `Your book gives four languages: isiZulu, Sesotho, Afrikaans and English. The anthem ends in English.`,
+  ];
+  T('his_song').walk = [
+    { card: `Two songs become one`, say: `South Africa's anthem joins parts of two older songs, Nkosi Sikelel' iAfrika and Die Stem van Suid-Afrika, with some newly written English words.`, eg: `At a Springbok match, the whole stadium sings one anthem together, even though its parts once belonged to people on different sides.`, more: `Before 1994, Die Stem was the apartheid government's anthem, and many opponents of apartheid sang Nkosi Sikelel' iAfrika. Joining them brings together people who were once divided.` },
+    { tap: `Enoch Sontonga was a teacher and choir master who wrote a hymn.`, find: `hymn`, ask: `What kind of song was Nkosi Sikelel' iAfrika at first? Tap the word.`, got: `A hymn, written in 1897. He only became famous many years after he died.` },
+    { match: [[`Enoch Sontonga`, `A teacher and choir master who wrote a hymn in 1897`], [`CJ Langenhoven`, `An Afrikaans poet who wrote a poem in 1918`], [`ML de Villiers`, `Set Langenhoven's poem to music`], [`Nkosi Sikelel' iAfrika`, `God bless Africa`], [`Die Stem van Suid-Afrika`, `The call of South Africa`]], ask: `Tap one on the left, then tap what goes with it.` },
+    { sort: [`Nkosi Sikelel' iAfrika`, `Die Stem`], ask: `Which song is this about?`, items: [
+      [`Began as a hymn`, 0, `Enoch Sontonga wrote it as a hymn in 1897.`],
+      [`Began as a poem`, 1, `CJ Langenhoven wrote it as a poem in 1918.`],
+      [`The apartheid government's anthem before 1994`, 1, `That is why using both songs in one anthem matters.`],
+      [`Sung by many opponents of apartheid`, 0, `It became a song of the struggle.`],
+      [`Closed ANC meetings by 1925`, 0, `It had spread and become well loved.`],
+      [`Grew as people sang it in different languages`, 0, `People added to it as it spread across South Africa.`],
+      [`Gives the anthem its lines about the sky`, 1, `Those lines are in Afrikaans, and they come from Die Stem.`],
+    ] },
+    { card: `Four languages, says your book`, say: `Your book says the anthem is sung in four languages: isiZulu, Sesotho, Afrikaans and English.`, eg: `At a big match, everyone stands up and either sings along or listens quietly. Listen for the last lines: they are in English.`, more: `The Afrikaans lines are about our sky, the Sesotho lines ask for wars and suffering to end, and the English words at the end call people to stand together and be free.` },
+  ];
+
+  // ---------- Indigenous and Western medicine, pages 172 to 175 ----------
+  T('his_healers').notes = [
+    `Indigenous, or traditional, medicine is healing handed down over many years in a community, using herbal remedies. It began in Africa.`,
+    `Western medicine is based on science and learnt at university. It began in western Europe, and settlers from Europe brought it here.`,
+    `Indigenous healers treat all of the patient, not only the sickness in the body. This is holistic healing, and the ancestors are very important in it.`,
+    `The two main kinds of traditional healers are diviners, or sangomas, and herbalists, or nyangas.`,
+    `Most South Africans use Western medicine today, and many use both kinds.`,
+  ];
+  T('his_healers').walk = [
+    { card: `Two ways of healing`, say: `Indigenous medicine is healing handed down over many years in a community, using herbal remedies. Western medicine is based on science, and doctors and nurses learn it at university.`, eg: `Long before there were clinics, hunter-gatherers, herders and African farmers in South Africa were already treating the sick with plants.`, more: `Western medicine began in western Europe, and settlers from Europe brought it to South Africa. Today most people use it, and many use both kinds.` },
+    { match: [[`Indigenous`, `Belonging to a place from the start`], [`Origin`, `Where something starts out`], [`Diagnose`, `Work out what is wrong by checking the patient`], [`Prescribe`, `Tell a patient which medicine to use`], [`Holistic`, `Caring for all of the patient`]], ask: `Tap a word, then tap what it means.` },
+    { tap: `An indigenous healer cares for the whole person, so the healing is holistic.`, find: `holistic`, ask: `Which word means caring for all of the patient? Tap it.`, got: `Holistic. Indigenous healers treat all of the patient, not only the sickness in the body.` },
+    { sort: [`Indigenous medicine`, `Western medicine`], ask: `Which kind of medicine is this?`, items: [
+      [`Began in Africa`, 0, `It is indigenous, so it started here.`],
+      [`Began in western Europe`, 1, `That is where its name comes from.`],
+      [`Based on science and learnt at university`, 1, `Doctors train in science at university.`],
+      [`Passed down from the older generation to the younger one`, 0, `Each older group teaches the younger one.`],
+      [`Tablets from a pharmacy`, 1, `A Western doctor would most likely prescribe these.`],
+      [`Herbs and other natural remedies`, 0, `Traditional healers use remedies from plants.`],
+      [`Mainly treats diseases of the physical body`, 1, `Indigenous healers treat all of the patient, not only the body.`],
+    ] },
+    { card: `Two kinds of healers`, say: `The two main kinds of traditional healers are diviners and herbalists. A diviner is also called a sangoma, and a herbalist is also called a nyanga.`, eg: `A family might take a sick child to a doctor for tablets, to a sangoma for herbs, or to both. Many South African families use both kinds.`, more: `The ancestors are very important in indigenous healing. They are seen as relatives who are still part of the family.` },
+  ];
+
+  // ---------- Herbalists and Buchu, pages 176 and 177 ----------
+  T('his_plants').notes = [
+    `Herbalists cure illness with plants, using bulbs, leaves, tubers, stems and bark, and they train for many years to get the amounts right.`,
+    `Your book says South Africa has more than 500 kinds of medicinal plants, among them Buchu, the aloe and the African potato.`,
+    `Aloe juice heals stomach aches, cuts and burns, and Buchu has been used for hundreds of years for stomach and bladder troubles.`,
+    `Buchu grows in the south-west Cape, and only someone with a licence may pick it, so the wild plants don't get wiped out.`,
+    `Farmers grow Buchu to sell, and the dried leaves are shipped from Cape Town, mostly to England and the United States of America.`,
+  ];
+  T('his_plants').walk = [
+    { card: `Medicine from plants`, say: `Herbalists use plants to cure illness. They use bulbs, leaves, tubers, stems and bark, and sometimes rocks or the whole plant.`, eg: `A herbalist could treat a stomach ache, a cut or a burn with juice from the aloe.`, more: `Herbalists train for many years, because getting the amounts right is hard to learn. Like doctors, they use medicines to treat illness.` },
+    { tap: `Only someone with a licence may pick wild Buchu.`, find: `licence`, ask: `What do you need before you may pick wild Buchu? Tap the word.`, got: `A licence. It stops the wild plants from being wiped out.` },
+    { match: [[`Aloe juice`, `Stomach aches, cuts and burns`], [`Buchu`, `Stomach and bladder troubles`], [`More than 500`, `Kinds of medicinal plants in South Africa`], [`Over half`, `The world's medicines with something from plants in them`], [`Bulbs, leaves, tubers, stems and bark`, `Parts of plants that herbalists use`]], ask: `Tap one on the left, then tap what goes with it.` },
+    { card: `Buchu goes overseas`, say: `Today, farmers grow Buchu to sell. They collect the leaves when it is in flower, and the leaves are dried and shipped overseas from Cape Town.`, eg: `It's like any farm crop: planted, picked at the right time, dried, then sent off to buyers far away.`, more: `Most Buchu goes to England and the United States of America, where it is made into liquids, ointments or tablets. Drug companies keep finding new medical uses for South Africa's wild plants.` },
+    { sort: [`True of Buchu`, `Not true of Buchu`], ask: `Is this true of Buchu?`, items: [
+      [`It grows in the south-west Cape.`, 0, `It is special to that part of South Africa.`],
+      [`Anyone may pick it in the wild.`, 1, `Only someone with a licence may pick it.`],
+      [`It has been used for stomach and bladder troubles.`, 0, `Herbalists have used it for hundreds of years.`],
+      [`It is Western medicine, because it began in Europe.`, 1, `It is indigenous medicine. Herbalists here used it first.`],
+      [`Its dried leaves are shipped overseas from Cape Town.`, 0, `Most go to England and the United States of America.`],
+      [`Its roots are used, and the leaves are thrown away.`, 1, `It is the leaves that are collected and dried.`],
+    ] },
+  ];
+
+  // ---------- Becoming a sangoma, pages 175, 177 and 178 ----------
+  T('his_sangoma').notes = [
+    `A diviner, or sangoma, finds out what is wrong by communicating with the ancestors, and can give medicine too.`,
+    `People believe a sangoma has a gift from birth and is chosen by the ancestors to serve others.`,
+    `The family takes the chosen person to an experienced sangoma, and the trainee, called an initiate, serves an apprenticeship of many years.`,
+    `Initiates drink the medicine, bathe in special water for cleansing and dance for the ancestors, and their red clay changes to white after three months.`,
+    `At the end, other sangomas tell the ancestors, the initiate goes home under a blanket, a goat is slaughtered, and the next day there is a celebration.`,
+  ];
+  T('his_sangoma').walk = [
+    { card: `A calling, not a job`, say: `People believe that a sangoma has a gift from birth, and that the ancestors choose that person to serve others. It is a calling, not a job you apply for.`, eg: `The signs are not the same for everyone. A chosen person might become ill or thin, walk in their sleep, or have dreams.`, more: `The family then takes the person to an experienced sangoma, who asks the ancestors what the new trainee should do next.` },
+    { tap: `A trainee sangoma is called an initiate.`, find: `initiate`, ask: `Which word names a sangoma in training? Tap it.`, got: `An initiate. Initiates train under an experienced sangoma for many years.` },
+    { card: `Years of training`, say: `Training to be a sangoma is an apprenticeship: many long, challenging years of learning under an expert.`, eg: `Like a young mechanic learning beside an expert in the workshop, an initiate learns by working under an experienced sangoma.`, more: `Initiates work with incense and medicine pots, drink the medicine and perform ritual dances for the ancestors. During training, they never sit on a chair or sleep on a bed.` },
+    { match: [[`Red clay`, `Smeared on at the start of training`], [`White clay`, `Smeared on after three months`], [`Special water`, `Bathed in for cleansing`], [`A blanket`, `Covers the initiate on the way home`], [`A goat`, `Slaughtered to welcome the initiate home`]], ask: `Tap one on the left, then tap where it fits in.` },
+    { sort: [`Part of a sangoma's training`, `Not part of it`], ask: `Is this part of training to be a sangoma?`, items: [
+      [`Drinking the medicine`, 0, `Initiates drink the medicine they are given.`],
+      [`Passing exams at a university`, 1, `Sangomas train under an experienced sangoma, not at a university.`],
+      [`Performing ritual dances for the ancestors`, 0, `Dancing is part of the training.`],
+      [`Sleeping on a soft bed`, 1, `An initiate never sits on a chair or sleeps on a bed during training.`],
+      [`Bathing in special water`, 0, `It is for cleansing.`],
+      [`Finishing in a few weeks`, 1, `The training takes many years.`],
+      [`Working with incense and medicine pots`, 0, `These are part of an initiate's work.`],
+    ] },
+    { card: `Welcome home`, say: `When the training is complete, other sangomas tell the ancestors. The initiate goes home covered with a blanket, and the community slaughters a goat.`, eg: `Think of a whole family gathering to welcome someone home after years away.`, more: `The next day there is a celebration with singing, dancing and gifts.` },
+  ];
+
+  // ---------- Pasteur, Koch and TB, pages 179 and 180 ----------
+  T('his_germs').notes = [
+    `Louis Pasteur was the first to show, through his experiments, that germs make people ill.`,
+    `Germs are tiny living things that you can only see with a microscope, and each kind of bacteria causes its own kind of infection.`,
+    `In 1882 Dr Robert Koch identified the germ that causes TB, which is short for tuberculosis.`,
+    `TB mainly attacks the lungs and is highly contagious: people catch it by breathing in droplets from a cough or sneeze.`,
+    `TB can be cured with Western medicine, but only if it is taken every day until the disease is gone.`,
+  ];
+  T('his_germs').walk = [
+    { card: `Germs make us ill`, say: `Louis Pasteur was the first scientist to connect germs with illness. His experiments showed that germs are what make people ill.`, eg: `Your hands can look clean after a day at the track and still carry germs. Germs are far too small to see without a microscope.`, more: `The next step was to work out which germ causes which illness, because each kind of bacteria causes its own kind of infection.` },
+    { match: [[`Louis Pasteur`, `First to connect germs with illness`], [`Dr Robert Koch`, `Identified the TB germ in 1882`], [`Microscope`, `Makes tiny things big enough to see`], [`Contagious`, `Easily passed on between people`], [`Tuberculosis`, `What the letters TB stand for`]], ask: `Tap one on the left, then tap what goes with it.` },
+    { card: `Koch and TB`, say: `In 1882, Dr Robert Koch identified the germ that causes TB. TB is short for tuberculosis, a serious disease that mainly affects the lungs.`, eg: `Picture someone with TB coughing in a full taxi. The people nearby can breathe in the tiny droplets, and the germs with them.`, more: `TB can be cured with Western medicine, taken every day until the disease is gone. Many people still die of it because they don't get the right treatment.` },
+    { tap: `TB spreads when people breathe in droplets from a cough or sneeze.`, find: `droplets`, ask: `What carries TB germs through the air? Tap the word.`, got: `Droplets from a cough or sneeze carry the bacteria. That is why TB is so contagious.` },
+    { sort: [`Helps fight TB`, `Doesn't help`], ask: `Does this help fight TB?`, items: [
+      [`Taking the doctor's medicine every day until the disease is gone`, 0, `It takes steady treatment to get rid of TB.`],
+      [`Stopping the medicine as soon as you feel a little better`, 1, `The disease isn't gone yet, so the medicine must carry on.`],
+      [`Warning people how easily TB spreads`, 0, `That is why people march with banners about TB.`],
+      [`Getting the right treatment`, 0, `Many people die of TB because they don't get it.`],
+      [`Believing TB is only caught by touching skin`, 1, `It spreads through droplets in the air.`],
+      [`Taking the medicine only on the first day`, 1, `One day is not enough. It must be taken daily until the disease is gone.`],
+    ] },
+  ];
+
+  // ---------- Jenner and smallpox, pages 182 and 183 ----------
+  T('his_jenner').notes = [
+    `Smallpox, nicknamed the speckled monster, was a killer disease that caused a fever and pus-filled sores all over the body.`,
+    `Edward Jenner heard that women who milked cows caught cowpox, a mild disease, but stayed safe from smallpox.`,
+    `In 1796 he put cowpox pus into James Phipps, a healthy boy of about eight. Later he gave James smallpox, and James stayed well because he was now immune.`,
+    `"Vaccination" comes from "vacca", the Latin word for cow. A vaccination protects you from one disease ahead of time.`,
+    `At first many people doubted Jenner and laughed at his idea, and vaccination took many years to catch on.`,
+  ];
+  T('his_jenner').walk = [
+    { card: `The speckled monster`, say: `About 200 years ago, smallpox killed thousands of people in Europe. It caused a fever and pus-filled sores all over the body, and if it reached the heart, brain or lungs, the person could die.`, eg: `A speckled egg is covered in little spots. That's how smallpox got its nickname: the sores covered the whole body.`, more: `Smallpox spread from person to person, which made it even more dangerous.` },
+    { card: `Jenner's experiment`, say: `Edward Jenner heard that women who milked cows caught cowpox, a mild disease, but stayed safe from smallpox. In 1796 he tested the idea on James Phipps, a healthy boy of about eight.`, eg: `It's like a practice lap before the real race. The mild cowpox let James's body learn to fight, so it was ready for smallpox.`, more: `Jenner put cowpox pus into James, who felt ill for a while and then got better. Then Jenner gave him smallpox, and James stayed well.` },
+    { tap: `Having had cowpox made James immune to smallpox.`, find: `immune`, ask: `Which word means your body can beat a disease? Tap it.`, got: `Immune. A vaccination makes you immune to one disease before you ever catch it.` },
+    { match: [[`1796`, `Jenner develops his vaccine`], [`James Phipps`, `The healthy boy in the experiment`], [`Cowpox`, `The mild disease Jenner used`], [`Vacca`, `The Latin word for cow`], [`1980`, `The world is declared free of smallpox`]], ask: `Tap one on the left, then tap what goes with it.` },
+    { sort: [`Smallpox`, `Cowpox`], ask: `Smallpox or cowpox?`, items: [
+      [`A mild disease`, 1, `That's why Jenner could use it safely.`],
+      [`Nicknamed the speckled monster`, 0, `Its sores covered the whole body.`],
+      [`Caught by women who milked cows`, 1, `They caught it, and stayed safe from the deadly one.`],
+      [`Killed thousands of people in Europe`, 0, `It was a killer disease.`],
+      [`Gave vaccination its name`, 1, `"Vacca" is the Latin word for cow.`],
+      [`Could spread to the heart, brain and lungs`, 0, `That is what made it so deadly.`],
+    ] },
+    { card: `Laughed at first`, say: `Many people doubted Jenner and laughed at his idea. They were suspicious of putting cowpox into their bodies.`, eg: `When a rider tries a brand-new line through a corner, others often laugh, until it starts winning races.`, more: `A cartoon in your book makes fun of the vaccine, with cows growing out of people's bodies. It took many years before vaccination caught on.` },
+  ];
+
+  // ---------- Fleming and penicillin, page 184 ----------
+  T('his_fleming').notes = [
+    `Alexander Fleming found in his laboratory that ordinary mould can destroy germs, and in 1928 he tested it on animals without hurting them.`,
+    `From mould came penicillin, the world's first antibiotic: a medicine that destroys bacteria.`,
+    `Fleming couldn't make it safe for people. A later group of scientists did that about ten years on, in 1938, says your book.`,
+    `Before antibiotics, a simple throat infection could spread to other parts of the body.`,
+    `In World War II, penicillin kept bacteria out of soldiers' wounds.`,
+  ];
+  T('his_fleming').walk = [
+    { card: `Mould that kills germs`, say: `Alexander Fleming found out in his laboratory that ordinary mould can destroy germs. From mould came penicillin, the world's first antibiotic.`, eg: `The fuzzy stuff on stale bread or old cheese is mould. Never eat it! The medicine is made safely in a laboratory.`, more: `An antibiotic is a medicine that destroys bacteria. It doesn't work on viruses such as flu.` },
+    { tap: `Penicillin was the world's first antibiotic.`, find: `antibiotic`, ask: `Which word means a medicine that destroys bacteria? Tap it.`, got: `An antibiotic. Penicillin, made from mould, was the very first one.` },
+    { card: `Ten more years`, say: `In 1928 Fleming tested mould on animals, and they were not hurt. But he couldn't turn it into a medicine that was safe for people.`, eg: `It's like a new engine that runs well on the test bench. A team still needs time and more tests before it is safe to race.`, more: `A later group of scientists finished the job about ten years on. Your book says penicillin was first safe to inject into people in 1938, because 1928 + 10 = 1938.` },
+    { match: [[`1928`, `Fleming tests mould on animals`], [`1938`, `First safe to inject into people, says your book`], [`Laboratory`, `A room set up for scientific tests`], [`Penicillin`, `The world's first antibiotic`], [`Soldiers`, `Got it for their wounds in World War II`]], ask: `Tap one on the left, then tap what goes with it.` },
+    { sort: [`True of penicillin`, `Not true of penicillin`], ask: `Is this true of penicillin?`, items: [
+      [`It is made from mould.`, 0, `Fleming made it from ordinary mould.`],
+      [`It destroys bacteria.`, 0, `That is what an antibiotic does.`],
+      [`It cures flu and other viruses.`, 1, `Antibiotics work on bacteria, not on viruses such as flu.`],
+      [`Fleming could inject it into people straight away in 1928.`, 1, `He could only test it on animals. Others made it safe for people.`],
+      [`It kept bacteria out of soldiers' wounds in World War II.`, 0, `Infection was a big danger for wounded soldiers.`],
+      [`It puts patients to sleep.`, 1, `It fights germs. It doesn't make anyone sleep.`],
+      [`Eating mouldy bread works just as well.`, 1, `Never eat mouldy food. The medicine is made in a laboratory.`],
+    ] },
+  ];
+
+  // ---------- Surgery and safer operations, pages 185 to 187 ----------
+  T('his_ops').notes = [
+    `An operation means cutting the body open to fix or take out a damaged part, in a special room called the operating theatre.`,
+    `An anaesthetic keeps the patient deeply asleep so they feel no pain. Before anaesthetics, operations were terribly sore and many failed.`,
+    `To keep germs out of the wound, doctors and nurses scrub their hands and cover their heads, mouths and hands, and patients take antibiotics afterwards.`,
+    `A blood transfusion gives a patient blood that someone donated, to replace blood lost in the operation.`,
+    `X-rays let doctors see inside the body, so they can plan before the operation, and they use them during it too.`,
+  ];
+  T('his_ops').walk = [
+    { card: `No more pain`, say: `An operation means cutting the body open to fix or take out a damaged part. Before anaesthetics, operations were terribly sore, and many failed because the pain made patients move or go into shock.`, eg: `Even a small splinter hurts when someone digs it out. Now imagine a whole operation with nothing to stop the pain.`, more: `An anaesthetic keeps the patient in a very deep sleep, so they feel no pain at all during the operation.` },
+    { tap: `Doctors and nurses scrub their hands to keep germs out of the wound.`, find: `germs`, ask: `What are they keeping out of the wound? Tap the word.`, got: `Germs. Germs in a wound can cause a dangerous infection, so the operating theatre must be very clean.` },
+    { card: `Blood and X-rays`, say: `A patient can lose a lot of blood in an operation. A blood transfusion gives them blood that other people have donated.`, eg: `When people donate blood, it is kept in special bags until a patient needs it. Then it is pumped into the patient's body.`, more: `X-rays are pictures that let doctors see inside the body, such as a break in a bone. Doctors use them to plan before an operation, and during it too.` },
+    { match: [[`X-rays`, `Show doctors what is inside the body`], [`Anaesthetics`, `Stop the patient feeling pain`], [`Blood transfusions`, `Replace blood the patient has lost`], [`A clean operating theatre`, `Keeps germs out of the wound`]], ask: `Tap a discovery, then tap how it helps an operation.` },
+    { sort: [`Keeps germs away`, `Does a different job`], ask: `Does this keep germs away from the patient?`, items: [
+      [`Scrubbing hands clean`, 0, `Clean hands mean fewer germs.`],
+      [`Covering heads, mouths and hands`, 0, `It keeps the doctors' and nurses' germs away from the patient.`],
+      [`Taking antibiotics after the operation`, 0, `They keep germs out of the wound.`],
+      [`An X-ray before the operation`, 1, `It shows inside the body, so the doctors can plan.`],
+      [`An anaesthetic`, 1, `It keeps the patient deeply asleep and free of pain.`],
+      [`A blood transfusion`, 1, `It replaces blood the patient has lost.`],
+      [`A very clean operating theatre`, 0, `Germs in a wound can cause a dangerous infection.`],
+    ] },
+  ];
+
+  // ---------- The first heart transplant, pages 187 and 188 ----------
+  T('his_transplant').notes = [
+    `In December 1967, Professor Christiaan Barnard led a team from Groote Schuur Hospital in Cape Town in the world's first human heart transplant.`,
+    `Louis Washkansky's heart was failing. He was given the healthy heart of Denise Darvall, a young woman badly hurt in a car crash, after her father gave permission.`,
+    `Louis lived for 18 days and died of a lung infection, but the transplant itself worked, and heart doctors everywhere learned from it.`,
+    `It had never been done before, and Barnard said it made him world famous in two days.`,
+    `A point of view is what someone thinks: two newspaper stories were against the transplant, one because doctors had gone too far and one because it cost too much.`,
+  ];
+  T('his_transplant').walk = [
+    { card: `A first for the world`, say: `In December 1967, Professor Christiaan Barnard led a team of doctors and nurses from Groote Schuur Hospital in Cape Town. They did the world's first human heart transplant.`, eg: `Think of a South African sports star who wakes up famous after one big win. Barnard said the transplant made him world famous in just two days.`, more: `The story begins on a Saturday afternoon. The team moved a healthy heart into the body of a man whose own heart was failing.` },
+    { match: [[`Christiaan Barnard`, `Led the team of doctors and nurses`], [`Louis Washkansky`, `Received the new heart`], [`Denise Darvall`, `The young woman whose heart was used`], [`Denise Darvall's father`, `Gave permission for her heart to be used`], [`Groote Schuur Hospital`, `Where the team came from`]], ask: `Tap a name, then tap who or what they were.` },
+    { tap: `Louis Washkansky lived for 18 more days.`, find: `18`, ask: `How many days did he live after the operation? Tap the number.`, got: `18 days. A lung infection killed him, but the new heart had worked, so the operation was still called a success.` },
+    { card: `Two newspapers, two complaints`, say: `A point of view is what someone thinks. Newspaper story 1 said doctors should leave the heart alone. Newspaper story 2 said too much money was spent on one man while thousands of people went hungry.`, eg: `Two fans watch the same race. One says a pass was brilliant, the other says it was dirty. Same race, different points of view.`, more: `Both stories were against the transplant, for different reasons. Today many heart transplants work well, and patients can live for years.` },
+    { tap: `Newspaper story 2 called the transplant a big waste of money.`, find: `waste`, ask: `Which word shows most clearly that the writer disapproves? Tap it.`, got: `Waste. Calling something a waste shows a negative point of view.` },
+    { sort: [`Fact`, `Opinion`], ask: `Is it a fact you can check, or what someone thinks?`, items: [
+      [`The transplant took place in December 1967.`, 0, `You can check this.`],
+      [`Doctors have gone too far.`, 1, `That is what newspaper story 1 thinks.`],
+      [`Louis Washkansky lived for 18 days after the operation.`, 0, `You can check this.`],
+      [`The money was completely wasted.`, 1, `That is what newspaper story 2 thinks.`],
+      [`The team came from Groote Schuur Hospital.`, 0, `You can check this.`],
+      [`It is wrong to give one person another's heart.`, 1, `That is what someone thinks, not something you can check.`],
+    ] },
+  ];
+
+  // ---------- The usual wrong thinking in each written list ----------
+  S.his_vote.not = `It's easy to forget the main idea, so go back to it: in a democracy every adult citizen gets a free and fair vote, and the people, not one ruler, choose the leaders.`;
+  S.his_1994.not = `Keep the order straight: the National Party ruled until 1994, the 1994 elections brought democracy with the ANC on 63%, and the Constitution came later, in December 1996.`;
+  S.his_equal.not = `Ask whether the answer treats everybody the same, because under the law money, fame, a job or a title never changes how a court treats someone.`;
+  S.his_song.not = `Keep the two songs apart: Nkosi Sikelel' iAfrika is Enoch Sontonga's hymn from 1897, and Die Stem is CJ Langenhoven's poem from 1918.`;
+  S.his_healers.not = `Don't mix up the two kinds: indigenous medicine began in Africa and treats the whole person, while Western medicine began in Europe, is based on science and mainly treats the body.`;
+  S.his_plants.not = `Pair each plant with its facts: aloe juice for stomach aches, cuts and burns, and Buchu for stomach and bladder troubles, grown in the south-west Cape and picked only with a licence.`;
+  S.his_sangoma.not = `Picture the steps in order: chosen by the ancestors, taken to an experienced sangoma, many years as an initiate, then a welcome home with a goat and a celebration.`;
+  S.his_germs.not = `Keep the two scientists apart, because Pasteur linked germs with illness, while Koch named the TB germ in 1882.`;
+  S.his_jenner.not = `Follow Jenner's steps in order: mild cowpox first, then James got better, and only then smallpox, which couldn't harm him because he was immune.`;
+  S.his_fleming.not = `Keep the years and the people apart: Fleming found the mould and tested it on animals in 1928, and other scientists made penicillin safe for people about ten years later.`;
+  S.his_surgery.not = `Think about how each step makes an operation safer: the anaesthetic stops the pain, while clean hands, covers and antibiotics keep germs out of the wound.`;
+  S.his_aids.not = `Each discovery has one job: X-rays show inside the body, anaesthetics stop pain, transfusions replace lost blood, and a clean theatre keeps germs out.`;
+  S.his_heart.not = `Keep the people straight: Barnard led the team, Louis Washkansky got the new heart and lived 18 days, and Denise Darvall's father gave permission for her heart to be used.`;
+  S.his_views.not = `A fact can be checked, but a point of view is what someone thinks, so look for words like "wrong", "too far" or "waste" that show how the writer feels.`;
+})(typeof window !== 'undefined' ? window : globalThis);
+
+/* Natural Sciences, Topics 14 and 15: a rule card and a track walk for each of the eight book sections,
+   and a short reason a child reads straight after a wrong answer (not) for each written list.
+   Every fact comes from the questions in bank-science.js, which follow the book. Nothing here is marked. */
+(function (root) {
+  'use strict';
+  const RS = root.RS;
+  const { fmt } = RS;
+  const T = (id) => RS.packs.jordy.subjects.science.topics.find((t) => t.id === id);
+  const S = RS.packs.jordy.skills;
+
+  // ---------- The Sun and the solar system, pages 167 to 169 ----------
+  T('sci_solar').notes = [
+    `The Sun is a star: a huge ball of very hot gas that gives out its own heat and light. It is the only star in our solar system.`,
+    `The solar system is the Sun in the centre plus everything in orbit around it. That includes the planets, their moons and the asteroids.`,
+    `Planets are big bodies that revolve around the Sun. They aren't made of hot gas, so they make no heat or light of their own.`,
+    `An orbit is the path one space object follows around another. Each planet has its own, shaped like a slightly squashed circle called an ellipse.`,
+    `Asteroids are rocky lumps orbiting the Sun, mostly in the asteroid belt between Mars and Jupiter. Ceres is the largest, about ${fmt(1000)} km across.`,
+  ];
+  T('sci_solar').walk = [
+    { card: `The Sun is a star`, say: `Every star is a huge ball of very hot gas, and that hot gas gives out heat and light. The Sun is the only star in our solar system.`, eg: `A braai fire gives out heat you feel on your face and light you can see by. The Sun does both, with a surface of about ${fmt(6000)} °C.`, more: `Other stars give out heat and light too, but they are so much further away that it doesn't help us.` },
+    { tap: `An orbit is the path one space object follows around another.`, find: `path`, ask: `What is an orbit? Tap the word that tells you.`, got: `A path, or route. The Earth's path around the Sun is its orbit, like your line around a track.` },
+    { card: `Every planet has its own orbit`, say: `No two planets share an orbit. Each one follows its own path around the Sun, and that path is a slightly squashed circle.`, eg: `An oval track isn't a perfect circle, but you still go round and round it. A planet's orbit is like that.`, more: `The name for a flattened circle shape is an ellipse.` },
+    { match: [[`The Sun`, `The only star in our solar system`], [`Ceres`, `The largest asteroid, about ${fmt(1000)} km across`], [`The asteroid belt`, `Where most asteroids travel, between Mars and Jupiter`], [`An ellipse`, `The slightly squashed circle shape of an orbit`], [`About ${fmt(6000)} °C`, `How hot the Sun's surface is`]], ask: `Tap one, then tap what it tells you.` },
+    { sort: [`Gives out its own heat and light`, `Makes no heat or light of its own`], ask: `Does it shine by itself?`, items: [[`The Sun`, 0, `It is a star, made of very hot gas.`], [`The Earth`, 1, `It is a planet. Sunlight lights it, but it makes no light of its own.`], [`Ceres`, 1, `It is a rocky lump, not hot gas.`], [`A far-off star in the night sky`, 0, `Every star gives out heat and light. The others are just much further away than the Sun.`], [`Jupiter`, 1, `It is a gas giant, but its gas isn't very hot like a star's, so it makes no light of its own.`], [`Mars`, 1, `It is a rocky planet. No planet makes its own heat or light.`]] },
+    { card: `Rocky inside, gas outside`, say: `The four planets closest to the Sun are solid and rocky. The four outer planets are called gas giants, because they are huge balls of gas.`, eg: `Compare a cricket ball with a giant party balloon. One is solid right through, and the other is mostly gas.`, more: `There are eight planets, not nine. They differ in size, orbit, distance from the Sun, what they are made of and how many moons they have.` },
+  ];
+
+  // ---------- The eight planets, pages 170 to 173 ----------
+  T('sci_eight').notes = [
+    `In order from the Sun: Mercury, Venus, Earth, Mars, the asteroid belt, then Jupiter, Saturn, Uranus and Neptune.`,
+    `The four inner planets are rocky. The four outer ones are gas giants with rings, and Uranus and Neptune are also called ice giants.`,
+    `Further from the Sun usually means colder. But Venus is the hottest, because its thick carbon dioxide atmosphere traps heat, and Mercury has no atmosphere.`,
+    `Earth is the only planet with life: it has water, oxygen and a suitable temperature.`,
+    `Mars has red dust and the huge volcano Olympus Mons. Jupiter is the largest, with a giant red spot storm. Saturn has bright rings of frozen water.`,
+  ];
+  T('sci_eight').walk = [
+    { card: `What an atmosphere does`, say: `An atmosphere is a covering of gas around a planet. Mercury is the only planet without one. Venus has a very thick one, made of carbon dioxide, and it traps the Sun's heat.`, eg: `Leave a bakkie in the sun with the windows shut. Heat gets in but can't get out, so the inside gets far hotter than the air outside.`, more: `That is why Venus averages 500 °C and Mercury only 168 °C, even though Mercury is closer to the Sun.` },
+    { tap: `Venus is the hottest planet because its thick atmosphere traps heat.`, find: `atmosphere`, ask: `What makes Venus so hot? Tap the word.`, got: `Its atmosphere. Being close to the Sun isn't enough, because Mercury is closer and it is cooler.` },
+    { match: [[`Mercury`, `No atmosphere, fine soil and many craters`], [`Venus`, `A thick carbon dioxide atmosphere hides its volcanoes`], [`Earth`, `The blue planet, with water and oxygen`], [`Mars`, `Red dust and the huge volcano Olympus Mons`], [`Jupiter`, `The largest planet, with a giant red spot storm`]], ask: `Tap a planet, then tap its clues.` },
+    { sort: [`Inner rocky planet`, `Outer gas giant`], ask: `Which kind of planet is this clue about?`, items: [[`Bright rings of frozen water`, 1, `Those are Saturn's rings.`], [`No atmosphere at all`, 0, `That is Mercury, the closest planet to the Sun.`], [`Olympus Mons, a volcano 28 km high`, 0, `It is on Mars, the last of the four rocky planets.`], [`A giant red spot`, 1, `It is an enormous storm of gas on Jupiter.`], [`Methane that makes it look blue-green`, 1, `That is Uranus and Neptune, the ice giants.`], [`Animals breathing oxygen`, 0, `That only happens on Earth, the third planet.`], [`Made mainly of hydrogen and helium`, 1, `Jupiter and Saturn are, just like the Sun.`]] },
+    { card: `The gas giants`, say: `Jupiter and Saturn are made mainly of hydrogen and helium, the same gases as the Sun. Uranus and Neptune are made of frozen gas, so they are also called ice giants.`, eg: `Saturn is so light that scientists think it would float, if you could find a bath big enough to drop it in.`, more: `Methane gives Uranus and Neptune their blue-green colour. Uranus seems to lie on its side, because its axis is tilted over.` },
+    { tap: `Saturn is the furthest planet you can spot with just your eyes.`, find: `saturn`, ask: `Which planet is the furthest one you can see without help? Tap it.`, got: `Saturn. To see Uranus or Neptune, you need a telescope or binoculars.` },
+  ];
+
+  // ---------- Trips around the Sun, pages 173 and 174 ----------
+  T('sci_trips').notes = [
+    `A year is the time a planet takes to revolve once around the Sun. The Earth takes 365¼ days.`,
+    `We count 365 days and leave out the quarter. Every fourth year, the four quarters make one extra day: a leap year.`,
+    `The further a planet is from the Sun, the longer it takes to go around once.`,
+    `Mercury has the shortest year, 88 Earth days. Neptune has the longest, ${fmt(164.8)} Earth years.`,
+    `Watch the units: the times are in Earth days for the inner planets and in Earth years from the asteroids outwards.`,
+  ];
+  T('sci_trips').walk = [
+    { card: `What is a year?`, say: `A year is the time a planet takes to revolve once around the Sun. The Earth takes 365¼ days.`, eg: `Every birthday means the Earth has finished one more trip around the Sun since your last one.`, more: `We measure every planet's year in Earth time, using Earth days and Earth years.` },
+    { card: `Why we need a leap year`, say: `Most years we count only 365 days and leave out the quarter day. After four years, those four quarters add up to one whole day.`, eg: `Drop 25c into a tin every day. After four days you have R1, one whole rand.`, more: `So every fourth year gets one extra day. That year is called a leap year.` },
+    { tap: `A leap year makes up for the quarter days we leave out.`, find: `quarter`, ask: `What does a leap year make up for? Tap the key word.`, got: `The quarter days. ¼ + ¼ + ¼ + ¼ = 1, so every fourth year gets one extra day.` },
+    { card: `Further out, longer trip`, say: `The further a planet is from the Sun, the longer it takes to go around once. Mercury travels fast and has less far to go. Neptune has a huge trip and travels more slowly.`, eg: `Two riders set off at once. One takes the short loop near the pits, and the other takes the long loop out in the hills at a slower pace. The short-loop rider is back long before the other.`, more: `Asteroids are at different distances from the Sun, so they take different times: 3 to 6 Earth years.` },
+    { match: [[`88 Earth days`, `Mercury`], [`365¼ days`, `Earth`], [`3 to 6 Earth years`, `The asteroids`], [`${fmt(11.9)} Earth years`, `Jupiter`], [`${fmt(164.8)} Earth years`, `Neptune`]], ask: `Tap a time, then tap what takes that long to go around the Sun.` },
+    { sort: [`Shorter year than Earth's`, `Longer year than Earth's`], ask: `How does its year compare with ours?`, items: [[`Mercury`, 0, `88 Earth days. It is the closest planet, so its year is the shortest.`], [`Venus`, 0, `225 Earth days, which is less than our 365.`], [`Mars`, 1, `687 Earth days, which is more than our 365.`], [`The asteroids`, 1, `3 to 6 Earth years. They are further out than Mars.`], [`Saturn`, 1, `${fmt(29.5)} Earth years.`], [`Uranus`, 1, `84 Earth years.`], [`Neptune`, 1, `${fmt(164.8)} Earth years, the longest year of all.`]] },
+  ];
+
+  // ---------- Moons and craters, pages 176 and 177 ----------
+  T('sci_moons2').notes = [
+    `A moon is a rocky body that orbits a planet. Mercury and Venus have none.`,
+    `Moons differ a lot. Ganymede, a moon of Jupiter, is bigger than the planet Mercury. Telesto, a moon of Saturn, is only 24 km wide.`,
+    `Moons make no heat or light of their own. Our Moon shines only because sunlight lands on it, so we see only its sunlit part.`,
+    `The Moon's surface has mountains (the light areas), plains (flat, low areas that look dark because of dark rock) and craters.`,
+    `A crater is a big round hole with a raised rim. Scientists think big rocks from space smashed into the Moon and made them.`,
+  ];
+  T('sci_moons2').walk = [
+    { card: `What is a moon?`, say: `A moon is a rocky body that travels around a planet. Earth's own one is called the Moon, with a capital M.`, eg: `Walk across the veld while your dog runs circles around you. You are the planet, and the dog is your moon.`, more: `Mercury and Venus have no moon at all. Scientists believe more moons are still waiting to be found.` },
+    { card: `Moons don't shine`, say: `Only stars give out their own heat and light, because only stars are balls of hot gas. Moons aren't, so our Moon only shines because sunlight lands on it.`, eg: `The reflector on a bike makes no light. It only glows when car headlights hit it.`, more: `We only see the sunlit part of the Moon. If the Sun stopped shining on it, the Moon would vanish from view.` },
+    { card: `Craters`, say: `The Moon isn't smooth. Its surface has mountains, plains and craters. A crater is a big round hole with a raised rim.`, eg: `Drop a stone into a heap of sand. It leaves a round hole with sand pushed up around the edge: a crater of your own.`, more: `Scientists think big rocks from space smashed into the Moon many years ago and made its craters.` },
+    { tap: `On a photograph of the Moon, the plains are dark and the mountains are light.`, find: `light`, ask: `How do the Moon's mountains look on a photograph? Tap the word.`, got: `Light. The plains are the dark parts, because dark rock lies over them. They are flat and lower-lying.` },
+    { match: [[`Ganymede`, `A moon of Jupiter, bigger than the planet Mercury`], [`Telesto`, `A moon of Saturn, only 24 km wide`], [`A crater`, `A big round hole with a raised rim`], [`Plains`, `Flat, low areas covered in dark rock`], [`Mountains`, `The light areas on a photograph`]], ask: `Tap a name, then tap what it means.` },
+    { sort: [`True`, `False`], ask: `True or false?`, items: [[`Every planet has at least one moon.`, 1, `Mercury and Venus have none.`], [`Moons can be very different in size.`, 0, `Ganymede is bigger than Mercury, and Telesto is only 24 km wide.`], [`The Moon is smooth all over.`, 1, `It has mountains, plains and craters.`], [`Moons give out their own light.`, 1, `They aren't balls of hot gas, so they can't.`], [`Some moons are covered in ice.`, 0, `Telesto's surface is covered with ice.`], [`Scientists have found every moon there is.`, 1, `They believe more are still waiting to be found.`], [`A crater has a raised rim.`, 0, `It is a big round hole with higher land around the edge.`]] },
+  ];
+
+  // ---------- Day and night, pages 183 to 185 ----------
+  T('sci_spin').notes = [
+    `The axis is an imaginary line through the middle of the Earth, from the North Pole to the South Pole.`,
+    `Rotation is spinning on its own axis. Revolution is travelling around another body.`,
+    `The Earth rotates from west to east, anticlockwise seen from above the North Pole. One rotation takes 24 hours.`,
+    `Rotation causes day and night: the side turned towards the Sun has day, and the side turned away has night.`,
+    `The Sun doesn't move around us. The Earth turns, carrying each place from light into dark and back again.`,
+  ];
+  T('sci_spin').walk = [
+    { card: `The axis`, say: `An axis is an imaginary line through the middle of something. The Earth's axis runs from the North Pole to the South Pole, through the centre.`, eg: `Push a knitting needle through an orange from top to bottom and twirl it. The orange is the Earth, and the needle is its axis. The real axis is imaginary, so nobody could ever see or touch it.`, more: `Every planet has its own axis, and the Moon rotates on its own axis too.` },
+    { tap: `Rotation means spinning on an axis, and revolution means travelling around another body.`, find: `rotation`, ask: `Which word means spinning on the spot? Tap it.`, got: `Rotation. Revolution is the other one: a trip around another body.` },
+    { sort: [`Rotation`, `Revolution`], ask: `Is this spinning, or going around something?`, items: [[`The Earth spinning once in 24 hours`, 0, `It spins on its own axis.`], [`The Earth going around the Sun`, 1, `One space body is travelling around another.`], [`A wheel spinning on its axle`, 0, `It turns on the spot, around its own middle.`], [`The Moon travelling around the Earth`, 1, `The Moon goes around another body, the Earth.`], [`A globe turning on its stand`, 0, `It spins on its axis without going anywhere.`], [`A rider doing laps around a track`, 1, `The rider travels around something else, like the Earth around the Sun.`], [`The Moon spinning on its own axis`, 0, `Spinning on an axis is always rotation.`]] },
+    { card: `Day and night`, say: `The Sun can only light the side of the Earth that faces it. That side has day, and the side turned away has night. As the Earth rotates, every place moves from light into dark and back again.`, eg: `Shine a torch at a globe in a dark garage. The torch is the Sun. One half of the globe lights up and the other half stays dark. Turn the globe slowly, and watch South Africa move from dark into light.`, more: `The Sun doesn't move around us. Morning comes to South Africa when the Earth turns it towards the Sun, about 24 hours after the last sunrise.` },
+    { match: [[`The orange`, `The Earth`], [`The knitting needle`, `The Earth's axis`], [`The torch`, `The Sun`], [`24 hours`, `One full rotation of the Earth`], [`Anticlockwise`, `How the Earth spins, seen from above the North Pole`]], ask: `Tap one, then tap what it stands for or means.` },
+    { tap: `The Earth rotates from west to east.`, find: `east`, ask: `Which way does the Earth turn? Tap the direction it turns towards.`, got: `East. It turns from west to east, which is anticlockwise when you look down on the North Pole.` },
+  ];
+
+  // ---------- How the Moon moves, pages 189 to 193 ----------
+  T('sci_moonmove').notes = [
+    `The Moon is Earth's closest neighbour. It is much nearer than the Sun, and sunlight lights it up.`,
+    `In your book, the Moon takes about 28 days to rotate once, and 28 days to revolve once around the Earth: about one month.`,
+    `The two times are equal, so the same face of the Moon always points at us. We only ever see one side.`,
+    `Sunlight still reaches every part of the Moon at some stage, as it rotates.`,
+    `The Moon has no orbit of its own around the Sun. It goes around the Sun along with the Earth.`,
+  ];
+  T('sci_moonmove').walk = [
+    { card: `Two moves in the same time`, say: `The Moon rotates on its axis, and it revolves around the Earth. Your book gives about 28 days for each, which is about one month.`, eg: `Walk a full circle around a braai, always facing the fire. When you get back to the start, you have also turned all the way around once.`, more: `In the time the Moon rotates once, the Earth rotates 28 times. The Earth is by far the faster spinner.` },
+    { tap: `We only see one side of the Moon because its rotation and revolution take equal time.`, find: `equal`, ask: `Why do we only ever see one face of the Moon? Tap the key word.`, got: `Equal. One spin takes as long as one trip around the Earth, so the same face keeps pointing at us.` },
+    { card: `The seat model`, say: `Sit on a seat while a partner walks a full circle around you, always facing you. You only ever see their front. You are the Earth, and your partner is the Moon.`, eg: `Now leave the seat empty and watch from outside the circle. You see their front, side, back, other side and front again.`, more: `So your partner turned around once while going around the seat once. That is exactly what the Moon does.` },
+    { card: `Every part gets sunlight`, say: `Don't mix up two different sides. The side facing the Earth never changes, but the side facing the Sun keeps changing as the Moon rotates.`, eg: `Walk around a friend while always facing them. Your friend only sees your front, but the sunshine lands on your back, your sides and your front in turn.`, more: `The side towards the Sun is lit and the other side is dark, like day and night on Earth.` },
+    { match: [[`The seat`, `The Earth`], [`Your partner`, `The Moon`], [`About 28 days`, `One rotation of the Moon`], [`24 hours`, `One rotation of the Earth`], [`Anticlockwise`, `How the Moon travels around the Earth, seen from above the North Pole`]], ask: `Tap one, then tap what it stands for or means.` },
+    { sort: [`The Earth`, `The Moon`], ask: `Which one does this?`, items: [[`Rotates once in 24 hours`, 0, `One spin of the Earth gives one day and one night.`], [`Rotates once in about 28 days`, 1, `Your book gives the Moon about 28 days for one spin.`], [`Has its own orbit around the Sun`, 0, `The Moon has no orbit of its own around the Sun. It goes along with the Earth.`], [`Revolves around the Earth`, 1, `It takes 28 days, about one month.`], [`Rotates 28 times while the other rotates once`, 0, `The Earth is the faster spinner.`], [`Shows us the same face all the time`, 1, `Its spin and its trip around us take equal time.`]] },
+  ];
+
+  // ---------- Sun, Moon and Earth compared, pages 182, 194 and 196 ----------
+  T('sci_compare').notes = [
+    `The Sun is a star made of very hot gas. The Earth is a rocky planet with soil and water on top. The Moon is a moon made of rock.`,
+    `All three are round. Only the Sun makes its own light.`,
+    `Biggest to smallest: the Sun, the Earth, the Moon.`,
+    `The Earth rotates in 24 hours and revolves around the Sun in a year. The Moon revolves around the Earth in about a month, and goes around the Sun with the Earth.`,
+    `Compared with the rocky planets, the gas giants are much bigger, much further from the Sun, made of gas, and have many more moons.`,
+  ];
+  T('sci_compare').walk = [
+    { card: `Three round bodies`, say: `The Sun, the Earth and the Moon are all round, but they are three different kinds of body: a star, a planet and a moon.`, eg: `Picture race day: the Sun is the big floodlight in the middle, the Earth rides laps around it, and the Moon sticks close to the Earth the whole way.`, more: `The Sun is the biggest of the three and the Moon is the smallest.` },
+    { tap: `Only the Sun can produce its own light, because it is made of very hot gas.`, find: `gas`, ask: `Why can only the Sun make light? Tap what it is made of.`, got: `Gas, and very hot gas at that. The Earth and the Moon are made of rock, so they can't make light.` },
+    { sort: [`True of the Sun`, `True of the Moon`], ask: `Which one is this true of?`, items: [[`It is a star.`, 0, `It is the only star in the solar system.`], [`It is made of rock.`, 1, `The Moon is a rocky body. The Sun is very hot gas.`], [`It makes its own light.`, 0, `Only a ball of very hot gas can do that.`], [`It is the smallest of the three.`, 1, `The Moon is smaller than the Earth, and the Sun is by far the biggest.`], [`It sits at the centre of the solar system.`, 0, `The Earth and the Moon revolve around it.`], [`It revolves around the Earth.`, 1, `It takes about 28 days to go around once.`], [`It is the biggest of the three.`, 0, `The Sun is far bigger than the Earth and the Moon.`]] },
+    { card: `How they move`, say: `The Sun sits in the centre. The Earth rotates on its axis and revolves around the Sun. The Moon does three things: it rotates, it revolves around the Earth, and it goes around the Sun along with the Earth.`, eg: `A kid rides circles around his dad while his dad rides one big lap of the track. The kid goes all the way round the track too, just by staying with his dad.`, more: `The Earth's rotation takes 24 hours, and its trip around the Sun takes 365¼ days. The Moon's trip around the Earth takes about 28 days.` },
+    { match: [[`Rotation`, `Spinning on an axis`], [`Revolution`, `Travelling around another body`], [`Orbit`, `The route a planet follows around the Sun`], [`Year`, `One trip of the Earth around the Sun`], [`Month`, `One trip of the Moon around the Earth`]], ask: `Tap a word, then tap what it means.` },
+    { card: `Gas giants and rocky planets`, say: `Compared with the rocky planets, the gas giants are much bigger and much further from the Sun. They are made of gas, and they have many more moons.`, eg: `Park a 50 cc kids' bike next to a 450, and the difference jumps out at you. The gas giants are the 450s of the solar system.`, more: `Earth has only one moon, but each gas giant has many more.` },
+  ];
+
+  // ---------- Units of measurement, page 195 ----------
+  T('sci_units').notes = [
+    `A unit is a fixed amount we measure with. A number with no unit doesn't tell you how big something is.`,
+    `Length or distance: km, m, cm, mm. Amount of liquid (volume): ℓ, ml. Mass: kg, g.`,
+    `Temperature: °C, degrees Celsius. Time: h, min, s.`,
+    `Watch the look-alikes: ml is millilitre, mm is millimetre, and min is minute.`,
+    `The planet facts use million km for distance from the Sun, km for width, °C for temperature, and Earth days or Earth years for a trip around the Sun.`,
+  ];
+  T('sci_units').walk = [
+    { card: `Why units matter`, say: `A unit is a fixed amount we measure things with. Without one, a number doesn't tell you how big something is.`, eg: `"The jump is 20 long" tells you nothing. 20 m is a big double. 20 mm is about the size of a pebble.`, more: `You can measure the same thing in different sized units, so always write the unit next to the number.` },
+    { match: [[`Length or distance`, `km, m, cm and mm`], [`Amount of liquid`, `ℓ and ml`], [`Mass`, `kg and g`], [`Temperature`, `°C`], [`Time`, `h, min and s`]], ask: `Tap what you are measuring, then tap its units.` },
+    { tap: `After the moto, the rider drank 500 ml of water.`, find: `ml`, ask: `Which word is the unit? Tap it.`, got: `ml, short for millilitre. It measures the amount of a liquid.` },
+    { sort: [`Measures length`, `Measures something else`], ask: `What does this unit measure?`, items: [[`mm`, 0, `Millimetre, a small unit of length.`], [`ml`, 1, `Millilitre, for the amount of a liquid.`], [`min`, 1, `Minute, for time.`], [`km`, 0, `Kilometre, for long distances.`], [`kg`, 1, `Kilogram, for mass.`], [`cm`, 0, `Centimetre, a length you can read on a ruler.`], [`s`, 1, `Second, for time.`]] },
+    { card: `The right tool`, say: `Each kind of measuring has its own tool. Use a ruler or a tape measure for length, and a stopwatch to time something.`, eg: `At the track, a stopwatch times your lap in min and s, and a tape measure tells you how long a jump is in m.`, more: `The tool and the unit go together: a ruler gives you cm or mm, and a stopwatch gives you min and s.` },
+    { match: [[`Million km`, `How far a planet is from the Sun`], [`km`, `How wide a planet is`], [`°C`, `A planet's temperature`], [`Earth years`, `How long the outer planets take to go around the Sun`], [`km per hour`, `How fast the winds blow`]], ask: `Tap a unit, then tap what your book uses it for.` },
+  ];
+
+  // ---------- The usual wrong thinking in each written list ----------
+  S.sci_sun.not = `It's easy to mix up stars and planets, so remember: a star is very hot gas that shines by itself, and everything else in the solar system just travels around it.`;
+  S.sci_each.not = `Don't go by distance from the Sun alone: match each planet to its own clue, like Venus's heat-trapping atmosphere, Mars's red dust or Saturn's frozen-water rings.`;
+  S.sci_years.not = `A planet's year depends on how far it is from the Sun, not on its size, so picture its lap: the further out, the longer the trip.`;
+  S.sci_moons2.not = `A moon is rock or ice, not hot gas, so it only shines where sunlight lands on it, and moons can be very different from one another.`;
+  S.sci_spin.not = `Day and night come from the Earth spinning on its axis, not from the Sun moving or from the Earth's trip around the Sun.`;
+  S.sci_moonmove.not = `The Moon's spin and its trip around the Earth take the same time, so keep the two words straight: rotate means spin, and revolve means go around.`;
+  S.sci_compare.not = `Sort out the three bodies first: the Sun is a star of very hot gas, the Earth is a rocky planet and the Moon is a rocky moon, and only the star makes light.`;
+  S.sci_units.not = `Look at what is being measured before you pick a unit, and watch the look-alikes: ml is for liquid, mm is for length and min is for time.`;
 })(typeof window !== 'undefined' ? window : globalThis);
 
 /* November 2026: more of Kash's Afrikaans, on the mind maps at the front of die strand Taalboek, and Track walks for five sections. */
@@ -9217,7 +9937,7 @@ Jordy's Science test, Tuesday 10 November: Planet Earth and Beyond. Written from
   // ---------- staying up to date ----------
   // An open tab or a home screen app keeps running the page it first loaded, old prices and all. So it asks which version
   // is live when it comes back into view and every few minutes, and swaps over between races. build.mjs fills in BUILD.
-  const BUILD = 'd04dcb50af';
+  const BUILD = '1da98bc795';
   const BACK_KEY = 'holeshot.back.v1';
   const TRIED_KEY = 'holeshot.tried.v1';
   let liveBuild = null;
@@ -9851,7 +10571,7 @@ Jordy's Science test, Tuesday 10 November: Planet Earth and Beyond. Written from
       ${planCard(p, pack)}
       <div class="home-grid">
         <section class="hero" aria-label="Today's moto">
-          <div class="hero-photo">${photo('hero-jump', 'A rider whipping a dirt bike over a jump')}<span class="chip on-photo ${doneToday ? '' : 'lime'}">${doneToday ? 'Done today' : 'Ready'}</span></div>
+          <div class="hero-photo mine">${rig(p, `${pack.name} on his ${BIKES[p.bike] ? BIKES[p.bike].label : 'Mini MX'} bike`)}<span class="chip on-photo ${doneToday ? '' : 'lime'}">${doneToday ? 'Done today' : 'Ready'}</span></div>
           <div class="hero-pad">
             <div><div class="eyebrow">${sub.label} · ${sub.scope}</div><h2>Today's moto</h2></div>
             <div class="trio">
@@ -9868,6 +10588,7 @@ Jordy's Science test, Tuesday 10 November: Planet Earth and Beyond. Written from
           </div>
         </section>
         <div class="home-side">
+          ${goalCard(p)}
           ${comebackCard(p, sub)}
           ${fixCard(p, sub)}
           ${stuckCard(p, sub)}
@@ -10044,6 +10765,20 @@ Jordy's Science test, Tuesday 10 November: Planet Earth and Beyond. Written from
       <p class="small-t muted">${foot}</p>
     </section>`;
   }
+  // A goal he picks in the pits. It only shows how close he is: prices and points don't change.
+  function goalCard(p) {
+    const g = p.goal;
+    if (!g || !shopOf(g.tab) || !shopOf(g.tab)[g.id] || hasItem(p, g.tab, g.id)) return '';
+    const item = shopOf(g.tab)[g.id];
+    const need = stillNeeds(p, item);
+    const pct = Math.min(100, Math.round((100 * p.points) / Math.max(1, item.cost)));
+    const short = item.cost - p.points;
+    return `<section class="card goal" aria-label="Saving for">
+      <div class="hero-head"><div><div class="eyebrow">Saving for</div><div class="h-sec">${item.label}</div></div><span class="chip ${pct >= 100 && !need ? 'lime' : ''} num">${pct}%</span></div>
+      <div class="meter" role="img" aria-label="${pct} percent of the points"><i style="width:${pct}%"></i></div>
+      <p class="small-t muted num">${short > 0 ? `${RS.fmt(p.points)} of ${RS.fmt(item.cost)} points. ${RS.fmt(short)} to go, about ${Math.ceil(short / 140)} races.` : 'You have the points.'}${need ? ` It also needs: ${need}.` : short > 0 ? '' : ' Go to the pits to buy it.'}</p>
+    </section>`;
+  }
   function fixCard(p, sub) {
     const n = fixList(p, sub).length;
     if (!n) return '';
@@ -10065,10 +10800,24 @@ Jordy's Science test, Tuesday 10 November: Planet Earth and Beyond. Written from
     </div>`;
   }
 
-  // A section's own rule beats the general hint.
+  // A section's own rule beats the general hint: the one that shares most words with the question,
+  // as long as it doesn't give the answer away. True or false questions keep the general hint, because
+  // a rule that fits them nearly always answers them.
+  const wordsOf = (x) => new Set(RS.plain(String(x)).toLowerCase().split(/[^\p{L}\p{N}'-]+/u).filter((w) => w.length >= 4));
+  function givesAway(note, q) {
+    const n = RS.plain(note).toLowerCase();
+    const ans = RS.plain(String(q.correct || '')).toLowerCase().trim();
+    if (!ans) return false;
+    if (n.includes(ans) || (ans.match(/\d+/g) || []).some((d) => n.includes(d))) return true;
+    const key = [...wordsOf(ans)];
+    return key.length > 0 && key.filter((w) => n.includes(w)).length / key.length >= 0.5;
+  }
   const hintFor = (q) => {
     const t = topicOf(q.skill);
-    return q.hint === RS.DEFAULT_HINT && t && t.notes ? t.notes[0] : q.hint;
+    if (q.hint !== RS.DEFAULT_HINT || !t || !t.notes || /^(true|false)$/i.test(RS.plain(String(q.correct || '')).trim())) return q.hint;
+    const asked = wordsOf(q.q);
+    const best = t.notes.filter((n) => !givesAway(n, q)).map((n) => ({ n, shared: [...wordsOf(n)].filter((w) => asked.has(w)).length })).sort((x, y) => y.shared - x.shared)[0];
+    return best && best.shared ? best.n : q.hint;
   };
   // A wrong answer is a lesson, then a similar question straight away. If that goes wrong too, one more, and then the race moves on.
   const kindOf = (text) => RS.plain(text).replace(/"[^"]*"/g, '').trim().toLowerCase().split(/\s+/).slice(0, 4).join(' ');
@@ -10273,7 +11022,7 @@ Jordy's Science test, Tuesday 10 November: Planet Earth and Beyond. Written from
     const note = need ? `${need}, then ${RS.fmt(item.cost)} points` : short > 0 ? `${RS.fmt(item.cost)} points. You need ${RS.fmt(short)} more.` : `${RS.fmt(item.cost)} points`;
     return `<div class="try-bar" role="status">
       <div><b>${item.label}</b><div class="small-t muted num">${note}</div></div>
-      ${need || short > 0 ? '' : '<button class="btn primary small" data-act="buy-try">Buy</button>'}
+      ${need || short > 0 ? (p.goal && p.goal.id === ui.tryOn.id && p.goal.tab === ui.tryOn.tab ? '<span class="chip good">Saving for it</span>' : '<button class="btn primary small" data-act="goal">Save for it</button>') : '<button class="btn primary small" data-act="buy-try">Buy</button>'}
       <button class="btn small" data-act="try-off">Take off</button>
     </div>`;
   }
@@ -10471,7 +11220,7 @@ Jordy's Science test, Tuesday 10 November: Planet Earth and Beyond. Written from
     if (mode === 'review' && !dueList(P(), sub).length) mode = 'daily';
     const n = mode === 'exam' ? sub.examSize : mode === 'review' ? Math.min(10, dueList(P(), sub).length) : 10;
     ui.result = null;
-    ui.run = { id: uuid(), mode, topicId, queue: buildQueue(P(), sub, mode, topicId, n).map((slot) => (typeof slot === 'string' ? { skill: slot } : slot)), i: 0, total: n, q: null, typed: '', tries: 0, combo: 0, bestCombo: 0, pts: 0, score: 0, right: 0, log: [], extras: 0, asked: new Set(), sheet: null, heard: '', listening: false, started: Date.now(), halfPay: mode === 'topic' && ((P().topics[topicId] || {}).stars || 0) >= 3, fixed: [], fixNote: '', firstGiven: null, qStart: Date.now(), penalty: 0 };
+    ui.run = { id: uuid(), mode, topicId, queue: buildQueue(P(), sub, mode, topicId, n).map((slot) => (typeof slot === 'string' ? { skill: slot } : slot)), i: 0, total: n, q: null, typed: '', tries: 0, combo: 0, bestCombo: 0, pts: 0, score: 0, right: 0, log: [], extras: 0, asked: new Set(), sheet: null, heard: '', listening: false, started: Date.now(), halfPay: mode === 'topic' && ((P().topics[topicId] || {}).stars || 0) >= 3, fixed: [], fixNote: '', firstGiven: null, qStart: Date.now(), penalty: 0, gate: true, trace: [], before: Object.fromEntries(sub.topics.map((t) => [t.id, mastery(P(), t)])) };
     audio();
     nextQuestion();
     if (mode === 'lap') {
@@ -10516,6 +11265,7 @@ Jordy's Science test, Tuesday 10 November: Planet Earth and Beyond. Written from
       if (!fn.items) p.seen[slot.skill] = [...made, RS.shortHash(key)].slice(-12);
     }
     r.asked.add(key);
+    r.trace[r.i] = r.pts;
     q.skill = slot.skill;
     q.bonus = !!slot.bonus;
     r.q = q;
@@ -10738,8 +11488,18 @@ Jordy's Science test, Tuesday 10 November: Planet Earth and Beyond. Written from
     const secs = Math.min(1200, Math.round((Date.now() - r.started) / 1000));
     dayLog(p).secs = (dayLog(p).secs || 0) + secs;
     p.runs.unshift({ label: `${sub.label}: ${label}`, pct, right: r.right, total: r.total, pts: r.pts, when: today, mode: r.mode });
+    // A section full for the very first time gets its own moment. It can drop back and fill again, but that only counts once.
+    const firstClears = sub.topics.filter((t) => !t.warmup && isCleared(p, t) && !(p.topics[t.id] || {}).clearedAt).map((t) => {
+      (p.topics[t.id] = p.topics[t.id] || {}).clearedAt = today;
+      return t.title;
+    });
+    const moved = sub.topics.map((t) => ({ title: t.title, from: Math.round(100 * (r.before[t.id] || 0)), to: Math.round(100 * mastery(p, t)) })).filter((m) => m.from !== m.to).sort((a, b) => Math.abs(b.to - b.from) - Math.abs(a.to - a.from)).slice(0, 4);
+    p.ghost = p.ghost || {};
+    const gk = ghostKey(r);
+    const oldGhost = p.ghost[gk];
+    if (r.mode !== 'lap' && (!oldGhost || r.pts > oldGhost.pts)) p.ghost[gk] = { pts: r.pts, trace: [...r.trace.slice(0, r.i), r.pts] };
     p.runs = p.runs.slice(0, 30);
-    const x = { lap, label, pct, stars: earnedStars, pts: r.pts, bonus, bestCombo: r.bestCombo, right: r.right, total: r.total, second: r.log.filter((l) => l.ok && !l.firstTry && !l.bonus).length, mode: r.mode, topicId: r.topicId, missed: r.log.filter((l) => !l.ok), newBadges: [], streak: p.streak, halfPay: r.halfPay, newRank: rankNow > rankBefore ? RANKS[rankNow - 1][0] : '', fixed: new Set(r.fixed.filter((id) => !p.fix[id])).size, fixLeft: fixList(p, sub).length, stuck: stuckList(p, sub).length, held: r.log.filter((l) => l.ok && l.firstTry && !l.bonus).length, dueLeft: dueList(p, sub).length, mins: Math.round(dayLog(p).secs / 60) };
+    const x = { lap, label, pct, stars: earnedStars, pts: r.pts, bonus, bestCombo: r.bestCombo, right: r.right, total: r.total, second: r.log.filter((l) => l.ok && !l.firstTry && !l.bonus).length, mode: r.mode, topicId: r.topicId, missed: r.log.filter((l) => !l.ok), newBadges: [], streak: p.streak, halfPay: r.halfPay, newRank: rankNow > rankBefore ? RANKS[rankNow - 1][0] : '', fixed: new Set(r.fixed.filter((id) => !p.fix[id])).size, fixLeft: fixList(p, sub).length, stuck: stuckList(p, sub).length, held: r.log.filter((l) => l.ok && l.firstTry && !l.bonus).length, dueLeft: dueList(p, sub).length, mins: Math.round(dayLog(p).secs / 60), firstClears, moved, beatGhost: !!oldGhost && r.mode !== 'lap' && r.pts > oldGhost.pts };
     for (const b of BADGES) {
       if (!p.badges.includes(b.id) && b.test(p, x, sub)) {
         p.badges.push(b.id);
@@ -10768,7 +11528,7 @@ Jordy's Science test, Tuesday 10 November: Planet Earth and Beyond. Written from
     render();
     window.scrollTo(0, 0);
     sfx('fanfare');
-    if (lap ? lap.record || lap.first : earnedStars >= 2) confetti();
+    if (lap ? lap.record || lap.first : earnedStars >= 2 || firstClears.length) confetti();
   }
 
   // ---------- drawing the moto ----------
@@ -10956,6 +11716,14 @@ Jordy's Science test, Tuesday 10 November: Planet Earth and Beyond. Written from
     </div>`;
   }
 
+  // The ghost is his own best race of the same kind, and shows how many points it had at this question.
+  const ghostKey = (r) => `${ui.subject}:${r.mode}:${r.topicId || ''}`;
+  function ghostChip(r) {
+    const g = (P().ghost || {})[ghostKey(r)];
+    if (!g || r.mode === 'lap' || r.i === 0 || g.trace[r.i] == null) return '';
+    const diff = r.pts - g.trace[r.i];
+    return `<span class="ghost ${diff >= 0 ? 'ahead' : ''}" title="Your best race of this kind had ${g.trace[r.i]} points here">${diff >= 0 ? `+${diff}` : diff} on your ghost</span>`;
+  }
   function viewRun() {
     const r = ui.run;
     const q = r.q;
@@ -10968,8 +11736,9 @@ Jordy's Science test, Tuesday 10 November: Planet Earth and Beyond. Written from
         ${roadBar(pct, true)}
         ${r.mode === 'lap'
           ? `<div class="run-score"><b id="lap-clock" class="lap-clock">${lapText(Date.now() - r.started + r.penalty * 1000)}</b><small class="small-t muted">${r.penalty ? `+${r.penalty} s penalty` : 'clean so far'}</small></div>`
-          : `<div class="run-score"><b>${RS.fmt(r.pts)}</b>${mult > 1 ? `<span class="combo">${ic('bolt', 11, true)} ×${mult}</span>` : `<small class="small-t muted">points</small>`}</div>`}
+          : `<div class="run-score"><b>${RS.fmt(r.pts)}</b>${mult > 1 ? `<span class="combo">${ic('bolt', 11, true)} ×${mult}</span>` : `<small class="small-t muted">points</small>`}${ghostChip(r)}</div>`}
       </header>
+      ${r.gate && r.i === 0 ? '<div class="gate-drop" aria-hidden="true"><span>Gate drop!</span></div>' : ''}
       <div class="run-body">
         <article class="q-card ${!q.visual && RS.plain(q.q).length <= 30 ? 'bare' : ''}">
           <div class="q-meta">
@@ -10988,6 +11757,10 @@ Jordy's Science test, Tuesday 10 November: Planet Earth and Beyond. Written from
     </section>`;
   }
   function drawRun() {
+    // The gate drops once, on the first question.
+    setTimeout(() => {
+      if (ui.run) ui.run.gate = false;
+    }, 0);
     $('#app').innerHTML = viewRun();
     const primary = document.querySelector('[data-primary]');
     if (primary) primary.focus({ preventScroll: true });
@@ -11032,7 +11805,7 @@ Jordy's Science test, Tuesday 10 November: Planet Earth and Beyond. Written from
     const again = `data-act="start" data-mode="${x.mode}" ${x.topicId ? `data-topic="${x.topicId}"` : ''}`;
     return `<div class="wrap" style="padding-bottom:32px;padding-left:max(16px,env(safe-area-inset-left,0px));max-width:720px">
       <section class="card result-head">
-        <div class="result-photo">${photo(x.stars >= 2 ? 'finish' : 'stop-gate', x.stars >= 2 ? 'A rider crossing the finish line' : 'Riders launching off the start gate')}</div>
+        <div class="result-photo mine">${rig(P(), '')}</div>
         <div class="eyebrow">${x.label}</div>
         <h1>${title}</h1>
         <div class="result-stars">${[1, 2, 3].map((i) => `<span class="${i <= x.stars ? 'on' : ''}" style="animation-delay:${i * 0.12}s">${ic('star', 40, true)}</span>`).join('')}</div>
@@ -11045,6 +11818,9 @@ Jordy's Science test, Tuesday 10 November: Planet Earth and Beyond. Written from
         ${lap ? '' : tile('bolt', 'Best in a row', x.bestCombo, `<span class="chip">${x.bestCombo >= 6 ? 'Full gas' : x.bestCombo >= 3 ? 'Nice combo' : 'Keep building'}</span>`)}
         ${lap ? '' : tile('flame', 'Day streak', x.streak, `<span class="chip good">A rest day won't break it</span>`)}
       </section>
+      ${x.firstClears.length ? `<section class="card moment-card"><div class="eyebrow">Section cleared</div><div class="h-sec" style="font-size:26px">${x.firstClears.join(' and ')}</div><p class="small-t">The bar is full at 100%. Ride the comeback laps and it stays that way.</p></section>` : ''}
+      ${x.beatGhost ? '<p class="small-t" style="padding-inline:4px"><b>You beat your ghost.</b> This race is the new one to beat.</p>' : ''}
+      ${x.moved.length ? `<section class="card"><div class="h-sec" style="margin-bottom:8px">What moved</div><div class="rows">${x.moved.map((m) => `<div class="moved"><span>${m.title}</span><span class="num ${m.to > m.from ? 'up' : 'down'}">${m.from}% → ${m.to}%</span></div>`).join('')}</div></section>` : ''}
       ${x.mode === 'review' ? `<section class="card"><div class="h-sec" style="margin-bottom:4px">Still remembered: ${x.held} of ${x.total}</div><p class="small-t">${x.held === x.total ? 'Every one stuck. They come back later, with a longer gap each time.' : `The ones that slipped come back tomorrow. The rest wait longer before they come back.`}${x.dueLeft ? ` ${x.dueLeft} more ${x.dueLeft === 1 ? 'is' : 'are'} due today.` : ''}</p></section>` : ''}
       ${x.mins >= 30 ? `<section class="card stop-cue"><div class="h-sec" style="margin-bottom:4px">Good session: ${x.mins} minutes today</div><p class="small-t">Your brain keeps sorting out what you learnt while you rest, so this is a great place to stop. ${x.dueLeft ? 'Your comeback lap will be waiting.' : 'Tomorrow brings a fresh comeback lap.'}</p></section>` : ''}
       ${x.second ? `<p class="small-t muted" style="padding-inline:4px">A right answer on the second try counts for half, so ${x.second} on the second try ${x.second === 1 ? 'brings' : 'bring'} the score to ${x.pct}%.</p>` : ''}
@@ -11578,7 +12354,19 @@ Jordy's Science test, Tuesday 10 November: Planet Earth and Beyond. Written from
     else if (ui.run) drawRun();
     else if (ui.result) app.innerHTML = viewResult();
     else if (ui.walk) app.innerHTML = viewWalk();
+    else if (ui.moment) app.innerHTML = viewMoment();
     else app.innerHTML = { home: viewHome, route: viewRoute, garage: viewGarage, progress: viewProgress }[ui.tab]();
+  }
+
+  function viewMoment() {
+    const p = P();
+    return `<div class="wrap" style="max-width:720px;padding-bottom:32px"><section class="card moment" role="dialog" aria-label="${h(ui.moment.title)}">
+      <div class="eyebrow">It's yours</div>
+      <h1>${h(ui.moment.title)}</h1>
+      <div class="stage">${rig(p)}</div>
+      <p class="small-t muted">Number ${h(String(p.plate))}, painted ${(PAINTS[p.paint] || PAINTS.orange).label}. Every race from now on is on this bike.</p>
+      <button class="btn primary full" data-act="moment-off">Let's ride ${ic('arrow')}</button>
+    </section></div>`;
   }
 
   // ---------- race number ----------
@@ -11823,6 +12611,20 @@ Jordy's Science test, Tuesday 10 November: Planet Earth and Beyond. Written from
         if (tab === 'voice') speakAs(GEAR.voice.items[id], GEAR.voice.items[id].sample);
         break;
       }
+      case 'moment-off':
+        ui.moment = null;
+        ui.tab = 'home';
+        render();
+        window.scrollTo(0, 0);
+        break;
+      case 'goal':
+        if (ui.tryOn) {
+          P().goal = { tab: ui.tryOn.tab, id: ui.tryOn.id };
+          save();
+          toast(`Saving for ${shopOf(ui.tryOn.tab)[ui.tryOn.id].label}. It's on your home screen.`);
+          render();
+        }
+        break;
       case 'buy-try': {
         // Prices can change between versions, so nothing is bought until this page is known to be the live one.
         if (buying) break;
@@ -11842,7 +12644,11 @@ Jordy's Science test, Tuesday 10 November: Planet Earth and Beyond. Written from
           } else if (ui.tryOn && !hasItem(p, tab, item) && buy(p, { ...shopOf(tab)[item], id: item }, ownedOf(p, tab))) {
             wear(p, tab, item);
             ui.tryOn = null;
-            toast(`${shopOf(tab)[item].label} is yours.`);
+            if (tab === 'bike') {
+              ui.moment = { title: `Your new ${shopOf(tab)[item].label} bike` };
+              confetti();
+              sfx('fanfare');
+            } else toast(`${shopOf(tab)[item].label} is yours.`);
             save();
             render();
           }
