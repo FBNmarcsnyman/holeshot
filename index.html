@@ -513,6 +513,16 @@ details ol { margin: 6px 0 0; padding-left: 20px; }
   *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; }
 }
 
+/* The test plan on Home */
+.plan { display: grid; gap: 8px; }
+.plan-list { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; }
+.plan-list li { display: flex; align-items: center; gap: 10px; background: var(--card-2); border-radius: 16px; padding: 10px 12px; min-height: 52px; }
+.plan-list li.done .plan-text { color: var(--ink-3); text-decoration: line-through; }
+.plan-tick { flex: none; width: 28px; height: 28px; border-radius: 50%; display: grid; place-items: center; background: var(--ink); color: var(--card); font-weight: 800; font-size: 14px; }
+.plan-list li.done .plan-tick { background: var(--good); }
+.plan-text { flex: 1; min-width: 0; font-weight: 700; }
+.stop-cue { border: 2px solid var(--good); }
+
 </style>
 <div id="app"></div>
 <div id="toast" class="toast" role="status" aria-live="polite" hidden></div>
@@ -8224,6 +8234,142 @@ Jordy's Science test, Tuesday 10 November: Planet Earth and Beyond. Written from
   });
 })(typeof window !== 'undefined' ? window : globalThis);
 
+/* Social Sciences, Geography, Topic 4: Population (pages 76 to 92): a rule card and a track walk
+   for each racing section, and short reasons a child reads straight after a wrong answer (not).
+   Facts come only from the questions already in bank-geography.js. See ADDING-QUESTIONS.md. */
+(function (root) {
+  'use strict';
+  const RS = root.RS;
+  const { fmt } = RS;
+  const T = (id) => RS.packs.jordy.subjects.geography.topics.find((t) => t.id === id);
+  const S = RS.packs.jordy.skills;
+
+  // ---------- Unit 1, pages 76 to 78 ----------
+  T('geo_people').notes = [
+    `Population density means how many people live in a certain amount of space, usually in each square kilometre (km²).`,
+    `Population distribution means where people are found in a place and where they are not, and in South Africa it is uneven.`,
+    `On a dot map, each dot stands for a number of people: count the dots, then multiply by what one dot stands for.`,
+    `Dots packed close together mean densely populated, and a few dots far apart mean sparsely populated.`,
+    `Gauteng is the smallest province and the most densely populated, and the eastern side of South Africa is more crowded than the west.`,
+  ];
+  T('geo_people').walk = [
+    { card: `Density: how packed is it?`, say: `Population density compares the number of people with the amount of space they live in. More people in the same space means a higher density.`, eg: `Forty riders squeezed onto one start gate is high density. Two riders out on a long enduro trail is low density.`, more: `We study density so we can plan for what people will need later on.` },
+    { tap: `People are spread unevenly across South Africa.`, find: `unevenly`, ask: `How is South Africa's population spread? Tap the word.`, got: `Unevenly. Some areas are crowded and others have very few people.` },
+    { card: `Reading a dot map`, say: `Each dot on a population map stands for a number of people, not one person. Count the dots, then multiply by what one dot stands for.`, eg: `One dot stands for ${fmt(1000)} people and a square has 6 dots. That square shows 6 × ${fmt(1000)} = ${fmt(6000)} people.`, more: `On the South Africa map, one red dot is ${fmt(50000)} people, and a big green dot is an urban area with over 1 million people.` },
+    { match: [[`Red dot on the South Africa map`, `${fmt(50000)} people`], [`Big green dot`, `An urban area with over 1 million people`], [`Many dots packed close together`, `Densely populated`], [`A few dots far apart`, `Sparsely populated`], [`Settle`, `Make a place your permanent home`]], ask: `Tap one, then tap what it means.` },
+    { sort: [`High population density`, `Low population density`], ask: `Is the density high or low here?`, items: [[`Johannesburg`, 0, `Jobs, services and places to live draw many people close together.`], [`Much of the Northern Cape`, 1, `It is very dry and has fewer jobs, so few people live there.`], [`Gauteng`, 0, `It is the most densely populated province.`], [`Farming country`, 1, `Fewer people live there, and they live further apart.`], [`A crowded city`, 0, `Many people live close together in towns and cities.`], [`The eastern side of South Africa`, 0, `On the dot map, the dots crowd together in the east.`], [`The western side of South Africa`, 1, `On the dot map, the dots thin out in the west.`]] },
+  ];
+
+  // ---------- Unit 1, pages 79 to 81 ----------
+  T('geo_graphs').notes = [
+    `Average population density = number of people ÷ area in km².`,
+    `Gauteng has the least land but the most people, so it is the most densely populated, at about 800 people per km².`,
+    `The Northern Cape has the most land but the fewest people, at only about 3 people per km².`,
+    `A bigger province does not mean more people, so read area, people and density each from its own graph.`,
+    `On a bar graph, the tallest bar is the most and the shortest bar is the least.`,
+  ];
+  T('geo_graphs').walk = [
+    { card: `Three different graphs`, say: `The provinces can be compared on three graphs: area (how much land), population (how many people) and density (how many people in each km², on average).`, eg: `The size of the pits, the number of riders and how squashed together they are: three different things to measure at one race.`, more: `The province with the most land is not the one with the most people.` },
+    { tap: `Gauteng has the least land but the most people.`, find: `gauteng`, ask: `Which province is the smallest but has the most people? Tap it.`, got: `Gauteng. About 15 million people on only about ${fmt(18000)} km².` },
+    { match: [[`Northern Cape`, `Largest by area`], [`Gauteng`, `Smallest by area`], [`KwaZulu-Natal`, `Second most people`], [`Eastern Cape`, `Second largest by area`], [`Mpumalanga`, `Second smallest by area`]], ask: `Tap a province, then tap its record.` },
+    { card: `Working out density`, say: `To find the average density, divide the number of people by the area in km². The answer is how many people there are in each square kilometre.`, eg: `Mpumalanga has about ${fmt(4700000)} people on about ${fmt(76500)} km². ${fmt(4700000)} ÷ ${fmt(76500)} is about 61 people per km².`, more: `Density is an average for each km², not a total. Gauteng's is about 800 and the Northern Cape's is about 3.` },
+    { tap: `Density is the number of people divided by the area.`, find: `divided`, ask: `What do you do to the people to find density? Tap the word.`, got: `Divided. People ÷ km² gives you the number of people in each km².` },
+    { sort: [`Gauteng`, `Northern Cape`], ask: `Which province is this?`, items: [[`The smallest province by area`, 0, `About ${fmt(18000)} km², the least land of all nine.`], [`The largest province by area`, 1, `Over ${fmt(350000)} km², by far the most land.`], [`The most people`, 0, `About 15 million people live there.`], [`The fewest people`, 1, `Only about ${fmt(1.4)} million people live there.`], [`About 800 people per km²`, 0, `Its bar on the density graph is by far the tallest.`], [`About 3 people per km²`, 1, `${fmt(1.4)} million people on ${fmt(373000)} km² works out at 3 or 4.`], [`Most people live in cities and towns`, 0, `That is why its density is so high.`]] },
+  ];
+
+  // ---------- Unit 2, pages 82 and 83 ----------
+  T('geo_urban').notes = [
+    `Urban areas are towns and cities: built up, busy and crowded, so the population density is high.`,
+    `Rural areas are the countryside, with farms and small villages, where homes are spread out and the density is low.`,
+    `In urban areas many people work in offices, hospitals and factories.`,
+    `In rural areas many families farm crops and livestock, and villages also need teachers, nurses and shopkeepers.`,
+    `Some services travel to rural people, like a library bus, because they live far apart.`,
+  ];
+  T('geo_urban').walk = [
+    { card: `Two kinds of places`, say: `Urban means towns and cities. Rural means the countryside, with farms and small villages.`, eg: `A supercross race in a city stadium is in an urban area. A farm enduro through the veld, far from any town, is in a rural area.`, more: `Urban areas are crowded, so the density is high. Rural areas have fewer people, so the density is low.` },
+    { tap: `Durban's city centre is a busy urban area.`, find: `urban`, ask: `Is the middle of a city rural or urban? Tap the word.`, got: `Urban. City centres are built up and crowded.` },
+    { sort: [`Urban`, `Rural`], ask: `Urban or rural?`, items: [[`Tall buildings and heavy traffic`, 0, `Built-up, crowded places are urban.`], [`A village with fields of maize and goats`, 1, `Farming villages are in the countryside.`], [`A flat above a shop in the middle of Durban`, 0, `A city centre is urban.`], [`A farm 40 km from the nearest town`, 1, `A farm far from town is in the countryside.`], [`Offices, hospitals and factories`, 0, `Towns and cities offer many different kinds of work.`], [`A library bus that drives from place to place`, 1, `People live far apart, so the library goes to them.`], [`Homes packed close together`, 0, `Many people living close together means high density.`]] },
+    { match: [[`Urban area`, `Towns and cities`], [`Rural area`, `Farms and small villages`], [`Densely populated`, `Many people living close together`], [`Sparsely populated`, `Few people, spread far apart`], [`Library bus`, `A service that travels to people who live far apart`]], ask: `Tap a word, then tap what it means.` },
+    { card: `Jobs in each place`, say: `In towns and cities, many people work in offices, hospitals and factories. In the countryside, many families farm crops and livestock.`, eg: `Someone working in an office in the town centre has an urban job. A family growing maize and keeping goats works the land in a rural area.`, more: `Villages still need teachers, nurses and shopkeepers, so not everyone in a rural area farms.` },
+  ];
+
+  // ---------- Unit 2, pages 84 to 86 ----------
+  T('geo_places').notes = [
+    `People settle where there is water, a good climate, jobs and resources, and in South Africa laws in the past also forced some people to live in certain places.`,
+    `Kimberley, in the Northern Cape, was a farm until diamonds were found, and then roads and railways came for trade.`,
+    `Durban drew African farmers with its land and a river with good fishing, and European traders with ivory and a bay for a harbour.`,
+    `Trade ships sailing between Europe and India stopped at Table Bay, at Cape Town, to stock up on fresh vegetables.`,
+    `In the area that is now Mpumalanga, the San came first, then African farmers, then Boer settlers, and today hunting and farming are banned in the Kruger National Park.`,
+  ];
+  T('geo_places').walk = [
+    { card: `Why there?`, say: `People settle in a place for reasons: water, a good climate, land, minerals, jobs and trade. In South Africa, laws in the past also forced many people to live in certain places.`, eg: `When you choose a spot to camp at a race, you look for water nearby and an easy road in. People choosing where to live think the same way.`, more: `Some people have no choice at all. Refugees flee their own country because of war or danger.` },
+    { match: [[`Kimberley`, `Diamonds were found on a farm`], [`Johannesburg`, `Gold was found there`], [`Durban`, `Ivory to trade and a bay for a harbour`], [`Table Bay`, `Ships stopped for fresh vegetables`], [`Kruger National Park`, `Wildlife, vegetation and tourism`]], ask: `Tap a place, then tap why people came.` },
+    { tap: `Kimberley grew from a farm into a town after diamonds were found.`, find: `diamonds`, ask: `What made people rush to Kimberley? Tap the word.`, got: `Diamonds. Roads and railways followed for trade, and the town is known for mining and transport today.` },
+    { card: `Who came first?`, say: `Over ${fmt(2000)} years ago, the San lived in the area that is now Mpumalanga. They hunted wild animals and ate plants and fruit. African farmers came next, and then Boer settlers.`, eg: `Think of a start line-up: San in gate one, African farmers in gate two, Boer settlers in gate three.`, more: `The Kruger National Park is named after the Boer leader Paul Kruger. Hunting and farming are banned there, so people nearby work as game rangers and tourist guides.` },
+    { sort: [`Durban`, `Cape Town`], ask: `Durban or Cape Town?`, items: [[`Elephants hunted for their ivory`, 0, `European traders came to the Durban area to hunt elephants for ivory.`], [`Table Bay`, 1, `Table Bay is at Cape Town.`], [`Ships between Europe and India stopped for fresh vegetables`, 1, `They called in at Table Bay.`], [`A river with good fishing for African farmers`, 0, `The land and the river drew African farmers to the Durban area.`], [`Table Mountain brings tourists`, 1, `Table Mountain stands over the city.`]] },
+    { tap: `Laws in the past forced many people to live in remote rural areas.`, find: `laws`, ask: `What made many people live far from towns? Tap the word.`, got: `Laws. The government of the time moved many black people there. Today many of them farm for themselves or run small businesses.` },
+  ];
+
+  // ---------- Unit 3, pages 87 to 89 ----------
+  T('geo_move').notes = [
+    `About 69% of South Africans live in urban areas, and that share is growing.`,
+    `Rural to urban migration means people moving from the countryside to towns and cities.`,
+    `People leave poorer rural areas to find work and better services, like clean water, electricity, toilets, hospitals and high schools.`,
+    `Commercial farms sell what they produce, but subsistence farmers grow only enough to feed their own families.`,
+    `When many people arrive at once, a city gets more traffic, busier hospitals and more shoppers, and there may not be enough houses.`,
+  ];
+  T('geo_move').walk = [
+    { card: `Moving to the city`, say: `Many people are moving from rural areas to towns and cities. This is called rural to urban migration.`, eg: `A family packs up the bakkie and leaves the farm to look for work in Johannesburg.`, more: `About 69% of South Africans already live in urban areas, and the share keeps growing. Researchers predict that fewer people will live in the countryside.` },
+    { tap: `Commercial farms sell the food they produce.`, find: `commercial`, ask: `Which kind of farm sells what it grows? Tap the word.`, got: `Commercial. Subsistence farmers have little land and grow only enough to feed their own families.` },
+    { match: [[`An elderly man who is often ill`, `A hospital`], [`A teenager who wants to keep studying`, `A high school`], [`A man who wants wages for his family back home`, `A job on the mines`], [`A family with no clean water at home`, `Clean water in town`], [`Someone who wants to be a taxi driver`, `A driving licence`]], ask: `Tap a person, then tap what they need.` },
+    { card: `What it does to a city`, say: `When lots of people arrive at once, a city can become overpopulated. Its roads, hospitals, houses and shops all feel it.`, eg: `It's like 200 riders turning up at a track built for 40: long queues, a packed pit area and a chopped-up track.`, more: `Bringing jobs, clinics, schools and clean water to rural areas could slow the move down, because people would have less reason to leave.` },
+    { sort: [`More of it`, `Less of it`], ask: `When many people move into a city, is there more or less of this?`, items: [[`Traffic on the roads`, 0, `More people means more cars, taxis and buses.`], [`Patients at the hospitals`, 0, `The same hospitals must serve more people.`], [`Empty houses`, 1, `Everyone who arrives needs somewhere to live, so there may not be enough houses.`], [`Customers in the shops`, 0, `More people means more people buying things.`], [`Quiet, empty roads`, 1, `The roads get busier, not quieter.`], [`Wear on the roads`, 0, `More traffic wears the roads down.`], [`Free beds in the hospital wards`, 1, `Hospitals get busier, with more patients to treat.`]] },
+  ];
+
+  // ---------- Unit 4, pages 90 and 91 ----------
+  T('geo_globe').notes = [
+    `Your book says over 7 billion people live on Earth, and they are spread very unevenly.`,
+    `On the world map, a green dot is a city of over 10 million people, a red dot is a city of 1 to 10 million, and a small black dot stands for ${fmt(500000)} people.`,
+    `Most people live in the northern hemisphere, because most of the world's land is there.`,
+    `Nobody lives permanently in Antarctica, because it is far too cold, so scientists only visit.`,
+    `India and Japan are crowded, most Egyptians live along the Nile, and most people in Brazil live towards the coast.`,
+  ];
+  T('geo_globe').walk = [
+    { card: `Spread out unevenly`, say: `Your book says over 7 billion people live on Earth. Some places are packed and others are nearly empty.`, eg: `Think of the crowd at a motocross race: hundreds pack around the big jump, and hardly anyone stands at the far end of the track.`, more: `Most people live in the northern hemisphere, north of the equator, because most of the world's land is there.` },
+    { match: [[`Green dot`, `A city of over 10 million people`], [`Red dot`, `A city of 1 to 10 million people`], [`Small black dot`, `${fmt(500000)} people`], [`Antarctica`, `No permanent residents`], [`Resident`, `Someone whose permanent home is in a place`]], ask: `Tap one, then tap what it means.` },
+    { tap: `Nobody lives permanently in Antarctica because it is far too cold.`, find: `cold`, ask: `Why does nobody make a permanent home in Antarctica? Tap the word.`, got: `Cold. It is too cold and icy to live and grow food there, so scientists only visit.` },
+    { card: `Where the crowds are`, say: `In Egypt, people crowd along the Nile, because it brings water through the desert. In Brazil, most people live towards the coast.`, eg: `Japan packs a huge number of people into a small country, and India is crowded too.`, more: `Europe has more people for its size than Africa. Europe's weather is gentler overall, while much of Africa is hot, with large deserts.` },
+    { sort: [`Crowded`, `Few people`], ask: `Crowded, or few people?`, items: [[`India`, 0, `The map is packed with dots across India.`], [`Antarctica`, 1, `Nobody lives there permanently.`], [`Japan`, 0, `A huge number of people share a fairly small country.`], [`The land beside the Nile in Egypt`, 0, `The river brings water through the desert.`], [`Egypt's desert, far from the Nile`, 1, `Most Egyptians live along the Nile, because that is where the water is.`], [`Brazil's coast`, 0, `Brazil's big cities and most of its dots are near the sea.`], [`Deep in Brazil's rainforest`, 1, `Most people in Brazil live towards the coast, not deep in the rainforest.`]] },
+    { match: [[`Tokyo`, `Japan`], [`Sydney`, `Australia`], [`New York`, `United States of America`], [`London`, `United Kingdom`], [`Rio de Janeiro`, `Brazil`]], ask: `Tap a city from the world map, then tap its country.` },
+  ];
+
+  // ---------- Unit 4, pages 91 and 92 ----------
+  T('geo_climate').notes = [
+    `Your book's three big reasons people settle somewhere are climate, water, and mineral and energy resources.`,
+    `Climate is temperature and rainfall, and most people live where it is mild: not very hot and not very cold.`,
+    `People need water to live and to grow food, so they settle where it rains or along rivers, like the Nile in the Sahara.`,
+    `Mineral and energy resources bring jobs, so settlements grow around them.`,
+    `In harsh places people cope by piping in water for desert towns and bringing in fuel for heating in very cold places.`,
+  ];
+  T('geo_climate').walk = [
+    { card: `The big three`, say: `Climate, water, and mineral and energy resources are big reasons people settle in a place. They matter in South Africa and all over the world.`, eg: `A good race day needs mild weather, water for the riders and fuel for the bikes. A town needs much the same things.`, more: `Where large numbers of people have settled, the climate is usually mild: neither very hot nor very cold.` },
+    { tap: `Climate is the temperature and rainfall of an area.`, find: `rainfall`, ask: `Climate is temperature and what else? Tap the word.`, got: `Rainfall. Climate is how hot or cold it is, and how much rain falls.` },
+    { match: [[`A desert town`, `Water is piped in from elsewhere`], [`A very cold town`, `Fuel is brought in for heating`], [`A mining town`, `It grows because of the jobs the resources bring`], [`A river in a dry area`, `Its water comes from rain on mountains far away`], [`The wet tropics`, `People escape the heat by the sea or high in the mountains`]], ask: `Tap a place, then tap how it works there.` },
+    { card: `Australia and the Sahara`, say: `Much of Australia is too hot or too dry, so few people live there. Most Australians live near the coast, where the climate is mild.`, eg: `The east coast of Australia gets plenty of rain. The north is hot, because it is close to the equator.`, more: `In the Sahara, people crowd along the Nile River, because it brings water through the desert.` },
+    { sort: [`Easier to live in`, `Harder to live in`], ask: `Would this make a place easier or harder to live in?`, items: [[`A mild climate`, 0, `Neither very hot nor very cold makes living and farming easier.`], [`No water at all`, 1, `Nobody can live or farm without water.`], [`A river running through dry land`, 0, `The river gives people water in a dry place.`], [`Freezing weather and no fuel`, 1, `Fuel for heating is what makes very cold places liveable.`], [`Jobs at a mine nearby`, 0, `Resources bring work, and work brings people.`], [`Very hot, dry land`, 1, `Harsh, dry land is hard to live on, like much of Australia.`], [`Plenty of rain`, 0, `People need water to live and to grow food.`]] },
+    { tap: `In the Sahara, many people crowd together along the Nile.`, find: `nile`, ask: `Where do people crowd together in the Sahara? Tap the word.`, got: `The Nile. It brings water through the desert to Egypt.` },
+  ];
+
+  // ---------- The usual wrong thinking in each written list ----------
+  S.geo_u1.not = `Go back to the two big words: density is how packed people are in a space, and distribution is where people are found and where they are not.`;
+  S.geo_prov.not = `Size and people don't go together: Gauteng has the least land but the most people, and the Northern Cape has the most land but the fewest, so check which graph the question is about.`;
+  S.geo_urban.not = `Urban means towns and cities, built up and crowded, and rural means farms and villages, with homes spread out, so check which one the clue describes.`;
+  S.geo_places.not = `Each place has its own reason, so link them up: Kimberley and diamonds, Durban and ivory and its bay, Table Bay and ships needing vegetables, Kruger and wildlife.`;
+  S.geo_move.not = `Think about why people move: poorer rural areas lack jobs and services, so people head to the cities, and then the cities get busier in every way.`;
+  S.geo_globe.not = `People are spread very unevenly, so picture the dots on the world map: most are north of the equator, and they crowd where there is water and thin out where it is far too cold or dry.`;
+  S.geo_climate.not = `People settle where life is easier, so think of a mild climate, water nearby and resources that bring jobs, with pipes and fuel helping in harsh places.`;
+})(typeof window !== 'undefined' ? window : globalThis);
+
 /* November 2026: more of Kash's Afrikaans, on the mind maps at the front of die strand Taalboek, and Track walks for five sections. */
 (function (root) {
   'use strict';
@@ -9071,7 +9217,7 @@ Jordy's Science test, Tuesday 10 November: Planet Earth and Beyond. Written from
   // ---------- staying up to date ----------
   // An open tab or a home screen app keeps running the page it first loaded, old prices and all. So it asks which version
   // is live when it comes back into view and every few minutes, and swaps over between races. build.mjs fills in BUILD.
-  const BUILD = '25831db49f';
+  const BUILD = 'd04dcb50af';
   const BACK_KEY = 'holeshot.back.v1';
   const TRIED_KEY = 'holeshot.tried.v1';
   let liveBuild = null;
@@ -9218,9 +9364,18 @@ Jordy's Science test, Tuesday 10 November: Planet Earth and Beyond. Written from
   // ---------- the fix list ----------
   // Anything missed goes on the list, and stays until it is right first try this many times in a row.
   const FIX_NEED = 3;
+  // After this many misses in a row of fix-its it stops drilling for 2 days, and points to the Track walk or a grown-up.
+  const FIX_STUCK = 10;
+  const resting = (f) => !!f.stuck && daysUntil(f.stuck) > -2;
+  // Right 3 times on the day it was missed still has to be right once more on a later day, so it waits for tomorrow.
+  const fixable = (f) => !!f && !resting(f) && !(f.got >= FIX_NEED && f.day === dayKey());
   const fixList = (p, sub) => {
     const mine = new Set(sub.topics.flatMap((t) => t.skills));
-    return Object.keys(p.fix).filter((id) => mine.has(id));
+    return Object.keys(p.fix).filter((id) => mine.has(id) && fixable(p.fix[id]));
+  };
+  const stuckList = (p, sub) => {
+    const mine = new Set(sub.topics.flatMap((t) => t.skills));
+    return Object.keys(p.fix).filter((id) => mine.has(id) && resting(p.fix[id]));
   };
 
   // ---------- dates and sums ----------
@@ -9230,7 +9385,9 @@ Jordy's Science test, Tuesday 10 November: Planet Earth and Beyond. Written from
     d.setDate(d.getDate() - n);
     return d;
   };
-  const liveStreak = (p) => (p.lastDay === dayKey() || p.lastDay === dayKey(daysAgo(1)) ? p.streak : 0);
+  // One missed day is a rest day and keeps the streak going. Missing more halves it rather than wiping it out.
+  const gapDays = (k) => (k ? -daysUntil(k) : Infinity);
+  const liveStreak = (p) => (gapDays(p.lastDay) <= 2 ? p.streak : Math.floor(p.streak / 2));
   const dayLog = (p) => p.days[dayKey()] || (p.days[dayKey()] = { pts: 0, q: 0, ok: 0 });
   const mastery = (p, t) => t.skills.reduce((a, id) => a + ((p.skills[id] && p.skills[id].m) || 0), 0) / t.skills.length;
   const seenTopic = (p, t) => t.skills.some((id) => p.skills[id] && p.skills[id].seen);
@@ -9239,6 +9396,37 @@ Jordy's Science test, Tuesday 10 November: Planet Earth and Beyond. Written from
   const clearedCount = (p, sub) => racing(sub).filter((t) => isCleared(p, t)).length;
   const nextStop = (p, sub) => racing(sub).find((t) => !isCleared(p, t));
   const topicOf = (skill) => SUB().topics.find((t) => t.skills.includes(skill));
+
+  // ---------- coming back on later days ----------
+  // Remembering is about later days. Each kind of question comes back after a gap that grows every time it is right
+  // first try on a new day: 1, 2, 4, 7, 14, then 30 days. A miss, or right only on the second try, brings it back tomorrow.
+  // A test coming up shortens the gap, so everything gets checked again before the day.
+  const GAPS = [1, 2, 4, 7, 14, 30];
+  const laterDay = (k, n) => dayKey(addDays(parseDay(k), n));
+  const skillSubject = (pack, id) => Object.keys(pack.subjects).find((k) => pack.subjects[k].topics.some((t) => t.skills.includes(id)));
+  function gapFor(pack, id, box) {
+    const k = skillSubject(pack, id);
+    const e = (pack.exams || []).find((x) => x.subject === k && daysUntil(x.date) >= 1);
+    return e ? Math.max(1, Math.min(GAPS[box], daysUntil(e.date) - 1)) : GAPS[box];
+  }
+  function space(p, id, ok) {
+    const s = p.skills[id];
+    const today = dayKey();
+    if (!ok) Object.assign(s, { box: 0, day: today, due: laterDay(today, 1) });
+    else if (s.day !== today) {
+      // Right twice on the same day counts once.
+      s.box = s.day ? Math.min((s.box || 0) + 1, GAPS.length - 1) : 0;
+      s.day = today;
+      s.due = laterDay(today, gapFor(PK(), id, s.box));
+    }
+  }
+  // Anything answered before this existed has never been checked on a later day, so it starts out due.
+  const isDue = (s) => !!s && s.seen > 0 && (!s.due || s.due <= dayKey());
+  const dueList = (p, sub) => [...new Set(racing(sub).flatMap((t) => t.skills))].filter((id) => isDue(p.skills[id]));
+  // Still remembered: right first try on two different days, and not due back yet.
+  const held = (s) => !!s && (s.box || 0) >= 1 && !isDue(s);
+  const heldTopic = (p, t) => t.skills.every((id) => held(p.skills[id]));
+  const dueTopic = (p, t) => t.skills.some((id) => isDue(p.skills[id]));
 
   // ---------- the exam timetable ----------
   const WEEKDAYS = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
@@ -9660,6 +9848,7 @@ Jordy's Science test, Tuesday 10 November: Planet Earth and Beyond. Written from
       : `<div class="coach-item"><p class="small-t">${seenTopic(p, main[0]) ? 'Nothing needs fixing right now. Try the main event.' : 'Finish one moto and your coach will find what to practise next.'}</p></div>`;
     return shell(`
       ${examCard(pack)}
+      ${planCard(p, pack)}
       <div class="home-grid">
         <section class="hero" aria-label="Today's moto">
           <div class="hero-photo">${photo('hero-jump', 'A rider whipping a dirt bike over a jump')}<span class="chip on-photo ${doneToday ? '' : 'lime'}">${doneToday ? 'Done today' : 'Ready'}</span></div>
@@ -9679,10 +9868,12 @@ Jordy's Science test, Tuesday 10 November: Planet Earth and Beyond. Written from
           </div>
         </section>
         <div class="home-side">
+          ${comebackCard(p, sub)}
           ${fixCard(p, sub)}
+          ${stuckCard(p, sub)}
           <section class="tiles" aria-label="Your numbers">
             ${tile('star', 'Points', RS.fmt(p.points), today.pts ? `<span class="chip lime num">+${today.pts} today</span>` : '<span class="chip">Ride to earn</span>')}
-            ${tile('flame', 'Day streak', liveStreak(p), `<span class="chip ${liveStreak(p) ? 'good' : ''} num">Best ${p.best}</span>`)}
+            ${tile('flame', 'Day streak', liveStreak(p), `<span class="chip ${liveStreak(p) ? 'good' : ''} num">${gapDays(p.lastDay) === 2 ? 'Rest day used' : `Best ${p.best}`}</span>`)}
             ${tile('target', 'Right first try', acc === null ? '–' : acc + '%', `<span class="chip num">${RS.fmt(p.totalQ)} questions</span>`)}
             ${tile('flag', 'Sections cleared', `${cleared}/${main.length}`, `<span class="chip">${next ? next.stop : 'All clear'}</span>`)}
           </section>
@@ -9781,12 +9972,84 @@ Jordy's Science test, Tuesday 10 November: Planet Earth and Beyond. Written from
       </div>`).join('')}</div>
     </section>`;
   }
+  function comebackCard(p, sub) {
+    const n = dueList(p, sub).length;
+    if (!n) return '';
+    return `<section class="coach" aria-label="Comeback lap">
+      <div class="coach-head"><span class="coach-dot">${ic('swap', 20)}</span><div><div class="h-sec">Comeback lap</div><div class="small-t muted num">${n} due back in ${sub.label}</div></div></div>
+      <p class="small-t" style="padding-inline:4px">Questions you've done before, back to check they stuck. Each one you get right first try waits longer before it comes back.</p>
+      <button class="btn primary full" data-act="start" data-mode="review">Ride the comeback lap ${ic('arrow')}</button>
+    </section>`;
+  }
+  function stuckCard(p, sub) {
+    const ids = stuckList(p, sub);
+    if (!ids.length) return '';
+    const topics = [...new Set(ids.map((id) => sub.topics.find((t) => t.skills.includes(id))))].filter(Boolean);
+    return `<section class="card" aria-label="Get some help">
+      <div class="h-sec" style="margin-bottom:4px">Get some help with these</div>
+      <p class="small-t muted" style="margin-bottom:10px">They've caught you out a lot, so they're resting for 2 days. Walk the section, or ask Mom or Dad to go through it with you.</p>
+      <div class="rows">${topics.map((t) => (t.walk ? `<button class="btn full" data-act="walk" data-id="${t.id}">${ic('route', 16)} Track walk: ${t.title}</button>` : `<div class="small-t"><b>${t.title}</b></div>${ruleCard(t, true)}`)).join('')}</div>
+    </section>`;
+  }
+
+  // ---------- the test plan ----------
+  // In the week before a test, a few jobs for today picked from his own answers, ticked off as they're done.
+  // The jobs are picked once a day, so finishing one doesn't swap the others around.
+  function planExam(pack) {
+    const e = nextExam(pack);
+    // From lunchtime on the day itself, the plan moves on to the next test.
+    if (e && daysUntil(e.date) === 0 && new Date().getHours() >= 13) return (pack.exams || []).find((x) => daysUntil(x.date) >= 1 && pack.subjects[x.subject]);
+    return e;
+  }
+  function planJobs(p, pack, e) {
+    const sub = pack.subjects[e.subject];
+    const today = dayKey();
+    const n = daysUntil(e.date);
+    if (!p.plan || p.plan.day !== today || p.plan.subject !== e.subject) {
+      const jobs = [dueList(p, sub).length ? { kind: 'review' } : { kind: 'daily' }];
+      if (n > 0) {
+        const weak = racing(sub).filter((t) => !isCleared(p, t)).sort((a, b) => mastery(p, a) - mastery(p, b));
+        if (weak[0]) jobs.push({ kind: weak[0].walk && !(p.walked || {})[weak[0].id] ? 'walk' : 'topic', topic: weak[0].id });
+        if (n <= 2) jobs.push({ kind: 'exam' });
+        else if (weak[1]) jobs.push({ kind: 'topic', topic: weak[1].id });
+      }
+      p.plan = { day: today, subject: e.subject, jobs };
+      keepState();
+    }
+    const ran = (fn) => p.runs.some((r) => r.when === today && r.label.startsWith(`${sub.label}: `) && fn(r));
+    return p.plan.jobs.map((j) => {
+      const t = j.topic && sub.topics.find((x) => x.id === j.topic);
+      const go = `data-subject="${e.subject}" ${j.kind === 'walk' ? `data-act="walk" data-id="${j.topic}"` : `data-act="start" data-mode="${j.kind}" ${j.topic ? `data-topic="${j.topic}"` : ''}`}`;
+      if (j.kind === 'review') return { text: 'Comeback lap: check what you learnt before', done: ran((r) => r.mode === 'review') || !dueList(p, sub).length, go };
+      if (j.kind === 'daily') return { text: "Today's moto", done: p.dailyBy[e.subject] === today, go };
+      if (j.kind === 'walk') return { text: `Track walk: ${t.title}`, done: (p.walked || {})[j.topic] === today, go };
+      if (j.kind === 'topic') return { text: `Practise: ${t.title}`, done: ran((r) => r.mode === 'topic' && r.label === `${sub.label}: ${t.title}`), go };
+      return { text: 'Main event practice test', done: ran((r) => r.mode === 'exam'), go };
+    });
+  }
+  function planCard(p, pack) {
+    const e = planExam(pack);
+    if (!e) return '';
+    const n = daysUntil(e.date);
+    if (n > 7) return '';
+    const jobs = planJobs(p, pack, e);
+    const left = jobs.filter((j) => !j.done).length;
+    const word = pack.testWord || 'exam';
+    const head = n === 0 ? `${e.label} ${word} today` : `${n === 1 ? 'Tomorrow' : `${n} days to go`}: do ${jobs.length === 1 ? 'this' : `these ${jobs.length}`} today`;
+    const foot = n === 0 ? 'One quick lap to warm up, then put the screen away. You know this. Good luck!' : left ? `${left} to go. They're picked from your own answers.` : `All done for today. That's how you get ready for a ${word}.`;
+    return `<section class="card plan" aria-label="Plan for your ${word}">
+      <div class="eyebrow">${e.label} ${word} · ${shortDay(e.date)}</div>
+      <div class="h-sec">${head}</div>
+      <ol class="plan-list">${jobs.map((j, i) => `<li class="${j.done ? 'done' : ''}"><span class="plan-tick">${j.done ? ic('check', 16) : i + 1}</span><span class="plan-text">${j.text}</span>${j.done ? '<span class="chip good">Done</span>' : `<button class="btn small dark" ${j.go}>Go</button>`}</li>`).join('')}</ol>
+      <p class="small-t muted">${foot}</p>
+    </section>`;
+  }
   function fixCard(p, sub) {
     const n = fixList(p, sub).length;
     if (!n) return '';
     return `<section class="coach" aria-label="Fix-it lap">
       <div class="coach-head"><span class="coach-dot">${ic('bolt', 20)}</span><div><div class="h-sec">Fix-it lap</div><div class="small-t muted num">${n} to fix in ${sub.label}</div></div></div>
-      <p class="small-t" style="padding-inline:4px">New questions on what caught you out. Get each one right ${FIX_NEED} times in a row to clear it.</p>
+      <p class="small-t" style="padding-inline:4px">New questions on what caught you out. Get each one right ${FIX_NEED} times in a row, then once more on another day, to clear it.</p>
       <button class="btn primary full" data-act="start" data-mode="fix">Ride the fix-it lap ${ic('arrow')}</button>
     </section>`;
   }
@@ -9841,6 +10104,7 @@ Jordy's Science test, Tuesday 10 November: Planet Earth and Beyond. Written from
             <button class="btn ${here ? 'primary' : ''} small" data-act="start" data-mode="topic" data-topic="${t.id}">Ride</button>
           </div>
           <div class="stop-row"><div class="meter" style="flex:1" role="img" aria-label="${m} percent"><i style="width:${m}%"></i></div><span class="small-t num muted">${m}%</span>${stars(tp.stars || 0, 14)}</div>
+          ${heldTopic(p, t) ? `<div><span class="chip good">${ic('check', 12)} Still remembered</span></div>` : seenTopic(p, t) && dueTopic(p, t) ? '<div><span class="chip warn">Due back: ride the comeback lap</span></div>' : ''}
           ${lists.length ? `<div class="small-t muted num">${fresh ? `${fresh} new question${fresh === 1 ? '' : 's'} to go` : 'All asked once. They come round again now.'}</div>` : ''}
           ${t.walk ? `<button class="btn small full walk-go" data-act="walk" data-id="${t.id}">${ic('route', 16)} Track walk: learn it first</button>` : ''}
           ${ruleCard(t)}
@@ -10152,6 +10416,8 @@ Jordy's Science test, Tuesday 10 November: Planet Earth and Beyond. Written from
   }
   function buildQueue(p, sub, mode, topicId, n) {
     if (mode === 'fix') return fixSlots(p, sub, n);
+    // The comeback lap asks what's due back, longest waiting first, one question each.
+    if (mode === 'review') return RS.shuffle(dueList(p, sub).sort((a, b) => ((p.skills[a].due || '') < (p.skills[b].due || '') ? -1 : 1)).slice(0, n));
     if (mode === 'lap') {
       // Graphs and long stories would be a reading race, so only the quick kinds go in.
       const all = [...new Set(racing(sub).flatMap((t) => t.skills))];
@@ -10180,7 +10446,7 @@ Jordy's Science test, Tuesday 10 November: Planet Earth and Beyond. Written from
       const weights = pool.map((id) => {
         const s = p.skills[id];
         // Focus skills come up more often until they are strong, and anything on the fix list more often still.
-        const base = (s ? 0.25 + (1 - s.m) : 1.3) * ((sub.focus || []).includes(id) && (!s || s.m < 0.8) ? 2 : 1) * (p.fix[id] ? 3 : 1);
+        const base = (s ? 0.25 + (1 - s.m) : 1.3) * ((sub.focus || []).includes(id) && (!s || s.m < 0.8) ? 2 : 1) * (fixable(p.fix[id]) ? 3 : 1) * (isDue(s) ? 1.5 : 1);
         // One-section banks may repeat the skill; the asked list stops the same question repeating.
         return base * 0.35 ** (used[id] || 0) * (pool.length > 1 && out[out.length - 1] === id ? 0 : 1);
       });
@@ -10202,7 +10468,8 @@ Jordy's Science test, Tuesday 10 November: Planet Earth and Beyond. Written from
     const sub = SUB();
     // An old screen can still offer a lap after the list has emptied.
     if (mode === 'fix' && !fixList(P(), sub).length) mode = 'daily';
-    const n = mode === 'exam' ? sub.examSize : 10;
+    if (mode === 'review' && !dueList(P(), sub).length) mode = 'daily';
+    const n = mode === 'exam' ? sub.examSize : mode === 'review' ? Math.min(10, dueList(P(), sub).length) : 10;
     ui.result = null;
     ui.run = { id: uuid(), mode, topicId, queue: buildQueue(P(), sub, mode, topicId, n).map((slot) => (typeof slot === 'string' ? { skill: slot } : slot)), i: 0, total: n, q: null, typed: '', tries: 0, combo: 0, bestCombo: 0, pts: 0, score: 0, right: 0, log: [], extras: 0, asked: new Set(), sheet: null, heard: '', listening: false, started: Date.now(), halfPay: mode === 'topic' && ((P().topics[topicId] || {}).stars || 0) >= 3, fixed: [], fixNote: '', firstGiven: null, qStart: Date.now(), penalty: 0 };
     audio();
@@ -10274,6 +10541,7 @@ Jordy's Science test, Tuesday 10 November: Planet Earth and Beyond. Written from
     s.seen++;
     if (ok && firstTry) s.ok++;
     s.m = s.m * 0.65 + credit * 0.35;
+    space(p, q.skill, ok && firstTry);
     p.totalQ++;
     if (ok && firstTry) p.totalOk++;
     const d = dayLog(p);
@@ -10291,15 +10559,19 @@ Jordy's Science test, Tuesday 10 November: Planet Earth and Beyond. Written from
     const f = p.fix[q.skill];
     if (!ok || !firstTry) {
       const { skill, bonus, exact, ...plainQ } = q;
-      p.fix[q.skill] = { got: 0, misses: (f ? f.misses : 0) + 1, q: plainQ };
+      const misses = (f ? f.misses : 0) + 1;
+      const stuck = misses >= FIX_STUCK;
+      p.fix[q.skill] = { got: 0, misses: stuck ? 0 : misses, q: plainQ, day: dayKey(), stuck: stuck ? dayKey() : f && resting(f) ? f.stuck : null };
+      if (stuck) r.fixNote = 'This one keeps catching you out, so it rests for 2 days. Try its Track walk, or ask Mom or Dad to go through it with you.';
     } else if (f) {
       f.got++;
       if (q.exact) f.q = null;
-      if (f.got >= FIX_NEED) {
+      if (f.got >= FIX_NEED && f.day !== dayKey()) {
         delete p.fix[q.skill];
         r.fixed.push(q.skill);
         r.fixNote = 'Cleared from your fix list!';
-      } else r.fixNote = `${f.got} of ${FIX_NEED} to clear this one`;
+      } else if (f.got >= FIX_NEED) r.fixNote = 'Right 3 in a row. Get it right again on another day to clear it, so you know it stuck.';
+      else r.fixNote = `${f.got} of ${FIX_NEED} to clear this one`;
     }
     save();
     logRow('answer', {
@@ -10437,7 +10709,7 @@ Jordy's Science test, Tuesday 10 November: Planet Earth and Beyond. Written from
     const rankNow = rankOf(p.earned);
     const today = dayKey();
     if (p.lastDay !== today) {
-      p.streak = p.lastDay === dayKey(daysAgo(1)) ? p.streak + 1 : 1;
+      p.streak = gapDays(p.lastDay) <= 2 ? p.streak + 1 : Math.floor(p.streak / 2) + 1;
       p.lastDay = today;
     }
     p.best = Math.max(p.best, p.streak);
@@ -10455,14 +10727,19 @@ Jordy's Science test, Tuesday 10 November: Planet Earth and Beyond. Written from
       p.examBy[ui.subject] = Math.max(p.examBy[ui.subject] || 0, pct);
     } else if (r.mode === 'fix') {
       label = 'Fix-it lap';
+    } else if (r.mode === 'review') {
+      label = 'Comeback lap';
     } else if (lap) {
       label = `Hot lap ${lapText(lap.ms)}`;
     } else {
       p.dailyBy[ui.subject] = today;
     }
+    // Time on task for the stop cue. A page left open mid-race can't count for more than 20 minutes.
+    const secs = Math.min(1200, Math.round((Date.now() - r.started) / 1000));
+    dayLog(p).secs = (dayLog(p).secs || 0) + secs;
     p.runs.unshift({ label: `${sub.label}: ${label}`, pct, right: r.right, total: r.total, pts: r.pts, when: today, mode: r.mode });
     p.runs = p.runs.slice(0, 30);
-    const x = { lap, label, pct, stars: earnedStars, pts: r.pts, bonus, bestCombo: r.bestCombo, right: r.right, total: r.total, second: r.log.filter((l) => l.ok && !l.firstTry && !l.bonus).length, mode: r.mode, topicId: r.topicId, missed: r.log.filter((l) => !l.ok), newBadges: [], streak: p.streak, halfPay: r.halfPay, newRank: rankNow > rankBefore ? RANKS[rankNow - 1][0] : '', fixed: new Set(r.fixed.filter((id) => !p.fix[id])).size, fixLeft: fixList(p, sub).length };
+    const x = { lap, label, pct, stars: earnedStars, pts: r.pts, bonus, bestCombo: r.bestCombo, right: r.right, total: r.total, second: r.log.filter((l) => l.ok && !l.firstTry && !l.bonus).length, mode: r.mode, topicId: r.topicId, missed: r.log.filter((l) => !l.ok), newBadges: [], streak: p.streak, halfPay: r.halfPay, newRank: rankNow > rankBefore ? RANKS[rankNow - 1][0] : '', fixed: new Set(r.fixed.filter((id) => !p.fix[id])).size, fixLeft: fixList(p, sub).length, stuck: stuckList(p, sub).length, held: r.log.filter((l) => l.ok && l.firstTry && !l.bonus).length, dueLeft: dueList(p, sub).length, mins: Math.round(dayLog(p).secs / 60) };
     for (const b of BADGES) {
       if (!p.badges.includes(b.id) && b.test(p, x, sub)) {
         p.badges.push(b.id);
@@ -10766,8 +11043,10 @@ Jordy's Science test, Tuesday 10 November: Planet Earth and Beyond. Written from
         ${tile('target', 'Score', x.pct + '%', `<span class="chip num">${x.right} of ${x.total} right</span>`)}
         ${tile('star', 'Points won', '+' + RS.fmt(x.pts), `<span class="chip lime num">${lap ? `${lap.record ? 'Includes +25 for the record' : '+5 for each right'}` : `Includes +${x.bonus} bonus`}</span>`)}
         ${lap ? '' : tile('bolt', 'Best in a row', x.bestCombo, `<span class="chip">${x.bestCombo >= 6 ? 'Full gas' : x.bestCombo >= 3 ? 'Nice combo' : 'Keep building'}</span>`)}
-        ${lap ? '' : tile('flame', 'Day streak', x.streak, `<span class="chip good">Ride again tomorrow</span>`)}
+        ${lap ? '' : tile('flame', 'Day streak', x.streak, `<span class="chip good">A rest day won't break it</span>`)}
       </section>
+      ${x.mode === 'review' ? `<section class="card"><div class="h-sec" style="margin-bottom:4px">Still remembered: ${x.held} of ${x.total}</div><p class="small-t">${x.held === x.total ? 'Every one stuck. They come back later, with a longer gap each time.' : `The ones that slipped come back tomorrow. The rest wait longer before they come back.`}${x.dueLeft ? ` ${x.dueLeft} more ${x.dueLeft === 1 ? 'is' : 'are'} due today.` : ''}</p></section>` : ''}
+      ${x.mins >= 30 ? `<section class="card stop-cue"><div class="h-sec" style="margin-bottom:4px">Good session: ${x.mins} minutes today</div><p class="small-t">Your brain keeps sorting out what you learnt while you rest, so this is a great place to stop. ${x.dueLeft ? 'Your comeback lap will be waiting.' : 'Tomorrow brings a fresh comeback lap.'}</p></section>` : ''}
       ${x.second ? `<p class="small-t muted" style="padding-inline:4px">A right answer on the second try counts for half, so ${x.second} on the second try ${x.second === 1 ? 'brings' : 'bring'} the score to ${x.pct}%.</p>` : ''}
       ${lap && !lap.counts ? `<p class="small-t muted" style="padding-inline:4px">Get at least ${LAP_KEEP} right for your time to count.</p>` : ''}
       ${x.newRank ? `<section class="card"><div class="eyebrow">New rank</div><div class="h-sec" style="font-size:24px">${x.newRank}</div><p class="small-t muted">New gear is open in the pits.</p></section>` : ''}
@@ -10775,9 +11054,10 @@ Jordy's Science test, Tuesday 10 November: Planet Earth and Beyond. Written from
       ${x.newBadges.length ? `<section class="card"><div class="h-sec" style="margin-bottom:8px">New badge${x.newBadges.length > 1 ? 's' : ''}</div><div class="badges">${x.newBadges.map((b) => `<div class="badge got"><b>${b.label}</b><small>${b.desc}</small></div>`).join('')}</div></section>` : ''}
       ${learnCard(x)}
       ${x.missed.length ? `<section class="card"><div class="h-sec" style="margin-bottom:8px">Look at these again</div><div class="log">${x.missed.map((m) => `<div class="log-item"><div>${h(m.q)}</div><div class="small-t" style="margin-top:2px"><b>Answer:</b> ${h(m.correct)}${m.given ? ` <span class="muted">(you said ${h(String(m.given))})</span>` : ''}</div><details><summary>Show the working</summary><ol>${m.steps.map((s) => `<li>${h(s)}</li>`).join('')}</ol></details></div>`).join('')}</div></section>` : ''}
-      ${x.mode === 'fix' || x.fixLeft ? `<section class="card"><div class="h-sec" style="margin-bottom:6px">Fix list</div><p class="small-t">${x.fixed ? `${x.fixed} cleared. ` : ''}${x.fixLeft ? `${x.fixLeft} still to fix. Get each one right ${FIX_NEED} times in a row to clear it.` : 'All clear. Nothing left to fix here.'}</p></section>` : ''}
+      ${x.mode === 'fix' || x.fixLeft ? `<section class="card"><div class="h-sec" style="margin-bottom:6px">Fix list</div><p class="small-t">${x.fixed ? `${x.fixed} cleared. ` : ''}${x.fixLeft ? `${x.fixLeft} still to fix. Get each one right ${FIX_NEED} times in a row, then once more on another day.` : 'All clear for today. Anything waiting for another day comes back tomorrow.'}${x.stuck ? ` ${x.stuck} ${x.stuck === 1 ? 'is' : 'are'} resting for 2 days: try the Track walk or ask for help.` : ''}</p></section>` : ''}
       ${x.fixLeft ? `<button class="btn primary full" data-act="start" data-mode="fix">${x.mode === 'fix' ? 'Next fix-it lap' : 'Re-test what you missed'} ${ic('arrow')}</button>` : ''}
-      ${x.mode === 'fix' ? '' : `<button class="btn ${x.fixLeft ? '' : 'primary'} full" ${again}>Go again ${ic('arrow')}</button>`}
+      ${x.mode === 'review' && x.dueLeft ? `<button class="btn primary full" data-act="start" data-mode="review">Next comeback lap ${ic('arrow')}</button>` : ''}
+      ${x.mode === 'fix' || x.mode === 'review' ? '' : `<button class="btn ${x.fixLeft ? '' : 'primary'} full" ${again}>Go again ${ic('arrow')}</button>`}
       <button class="btn full" data-act="home">Back to the pits</button>
     </div>`;
   }
@@ -11317,7 +11597,9 @@ Jordy's Science test, Tuesday 10 November: Planet Earth and Beyond. Written from
   });
 
   // ---------- result code to share with a parent ----------
-  // A short signed code of today's stages and streak. A parent's app checks the signature before it pays out a reward.
+  // A short signed code of today's stages. A parent's app checks the signature before it pays out a reward.
+  // Only a proper race scoring 70% or more counts as a stage, so rushed races can't earn anything. The streak is sent
+  // as 0 so rewards stay flat: research on children's rewards found streak bonuses the riskiest kind.
   function shareHash(t0) {
     let h = 5381;
     const t = 'hs-share|' + t0;
@@ -11328,8 +11610,8 @@ Jordy's Science test, Tuesday 10 November: Planet Earth and Beyond. Written from
     const p = state.players[id];
     const k = dayKey();
     const d = p.days[k] || {};
-    const stages = p.runs.filter((r) => r.when === k).length;
-    const body = ['HS', id, k.replace(/-/g, ''), stages, d.ok || 0, d.q || 0, liveStreak(p)].join('.');
+    const stages = p.runs.filter((r) => r.when === k && r.mode !== 'lap' && r.total >= 5 && r.pct >= 70).length;
+    const body = ['HS', id, k.replace(/-/g, ''), stages, d.ok || 0, d.q || 0, 0].join('.');
     return body + '.' + shareHash(body);
   }
   // ---------- taps ----------
@@ -11412,6 +11694,7 @@ Jordy's Science test, Tuesday 10 November: Planet Earth and Beyond. Written from
         window.scrollTo(0, 0);
         break;
       case 'start':
+        if (el.dataset.subject && PK().subjects[el.dataset.subject]) ui.subject = el.dataset.subject;
         startRun(el.dataset.mode, el.dataset.topic);
         break;
       case 'opt':
@@ -11567,6 +11850,7 @@ Jordy's Science test, Tuesday 10 November: Planet Earth and Beyond. Written from
         break;
       }
       case 'walk':
+        if (el.dataset.subject && PK().subjects[el.dataset.subject]) ui.subject = el.dataset.subject;
         ui.result = null;
         ui.walk = { id };
         walkStep(0);
