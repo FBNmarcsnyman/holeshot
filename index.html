@@ -2,7 +2,7 @@
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500..800&family=Lexend:wght@400;500;600;700&display=swap" media="print" onload="this.media='all'">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500..800&family=Anton&family=Lexend:wght@400;500;600;700&display=swap" media="print" onload="this.media='all'">
 <style>
 /* Layout concept: a race-day pit lane. White cards float on a grey paddock, real action
    photos bring the dirt, and the rider's own graphics kit colours the whole app. */
@@ -11736,6 +11736,10 @@ Jordy's Science test, Tuesday 10 November: Planet Earth and Beyond. Written from
     teal: { label: 'Teal rush', hex: '#0E9AA7', dark: '#0A7480', ink: '#FFFFFF', cost: 2000, filter: 'hue-rotate(160deg) saturate(1.05)' },
     sky: { label: 'Sky blue', hex: '#2FA8E8', dark: '#1C7FB6', ink: '#FFFFFF', cost: 3000, rank: 2, filter: 'hue-rotate(178deg) saturate(1.05) brightness(1.1)' },
     maroon: { label: 'Deep maroon', hex: '#7A1530', dark: '#5A0E22', ink: '#FFFFFF', cost: 3000, rank: 2, filter: 'hue-rotate(-30deg) saturate(1.1) brightness(.62)' },
+    copper: { label: 'Copper', hex: '#B8733A', dark: '#8A5326', ink: '#FFFFFF', cost: 4000, rank: 2, filter: 'hue-rotate(8deg) saturate(.75) brightness(.85)' },
+    mint: { label: 'Mint', hex: '#2DBE85', dark: '#1F8C61', ink: '#FFFFFF', cost: 3000, rank: 2, filter: 'hue-rotate(128deg) saturate(.85) brightness(1.1)' },
+    navy: { label: 'Navy', hex: '#1E2A5A', dark: '#131B3C', ink: '#FFFFFF', cost: 3000, rank: 2, filter: 'hue-rotate(205deg) saturate(.9) brightness(.55)' },
+    ice: { label: 'Ice', hex: '#8FD0F2', dark: '#4C9CC6', ink: '#FFFFFF', cost: 4000, rank: 2, accent: '#2F7FB0', filter: 'hue-rotate(180deg) saturate(.6) brightness(1.3)' },
     white: { label: 'Arctic white', hex: '#E8EAEE', dark: '#7C8594', ink: '#FFFFFF', accent: '#4A5568', cost: 5000, rank: 2, coat: '#F5F6F8', filter: 'saturate(0) brightness(1.08)' },
     black: { label: 'Midnight', hex: '#17181D', dark: '#000000', ink: '#FFFFFF', accent: '#4A5568', cost: 8000, rank: 3, coat: '#15161B', filter: 'saturate(0) brightness(.85)' },
     gold: { label: 'Champion gold', hex: '#D9A514', dark: '#A77E0B', ink: '#1C1600', cost: 15000, rank: 4, filter: 'hue-rotate(24deg) saturate(.95) brightness(1.02)' },
@@ -11750,6 +11754,8 @@ Jordy's Science test, Tuesday 10 November: Planet Earth and Beyond. Written from
     check: { label: 'Chequered', cost: 3000, rank: 2, w: 36, h: 36, turn: -12, art: '<rect width="18" height="18" fill="#fff"/><rect x="18" y="18" width="18" height="18" fill="#fff"/><rect x="18" width="18" height="18" fill="#15161B"/><rect y="18" width="18" height="18" fill="#15161B"/>' },
     bolt: { label: 'Lightning', cost: 4000, rank: 2, w: 70, h: 66, turn: -18, art: '<path d="M26 1h20L34 25h14L18 65l8-28H12z" fill="#F2C200" stroke="#15161B" stroke-width="2"/>' },
     pixel: { label: 'Digital', cost: 5000, rank: 2, w: 40, h: 40, art: '<g fill="#15161B"><rect width="10" height="10"/><rect x="20" y="10" width="10" height="10"/><rect x="10" y="30" width="10" height="10"/><rect x="30" y="30" width="10" height="10"/></g><g fill="#fff"><rect x="10" y="10" width="10" height="10"/><rect x="30" width="10" height="10"/><rect y="20" width="10" height="10"/><rect x="20" y="30" width="10" height="10"/></g>' },
+    stars: { label: 'Stars', cost: 4500, rank: 2, w: 60, h: 60, turn: -12, art: '<path d="M30 14l4.7 9.6 10.6 1.5-7.7 7.5 1.8 10.5L30 38.2l-9.4 4.9 1.8-10.5-7.7-7.5 10.6-1.5Z" fill="#fff" stroke="#15161B" stroke-width="2"/>' },
+    hexes: { label: 'Honeycomb', cost: 5500, rank: 3, w: 28, h: 48, art: '<path d="M14 0l14 8v16l-14 8-14-8V8ZM14 32v16" fill="none" stroke="#15161B" stroke-width="3"/>' },
     camo: { label: 'Camo', cost: 6000, rank: 3, w: 120, h: 90, art: '<rect width="120" height="90" fill="#59683F"/><path d="M0 20C20 5 45 8 55 25S40 55 20 50-10 35 0 20Z" fill="#2F3A24"/><path d="M70 0C90-6 115 5 118 22S95 48 78 38 60 8 70 0Z" fill="#8A8458"/><path d="M60 58C78 48 105 55 112 70S90 96 72 88 48 68 60 58Z" fill="#2F3A24"/><path d="M8 62C20 54 38 62 38 74S22 92 10 86 0 70 8 62Z" fill="#8A8458"/>' },
     mud: { label: 'Mud splat', cost: 7000, rank: 3, w: 100, h: 80, art: '<g fill="#5B3A1E"><path d="M18 14C30 4 46 10 44 24S24 38 14 30 8 20 18 14Z"/><circle cx="56" cy="12" r="5"/><circle cx="8" cy="46" r="4"/><path d="M62 44C74 36 92 42 90 56S70 72 60 64 52 50 62 44Z"/><circle cx="38" cy="58" r="7"/><circle cx="86" cy="24" r="3"/></g>' },
     flame: { label: 'Flames', cost: 8000, rank: 3, w: 130, h: 80, turn: -10, art: '<rect width="130" height="80" fill="#15161B"/><path d="M0 80C16 70 14 52 6 40C20 46 26 44 26 28C36 38 42 34 44 14C56 30 60 44 56 58C64 52 68 52 72 62C80 56 84 62 86 80Z" fill="#F97316"/><path d="M16 80C26 72 26 60 22 52C30 58 36 54 36 44C44 52 48 62 44 80Z" fill="#FDE047"/>' },
@@ -11774,27 +11780,35 @@ Jordy's Science test, Tuesday 10 November: Planet Earth and Beyond. Written from
       hBlue: { label: 'Blue', cost: 1000, c: '#1F5FE0', c2: '#FFFFFF' },
       hBlack: { label: 'Matt black', cost: 1500, c: '#23262C', c2: '#596273' },
       hOrange: { label: 'Orange', cost: 1500, c: '#E9501C', c2: '#FFFFFF' },
-      hTeam: { label: 'Team match', cost: 3500, rank: 2, team: true, c: '#E9501C', c2: '#15161B' },
+      hPink: { label: 'Pink', cost: 1500, c: '#D81B7C', c2: '#FFFFFF' },
+      hSplit: { label: 'Split', cost: 4500, rank: 2, c: '#1F5FE0', c2: '#F2F3F5', look: 'split' },
+      hStars: { label: 'Stars', cost: 6000, rank: 2, c: '#1E2A5A', c2: '#F2C200', look: 'star' },
+      hTeam: { label: 'Team match', cost: 3500, rank: 2, team: true, c: '#E9501C', c2: '#15161B', look: 'shard', lc: '#FFFFFF' },
       hRace: { label: 'Race stripe', cost: 4000, rank: 2, c: '#D4262F', c2: '#FFFFFF', look: 'stripe' },
       hCheck: { label: 'Chequered', cost: 5000, rank: 2, c: '#F2F3F5', c2: '#15161B', look: 'check' },
       hBolt: { label: 'Lightning', cost: 7000, rank: 3, c: '#15161B', c2: '#F2C200', look: 'bolt' },
       hCamo: { label: 'Camo', cost: 7500, rank: 3, c: '#59683F', c2: '#2F3A24', look: 'camo' },
       hFlame: { label: 'Hot flames', cost: 9000, rank: 3, c: '#17181D', c2: '#F97316', look: 'flame' },
-      hCarbon: { label: 'Carbon', cost: 16000, rank: 4, c: '#2B2F36', c2: '#7C8594', look: 'carbon' },
-      hChrome: { label: 'Chrome', cost: 22000, rank: 5, c: '#C9CED6', c2: '#FFFFFF', look: 'stripe' },
-      hGold: { label: 'Champion gold', cost: 30000, rank: 6, c: '#D9A514', c2: '#FFF3C4', look: 'stripe' },
+      hIce: { label: 'Ice', cost: 8000, rank: 3, c: '#BFE6FA', c2: '#1F5FE0', look: 'shard', lc: '#FFFFFF' },
+      hNeonTiger: { label: 'Neon tiger', cost: 11000, rank: 3, c: '#B7E021', c2: '#15161B', look: 'tiger' },
+      hCarbon: { label: 'Carbon', cost: 16000, rank: 4, c: '#14161B', c2: '#3B424E', look: 'carbon', shine: 'soft' },
+      hChrome: { label: 'Chrome', cost: 22000, rank: 5, c: '#9AA3AF', c2: '#E8EAEE', look: 'chrome', lc: '#FFFFFF', shine: true },
+      hGold: { label: 'Champion gold', cost: 30000, rank: 6, c: '#C8960F', c2: '#15161B', look: 'race', lc: '#15161B', shine: true },
     } },
     goggles: { title: 'Goggles', items: {
       oStock: { label: 'Clear lens', cost: 0, c: '#CFE6F2', c2: '#23262C' },
       oSmoke: { label: 'Smoke', cost: 1000, c: '#3B4250', c2: '#23262C' },
       oOrange: { label: 'Fire orange', cost: 1200, c: '#F97316', c2: '#23262C' },
       oPink: { label: 'Hot pink', cost: 1500, c: '#EC4899', c2: '#23262C' },
-      oGreen: { label: 'Mirror green', cost: 2500, rank: 2, c: '#22C55E', c2: '#23262C' },
-      oBlue: { label: 'Mirror blue', cost: 3000, rank: 2, c: '#2F8FE8', c2: '#FFFFFF' },
-      oRed: { label: 'Mirror red', cost: 3500, rank: 2, c: '#EF4444', c2: '#FFFFFF' },
-      oPurple: { label: 'Purple haze', cost: 5000, rank: 3, c: '#8B5CF6', c2: '#FFFFFF' },
+      oTeal: { label: 'Teal', cost: 1500, c: '#0E9AA7', c2: '#23262C' },
+      oGreen: { label: 'Mirror green', cost: 2500, rank: 2, c: '#22C55E', c2: '#23262C', shine: true },
+      oBlue: { label: 'Mirror blue', cost: 3000, rank: 2, c: '#2F8FE8', c2: '#FFFFFF', shine: true },
+      oRed: { label: 'Mirror red', cost: 3500, rank: 2, c: '#EF4444', c2: '#FFFFFF', shine: true },
+      oSilver: { label: 'Mirror silver', cost: 4000, rank: 2, c: '#AEB6C2', c2: '#23262C', shine: true },
+      oPurple: { label: 'Purple haze', cost: 5000, rank: 3, c: '#8B5CF6', c2: '#FFFFFF', shine: true },
+      oIridium: { label: 'Iridium', cost: 6500, rank: 3, c: '#5B3DF5', c2: '#23262C', look: 'iridium', shine: true },
       oRainbow: { label: 'Rainbow', cost: 8000, rank: 3, c: '#F2C200', c2: '#23262C', look: 'rainbow' },
-      oGold: { label: 'Gold mirror', cost: 10000, rank: 4, c: '#F2B705', c2: '#23262C' },
+      oGold: { label: 'Gold mirror', cost: 10000, rank: 4, c: '#E0A800', c2: '#23262C', shine: true },
     } },
     kit: { title: 'Race kit', items: {
       kStock: { label: 'Club grey', cost: 0, c: '#8A93A1', c2: '#D5D9E0', p: '#4B5361' },
@@ -11804,17 +11818,24 @@ Jordy's Science test, Tuesday 10 November: Planet Earth and Beyond. Written from
       kRed: { label: 'Race red', cost: 4000, rank: 2, c: '#D4262F', c2: '#FFFFFF', p: '#23262C' },
       kPink: { label: 'Hot pink', cost: 4000, rank: 2, c: '#D81B7C', c2: '#FFFFFF', p: '#23262C' },
       kWhite: { label: 'Clean white', cost: 5000, rank: 2, c: '#F2F3F5', c2: '#15161B', p: '#9AA3AF' },
-      kTeam: { label: 'Team match', cost: 7000, rank: 3, team: true, c: '#E9501C', c2: '#FFFFFF', p: '#23262C' },
+      kRetro: { label: 'Retro', cost: 6500, rank: 2, c: '#F2F3F5', c2: '#D4262F', p: '#1F5FE0', look: 'race' },
+      kTeam: { label: 'Team match', cost: 7000, rank: 3, team: true, c: '#E9501C', c2: '#FFFFFF', p: '#23262C', look: 'slash' },
       kBand: { label: 'Race bands', cost: 8000, rank: 3, c: '#1F5FE0', c2: '#F2C200', p: '#16264D', look: 'band' },
+      kNeonSplit: { label: 'Neon split', cost: 8500, rank: 3, c: '#15161B', c2: '#B7E021', p: '#15161B', look: 'split' },
+      kStars: { label: 'Star rider', cost: 9500, rank: 3, c: '#1E2A5A', c2: '#F2C200', p: '#1E2A5A', look: 'star' },
       kChev: { label: 'Chevron', cost: 9000, rank: 3, c: '#15161B', c2: '#E9501C', p: '#15161B', look: 'chev' },
       kCamo: { label: 'Camo', cost: 11000, rank: 3, c: '#59683F', c2: '#2F3A24', p: '#2F3A24', look: 'camo' },
-      kNight: { label: 'Night rider', cost: 14000, rank: 4, c: '#17181D', c2: '#B7E021', p: '#17181D' },
+      kNight: { label: 'Night rider', cost: 14000, rank: 4, c: '#17181D', c2: '#B7E021', p: '#17181D', look: 'pin' },
       kFlame: { label: 'Flame suit', cost: 18000, rank: 4, c: '#15161B', c2: '#F97316', p: '#15161B', look: 'flame' },
+      kLava: { label: 'Lava', cost: 20000, rank: 4, c: '#15161B', c2: '#D4262F', p: '#15161B', look: 'flame', shine: true },
       kSlash: { label: 'Slash', cost: 6000, rank: 2, c: '#17181D', c2: '#2FA8E8', p: '#17181D', look: 'slash' },
       kShard: { label: 'Shard', cost: 10000, rank: 3, c: '#F2F3F5', c2: '#D4262F', p: '#23262C', look: 'shard' },
-      kDigital: { label: 'Digital camo', cost: 12000, rank: 3, c: '#3B4250', c2: '#17181D', p: '#23262C', look: 'digital' },
+      kHex: { label: 'Honeycomb', cost: 10500, rank: 3, c: '#F2C200', c2: '#15161B', p: '#15161B', look: 'hex' },
+      kPurple: { label: 'Purple reign', cost: 11500, rank: 3, c: '#5B3DF5', c2: '#D9A514', p: '#1E1A3A', look: 'chev' },
+      kIce: { label: 'Ice storm', cost: 12500, rank: 3, c: '#BFE6FA', c2: '#1F5FE0', p: '#F2F3F5', look: 'wave' },
+      kDigital: { label: 'Digital camo', cost: 12000, rank: 3, c: '#4A5568', c2: '#1C1F25', p: '#23262C', look: 'digital' },
       kTiger: { label: 'Tiger', cost: 16000, rank: 4, c: '#E9501C', c2: '#15161B', p: '#15161B', look: 'tiger' },
-      kGold: { label: 'Champion', cost: 30000, rank: 6, c: '#D9A514', c2: '#17181D', p: '#17181D' },
+      kGold: { label: 'Champion', cost: 30000, rank: 6, c: '#C8960F', c2: '#15161B', p: '#17181D', look: 'race', shine: true },
     } },
     // Original characters, spoken by the free voices already on the device, so how they sound differs a little between devices.
     // prefer lists voice names to look for on Apple, Windows, Android and Chrome. Pitch and speed do the rest.
@@ -11854,8 +11875,10 @@ Jordy's Science test, Tuesday 10 November: Planet Earth and Beyond. Written from
       cRed: { label: 'Red', cost: 3500, rank: 2, c: '#D4262F', c2: '#17181D' },
       cOrange: { label: 'Factory orange', cost: 5000, rank: 2, c: '#E9501C', c2: '#17181D' },
       cNeon: { label: 'Neon', cost: 8000, rank: 3, c: '#B7E021', c2: '#17181D' },
-      cCarbon: { label: 'Carbon', cost: 14000, rank: 4, c: '#2B2F36', c2: '#7C8594', look: 'carbon' },
-      cGold: { label: 'Gold', cost: 24000, rank: 5, c: '#D9A514', c2: '#17181D' },
+      cCamo: { label: 'Camo', cost: 6000, rank: 3, c: '#59683F', c2: '#2F3A24', look: 'camo' },
+      cTiger: { label: 'Tiger', cost: 9000, rank: 3, c: '#E9501C', c2: '#15161B', look: 'tiger' },
+      cCarbon: { label: 'Carbon', cost: 14000, rank: 4, c: '#14161B', c2: '#3B424E', look: 'carbon', shine: 'soft' },
+      cGold: { label: 'Gold', cost: 24000, rank: 5, c: '#C8960F', c2: '#17181D', shine: true },
     } },
     knee: { title: 'Knee and shin guards', items: {
       nStock: { label: 'Under the pants', cost: 0, c: '#4B5361', c2: '#3B4250' },
@@ -11865,8 +11888,10 @@ Jordy's Science test, Tuesday 10 November: Planet Earth and Beyond. Written from
       nRed: { label: 'Red', cost: 3000, rank: 2, c: '#D4262F', c2: '#17181D' },
       nOrange: { label: 'Factory orange', cost: 4000, rank: 2, c: '#E9501C', c2: '#17181D' },
       nNeon: { label: 'Neon', cost: 6000, rank: 3, c: '#B7E021', c2: '#17181D' },
-      nCarbon: { label: 'Carbon', cost: 10000, rank: 4, c: '#2B2F36', c2: '#7C8594', look: 'carbon' },
-      nGold: { label: 'Gold', cost: 18000, rank: 5, c: '#D9A514', c2: '#17181D' },
+      nCamo: { label: 'Camo', cost: 5000, rank: 3, c: '#59683F', c2: '#2F3A24', look: 'camo' },
+      nTiger: { label: 'Tiger', cost: 7000, rank: 3, c: '#E9501C', c2: '#15161B', look: 'tiger' },
+      nCarbon: { label: 'Carbon', cost: 10000, rank: 4, c: '#14161B', c2: '#3B424E', look: 'carbon', shine: 'soft' },
+      nGold: { label: 'Gold', cost: 18000, rank: 5, c: '#C8960F', c2: '#17181D', shine: true },
     } },
     gloves: { title: 'Gloves', items: {
       gStock: { label: 'Stock grey', cost: 0, c: '#6B7280', c2: '#3B4250' },
@@ -11875,24 +11900,30 @@ Jordy's Science test, Tuesday 10 November: Planet Earth and Beyond. Written from
       gOrange: { label: 'Orange', cost: 900, c: '#E9501C', c2: '#17181D' },
       gWhite: { label: 'White', cost: 1000, c: '#F2F3F5', c2: '#15161B' },
       gGreen: { label: 'Green', cost: 1000, c: '#0B8457', c2: '#FFFFFF' },
+      gSky: { label: 'Sky blue', cost: 1000, c: '#2FA8E8', c2: '#FFFFFF' },
       gRed: { label: 'Red', cost: 2500, rank: 2, c: '#D4262F', c2: '#17181D' },
       gPink: { label: 'Pink', cost: 2500, rank: 2, c: '#D81B7C', c2: '#FFFFFF' },
-      gCamo: { label: 'Camo', cost: 4000, rank: 2, c: '#59683F', c2: '#2F3A24' },
+      gCamo: { label: 'Camo', cost: 4000, rank: 2, c: '#59683F', c2: '#2F3A24', look: 'camo' },
+      gFlame: { label: 'Flames', cost: 5000, rank: 2, c: '#15161B', c2: '#F97316', look: 'flame' },
+      gTiger: { label: 'Tiger', cost: 7000, rank: 3, c: '#E9501C', c2: '#15161B', look: 'tiger' },
       gNeon: { label: 'Neon', cost: 6000, rank: 3, c: '#B7E021', c2: '#17181D' },
-      gCarbon: { label: 'Carbon', cost: 10000, rank: 4, c: '#2B2F36', c2: '#7C8594' },
-      gGold: { label: 'Gold', cost: 20000, rank: 5, c: '#D9A514', c2: '#17181D' },
+      gCarbon: { label: 'Carbon', cost: 10000, rank: 4, c: '#14161B', c2: '#3B424E', look: 'carbon', shine: 'soft' },
+      gGold: { label: 'Gold', cost: 20000, rank: 5, c: '#C8960F', c2: '#17181D', shine: true },
     } },
     boots: { title: 'Boots', items: {
       bStock: { label: 'Stock black', cost: 0, c: '#23262C', c2: '#7C8594' },
       bWhite: { label: 'White', cost: 1200, c: '#EEF0F3', c2: '#23262C' },
       bBlue: { label: 'Blue', cost: 1500, c: '#1F5FE0', c2: '#FFFFFF' },
       bGreen: { label: 'Green', cost: 1500, c: '#0B8457', c2: '#FFFFFF' },
+      bTeal: { label: 'Teal', cost: 1500, c: '#0E9AA7', c2: '#FFFFFF' },
       bRed: { label: 'Red', cost: 3000, rank: 2, c: '#D4262F', c2: '#17181D' },
       bPink: { label: 'Pink', cost: 3000, rank: 2, c: '#D81B7C', c2: '#FFFFFF' },
-      bOrange: { label: 'Factory orange', cost: 8000, rank: 3, c: '#E9501C', c2: '#17181D' },
+      bOrange: { label: 'Factory orange', cost: 8000, rank: 3, c: '#E9501C', c2: '#F5F6F8', look: 'band', lc: '#15161B' },
       bNeon: { label: 'Neon', cost: 8000, rank: 3, c: '#B7E021', c2: '#17181D' },
-      bCarbon: { label: 'Carbon', cost: 12000, rank: 4, c: '#2B2F36', c2: '#7C8594' },
-      bGold: { label: 'Gold', cost: 22000, rank: 5, c: '#D9A514', c2: '#17181D' },
+      bCamo: { label: 'Camo', cost: 6000, rank: 3, c: '#59683F', c2: '#2F3A24', look: 'camo', lc: '#2F3A24' },
+      bFlame: { label: 'Flames', cost: 9000, rank: 3, c: '#15161B', c2: '#F97316', look: 'flame', lc: '#F97316' },
+      bCarbon: { label: 'Carbon', cost: 12000, rank: 4, c: '#14161B', c2: '#B7BEC9', look: 'carbon', lc: '#3B424E', shine: 'soft' },
+      bGold: { label: 'Gold', cost: 22000, rank: 5, c: '#C8960F', c2: '#17181D', shine: true },
     } },
   };
   const BADGES = [
@@ -11997,7 +12028,7 @@ Jordy's Science test, Tuesday 10 November: Planet Earth and Beyond. Written from
   // ---------- staying up to date ----------
   // An open tab or a home screen app keeps running the page it first loaded, old prices and all. So it asks which version
   // is live when it comes back into view and every few minutes, and swaps over between races. build.mjs fills in BUILD.
-  const BUILD = '7e4d5ee430';
+  const BUILD = '5f9d2294f4';
   const BACK_KEY = 'holeshot.back.v1';
   const TRIED_KEY = 'holeshot.tried.v1';
   let liveBuild = null;
@@ -12291,14 +12322,16 @@ Jordy's Science test, Tuesday 10 November: Planet Earth and Beyond. Written from
     const tall = Math.hypot(...down);
     const across1 = String(text).length * 0.6;
     // A race number fills its plate: as tall as it can go, narrowed a little if it has to be, and thickened with its own outline.
-    const size = opts.bold ? Math.min(tall * 1.22, (wide * 0.96) / (across1 * 0.74)) : Math.min(tall * 0.84, wide / (String(text).length * 0.62 * (opts.squeeze || 1)));
-    const squeeze = opts.bold ? Math.min(1, (wide * 0.96) / (across1 * size)) : opts.squeeze || 1;
+    // Race numbers use Anton, a tall condensed face like real number boards, filling the plate edge to edge.
+    const size = opts.bold ? Math.min(tall * 1.12, (wide * 0.9) / (String(text).length * 0.5)) : Math.min(tall * 0.84, wide / (String(text).length * 0.62 * (opts.squeeze || 1)));
+    const squeeze = opts.bold ? Math.min(1, (wide * 0.9) / (String(text).length * 0.5 * size)) : opts.squeeze || 1;
     const fill = opts.fill || '#111318';
-    const line = opts.bold ? `stroke="${fill}" stroke-width="${(size * 0.05).toFixed(1)}" stroke-linejoin="round"` : opts.stroke ? `stroke="${opts.stroke}" stroke-width="${opts.line || 3}"` : '';
+    const line = opts.bold ? `stroke="${fill}" stroke-width="${(size * 0.012).toFixed(2)}" stroke-linejoin="miter"` : opts.stroke ? `stroke="${opts.stroke}" stroke-width="${opts.line || 3}"` : '';
     const unit = (v, k = 1) => [(v[0] / Math.hypot(...v)) * k, (v[1] / Math.hypot(...v)) * k];
     const mid = [(a[0] + b[0] + c[0] + d[0]) / 4, (a[1] + b[1] + c[1] + d[1]) / 4];
     const m = [...unit(across, squeeze), ...unit(down), ...mid].map((n) => n.toFixed(3)).join(' ');
-    return `<text transform="matrix(${m}) skewX(-8)" y="${(size * 0.36).toFixed(1)}" font-size="${size.toFixed(1)}" font-weight="800" text-anchor="middle" fill="${fill}" ${line} style="font-family:var(--display);paint-order:stroke">${text}</text>`;
+    const face = opts.bold ? "font-family:Anton,Impact,'Arial Narrow',sans-serif;font-weight:400;letter-spacing:-.01em" : 'font-family:var(--display);font-weight:800';
+    return `<text transform="matrix(${m}) skewX(${opts.bold ? -6 : -8})" y="${(size * (opts.bold ? 0.37 : 0.36)).toFixed(1)}" font-size="${size.toFixed(1)}" text-anchor="middle" fill="${fill}" ${line} style="${face};paint-order:stroke">${text}</text>`;
   };
   const SHOT_PARTS = ['shade', 'plastic', 'helmet', 'peak', 'lens', 'jersey', 'chest', 'knee', 'pants', 'gloves', 'boots', 'boots2'];
   const readied = {};
@@ -12315,7 +12348,15 @@ Jordy's Science test, Tuesday 10 November: Planet Earth and Beyond. Written from
     bolt: [70, 66, 13, (c) => `<path d="M26 1h20L34 25h14L18 65l8-28H12z" fill="${c}"/>`],
     camo: [120, 90, 20, (c) => `<path d="M0 20C20 5 45 8 55 25S40 55 20 50-10 35 0 20ZM60 58C78 48 105 55 112 70S90 96 72 88 48 68 60 58Z" fill="${c}"/>`],
     flame: [130, 80, 15, (c) => `<path d="M0 80C16 70 14 52 6 40C20 46 26 44 26 28C36 38 42 34 44 14C56 30 60 44 56 58C64 52 68 52 72 62C80 56 84 62 86 80Z" fill="${c}"/>`],
-    carbon: [12, 12, 2.4, (c) => `<path d="M0 0L6 6L0 12M6 0L12 6L6 12" stroke="${c}" stroke-width="2" fill="none"/>`],
+    // A twill weave, big enough to read as carbon on a phone.
+    carbon: [16, 16, 3.4, (c) => `<path d="M0 0h8v4H0zM4 4h8v4H4zM8 8h8v4H8zM12 12h4v4h-4zM0 12h4v4H0zM8 0h4v4H8z" fill="${c}"/>`],
+    split: [100, 100, 62, (c) => `<path d="M0 0H100L0 100Z" fill="${c}"/>`],
+    star: [60, 60, 10, (c) => `<path d="M30 14l4.7 9.6 10.6 1.5-7.7 7.5 1.8 10.5L30 38.2l-9.4 4.9 1.8-10.5-7.7-7.5 10.6-1.5Z" fill="${c}"/>`],
+    hex: [28, 48, 6, (c) => `<path d="M14 0l14 8v16l-14 8-14-8V8ZM14 32v16" fill="none" stroke="${c}" stroke-width="3.5"/>`],
+    race: [100, 100, 38, (c) => `<path d="M34 0h16v100H34zM56 0h6v100h-6z" fill="${c}"/>`],
+    pin: [24, 24, 6, (c) => `<path d="M-2 26L26-2M-2 14L14-2M10 26L26 10" stroke="${c}" stroke-width="2.4"/>`],
+    wave: [60, 30, 12, (c) => `<path d="M-2 15C13 0 15 30 30 15S47 0 62 15" fill="none" stroke="${c}" stroke-width="7"/>`],
+    chrome: [100, 100, 26, (c) => `<path d="M0 30L30 0H44L0 44ZM0 78L78 0H84L0 84ZM40 100L100 40V58L58 100Z" fill="${c}" opacity=".8"/>`],
     band: [60, 60, 16, (c) => `<path d="M0 8h60v14H0zM0 30h60v5H0z" fill="${c}"/>`],
     chev: [60, 40, 12, (c) => `<path d="M0 34L30 8L60 34" stroke="${c}" stroke-width="9" fill="none"/>`],
     shard: [120, 120, 30, (c) => `<path d="M0 0L62 34L28 120L0 120ZM120 0L92 70L120 120ZM70 60L104 120L52 120Z" fill="${c}"/>`],
@@ -12324,6 +12365,17 @@ Jordy's Science test, Tuesday 10 November: Planet Earth and Beyond. Written from
     tiger: [90, 70, 20, (c) => `<path d="M0 8C20 2 34 14 52 10C38 22 18 20 0 24ZM36 40C54 32 70 46 90 38V52C70 58 54 46 36 40ZM0 52C14 48 26 56 40 54C28 66 12 62 0 66Z" fill="${c}"/>`],
   };
   const svgFill = (svg, sizing) => `url('data:image/svg+xml,${encodeURIComponent(svg)}') 0 0 / ${sizing}`;
+  // Metal and gloss: bands of light and shade laid over the colour, so chrome, gold, carbon and mirror lenses catch the light.
+  const shineOf = (k) => svgFill(`<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><defs><linearGradient id="s" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#fff" stop-opacity="${0.7 * k}"/><stop offset=".2" stop-color="#fff" stop-opacity="0"/><stop offset=".48" stop-color="#000" stop-opacity="${0.3 * k}"/><stop offset=".62" stop-color="#fff" stop-opacity="0"/><stop offset=".8" stop-color="#fff" stop-opacity="${0.65 * k}"/><stop offset="1" stop-color="#fff" stop-opacity="${0.1 * k}"/></linearGradient></defs><rect width="100" height="100" fill="url(#s)"/></svg>`, '24% auto');
+  const SHINE = shineOf(1);
+  // Carbon gets a gentler gloss, so it stays dark.
+  const SHINE_SOFT = shineOf(0.4);
+  const shine = (it) => (!it || !it.shine ? '' : it.shine === 'soft' ? SHINE_SOFT : SHINE);
+  // Lenses that are a whole spectrum, in bands narrow enough to show on one pair of goggles.
+  const LENS = {
+    rainbow: 'repeating-linear-gradient(100deg,#EF4444 0 2%,#F97316 2% 4%,#F2C200 4% 6%,#22C55E 6% 8%,#2F8FE8 8% 10%,#8B5CF6 10% 12%)',
+    iridium: 'repeating-linear-gradient(100deg,#5B3DF5 0 3%,#2F8FE8 3% 6%,#22C55E 6% 8%,#5B3DF5 8% 11%)',
+  };
   const lookFill = (look, c) => {
     const art = lookArt[look];
     if (!art) return '';
@@ -12351,12 +12403,12 @@ Jordy's Science test, Tuesday 10 November: Planet Earth and Beyond. Written from
     return `<div class="rig" style="aspect-ratio:${spot.w}/${spot.h}">
       <img class="shot" src="img/photo-${id}.webp" alt="${alt}" width="${spot.w}" height="${spot.h}" decoding="sync">
       ${paint.rainbow ? coat('plastic', rainbowNow || paint.hex, 'rainbow') : coat('plastic', paint.coat || paint.hex)}${sticker && sticker.art ? coat('plastic', stickerSheet(sticker, spot)) : ''}
-      ${coat('pants', kit.p)}${coat('pants', lookFill(kit.look, kit.c2))}${coat('boots', boots.c)}${coat('boots2', boots.c2)}
-      ${coat('jersey', jersey)}${coat('jersey', lookFill(kit.look, kit.c2))}
-      ${coat('chest', chest.cost ? chest.c : jersey)}${coat('chest', lookFill(chest.look, chest.c2))}${coat('knee', knee.cost ? knee.c : kit.p)}${coat('knee', lookFill(knee.look, knee.c2))}
-      ${coat('gloves', gloves.c)}
-      ${coat('helmet', helmet.team ? paint.hex : helmet.c)}${coat('helmet', lookFill(helmet.look, helmet.c2))}${coat('peak', helmet.c2)}
-      ${coat('lens', goggles.look === 'rainbow' ? 'linear-gradient(90deg,#EF4444,#F2C200,#2F8FE8)' : goggles.c)}
+      ${coat('pants', kit.p)}${coat('pants', lookFill(kit.look, kit.c2))}${coat('boots', boots.c)}${coat('boots', lookFill(boots.look, boots.lc || boots.c2))}${coat('boots', shine(boots))}${coat('boots2', boots.c2)}
+      ${coat('jersey', jersey)}${coat('jersey', lookFill(kit.look, kit.c2))}${coat('jersey', shine(kit))}
+      ${coat('chest', chest.cost ? chest.c : jersey)}${coat('chest', lookFill(chest.look, chest.c2))}${coat('chest', shine(chest))}${coat('knee', knee.cost ? knee.c : kit.p)}${coat('knee', lookFill(knee.look, knee.c2))}${coat('knee', shine(knee))}
+      ${coat('gloves', gloves.c)}${coat('gloves', lookFill(gloves.look, gloves.c2))}${coat('gloves', shine(gloves))}
+      ${coat('helmet', helmet.team ? paint.hex : helmet.c)}${coat('helmet', lookFill(helmet.look, helmet.lc || helmet.c2))}${coat('helmet', shine(helmet))}${coat('peak', helmet.c2)}
+      ${coat('lens', LENS[goggles.look] || goggles.c)}${coat('lens', shine(goggles))}
       <svg viewBox="0 0 ${spot.w} ${spot.h}" aria-hidden="true">
         ${sticker && sticker.art ? printOn(spot.logo, 'HOLESHOT', { fill: '#fff', stroke: '#15161B', line: 2.5 }) : ''}
         ${printOn(spot.side, num, { bold: true })}${printOn(spot.front, num, { bold: true })}
@@ -13097,7 +13149,7 @@ Jordy's Science test, Tuesday 10 November: Planet Earth and Beyond. Written from
     if (tab === 'sticker') return `<span class="swatch" style="--c:${PAINTS[p.paint].hex}"><span class="swatch-mark">${mark}</span></span>`;
     if (item.rainbow) return `<span class="swatch" style="--c:conic-gradient(#EF4444,#F2C200,#22C55E,#2F8FE8,#8B5CF6,#EF4444)"><span class="swatch-mark">${mark}</span></span>`;
     const colour = item.team ? PAINTS[p.paint].hex : tab === 'paint' ? item.hex : item.c;
-    const look = tab === 'paint' ? colour : item.look === 'rainbow' ? 'linear-gradient(90deg,#EF4444,#F2C200,#2F8FE8)' : `linear-gradient(135deg,${colour} 62%,${item.c2} 62%)`;
+    const look = tab === 'paint' ? colour : LENS[item.look] ? LENS[item.look].replace(/(\d+(?:\.\d+)?)%/g, (_, n) => `${n * 6}%`) : item.shine ? `linear-gradient(135deg,${colour} 18%,#FFFFFF 40%,${colour} 58%,${colour} 62%,${item.lc || item.c2} 62%)` : `linear-gradient(135deg,${colour} 62%,${item.lc || item.c2} 62%)`;
     return `<span class="swatch" style="--c:${look}"><span class="swatch-mark">${mark}</span></span>`;
   }
   function pitItems(p, tab) {
