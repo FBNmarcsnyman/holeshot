@@ -546,6 +546,26 @@ details ol { margin: 6px 0 0; padding-left: 20px; }
 @keyframes gate { 0% { transform: translateY(-40px); opacity: 0; } 25% { transform: none; opacity: 1; } 70% { opacity: 1; } 100% { opacity: 0; transform: scale(1.08); } }
 @media (prefers-reduced-motion: reduce) { .gate-drop { display: none; } }
 
+/* Parents: one job for tonight */
+.tonight { border: 2px solid var(--accent); display: grid; gap: 4px; }
+
+/* Saved or offline */
+.saved.off { color: var(--warn); font-weight: 700; }
+/* First-run guide and finishing a race */
+.guide, .resume { display: grid; gap: 8px; }
+.guide-list { margin: 0; padding-left: 20px; display: grid; gap: 6px; }
+/* The pits in three groups */
+.pit-tabs { flex-direction: column; flex-wrap: nowrap; gap: 8px; }
+.pit-group { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
+.pit-group .eyebrow { width: 100%; }
+/* Easy to tap: at least 44 px */
+.btn.small, .pit-tab, .sub-chip { min-height: 44px; }
+.round.small { width: 44px; height: 44px; }
+.walk-head { display: flex; gap: 8px; align-items: center; }
+.walk-head > div:first-child { flex: 1; min-width: 0; }
+.sheet-head { display: flex; align-items: center; gap: 8px; }
+.sheet-head h2 { flex: 1; }
+
 </style>
 <div id="app"></div>
 <div id="toast" class="toast" role="status" aria-live="polite" hidden></div>
@@ -8257,6 +8277,179 @@ Jordy's Science test, Tuesday 10 November: Planet Earth and Beyond. Written from
   });
 })(typeof window !== 'undefined' ? window : globalThis);
 
+/* November 2026: rule cards, Track walks and wrong-answer tips for Jordy's nine Afrikaans racing sections,
+   following the book's rules as the questions in bank-afrikaans.js state them. */
+(function (root) {
+  'use strict';
+  const RS = root.RS;
+  const T = (id) => RS.packs.jordy.subjects.afrikaans.topics.find((t) => t.id === id);
+  const S = RS.packs.jordy.skills;
+
+  // ---------- Verlede tyd: rules 1, 2, 3, 6, 7, 8, 9 ----------
+  T('afr_past2').notes = [
+    `Rule 1: het comes second, and the verb goes to the end with ge- in front: Gister het ek 'n helm gekoop.`,
+    `Rule 2: a verb in two parts joins up at the end, with ge in the middle: Gister het Pa die fiets reggemaak.`,
+    `Rule 3: verbs starting with be-, ge-, her-, er-, ont-, ver- or mis- get no ge-: Gister het ons die wedren verloor.`,
+    `Rule 6: with a second verb at the end, the first verb goes right before it, and neither gets ge-: Gister het ek die ryer sien spring.`,
+    `Rules 7, 8 and 9: kan kon, wil wou, moet moes, sal sou, mag mag and is was, all with no het. When het means have, add gehad: Gister het ek 'n fiets gehad.`,
+  ];
+  T('afr_past2').walk = [
+    { card: `Het, and ge- at the end`, say: `Most verbs need two things in the past tense: "het" in second place, and the verb at the end with "ge-" in front of it.`, eg: `Ek koop 'n helm. Gister het ek 'n helm gekoop.`, more: `That is Rule 1. With a time word like Gister first, het still stays second, so "ek" moves to after het.` },
+    { tap: `Gister het Sipho die ketting skoongemaak.`, find: `skoongemaak`, ask: `"Maak ... skoon" is a verb in two parts. Tap where it joined up.`, got: `Skoon + ge + maak. Rule 2: the two parts join up at the end, with ge in the middle.` },
+    { sort: [`Gets ge-`, `No ge-`], ask: `In the past tense, does this verb get ge-?`, items: [[`skop`, 0, `Skop becomes geskop.`], [`verloor`, 1, `It starts with ver-, so it stays verloor.`], [`koop`, 0, `Koop becomes gekoop.`], [`betaal`, 1, `It starts with be-, so it stays betaal.`], [`onthou`, 1, `It starts with ont-, so it stays onthou.`], [`wen`, 0, `Wen becomes gewen.`], [`herstel`, 1, `It starts with her-, so it stays herstel.`]] },
+    { card: `Two verbs at the end`, say: `When a second verb waits at the end, the first verb goes right before it, and neither of them gets ge-.`, eg: `Ek sien die ryer spring. Gister het ek die ryer sien spring.`, more: `That is Rule 6. Hoor works the same way: Gister het ons die enjins hoor brul.` },
+    { match: [[`kan`, `kon`], [`wil`, `wou`], [`moet`, `moes`], [`sal`, `sou`], [`is`, `was`]], ask: `Tap a word, then tap its past tense. None of them takes het, and mag stays mag.` },
+    { tap: `Gister het die ryer 'n seer been gehad.`, find: `gehad`, ask: `In "Die ryer het 'n seer been", het means has. Tap the word that goes at the end in the past tense.`, got: `Rule 9: when het means have or has, het stays and gehad goes at the end.` },
+  ];
+
+  // ---------- Toekomende tyd: rules 1 to 6 ----------
+  T('afr_future2').notes = [
+    `Rule 1: sal comes second, and the verb goes to the end: Môre sal ek pap eet.`,
+    `Rule 2: a verb in two parts joins up at the end, with no ge: Môre sal Pa die fiets regmaak.`,
+    `Rule 3: with a second verb at the end, the first verb goes right before it: Môre sal ek die ryer sien spring.`,
+    `Rule 4: sal takes the helping verb's place, and the helping verb goes right before the verb at the end: Môre sal ons kan ry.`,
+    `Rules 5 and 6: is becomes sal ... wees, and het meaning have becomes sal ... hê: Môre sal ek moeg wees.`,
+  ];
+  T('afr_future2').walk = [
+    { card: `Sal, and the verb at the end`, say: `For the future tense, "sal" goes in second place and the verb moves right to the end.`, eg: `Ek eet pap. Môre sal ek pap eet.`, more: `That is Rule 1. With a time word like Môre first, sal still stays second, so "ek" moves to after sal.` },
+    { tap: `Môre sal Lerato haar stewels aantrek.`, find: `aantrek`, ask: `"Trek ... aan" is a verb in two parts. Tap where it joined up.`, got: `Aan + trek join up at the end with no ge, because ge is only for the past. That is Rule 2.` },
+    { card: `Two verbs at the end`, say: `When there are two verbs, sal takes the first verb's place, and that verb moves right before the other one at the end.`, eg: `Ons kan die bult sien. Môre sal ons die bult kan sien.`, more: `Rules 3 and 4. It works for sien and hoor too: Môre sal ek die ryer sien spring.` },
+    { tap: `Môre sal die ryer 'n nuwe helm hê.`, find: `hê`, ask: `In "Die ryer het 'n nuwe helm", het means has. Tap the word het turned into at the end.`, got: `Rule 6: het becomes sal, and hê goes at the end, with its kappie. Is works the same way: sal ... wees.` },
+    { match: [[`Ek is moeg.`, `Môre sal ek moeg wees.`], [`Ek het 'n fiets.`, `Môre sal ek 'n fiets hê.`], [`Ek kan ry.`, `Môre sal ek kan ry.`], [`Ek oefen hard.`, `Môre sal ek hard oefen.`], [`Ek tel my helm op.`, `Môre sal ek my helm optel.`]], ask: `Tap a sentence, then tap it in the future tense.` },
+    { sort: [`Right`, `Wrong`], ask: `Is this future tense sentence right?`, items: [[`Môre sal ek moeg wees.`, 0, `Is becomes sal ... wees.`], [`Môre sal ek moeg is.`, 1, `Is can't stay. It becomes wees at the end.`], [`Môre sal Thabo 'n nuwe ketting koop.`, 0, `Sal is second, and koop is at the end.`], [`Môre sal Thabo koop 'n nuwe ketting.`, 1, `The verb must go right to the end.`], [`Môre sal ons die fietse aflaai.`, 0, `Af and laai join up at the end, with no ge.`], [`Môre sal ons die fietse afgelaai.`, 1, `Ge is only for the past tense. In the future it is aflaai.`], [`Môre ek sal 'n helm hê.`, 1, `After a time word, sal comes straight after it, before the subject: Môre sal ek.`]] },
+  ];
+
+  // ---------- Stompi: S v1 T O M P v2 I ----------
+  T('afr_stompi2').notes = [
+    `The order is S v1 T O M P v2 I, and a sentence uses only the parts it has: Oupa drink elke oggend koffie op die stoep.`,
+    `S is who does it, T when, O what it is done to, M how and P where: Thabo gooi vandag die bal hard op die veld.`,
+    `The time comes before the object: Lerato lees elke aand haar boek.`,
+    `v2 is a second verb and I is the om ... te part, and they go last, in that order: Sipho wil elke dag in die bos ry om fiks te word.`,
+    `If the time comes first, the verb stays second and the subject moves after it: Vandag oefen die ryer op die baan.`,
+  ];
+  T('afr_stompi2').walk = [
+    { card: `S v1 T O M P v2 I`, say: `Afrikaans sentences follow a set order. Say it like one long word: S v1 T O M P v2 I.`, eg: `Pa braai elke Sondag die vleis stadig in die tuin.`, more: `S Pa, v1 braai, T elke Sondag, O die vleis, M stadig, P in die tuin. A sentence uses only the parts it has, in the same order.` },
+    { match: [[`S`, `Subjek: who does it?`], [`T`, `Tyd: when?`], [`O`, `Objek: what is it done to?`], [`M`, `Manier: how?`], [`P`, `Plek: where?`]], ask: `Tap a letter, then tap what it stands for.` },
+    { tap: `Die seuns speel elke middag rugby op die veld.`, find: `rugby`, ask: `Tap the O: wat speel hulle?`, got: `Rugby is the object. It comes after elke middag, because the time comes before the object.` },
+    { card: `v2 and I go last`, say: `A second verb (v2) goes after the place. The om ... te part (I) comes right at the end, after everything else.`, eg: `Die span moet elke middag op die veld oefen om te wen.`, more: `S die span, v1 moet, T elke middag, P op die veld, v2 oefen, I om te wen.` },
+    { tap: `Elke Saterdag oefen Sipho hard op die baan.`, find: `sipho`, ask: `This one starts with the time. Tap the subject.`, got: `With the time first, the verb stays second, so Sipho comes straight after oefen: T v1 S.` },
+    { sort: [`Right order`, `Wrong order`], ask: `Is this sentence in Stompi order?`, items: [[`Ons braai elke Saterdag by Oupa se huis.`, 0, `T, then P: the time comes before the place.`], [`Ons braai by Oupa se huis elke Saterdag.`, 1, `The place came before the time, but T comes before P.`], [`Die span oefen vandag hard op die veld.`, 0, `T, M, P: vandag, hard, op die veld.`], [`Die span oefen hard vandag op die veld.`, 1, `The manner came before the time, but T comes before M.`], [`Ma bak elke Vrydag 'n koek in die kombuis.`, 0, `T, O, P: elke Vrydag, 'n koek, in die kombuis.`], [`Ma bak 'n koek elke Vrydag in die kombuis.`, 1, `The object came before the time, but T comes before O.`], [`Môre die ryers ry vinnig op die baan.`, 1, `With the time first, the verb must stay second: Môre ry die ryers.`]] },
+  ];
+
+  // ---------- Voegwoorde: groups 1 to 3 ----------
+  T('afr_conj2').notes = [
+    `Group 1, MOWED (maar, of meaning or, want, en, dog): nothing moves. Put a comma before maar and want, but never before en: Ek is moeg, want ek het hard gery.`,
+    `Group 2 (such as dus, daarom, dan, tog): the verb comes straight after the voegwoord: Die baan is nat daarom ry ons stadig.`,
+    `Group 3 (such as omdat, sodat, terwyl, as): the verb goes to the end: Ons bly tuis omdat die baan nat is.`,
+    `In Group 3, a helping verb goes right before the main verb at the end: Hy oefen sodat hy kan wen.`,
+    `In Group 3, the TURBO verbs het, word, is and was go right at the very end: Ons is bly omdat ons gewen het.`,
+  ];
+  T('afr_conj2').walk = [
+    { card: `Three groups of voegwoorde`, say: `A voegwoord joins two sentences. Its group decides what happens to the verb in the second sentence.`, eg: `Ons bly tuis, want die baan is nat. Ons bly tuis omdat die baan nat is.`, more: `Want is Group 1, so nothing moves. Omdat is Group 3, so "is" goes to the end.` },
+    { sort: [`Group 1`, `Group 2`, `Group 3`], ask: `Which group is it in? Group 1 changes nothing, Group 2 pulls the verb next to it, Group 3 sends it to the end.`, items: [[`want`, 0, `Want is one of the MOWED words: maar, of, want, en, dog.`], [`daarom`, 1, `After daarom the verb comes straight next: daarom ry ons.`], [`omdat`, 2, `After omdat the verb goes to the end: omdat die baan nat is.`], [`en`, 0, `En is a MOWED word, so nothing moves.`], [`dus`, 1, `After dus the verb comes straight next: dus gaan ons.`], [`terwyl`, 2, `After terwyl the verb goes to the end: terwyl Pa die ketting olie.`], [`maar`, 0, `Maar is a MOWED word, so nothing moves.`]] },
+    { tap: `Die baan is modderig daarom ry ons stadig.`, find: `ry`, ask: `Daarom is in Group 2. Tap the verb that jumped right next to it.`, got: `Ry comes straight after daarom, and ons moves to after the verb.` },
+    { card: `Helping verbs and TURBO verbs`, say: `In Group 3, the TURBO verbs het, word, is and was go right at the very end, even after the main verb.`, eg: `Ons is bly omdat ons gewen het.`, more: `A helping verb like kan, wil or moet is different: it goes right before the main verb. Ons staan vroeg op omdat ons wil ry.` },
+    { tap: `Ek oefen elke dag sodat ek die wedren kan wen.`, find: `kan`, ask: `Sodat is in Group 3. Tap the helping verb that moved towards the end.`, got: `Kan goes right before the main verb, wen, at the end.` },
+    { sort: [`Right`, `Wrong`], ask: `Is the word order after the voegwoord right?`, items: [[`Ons is bly, want ons het gewen.`, 0, `Want is Group 1, so the order stays the same.`], [`Ons is bly omdat ons gewen het.`, 0, `Omdat is Group 3, and het is a TURBO verb, so it goes right at the end.`], [`Ons is bly omdat ons het gewen.`, 1, `After omdat, het must go right at the end: omdat ons gewen het.`], [`Ons is bly, want ons gewen het.`, 1, `Want is Group 1, so nothing moves: want ons het gewen.`], [`Dit is laat dus gaan ons huis toe.`, 0, `Dus is Group 2, so gaan comes straight after it.`], [`Dit is laat dus ons gaan huis toe.`, 1, `After dus the verb comes straight next: dus gaan ons.`], [`Ma maak die slaai en Pa braai die vleis.`, 0, `En is Group 1, so nothing moves, and there's no comma in front of en.`]] },
+  ];
+
+  // ---------- Voorsetsels ----------
+  T('afr_prep2').notes = [
+    `Many words keep the same partner, and it often isn't the English one, so learn them as pairs: hou van, lief vir, kwaad vir, kyk na, dink aan, kla oor, glo in.`,
+    `Where things are: op on, onder under, agter behind, voor in front of, oor over, deur through, teen against, om around: Die bal rol onder die bakkie.`,
+    `People: verloof aan, getroud met, verlief op, gesels met: Oom Piet is getroud met tannie Anna.`,
+    `Fixed phrases: per ongeluk, per vliegtuig, te voet, te perd, met vakansie, op pad, om die draai: Ons gaan te voet skool toe.`,
+    `Time: oor drie weke (in three weeks' time), van môre af, na die wedren (after), tien voor nege: Ons braai na die wedren.`,
+  ];
+  T('afr_prep2').walk = [
+    { card: `Words that show where`, say: `A voorsetsel shows how the words in a sentence link up, very often where something is.`, eg: `Die hond slaap onder die bakkie.`, more: `Onder shows where the hond is. Op is on, agter behind, voor in front of, oor over, deur through, teen against, om around.` },
+    { match: [[`agter`, `behind`], [`teen`, `against`], [`deur`, `through`], [`om`, `around`], [`voor`, `in front of`]], ask: `Tap an Afrikaans word, then tap its English meaning.` },
+    { tap: `Die fiets lê agter die bakkie.`, find: `agter`, ask: `Tap the voorsetsel. Waar lê die fiets?`, got: `Agter means behind. It shows where the fiets is.` },
+    { card: `Partners that don't match English`, say: `Some words always take the same voorsetsel, and it often isn't the one English uses. Learn them as pairs.`, eg: `Pa kyk elke Saterdag na die rugby.`, more: `English says look at, but Afrikaans says kyk na. Others: hou van, lief vir, kwaad vir, dink aan, kla oor, glo in, verlang na, getroud met, verloof aan, verlief op.` },
+    { sort: [`van`, `vir`], ask: `Which voorsetsel goes in the gap?`, items: [[`Ek hou ___ braaivleis. (like)`, 0, `Hou van means like.`], [`Sy is lief ___ haar perd. (loves)`, 1, `Lief vir means love.`], [`Ma is kwaad ___ die hond. (angry with)`, 1, `Kwaad vir means angry with.`], [`Die seun bewe ___ die koue. (shivers from)`, 0, `Bewe van means shiver from.`], [`Ons kry 'n afrigter ___ oorsee. (from)`, 0, `Van oorsee means from overseas.`], [`Oupa koop 'n helm ___ my. (for)`, 1, `Vir my means for me.`], [`___ môre af oefen ons elke dag. (from tomorrow)`, 0, `Van môre af means from tomorrow on.`]] },
+    { tap: `Ons gaan elke Desember met vakansie see toe.`, find: `met`, ask: `English says "on holiday". Tap the voorsetsel Afrikaans uses instead.`, got: `Met vakansie. English says on holiday, but your book uses met.` },
+  ];
+
+  // ---------- Voornaamwoorde ----------
+  T('afr_pron2').notes = [
+    `Ask what the word does: it does the action, has the action done to it, or shows who owns something: Hy sien hom op sy fiets.`,
+    `Doing the action: ek, jy, hy, sy, ons, julle, hulle: Sy ry vinnig.`,
+    `Having it done to them: my, jou, hom, haar, ons, julle, hulle: Almal hou van hom.`,
+    `Before a thing, showing the owner: my, jou, sy (his), haar, ons, julle, hulle: Dit is haar helm.`,
+    `Standing alone: myne, joune, syne, hare, and ons s'n, julle s'n, hulle s'n, or a name with s'n: Die bakkie is Oupa s'n.`,
+  ];
+  T('afr_pron2').walk = [
+    { card: `Three jobs`, say: `A voornaamwoord stands in for a name. Which one you use depends on its job: doing the action, having it done to them, or showing who owns something.`, eg: `Thabo ry. Hy ry op sy fiets en almal kyk na hom.`, more: `Hy does the riding. Sy fiets is his bike. Hom is him, the one everybody watches.` },
+    { match: [[`hy`, `he`], [`hom`, `him`], [`syne`, `his, standing alone`], [`haar`, `her`], [`hare`, `hers`]], ask: `Tap an Afrikaans word, then tap its English meaning.` },
+    { tap: `Sipho ry vandag op sy nuwe fiets.`, find: `sy`, ask: `Here sy doesn't mean she. Tap it.`, got: `Sy straight before a thing means his: sy fiets is his bike.` },
+    { card: `Standing alone`, say: `When the owner word stands on its own, with no thing after it, it takes a longer form.`, eg: `Dit is my helm. Die helm is myne.`, more: `my myne, jou joune, sy syne, haar hare, ons ons s'n, julle julle s'n, hulle hulle s'n. After a name, use s'n: Die helm is Thabo s'n.` },
+    { sort: [`Before a thing`, `Standing alone`], ask: `When it shows the owner, does this word go before a thing, or stand alone?`, items: [[`my`, 0, `My helm.`], [`myne`, 1, `Die helm is myne.`], [`haar`, 0, `Haar fiets.`], [`hare`, 1, `Die fiets is hare.`], [`syne`, 1, `Die bakkie is syne.`], [`jou`, 0, `Jou kamer.`], [`ons s'n`, 1, `Die huis is ons s'n.`]] },
+    { tap: `Ek en Sipho maak vuur en ons braai die vleis.`, find: `ons`, ask: `Tap the word that stands in for "Ek en Sipho".`, got: `Ek en Sipho together are ons. Hulle would leave you out.` },
+  ];
+
+  // ---------- Meervoude: rules 3, 4, 8, 9, 10, 12 ----------
+  T('afr_plural2').notes = [
+    `Rule 3: ending in a double vowel like oe, ei or ou, add e: vrou, vroue. Ending in ie or ee, add ë: knie, knieë. A word ending in the small -ie, like meisie, just takes s: meisies.`,
+    `Rules 4 and 12: a double vowel in the middle, or two consonants at the end, just add e: skoen, skoene.`,
+    `Rule 8: a short vowel before the last f: drop the f and add -wwe: gif, giwwe.`,
+    `Rule 9: a double or repeated vowel before the last f: drop the f and add -we, and a repeated vowel drops one letter: kreef, krewe. Golf, verf and erf take -we too.`,
+    `Rule 10: ending in i, o, u or a, add 's: foto, foto's. But ouma, oupa, baba, kafee, kamera and padda just add s.`,
+  ];
+  T('afr_plural2').walk = [
+    { card: `Just add e, or ë`, say: `Many words just add e: words ending in a double vowel like oe, ei or ou, words with a double vowel in the middle, and words ending in two consonants.`, eg: `vrou vroue, skoen skoene, tent tente`, more: `Rules 3, 4 and 12. Words ending in ie or ee add ë: drie drieë, tree treë.` },
+    { match: [[`vlei`, `vleie`], [`knie`, `knieë`], [`wiel`, `wiele`], [`bult`, `bulte`], [`see`, `seë`]], ask: `Tap a word, then tap its plural.` },
+    { card: `Words ending in f`, say: `Drop the f. A short vowel before it adds -wwe. A double or repeated vowel adds -we, and a repeated vowel loses one letter.`, eg: `gif giwwe, brief briewe, graaf grawe`, more: `Rules 8 and 9. Golf, verf and erf take -we too: golwe, verwe, erwe.` },
+    { tap: `Ons vang twee krewe by die see.`, find: `krewe`, ask: `Tap the plural of kreef.`, got: `Kreef has a repeated e, so it loses one e, and the f becomes we: krewe. That is Rule 9.` },
+    { sort: [`-wwe`, `-we`], ask: `The word ends in f. Does its plural end in -wwe or -we?`, items: [[`straf`, 0, `A short a: strawwe.`], [`duif`, 1, `A double vowel: duiwe.`], [`sif`, 0, `A short i: siwwe.`], [`kloof`, 1, `A repeated o loses one o: klowe.`], [`stof`, 0, `A short o: stowwe.`], [`skroef`, 1, `A double vowel: skroewe.`], [`golf`, 1, `Golf is one to remember: golwe.`]] },
+    { sort: [`Takes 's`, `Takes s`], ask: `Rule 10: words ending in i, o, u or a take 's, but your book lists a few that just take s. Which is it?`, items: [[`foto`, 0, `foto's`], [`ouma`, 1, `Ouma is on the list: oumas.`], [`pa`, 0, `pa's`], [`baba`, 1, `Baba is on the list: babas.`], [`skadu`, 0, `skadu's`], [`kamera`, 1, `Kamera is on the list: kameras.`], [`padda`, 1, `Padda is on the list: paddas.`]] },
+  ];
+
+  // ---------- Verkleining: rules 1, 2, 3, 5, 7, 10 ----------
+  T('afr_small').notes = [
+    `Rule 1: a short vowel in the middle: double the last letter and add -ie: kop, koppie.`,
+    `Rule 2: a repeated vowel in the middle: drop one of the two and add -ie: skaap, skapie.`,
+    `Rule 3: a short vowel, ending in l, m, n, r or b: double the last letter and add -etjie: bal, balletjie.`,
+    `Rule 5: a short vowel, ending in a consonant and m, adds -pie: helm, helmpie. Rule 7: one syllable ending in -ng adds -etjie: ring, ringetjie.`,
+    `Rule 10: a double vowel in the middle, or two consonants at the end (but not -m or -ng, which follow Rules 5 and 7), just adds -ie: huis, huisie.`,
+  ];
+  T('afr_small').walk = [
+    { card: `What is a verkleinwoord?`, say: `A verkleinwoord is the word for a small one of something. The vowel and the last letter of the word decide which ending it gets.`, eg: `'n Klein bal is 'n balletjie.`, more: `For a plural, go back to one, make it small, then add s: balle, bal, balletjie, balletjies.` },
+    { sort: [`Double the last letter`, `Drop a vowel`], ask: `Is the vowel short (Rule 1), or repeated (Rule 2)?`, items: [[`hek`, 0, `A short e: hekkie.`], [`aap`, 1, `A repeated a: apie.`], [`bok`, 0, `A short o: bokkie.`], [`roos`, 1, `A repeated o: rosie.`], [`sak`, 0, `A short a: sakkie.`], [`neef`, 1, `A repeated e: nefie, with one e.`], [`bus`, 0, `A short u: bussie.`]] },
+    { tap: `Ons sien 'n skapie op die plaas.`, find: `skapie`, ask: `Tap the verkleinwoord.`, got: `Skaap has a repeated a, so one a drops away: skapie. That is Rule 2.` },
+    { card: `-etjie, -pie or just -ie`, say: `A short vowel ending in l, m, n, r or b doubles the last letter and adds -etjie. A short vowel ending in a consonant and m adds -pie. One syllable ending in -ng adds -etjie.`, eg: `pen pennetjie, wurm wurmpie, ring ringetjie`, more: `Rules 3, 5 and 7. And Rule 10: a double vowel in the middle, or two consonants at the end (but not -m or -ng), just adds -ie: muis muisie, vurk vurkie.` },
+    { match: [[`klip`, `klippie`], [`maag`, `magie`], [`ster`, `sterretjie`], [`film`, `filmpie`], [`ding`, `dingetjie`]], ask: `Tap a word, then tap its verkleinwoord.` },
+    { sort: [`-ie`, `-etjie`], ask: `Does it end in -ie or -etjie?`, items: [[`huis`, 0, `A double vowel in the middle: huisie. Rule 10.`], [`ring`, 1, `One syllable ending in -ng: ringetjie. Rule 7.`], [`fiets`, 0, `Two consonants at the end: fietsie. Rule 10.`], [`son`, 1, `A short vowel ending in n: sonnetjie. Rule 3.`], [`boek`, 0, `A double vowel in the middle: boekie. Rule 10.`], [`ram`, 1, `A short vowel ending in m: rammetjie. Rule 3.`], [`dorp`, 0, `Two consonants at the end: dorpie. Rule 10.`]] },
+  ];
+
+  // ---------- Bywoorde ----------
+  T('afr_adverb2').notes = [
+    `A bywoord tells you how, when, where, how much or why. Wyse answers Hoe?: Die ryer ry versigtig.`,
+    `Tyd answers Wanneer?: Ons ry môre baan toe.`,
+    `Plek answers Waar?: Ons braai buite.`,
+    `Graad answers Hoeveel?: Die water is te koud.`,
+    `Rede answers Waarom?: Die seun huil van pyn.`,
+  ];
+  T('afr_adverb2').walk = [
+    { card: `What is a bywoord?`, say: `A bywoord tells you more about what happens: how, when, where, how much or why.`, eg: `Sipho ry versigtig oor die bult.`, more: `Hoe ry hy? Versigtig. So versigtig is a bywoord van wyse, which means manner.` },
+    { match: [[`Wyse`, `Hoe?`], [`Tyd`, `Wanneer?`], [`Plek`, `Waar?`], [`Graad`, `Hoeveel?`], [`Rede`, `Waarom?`]], ask: `Tap a kind of bywoord, then tap the question it answers.` },
+    { tap: `Ons braai vanaand buite.`, find: `buite`, ask: `Tap the bywoord van plek. Waar braai ons?`, got: `Buite tells you where, so it is a bywoord van plek. Vanaand is a bywoord too, but of tyd: it tells you when.` },
+    { sort: [`Tyd`, `Plek`, `Wyse`], ask: `Wanneer, waar or hoe? Which kind of bywoord is it?`, items: [[`gister`, 0, `Gister says when.`], [`daar`, 1, `Daar says where.`], [`sag`, 2, `Sag says how.`], [`môre`, 0, `Môre says when.`], [`buite`, 1, `Buite says where.`], [`stadig`, 2, `Stadig says how.`], [`vandag`, 0, `Vandag says when.`]] },
+    { card: `How much, and why`, say: `A bywoord van graad answers Hoeveel?, like baie or te. A bywoord van rede answers Waarom?, and it is often a few words, like van pyn.`, eg: `Die water is te koud.`, more: `Rede: Die seun huil van pyn. Waarom huil hy? Van pyn.` },
+    { tap: `Die ryer is baie moeg na die wedren.`, find: `baie`, ask: `Tap the bywoord van graad. Hoe moeg is hy?`, got: `Baie tells you how much, so it is a bywoord van graad.` },
+  ];
+
+  // ---------- The usual wrong thinking in each written list ----------
+  S.afr_tyd_reels.not = `Not every verb takes het and ge-: helping verbs and is just change form, verbs like vertel and begin keep their shape, and het meaning have takes gehad in the past and hê in the future.`;
+  S.afr_st_reels.not = `Afrikaans doesn't follow the English order, so say S v1 T O M P v2 I and remember that the time comes before the object, the manner and the place.`;
+  S.afr_voeg_reels.not = `Find the voegwoord's group before you move anything: MOWED words change nothing, Group 2 pulls the verb right next to it, and Group 3 sends it to the end, with het, word, is and was right at the very end.`;
+  S.afr_vs.not = `These partners often don't match the English word, so don't translate word for word: learn each one as a pair, like hou van, lief vir and kyk na.`;
+  S.afr_pn.not = `Ask what the word does: hy and sy do the action, hom and haar have it done to them, sy and haar before a thing show the owner, and syne, hare and myne stand alone.`;
+  S.afr_mv_reels.not = `Check the vowel before the ending first, because a short vowel, a double vowel and a repeated vowel each follow a different rule.`;
+  S.afr_dim.not = `Don't just add an ending: look at the vowel and the last letter first, because they decide whether you double a letter, drop one, or add -ie, -etjie or -pie.`;
+  S.afr_dim_reels.not = `Say the word out loud and check two things before you pick a rule: is the vowel short, repeated or double, and which letter does the word end on?`;
+  S.afr_bw.not = `Don't go by how the word looks: ask hoe, wanneer, waar, hoeveel or waarom about the sentence, and the question it answers tells you the kind of bywoord.`;
+})(typeof window !== 'undefined' ? window : globalThis);
+
 /* Teaching for the eight English language sections: a rule card (notes), a Track walk (walk),
    and a line for each written list that is shown after a wrong answer (not). */
 (function (root) {
@@ -8339,7 +8532,7 @@ Jordy's Science test, Tuesday 10 November: Planet Earth and Beyond. Written from
       [`Her bike was as clean as a new plate.`, 0, `It compares the bike to a plate using "as".`],
     ] },
   ];
-  S.eng_figures.not = `It's easy to mix them up, so check in order: "like" or "as" means simile, "is" without them means metaphor, a thing acting like a person is personification, and a huge exaggeration is hyperbole.`;
+  S.eng_figures.not = `It's easy to mix them up, so check each one: "like" or "as" comparing two things is a simile, saying one thing is another is a metaphor, a thing acting like a person is personification, a huge exaggeration is hyperbole, the same first sound is alliteration, and a word that sounds like its noise is onomatopoeia.`;
 
   // ---------- Direct and indirect speech ----------
   T('eng_speech').notes = [
@@ -8365,7 +8558,7 @@ Jordy's Science test, Tuesday 10 November: Planet Earth and Beyond. Written from
       [`"My chain is loose," said Kabelo. → Kabelo said that my chain was loose.`, 1, `It is Kabelo's chain, so "my" becomes "his": Kabelo said that his chain was loose.`],
     ] },
   ];
-  S.eng_speech.not = `It's easy to change only one part, so check all of them: the pronouns, each verb one step back, the time and place words, and no question mark on a reported question.`;
+  S.eng_speech.not = `It's easy to change only one part, so check all of them: the pronouns, the verbs (one step back for indirect speech, one step forward for direct), the time and place words, and the punctuation.`;
 
   // ---------- Synonyms and antonyms ----------
   T('eng_syn').notes = [
@@ -8397,7 +8590,7 @@ Jordy's Science test, Tuesday 10 November: Planet Earth and Beyond. Written from
   T('eng_affix').notes = [
     `A prefix goes at the beginning of a word and a suffix at the end: un + safe = unsafe, care + less = careless.`,
     `Prefix meanings: re- again (redo), pre- before (preview), sub- under (subway), mis- wrongly (misspell), over- too much (overcook).`,
-    `un-, dis-, in-, im-, il- and ir- mean "not". Use il- before l, ir- before r and im- before p: illegal, irregular, impatient.`,
+    `un-, dis-, in-, im-, il- and ir- mean "not". in- changes to match the next letter: il- before l, ir- before r, im- before p, b or m (illegal, irregular, impatient). Many words take un- or dis- instead: unpopular, unlucky, displease.`,
     `Suffix meanings: -less means without (hopeless) and -ful means full of (hopeful). -ness and -ment make nouns (kindness, payment).`,
     `Spelling: y changes to i (happy → happiness), a silent e drops before -ing (ride → riding), and skid → skidding doubles the d.`,
   ];
@@ -8405,7 +8598,7 @@ Jordy's Science test, Tuesday 10 November: Planet Earth and Beyond. Written from
     { card: `Front and back`, say: `A prefix is added to the beginning of a word, and a suffix to the end. Both change the word's meaning or its job.`, eg: `un + fair = unfair. fear + less = fearless.`, more: `What's left must be a real word: take "un" off "uncle" and "cle" isn't a word, so there is no prefix there.` },
     { tap: `The marshal had to restart the race.`, find: `restart`, ask: `Tap the word that has a prefix.`, got: `re + start. re- means again, so the marshal started the race again.` },
     { match: [[`re-`, `again`], [`pre-`, `before`], [`sub-`, `under`], [`mis-`, `wrongly`], [`bi-`, `two`]], ask: `Tap a prefix, then tap what it means.` },
-    { sort: [`im-`, `il-`, `ir-`], ask: `To make the opposite, use il- before l, ir- before r and im- before p. Which one fits?`, items: [
+    { sort: [`im-`, `il-`, `ir-`], ask: `These all take in-, which changes to match the first letter: il- before l, ir- before r, im- before p. Which one fits?`, items: [
       [`patient`, 0, `It starts with p, so im-: impatient.`],
       [`logical`, 1, `It starts with l, so il-: illogical.`],
       [`relevant`, 2, `It starts with r, so ir-: irrelevant.`],
@@ -8445,7 +8638,7 @@ Jordy's Science test, Tuesday 10 November: Planet Earth and Beyond. Written from
       [`fixed the chain`, 1, `It has a verb and says what someone did.`],
       [`Lindiwe and her dad`, 0, `Two people together can make one subject.`],
     ] },
-    { tap: `The box of tools is in the bakkie.`, find: `box`, ask: `What is in the bakkie, the box or the tools? Tap it.`, got: `The box. So the subject is "The box of tools", and one box takes "is". "of tools" only tells you which box.` },
+    { tap: `The box of tools is in the bakkie.`, find: `box`, ask: `One box or many tools: which one does "is" go with? Tap it.`, got: `The box. So the subject is "The box of tools", and one box takes "is". "of tools" only tells you which box.` },
     { card: `Not always first`, say: `The subject usually comes first, but not always. Find the verb, then ask who or what did it.`, eg: `Over the last jump flew the leader. Who flew? The leader.`, more: `In a question, turn it into a statement first. Is the gate down? → The gate is down. The subject is "the gate".` },
     { match: [[`After lunch, the marshals walked the track.`, `the marshals`], [`Through the river splashed the riders.`, `the riders`], [`Is your helmet clean?`, `your helmet`], [`My dad and my uncle loaded the trailer.`, `My dad and my uncle`], [`The bag of gloves fell off the bike.`, `The bag of gloves`]], ask: `Tap a sentence, then tap its subject.` },
   ];
@@ -8533,7 +8726,7 @@ Jordy's Science test, Tuesday 10 November: Planet Earth and Beyond. Written from
     { card: `Two kinds of places`, say: `Urban means towns and cities. Rural means the countryside, with farms and small villages.`, eg: `A supercross race in a city stadium is in an urban area. A farm enduro through the veld, far from any town, is in a rural area.`, more: `Urban areas are crowded, so the density is high. Rural areas have fewer people, so the density is low.` },
     { tap: `Durban's city centre is a busy urban area.`, find: `urban`, ask: `Is the middle of a city rural or urban? Tap the word.`, got: `Urban. City centres are built up and crowded.` },
     { sort: [`Urban`, `Rural`], ask: `Urban or rural?`, items: [[`Tall buildings and heavy traffic`, 0, `Built-up, crowded places are urban.`], [`A village with fields of maize and goats`, 1, `Farming villages are in the countryside.`], [`A flat above a shop in the middle of Durban`, 0, `A city centre is urban.`], [`A farm 40 km from the nearest town`, 1, `A farm far from town is in the countryside.`], [`Offices, hospitals and factories`, 0, `Towns and cities offer many different kinds of work.`], [`A library bus that drives from place to place`, 1, `People live far apart, so the library goes to them.`], [`Homes packed close together`, 0, `Many people living close together means high density.`]] },
-    { match: [[`Urban area`, `Towns and cities`], [`Rural area`, `Farms and small villages`], [`Densely populated`, `Many people living close together`], [`Sparsely populated`, `Few people, spread far apart`], [`Library bus`, `A service that travels to people who live far apart`]], ask: `Tap a word, then tap what it means.` },
+    { match: [[`Urban area`, `Towns and cities`], [`Rural area`, `Farms and small villages`], [`Crops and livestock`, `What many country families farm`], [`Teachers, nurses and shopkeepers`, `Village jobs apart from farming`], [`Library bus`, `A service that travels to people who live far apart`]], ask: `Tap a word, then tap what it means.` },
     { card: `Jobs in each place`, say: `In towns and cities, many people work in offices, hospitals and factories. In the countryside, many families farm crops and livestock.`, eg: `Someone working in an office in the town centre has an urban job. A family growing maize and keeping goats works the land in a rural area.`, more: `Villages still need teachers, nurses and shopkeepers, so not everyone in a rural area farms.` },
   ];
 
@@ -8549,7 +8742,7 @@ Jordy's Science test, Tuesday 10 November: Planet Earth and Beyond. Written from
     { card: `Why there?`, say: `People settle in a place for reasons: water, a good climate, land, minerals, jobs and trade. In South Africa, laws in the past also forced many people to live in certain places.`, eg: `When you choose a spot to camp at a race, you look for water nearby and an easy road in. People choosing where to live think the same way.`, more: `Some people have no choice at all. Refugees flee their own country because of war or danger.` },
     { match: [[`Kimberley`, `Diamonds were found on a farm`], [`Johannesburg`, `Gold was found there`], [`Durban`, `Ivory to trade and a bay for a harbour`], [`Table Bay`, `Ships stopped for fresh vegetables`], [`Kruger National Park`, `Wildlife, vegetation and tourism`]], ask: `Tap a place, then tap why people came.` },
     { tap: `Kimberley grew from a farm into a town after diamonds were found.`, find: `diamonds`, ask: `What made people rush to Kimberley? Tap the word.`, got: `Diamonds. Roads and railways followed for trade, and the town is known for mining and transport today.` },
-    { card: `Who came first?`, say: `Over ${fmt(2000)} years ago, the San lived in the area that is now Mpumalanga. They hunted wild animals and ate plants and fruit. African farmers came next, and then Boer settlers.`, eg: `Think of a start line-up: San in gate one, African farmers in gate two, Boer settlers in gate three.`, more: `The Kruger National Park is named after the Boer leader Paul Kruger. Hunting and farming are banned there, so people nearby work as game rangers and tourist guides.` },
+    { card: `Who came first?`, say: `Over ${fmt(2000)} years ago, the San lived in the area that is now Mpumalanga. They hunted wild animals and ate plants and fruit. African farmers came next, and then Boer settlers.`, eg: `Picture a timeline: the San long ago at one end, then African farmers, then Boer settlers. Each group arrived after the one before.`, more: `The Kruger National Park is named after the Boer leader Paul Kruger. Hunting and farming are banned there, so people nearby work as game rangers and tourist guides.` },
     { sort: [`Durban`, `Cape Town`], ask: `Durban or Cape Town?`, items: [[`Elephants hunted for their ivory`, 0, `European traders came to the Durban area to hunt elephants for ivory.`], [`Table Bay`, 1, `Table Bay is at Cape Town.`], [`Ships between Europe and India stopped for fresh vegetables`, 1, `They called in at Table Bay.`], [`A river with good fishing for African farmers`, 0, `The land and the river drew African farmers to the Durban area.`], [`Table Mountain brings tourists`, 1, `Table Mountain stands over the city.`]] },
     { tap: `Laws in the past forced many people to live in remote rural areas.`, find: `laws`, ask: `What made many people live far from towns? Tap the word.`, got: `Laws. The government of the time moved many black people there. Today many of them farm for themselves or run small businesses.` },
   ];
@@ -8634,7 +8827,7 @@ Jordy's Science test, Tuesday 10 November: Planet Earth and Beyond. Written from
   ];
   T('his_vote').walk = [
     { card: `Power to the people`, say: `In a democracy, all the people have a say in who leads them. They choose their leaders by voting, and the leaders with the most votes form the biggest part of the government.`, eg: `Think of a motocross club choosing who will run it. Every member gets one vote, and the votes decide who leads.`, more: `We say a democracy is government "by the people", because the people choose the leaders, and "for the people", because it must work for the good of all.` },
-    { tap: `On election day, each voter marks one party on a ballot paper.`, find: `ballot`, ask: `Which word goes with the form you mark when you vote? Tap it.`, got: `A ballot paper. You make your mark next to one party only.` },
+    { tap: `On election day, each voter marks one party on a ballot paper.`, find: `ballot`, ask: `What kind of paper do you mark when you vote? Tap the word.`, got: `A ballot paper. You make your mark next to one party only.` },
     { card: `Before 1994`, say: `Before 1994, the apartheid government ruled South Africa. Most people were not allowed to vote, and many of their other rights were taken away too.`, eg: `Imagine being told that only a few learners in your class may choose the class captain, and everyone else must just accept it.`, more: `Many who fought against the apartheid government were jailed or forced to leave the country, and many lost their lives. In 1994 every adult citizen could vote at last, and people were so excited that they queued for hours.` },
     { sort: [`Democracy`, `Not a democracy`], ask: `Is this how a democracy works?`, items: [
       [`All adult citizens may vote.`, 0, `A democratic election is free and fair, and open to every adult citizen.`],
@@ -8736,7 +8929,7 @@ Jordy's Science test, Tuesday 10 November: Planet Earth and Beyond. Written from
   T('his_healers').walk = [
     { card: `Two ways of healing`, say: `Indigenous medicine is healing handed down over many years in a community, using herbal remedies. Western medicine is based on science, and doctors and nurses learn it at university.`, eg: `Long before there were clinics, hunter-gatherers, herders and African farmers in South Africa were already treating the sick with plants.`, more: `Western medicine began in western Europe, and settlers from Europe brought it to South Africa. Today most people use it, and many use both kinds.` },
     { match: [[`Indigenous`, `Belonging to a place from the start`], [`Origin`, `Where something starts out`], [`Diagnose`, `Work out what is wrong by checking the patient`], [`Prescribe`, `Tell a patient which medicine to use`], [`Holistic`, `Caring for all of the patient`]], ask: `Tap a word, then tap what it means.` },
-    { tap: `An indigenous healer cares for the whole person, so the healing is holistic.`, find: `holistic`, ask: `Which word means caring for all of the patient? Tap it.`, got: `Holistic. Indigenous healers treat all of the patient, not only the sickness in the body.` },
+    { tap: `Healing that cares for the whole person is called holistic.`, find: `holistic`, ask: `What is it called? Tap the word.`, got: `Holistic. Indigenous healers treat all of the patient, not only the sickness in the body.` },
     { sort: [`Indigenous medicine`, `Western medicine`], ask: `Which kind of medicine is this?`, items: [
       [`Began in Africa`, 0, `It is indigenous, so it started here.`],
       [`Began in western Europe`, 1, `That is where its name comes from.`],
@@ -8746,14 +8939,14 @@ Jordy's Science test, Tuesday 10 November: Planet Earth and Beyond. Written from
       [`Herbs and other natural remedies`, 0, `Traditional healers use remedies from plants.`],
       [`Mainly treats diseases of the physical body`, 1, `Indigenous healers treat all of the patient, not only the body.`],
     ] },
-    { card: `Two kinds of healers`, say: `The two main kinds of traditional healers are diviners and herbalists. A diviner is also called a sangoma, and a herbalist is also called a nyanga.`, eg: `A family might take a sick child to a doctor for tablets, to a sangoma for herbs, or to both. Many South African families use both kinds.`, more: `The ancestors are very important in indigenous healing. They are seen as relatives who are still part of the family.` },
+    { card: `Two kinds of healers`, say: `The two main kinds of traditional healers are diviners and herbalists. A diviner is also called a sangoma, and a herbalist is also called a nyanga.`, eg: `A family might take a sick child to a doctor for tablets, to a nyanga for herbs, or to both. Many South African families use both kinds.`, more: `The ancestors are very important in indigenous healing. They are seen as relatives who are still part of the family.` },
   ];
 
   // ---------- Herbalists and Buchu, pages 176 and 177 ----------
   T('his_plants').notes = [
     `Herbalists cure illness with plants, using bulbs, leaves, tubers, stems and bark, and they train for many years to get the amounts right.`,
     `Your book says South Africa has more than 500 kinds of medicinal plants, among them Buchu, the aloe and the African potato.`,
-    `Aloe juice heals stomach aches, cuts and burns, and Buchu has been used for hundreds of years for stomach and bladder troubles.`,
+    `Herbalists use aloe juice for stomach aches, cuts and burns, and Buchu has been used for hundreds of years for stomach and bladder troubles.`,
     `Buchu grows in the south-west Cape, and only someone with a licence may pick it, so the wild plants don't get wiped out.`,
     `Farmers grow Buchu to sell, and the dried leaves are shipped from Cape Town, mostly to England and the United States of America.`,
   ];
@@ -8782,7 +8975,7 @@ Jordy's Science test, Tuesday 10 November: Planet Earth and Beyond. Written from
   ];
   T('his_sangoma').walk = [
     { card: `A calling, not a job`, say: `People believe that a sangoma has a gift from birth, and that the ancestors choose that person to serve others. It is a calling, not a job you apply for.`, eg: `The signs are not the same for everyone. A chosen person might become ill or thin, walk in their sleep, or have dreams.`, more: `The family then takes the person to an experienced sangoma, who asks the ancestors what the new trainee should do next.` },
-    { tap: `A trainee sangoma is called an initiate.`, find: `initiate`, ask: `Which word names a sangoma in training? Tap it.`, got: `An initiate. Initiates train under an experienced sangoma for many years.` },
+    { tap: `A trainee sangoma is called an initiate.`, find: `initiate`, ask: `What is a trainee sangoma called? Tap the word.`, got: `An initiate. Initiates train under an experienced sangoma for many years.` },
     { card: `Years of training`, say: `Training to be a sangoma is an apprenticeship: many long, challenging years of learning under an expert.`, eg: `Like a young mechanic learning beside an expert in the workshop, an initiate learns by working under an experienced sangoma.`, more: `Initiates work with incense and medicine pots, drink the medicine and perform ritual dances for the ancestors. During training, they never sit on a chair or sleep on a bed.` },
     { match: [[`Red clay`, `Smeared on at the start of training`], [`White clay`, `Smeared on after three months`], [`Special water`, `Bathed in for cleansing`], [`A blanket`, `Covers the initiate on the way home`], [`A goat`, `Slaughtered to welcome the initiate home`]], ask: `Tap one on the left, then tap where it fits in.` },
     { sort: [`Part of a sangoma's training`, `Not part of it`], ask: `Is this part of training to be a sangoma?`, items: [
@@ -8808,7 +9001,7 @@ Jordy's Science test, Tuesday 10 November: Planet Earth and Beyond. Written from
   T('his_germs').walk = [
     { card: `Germs make us ill`, say: `Louis Pasteur was the first scientist to connect germs with illness. His experiments showed that germs are what make people ill.`, eg: `Your hands can look clean after a day at the track and still carry germs. Germs are far too small to see without a microscope.`, more: `The next step was to work out which germ causes which illness, because each kind of bacteria causes its own kind of infection.` },
     { match: [[`Louis Pasteur`, `First to connect germs with illness`], [`Dr Robert Koch`, `Identified the TB germ in 1882`], [`Microscope`, `Makes tiny things big enough to see`], [`Contagious`, `Easily passed on between people`], [`Tuberculosis`, `What the letters TB stand for`]], ask: `Tap one on the left, then tap what goes with it.` },
-    { card: `Koch and TB`, say: `In 1882, Dr Robert Koch identified the germ that causes TB. TB is short for tuberculosis, a serious disease that mainly affects the lungs.`, eg: `Picture someone with TB coughing in a full taxi. The people nearby can breathe in the tiny droplets, and the germs with them.`, more: `TB can be cured with Western medicine, taken every day until the disease is gone. Many people still die of it because they don't get the right treatment.` },
+    { card: `Koch and TB`, say: `In 1882, Dr Robert Koch identified the germ that causes TB. TB is short for tuberculosis, a serious disease that mainly affects the lungs.`, eg: `Picture someone coughing in a full taxi without covering their mouth. The people nearby can breathe in the tiny droplets, and any germs with them.`, more: `TB can be cured with Western medicine, taken every day until the disease is gone. Many people still die of it because they don't get the right treatment.` },
     { tap: `TB spreads when people breathe in droplets from a cough or sneeze.`, find: `droplets`, ask: `What carries TB germs through the air? Tap the word.`, got: `Droplets from a cough or sneeze carry the bacteria. That is why TB is so contagious.` },
     { sort: [`Helps fight TB`, `Doesn't help`], ask: `Does this help fight TB?`, items: [
       [`Taking the doctor's medicine every day until the disease is gone`, 0, `It takes steady treatment to get rid of TB.`],
@@ -8848,15 +9041,15 @@ Jordy's Science test, Tuesday 10 November: Planet Earth and Beyond. Written from
   T('his_fleming').notes = [
     `Alexander Fleming found in his laboratory that ordinary mould can destroy germs, and in 1928 he tested it on animals without hurting them.`,
     `From mould came penicillin, the world's first antibiotic: a medicine that destroys bacteria.`,
-    `Fleming couldn't make it safe for people. A later group of scientists did that about ten years on, in 1938, says your book.`,
+    `Fleming couldn't make it safe for people. Your book says a later group of scientists did that about ten years later, and 1928 + 10 = 1938.`,
     `Before antibiotics, a simple throat infection could spread to other parts of the body.`,
     `In World War II, penicillin kept bacteria out of soldiers' wounds.`,
   ];
   T('his_fleming').walk = [
     { card: `Mould that kills germs`, say: `Alexander Fleming found out in his laboratory that ordinary mould can destroy germs. From mould came penicillin, the world's first antibiotic.`, eg: `The fuzzy stuff on stale bread or old cheese is mould. Never eat it! The medicine is made safely in a laboratory.`, more: `An antibiotic is a medicine that destroys bacteria. It doesn't work on viruses such as flu.` },
-    { tap: `Penicillin was the world's first antibiotic.`, find: `antibiotic`, ask: `Which word means a medicine that destroys bacteria? Tap it.`, got: `An antibiotic. Penicillin, made from mould, was the very first one.` },
-    { card: `Ten more years`, say: `In 1928 Fleming tested mould on animals, and they were not hurt. But he couldn't turn it into a medicine that was safe for people.`, eg: `It's like a new engine that runs well on the test bench. A team still needs time and more tests before it is safe to race.`, more: `A later group of scientists finished the job about ten years on. Your book says penicillin was first safe to inject into people in 1938, because 1928 + 10 = 1938.` },
-    { match: [[`1928`, `Fleming tests mould on animals`], [`1938`, `First safe to inject into people, says your book`], [`Laboratory`, `A room set up for scientific tests`], [`Penicillin`, `The world's first antibiotic`], [`Soldiers`, `Got it for their wounds in World War II`]], ask: `Tap one on the left, then tap what goes with it.` },
+    { tap: `Penicillin was the world's first antibiotic.`, find: `antibiotic`, ask: `What kind of medicine was penicillin? Tap the word.`, got: `An antibiotic. Penicillin, made from mould, was the very first one.` },
+    { card: `Ten more years`, say: `In 1928 Fleming tested mould on animals, and they were not hurt. But he couldn't turn it into a medicine that was safe for people.`, eg: `It's like a new engine that runs well on the test bench. A team still needs time and more tests before it is safe to race.`, more: `A later group of scientists finished the job. Your book says it took about ten years, and 1928 + 10 = 1938, so 1938 is the answer for the test.` },
+    { match: [[`1928`, `Fleming tests mould on animals`], [`1938`, `About ten years after 1928, by your book`], [`Laboratory`, `A room set up for scientific tests`], [`Penicillin`, `The world's first antibiotic`], [`Soldiers`, `Got it for their wounds in World War II`]], ask: `Tap one on the left, then tap what goes with it.` },
     { sort: [`True of penicillin`, `Not true of penicillin`], ask: `Is this true of penicillin?`, items: [
       [`It is made from mould.`, 0, `Fleming made it from ordinary mould.`],
       [`It destroys bacteria.`, 0, `That is what an antibiotic does.`],
@@ -8919,7 +9112,7 @@ Jordy's Science test, Tuesday 10 November: Planet Earth and Beyond. Written from
   // ---------- The usual wrong thinking in each written list ----------
   S.his_vote.not = `It's easy to forget the main idea, so go back to it: in a democracy every adult citizen gets a free and fair vote, and the people, not one ruler, choose the leaders.`;
   S.his_1994.not = `Keep the order straight: the National Party ruled until 1994, the 1994 elections brought democracy with the ANC on 63%, and the Constitution came later, in December 1996.`;
-  S.his_equal.not = `Ask whether the answer treats everybody the same, because under the law money, fame, a job or a title never changes how a court treats someone.`;
+  S.his_equal.not = `Today everyone is equal under the law, so money, fame, a job or a title never changes how a court treats someone. Under apartheid it was different: the courts favoured some people over others.`;
   S.his_song.not = `Keep the two songs apart: Nkosi Sikelel' iAfrika is Enoch Sontonga's hymn from 1897, and Die Stem is CJ Langenhoven's poem from 1918.`;
   S.his_healers.not = `Don't mix up the two kinds: indigenous medicine began in Africa and treats the whole person, while Western medicine began in Europe, is based on science and mainly treats the body.`;
   S.his_plants.not = `Pair each plant with its facts: aloe juice for stomach aches, cuts and burns, and Buchu for stomach and bladder troubles, grown in the south-west Cape and picked only with a licence.`;
@@ -8956,7 +9149,7 @@ Jordy's Science test, Tuesday 10 November: Planet Earth and Beyond. Written from
     { tap: `An orbit is the path one space object follows around another.`, find: `path`, ask: `What is an orbit? Tap the word that tells you.`, got: `A path, or route. The Earth's path around the Sun is its orbit, like your line around a track.` },
     { card: `Every planet has its own orbit`, say: `No two planets share an orbit. Each one follows its own path around the Sun, and that path is a slightly squashed circle.`, eg: `An oval track isn't a perfect circle, but you still go round and round it. A planet's orbit is like that.`, more: `The name for a flattened circle shape is an ellipse.` },
     { match: [[`The Sun`, `The only star in our solar system`], [`Ceres`, `The largest asteroid, about ${fmt(1000)} km across`], [`The asteroid belt`, `Where most asteroids travel, between Mars and Jupiter`], [`An ellipse`, `The slightly squashed circle shape of an orbit`], [`About ${fmt(6000)} °C`, `How hot the Sun's surface is`]], ask: `Tap one, then tap what it tells you.` },
-    { sort: [`Gives out its own heat and light`, `Makes no heat or light of its own`], ask: `Does it shine by itself?`, items: [[`The Sun`, 0, `It is a star, made of very hot gas.`], [`The Earth`, 1, `It is a planet. Sunlight lights it, but it makes no light of its own.`], [`Ceres`, 1, `It is a rocky lump, not hot gas.`], [`A far-off star in the night sky`, 0, `Every star gives out heat and light. The others are just much further away than the Sun.`], [`Jupiter`, 1, `It is a gas giant, but its gas isn't very hot like a star's, so it makes no light of its own.`], [`Mars`, 1, `It is a rocky planet. No planet makes its own heat or light.`]] },
+    { sort: [`Gives out its own heat and light`, `Makes no heat or light of its own`], ask: `Does it shine by itself?`, items: [[`The Sun`, 0, `It is a star, made of very hot gas.`], [`The Earth`, 1, `It is a planet. Sunlight lights it, but it makes no light of its own.`], [`Ceres`, 1, `It is a rocky lump, not hot gas.`], [`A far-off star in the night sky`, 0, `Every star gives out heat and light. The others are just much further away than the Sun.`], [`The Moon`, 1, `It is made of rock. It shines only because sunlight lands on it.`], [`Mars`, 1, `It is a rocky planet. No planet makes its own heat or light.`]] },
     { card: `Rocky inside, gas outside`, say: `The four planets closest to the Sun are solid and rocky. The four outer planets are called gas giants, because they are huge balls of gas.`, eg: `Compare a cricket ball with a giant party balloon. One is solid right through, and the other is mostly gas.`, more: `There are eight planets, not nine. They differ in size, orbit, distance from the Sun, what they are made of and how many moons they have.` },
   ];
 
@@ -8965,7 +9158,7 @@ Jordy's Science test, Tuesday 10 November: Planet Earth and Beyond. Written from
     `In order from the Sun: Mercury, Venus, Earth, Mars, the asteroid belt, then Jupiter, Saturn, Uranus and Neptune.`,
     `The four inner planets are rocky. The four outer ones are gas giants with rings, and Uranus and Neptune are also called ice giants.`,
     `Further from the Sun usually means colder. But Venus is the hottest, because its thick carbon dioxide atmosphere traps heat, and Mercury has no atmosphere.`,
-    `Earth is the only planet with life: it has water, oxygen and a suitable temperature.`,
+    `Earth is the only planet known to have life: it has water, oxygen and a suitable temperature.`,
     `Mars has red dust and the huge volcano Olympus Mons. Jupiter is the largest, with a giant red spot storm. Saturn has bright rings of frozen water.`,
   ];
   T('sci_eight').walk = [
@@ -8988,7 +9181,7 @@ Jordy's Science test, Tuesday 10 November: Planet Earth and Beyond. Written from
   T('sci_trips').walk = [
     { card: `What is a year?`, say: `A year is the time a planet takes to revolve once around the Sun. The Earth takes 365¼ days.`, eg: `Every birthday means the Earth has finished one more trip around the Sun since your last one.`, more: `We measure every planet's year in Earth time, using Earth days and Earth years.` },
     { card: `Why we need a leap year`, say: `Most years we count only 365 days and leave out the quarter day. After four years, those four quarters add up to one whole day.`, eg: `Drop 25c into a tin every day. After four days you have R1, one whole rand.`, more: `So every fourth year gets one extra day. That year is called a leap year.` },
-    { tap: `A leap year makes up for the quarter days we leave out.`, find: `quarter`, ask: `What does a leap year make up for? Tap the key word.`, got: `The quarter days. ¼ + ¼ + ¼ + ¼ = 1, so every fourth year gets one extra day.` },
+    { tap: `A leap year makes up for the quarter days we leave out.`, find: `quarter`, ask: `How much of a day do we leave out each year? Tap the word.`, got: `The quarter days. ¼ + ¼ + ¼ + ¼ = 1, so every fourth year gets one extra day.` },
     { card: `Further out, longer trip`, say: `The further a planet is from the Sun, the longer it takes to go around once. Mercury travels fast and has less far to go. Neptune has a huge trip and travels more slowly.`, eg: `Two riders set off at once. One takes the short loop near the pits, and the other takes the long loop out in the hills at a slower pace. The short-loop rider is back long before the other.`, more: `Asteroids are at different distances from the Sun, so they take different times: 3 to 6 Earth years.` },
     { match: [[`88 Earth days`, `Mercury`], [`365¼ days`, `Earth`], [`3 to 6 Earth years`, `The asteroids`], [`${fmt(11.9)} Earth years`, `Jupiter`], [`${fmt(164.8)} Earth years`, `Neptune`]], ask: `Tap a time, then tap what takes that long to go around the Sun.` },
     { sort: [`Shorter year than Earth's`, `Longer year than Earth's`], ask: `How does its year compare with ours?`, items: [[`Mercury`, 0, `88 Earth days. It is the closest planet, so its year is the shortest.`], [`Venus`, 0, `225 Earth days, which is less than our 365.`], [`Mars`, 1, `687 Earth days, which is more than our 365.`], [`The asteroids`, 1, `3 to 6 Earth years. They are further out than Mars.`], [`Saturn`, 1, `${fmt(29.5)} Earth years.`], [`Uranus`, 1, `84 Earth years.`], [`Neptune`, 1, `${fmt(164.8)} Earth years, the longest year of all.`]] },
@@ -9021,7 +9214,7 @@ Jordy's Science test, Tuesday 10 November: Planet Earth and Beyond. Written from
   ];
   T('sci_spin').walk = [
     { card: `The axis`, say: `An axis is an imaginary line through the middle of something. The Earth's axis runs from the North Pole to the South Pole, through the centre.`, eg: `Push a knitting needle through an orange from top to bottom and twirl it. The orange is the Earth, and the needle is its axis. The real axis is imaginary, so nobody could ever see or touch it.`, more: `Every planet has its own axis, and the Moon rotates on its own axis too.` },
-    { tap: `Rotation means spinning on an axis, and revolution means travelling around another body.`, find: `rotation`, ask: `Which word means spinning on the spot? Tap it.`, got: `Rotation. Revolution is the other one: a trip around another body.` },
+    { tap: `The Earth's rotation gives us day and night, and its revolution gives us a year.`, find: `rotation`, ask: `Which word means the Earth spinning on its axis? Tap it.`, got: `Rotation. Revolution is the other one: a trip around another body.` },
     { sort: [`Rotation`, `Revolution`], ask: `Is this spinning, or going around something?`, items: [[`The Earth spinning once in 24 hours`, 0, `It spins on its own axis.`], [`The Earth going around the Sun`, 1, `One space body is travelling around another.`], [`A wheel spinning on its axle`, 0, `It turns on the spot, around its own middle.`], [`The Moon travelling around the Earth`, 1, `The Moon goes around another body, the Earth.`], [`A globe turning on its stand`, 0, `It spins on its axis without going anywhere.`], [`A rider doing laps around a track`, 1, `The rider travels around something else, like the Earth around the Sun.`], [`The Moon spinning on its own axis`, 0, `Spinning on an axis is always rotation.`]] },
     { card: `Day and night`, say: `The Sun can only light the side of the Earth that faces it. That side has day, and the side turned away has night. As the Earth rotates, every place moves from light into dark and back again.`, eg: `Shine a torch at a globe in a dark garage. The torch is the Sun. One half of the globe lights up and the other half stays dark. Turn the globe slowly, and watch South Africa move from dark into light.`, more: `The Sun doesn't move around us. Morning comes to South Africa when the Earth turns it towards the Sun, about 24 hours after the last sunrise.` },
     { match: [[`The orange`, `The Earth`], [`The knitting needle`, `The Earth's axis`], [`The torch`, `The Sun`], [`24 hours`, `One full rotation of the Earth`], [`Anticlockwise`, `How the Earth spins, seen from above the North Pole`]], ask: `Tap one, then tap what it stands for or means.` },
@@ -9076,7 +9269,7 @@ Jordy's Science test, Tuesday 10 November: Planet Earth and Beyond. Written from
     { tap: `After the moto, the rider drank 500 ml of water.`, find: `ml`, ask: `Which word is the unit? Tap it.`, got: `ml, short for millilitre. It measures the amount of a liquid.` },
     { sort: [`Measures length`, `Measures something else`], ask: `What does this unit measure?`, items: [[`mm`, 0, `Millimetre, a small unit of length.`], [`ml`, 1, `Millilitre, for the amount of a liquid.`], [`min`, 1, `Minute, for time.`], [`km`, 0, `Kilometre, for long distances.`], [`kg`, 1, `Kilogram, for mass.`], [`cm`, 0, `Centimetre, a length you can read on a ruler.`], [`s`, 1, `Second, for time.`]] },
     { card: `The right tool`, say: `Each kind of measuring has its own tool. Use a ruler or a tape measure for length, and a stopwatch to time something.`, eg: `At the track, a stopwatch times your lap in min and s, and a tape measure tells you how long a jump is in m.`, more: `The tool and the unit go together: a ruler gives you cm or mm, and a stopwatch gives you min and s.` },
-    { match: [[`Million km`, `How far a planet is from the Sun`], [`km`, `How wide a planet is`], [`°C`, `A planet's temperature`], [`Earth years`, `How long the outer planets take to go around the Sun`], [`km per hour`, `How fast the winds blow`]], ask: `Tap a unit, then tap what your book uses it for.` },
+    { match: [[`Million km`, `How far a planet is from the Sun`], [`Earth days`, `How long the inner planets take to go around the Sun`], [`°C`, `A planet's temperature`], [`Earth years`, `How long the outer planets take to go around the Sun`], [`km per hour`, `How fast the winds blow`]], ask: `Tap a unit, then tap what your book uses it for.` },
   ];
 
   // ---------- The usual wrong thinking in each written list ----------
@@ -9771,11 +9964,11 @@ Jordy's Science test, Tuesday 10 November: Planet Earth and Beyond. Written from
       vRik: { label: 'Rookie Rik', cost: 4000, rank: 2, c: '#2FA8E8', c2: '#FFFFFF', prefer: ['Junior', 'Samantha', 'Google US English', 'Microsoft Zira', 'Karen'], pitch: 1.6, rate: 1.18,
         sample: 'Hi! I am Rookie Rik! I am going to beat you to the first corner!',
         right: ['Yes! Even I did not know that one!', 'Whoa! Can you do my homework too?', 'Braaap! You are so good it is annoying!', 'Nice one! I am telling everyone it was me.'],
-        wrong: ['Ha ha! Nope! Try not to crash this time!', 'Oops! Even the pros stall it sometimes.', 'Wrong way, champ! The track is over there!'] },
+        wrong: ['Whoa, I nearly picked that one too!', 'Oops! Even the pros stall it sometimes.', 'Wrong turn, champ! Back on the track, you have got this.'] },
       vSpanner: { label: 'Uncle Spanner', cost: 5000, rank: 2, c: '#4A5568', c2: '#F2C200', prefer: ['Rishi', 'Fred', 'Microsoft David', 'Google UK English Male', 'Daniel'], pitch: 0.85, rate: 0.9,
         sample: 'Uncle Spanner here. I have seen your riding. We need to talk.',
         right: ['Finally! I can put my spanner down.', 'Hmm. Not bad. Do not tell anyone I said so.', 'Correct. I almost smiled. Almost.', 'Good. That is the first thing today that has worked properly.'],
-        wrong: ['Wrong. I am not angry. Just very, very disappointed.', 'I fixed a gearbox faster than you read that question.', 'That answer just made my spanner cry.', 'Put the bike down. Go and look at your rule card.'] },
+        wrong: ['Not that one. Every engine needs a second kick.', 'Hmm. Let us take that apart and see how it works.', 'Close. Even a good mechanic checks the manual.', 'Put the spanner down a sec. Have a look at your rule card.'] },
       vDad: { label: 'Dozy Dad', cost: 6000, rank: 2, c: '#0E9AA7', c2: '#FFFFFF', prefer: ['Ralph', 'Fred', 'Mark', 'Microsoft David', 'Google US English'], pitch: 0.6, rate: 0.8,
         sample: 'Howzit, my boy. I was going to help, but I have lost my glasses. Oh, they are on my head.',
         right: ['Yes! That calls for a boerewors roll.', 'Well done, my boy. Now, where did I put my keys?', 'Correct! Wait, was I meant to be watching?', 'Lekker! I am so proud I could have a nap.'],
@@ -9937,7 +10130,7 @@ Jordy's Science test, Tuesday 10 November: Planet Earth and Beyond. Written from
   // ---------- staying up to date ----------
   // An open tab or a home screen app keeps running the page it first loaded, old prices and all. So it asks which version
   // is live when it comes back into view and every few minutes, and swaps over between races. build.mjs fills in BUILD.
-  const BUILD = '1da98bc795';
+  const BUILD = '939a7052cc';
   const BACK_KEY = 'holeshot.back.v1';
   const TRIED_KEY = 'holeshot.tried.v1';
   let liveBuild = null;
@@ -10037,6 +10230,9 @@ Jordy's Science test, Tuesday 10 November: Planet Earth and Beyond. Written from
     }
     syncing = true;
     const got = await syncCall({ action: 'get', token: syncToken });
+    const before = ui.saved;
+    ui.saved = got && got.ok ? 'ok' : 'fail';
+    if (before !== ui.saved && !ui.run && !changedTop()) render();
     if (got && got.ok) {
       let changed = false;
       for (const id of Object.keys(RS.packs)) {
@@ -10075,7 +10271,17 @@ Jordy's Science test, Tuesday 10 November: Planet Earth and Beyond. Written from
     }
   }
 
-  const ui = { who: null, subject: null, tab: 'home', run: null, result: null, confirmReset: false, chartPick: null, voiceBlocked: false, pit: 'helmet', tryOn: null, parents: null };
+  // Whether the last save reached the family copy, shown small at the top of each screen.
+  const changedTop = () => !ui.who || ui.result || ui.walk || ui.parents || ui.pin || ui.moment;
+  const savedText = () => (!SYNC_ON || !syncToken ? 'Saved on this device' : navigator.onLine === false ? 'Offline: saved on this device' : ui.saved === 'fail' ? 'Not sent yet: saved on this device' : 'Saved');
+  window.addEventListener('online', () => {
+    if (!ui.run) render();
+    syncSoon();
+  });
+  window.addEventListener('offline', () => {
+    if (!ui.run) render();
+  });
+  const ui = { saved: null, who: null, subject: null, tab: 'home', run: null, result: null, confirmReset: false, chartPick: null, voiceBlocked: false, pit: 'helmet', tryOn: null, parents: null };
   const P = () => state.players[ui.who];
   const PK = () => RS.packs[ui.who];
   const SUB = () => PK().subjects[ui.subject];
@@ -10291,7 +10497,7 @@ Jordy's Science test, Tuesday 10 November: Planet Earth and Beyond. Written from
       <img class="shot-shade" src="img/${id}-shade.webp" alt="" decoding="sync">
     </div>`;
   }
-  const photo = (name, alt = '') => `<img class="photo" src="img/${name}.webp" alt="${alt}" decoding="async">`;
+  const photo = (name, alt = '') => `<img class="photo" src="img/${name}.webp" alt="${alt}" decoding="async" loading="lazy">`;
   const plate = (num) => `<span class="plate" aria-label="Race number ${h(String(num))}">${h(String(num))}</span>`;
 
   function applyAccent() {
@@ -10510,7 +10716,7 @@ Jordy's Science test, Tuesday 10 November: Planet Earth and Beyond. Written from
     return `<div class="wrap">
       <header class="top">
         ${plate(p.plate)}
-        <div class="top-who"><h1>Hello, ${pack.name}</h1><div class="small-t muted">${pack.grade} · ${pack.term}</div></div>
+        <div class="top-who"><h1>Hello, ${pack.name}</h1><div class="small-t muted">${pack.grade} · ${pack.term} · <span class="saved ${navigator.onLine === false || ui.saved === 'fail' ? 'off' : ''}">${savedText()}</span></div></div>
         <button class="round" data-act="switch" aria-label="Switch rider">${ic('swap')}</button>
       </header>
       ${inner}
@@ -10567,6 +10773,8 @@ Jordy's Science test, Tuesday 10 November: Planet Earth and Beyond. Written from
       ? weak.map((x, i) => `<div class="coach-item"><div class="coach-row"><span class="rank">${i + 1}</span><h3>${x.t.title}</h3><button class="btn dark small" data-act="start" data-mode="topic" data-topic="${x.t.id}">Practise</button></div><div class="meter" role="img" aria-label="${Math.round(x.m * 100)} percent"><i style="width:${Math.round(x.m * 100)}%"></i></div></div>`).join('')
       : `<div class="coach-item"><p class="small-t">${seenTopic(p, main[0]) ? 'Nothing needs fixing right now. Try the main event.' : 'Finish one moto and your coach will find what to practise next.'}</p></div>`;
     return shell(`
+      ${resumeCard()}
+      ${guideCard(p)}
       ${examCard(pack)}
       ${planCard(p, pack)}
       <div class="home-grid">
@@ -10691,6 +10899,19 @@ Jordy's Science test, Tuesday 10 November: Planet Earth and Beyond. Written from
         <div class="meter" role="img" aria-label="${x.score} percent of the weekly target"><i style="width:${Math.min(100, x.score)}%"></i></div>
         <div class="small-t muted num">${x.right} of ${x.target} this week · ${wins[x.id] || 0} ${wins[x.id] === 1 ? 'week' : 'weeks'} won</div>
       </div>`).join('')}</div>
+    </section>`;
+  }
+  function guideCard(p) {
+    if (p.guided || p.runsDone > 3) return '';
+    return `<section class="card guide" aria-label="How it works">
+      <div class="h-sec" style="margin-bottom:6px">How Holeshot works</div>
+      <ol class="guide-list">
+        <li><b>Drop the gate</b> for today's moto: 10 questions on what you need most.</li>
+        <li><b>Get one wrong?</b> You get a hint, then a lesson, then one like it. That's how it sticks.</li>
+        <li><b>Track walks</b> teach a section before you race it. Comeback laps check it stuck on a later day.</li>
+        <li><b>Points</b> buy bikes and kit in the Pits. Save up for something big.</li>
+      </ol>
+      <button class="btn dark small" data-act="guided">Got it</button>
     </section>`;
   }
   function comebackCard(p, sub) {
@@ -10870,6 +11091,14 @@ Jordy's Science test, Tuesday 10 November: Planet Earth and Beyond. Written from
       </section>
       <div class="stops">
         ${stops.join('')}
+        <article class="stop final mixed">
+          <div class="stop-body">
+            <div class="stop-row">
+              <div class="stop-txt"><span class="eyebrow">Every section</span><h3>Mixed lap</h3><div class="small-t muted">One question from each section, all mixed up, like a real test. You work out which rule each one needs.</div></div>
+              <button class="btn small" data-act="start" data-mode="mixed">Ride</button>
+            </div>
+          </div>
+        </article>
         <article class="stop final">
           <div class="stop-photo">${photo('main-event', 'Riders lined up at the start gate under floodlights')}<span class="chip on-photo">${ic('flag', 12)} Chequered flag</span></div>
           <div class="stop-body">
@@ -10913,7 +11142,7 @@ Jordy's Science test, Tuesday 10 November: Planet Earth and Beyond. Written from
     const steps = t.walk.length;
     const said = w.said ? `<p class="walk-said ${w.said.ok ? 'good' : 'bad'}" role="status">${w.said.about ? `<b>${h(w.said.about)}</b><br>` : ''}${h(w.said.text)}</p>` : '';
     const next = `<button class="btn primary full" data-act="walk-next">${w.i + 1 < steps ? 'Next' : 'Finish the walk'} ${ic('arrow')}</button>`;
-    const head = `<div class="walk-head"><div><div class="eyebrow">Track walk</div><div class="h-sec">${t.title}</div></div><button class="btn small" data-act="walk-off">Back</button></div>
+    const head = `<div class="walk-head"><div><div class="eyebrow">Track walk</div><div class="h-sec">${t.title}</div></div><button class="round small" data-act="say-card" aria-label="Read this aloud">${ic('speaker', 18)}</button><button class="btn small" data-act="walk-off">Back</button></div>
       <div class="meter" role="img" aria-label="Step ${Math.min(w.i + 1, steps)} of ${steps}"><i style="width:${Math.round((100 * w.i) / steps)}%"></i></div>`;
     let body;
     if (w.i >= steps) {
@@ -11038,7 +11267,9 @@ Jordy's Science test, Tuesday 10 November: Planet Earth and Beyond. Written from
     const p = P();
     const tab = ui.pit;
     const show = tried(p);
-    const tabs = PIT_TABS.map(([id, label]) => `<button class="pit-tab ${tab === id ? 'on' : ''}" data-act="pit" data-id="${id}" aria-pressed="${tab === id}">${label}</button>`).join('');
+    const tabBtn = ([id, label]) => `<button class="pit-tab ${tab === id ? 'on' : ''}" data-act="pit" data-id="${id}" aria-pressed="${tab === id}">${label}</button>`;
+    const groups = [['Bike', ['bike', 'paint', 'sticker', 'number']], ['Rider', ['helmet', 'goggles', 'kit', 'chest', 'knee', 'gloves', 'boots']], ['Extras', ['voice', 'badges']]];
+    const tabs = groups.map(([name, ids]) => `<div class="pit-group"><span class="eyebrow">${name}</span>${ids.map((id) => tabBtn(PIT_TABS.find((x) => x[0] === id))).join('')}</div>`).join('');
     let body;
     if (tab === 'number') {
       body = `<div class="h-sec" style="margin-bottom:10px">Race number</div>
@@ -11178,6 +11409,8 @@ Jordy's Science test, Tuesday 10 November: Planet Earth and Beyond. Written from
       while (out.length < n) out.push(...RS.shuffle(quick.length ? quick : all));
       return out.slice(0, n);
     }
+    // Mixing sections makes him work out which rule each question needs, which is what a real test asks.
+    if (mode === 'mixed') return RS.shuffle(racing(sub)).slice(0, n).map((t) => RS.pick(t.skills));
     if (mode === 'exam') {
       const out = [];
       const topics = RS.shuffle(racing(sub));
@@ -11218,7 +11451,7 @@ Jordy's Science test, Tuesday 10 November: Planet Earth and Beyond. Written from
     // An old screen can still offer a lap after the list has emptied.
     if (mode === 'fix' && !fixList(P(), sub).length) mode = 'daily';
     if (mode === 'review' && !dueList(P(), sub).length) mode = 'daily';
-    const n = mode === 'exam' ? sub.examSize : mode === 'review' ? Math.min(10, dueList(P(), sub).length) : 10;
+    const n = mode === 'exam' ? sub.examSize : mode === 'review' ? Math.min(10, dueList(P(), sub).length) : mode === 'mixed' ? Math.min(10, racing(sub).length) : 10;
     ui.result = null;
     ui.run = { id: uuid(), mode, topicId, queue: buildQueue(P(), sub, mode, topicId, n).map((slot) => (typeof slot === 'string' ? { skill: slot } : slot)), i: 0, total: n, q: null, typed: '', tries: 0, combo: 0, bestCombo: 0, pts: 0, score: 0, right: 0, log: [], extras: 0, asked: new Set(), sheet: null, heard: '', listening: false, started: Date.now(), halfPay: mode === 'topic' && ((P().topics[topicId] || {}).stars || 0) >= 3, fixed: [], fixNote: '', firstGiven: null, qStart: Date.now(), penalty: 0, gate: true, trace: [], before: Object.fromEntries(sub.topics.map((t) => [t.id, mastery(P(), t)])) };
     audio();
@@ -11266,6 +11499,7 @@ Jordy's Science test, Tuesday 10 November: Planet Earth and Beyond. Written from
     }
     r.asked.add(key);
     r.trace[r.i] = r.pts;
+    keepRun();
     q.skill = slot.skill;
     q.bonus = !!slot.bonus;
     r.q = q;
@@ -11283,6 +11517,28 @@ Jordy's Science test, Tuesday 10 November: Planet Earth and Beyond. Written from
     if (w) w.focus();
   }
 
+  const RUN_KEY = 'holeshot.run.v1';
+  function keepRun() {
+    const r = ui.run;
+    if (!r || r.mode === 'lap') return;
+    setKey(RUN_KEY, JSON.stringify({ who: ui.who, subject: ui.subject, day: dayKey(), run: { ...r, asked: [...r.asked], q: null, sheet: null } }));
+  }
+  const dropRun = () => setKey(RUN_KEY, '');
+  function savedRun() {
+    try {
+      const x = JSON.parse(getKey(RUN_KEY) || 'null');
+      return x && x.who === ui.who && x.day === dayKey() && PK().subjects[x.subject] && x.run.i > 0 && x.run.i < x.run.queue.length ? x : null;
+    } catch (e) {
+      return null;
+    }
+  }
+  function resumeCard() {
+    const x = savedRun();
+    if (!x) return '';
+    return `<section class="card resume" aria-label="Finish your race"><div class="hero-head"><div><div class="eyebrow">${PK().subjects[x.subject].label}</div><div class="h-sec">Finish your race</div></div><span class="chip num">${x.run.i} of ${x.run.queue.length} done</span></div>
+      <p class="small-t muted">You stopped part way. Your points from it are already yours.</p>
+      <div style="display:flex;gap:8px;flex-wrap:wrap"><button class="btn primary small" data-act="resume">Carry on ${ic('arrow')}</button><button class="btn small" data-act="resume-no">Leave it</button></div></section>`;
+  }
   function settle(q, ok, firstTry, given) {
     const r = ui.run;
     const p = P();
@@ -11479,6 +11735,8 @@ Jordy's Science test, Tuesday 10 November: Planet Earth and Beyond. Written from
       label = 'Fix-it lap';
     } else if (r.mode === 'review') {
       label = 'Comeback lap';
+    } else if (r.mode === 'mixed') {
+      label = 'Mixed lap';
     } else if (lap) {
       label = `Hot lap ${lapText(lap.ms)}`;
     } else {
@@ -11523,6 +11781,7 @@ Jordy's Science test, Tuesday 10 November: Planet Earth and Beyond. Written from
       installed: !!navigator.standalone || matchMedia('(display-mode: standalone)').matches,
     });
     ui.run = null;
+    dropRun();
     ui.result = x;
     syncSoon();
     render();
@@ -11705,13 +11964,13 @@ Jordy's Science test, Tuesday 10 November: Planet Earth and Beyond. Written from
     const similar = r.queue[r.i + 1] && r.queue[r.i + 1].depth;
     const done = s.step >= q.steps.length - 1;
     const shown = q.steps.slice(0, Math.max(0, s.step + 1));
-    return `<div class="sheet bad" role="status" ${s.step >= 0 ? 'style="animation:none"' : ''}><div class="sheet-head"><h2>Let's learn this one</h2></div>${lineHTML(s)}
+    return `<div class="sheet bad" role="status" ${s.step >= 0 ? 'style="animation:none"' : ''}><div class="sheet-head"><h2>Let's learn this one</h2><button class="round small" data-act="say-card" aria-label="Read this aloud">${ic('speaker', 18)}</button></div>${lineHTML(s)}
       ${picked ? `<p><b>You said:</b> ${h(picked)}</p>` : '<p><b>You skipped this one.</b></p>'}
       ${why && picked ? `<p class="small-t">${h(why)}</p>` : ''}
       <p style="font-size:17px"><b>The right answer:</b> ${h(q.correct).replace(/\.$/, '')}</p>
       ${shown.length ? `<ol class="steps">${shown.map((x) => `<li>${h(x)}</li>`).join('')}</ol>` : ''}
       ${done ? ruleCard(topicOf(q.skill), true) : ''}
-      ${done && !q.bonus ? `<p class="small-t muted">It stays on your fix list until you get it right ${FIX_NEED} times in a row.</p>` : ''}
+      ${done && !q.bonus ? `<p class="small-t muted">It stays on your fix list until you get it right ${FIX_NEED} times in a row, and once more on another day.</p>` : ''}
       ${done ? `<button class="btn primary full" data-act="next" data-primary>${similar ? 'Now try one like it' : 'Got it'} ${ic('arrow')}</button>` : `<button class="btn primary full" data-act="lesson-next" data-primary>${s.step < 0 ? 'Show me why' : 'Next step'} ${ic('arrow')}</button>`}
     </div>`;
   }
@@ -12137,6 +12396,44 @@ Jordy's Science test, Tuesday 10 November: Planet Earth and Beyond. Written from
       return { ...g, subject: sub ? sub.label : g.subject, title: topic ? topic.title : g.topic };
     });
   }
+  // Counts from the saved progress the report carries: what's due back for a check, what's held, and what's stuck.
+  function spacingOf(pack, prog) {
+    const sp = prog.sp || {};
+    const today = dayKey();
+    const due = Object.keys(sp).filter((id) => pack.skills[id] && sp[id].s > 0 && (!sp[id].d || sp[id].d <= today)).length;
+    const held = Object.keys(sp).filter((id) => pack.skills[id] && sp[id].b >= 1 && sp[id].d && sp[id].d > today).length;
+    const sectionOf = (id) => {
+      for (const sub of Object.values(pack.subjects)) {
+        const t = sub.topics.find((x) => x.skills.includes(id));
+        if (t) return { sub, t };
+      }
+      return null;
+    };
+    const stuck = [...new Map((prog.stuck || []).map(sectionOf).filter(Boolean).map((x) => [x.t.id, x])).values()];
+    return { due, held, stuck };
+  }
+  // One clear thing for a parent to do tonight, picked from the same report.
+  function tonightJob(pack, prog, subjectBits) {
+    const sp = spacingOf(pack, prog);
+    const name = pack.name;
+    if (sp.stuck.length) {
+      const x = sp.stuck[0];
+      return `Sit with ${name} for 10 minutes on ${x.sub.label}: ${x.t.title}. It has caught him out so often that the game has paused it for 2 days. ${x.t.walk ? 'Open the Track, do its Track walk together, then let him ride the section.' : 'Read its rule card on the Track together, then let him ride the section.'}`;
+    }
+    const next = planExam(pack);
+    const n = next ? daysUntil(next.date) : 99;
+    if (next && n <= 2) {
+      const b = subjectBits(next.subject);
+      const weak = b.weakest[0];
+      return `${next.label} is ${whenText(n).toLowerCase()}. Ask ${name} to finish today's plan on his Home screen${weak ? (weak.t.notes ? `, then ask him three questions from the rule card for ${weak.t.title} on the Track` : `, then let him ride ${weak.t.title} once more`) : ''}. Short and calm beats long and late.`;
+    }
+    if (sp.due >= 8) return `${sp.due} kinds of question are due back for a check. Ask ${name} to ride the comeback lap on his Home screen. It takes about 5 minutes.`;
+    if (next) {
+      const b = subjectBits(next.subject);
+      if (b.weakest[0]) return `Ask ${name} to explain ${b.weakest[0].t.title} (${next.label}) to you in his own words. Teaching it back is one of the best ways to make it stick.`;
+    }
+    return `Ask ${name} what he learnt this week, and let him show you one Track walk.`;
+  }
   function viewParents() {
     const v = ui.parents;
     if (!v.data) {
@@ -12209,6 +12506,12 @@ Jordy's Science test, Tuesday 10 November: Planet Earth and Beyond. Written from
       <header class="top"><div class="top-who"><h1>Results</h1><div class="small-t muted">${v.busy ? 'Fetching...' : `Last ${v.days} days`}</div></div><button class="btn small no-print" data-act="parents-print">Print</button><button class="round no-print" data-act="parents-off" aria-label="Close the results">${ic('x')}</button></header>
       <div class="pit-tabs no-print" role="group" aria-label="Rider and period">${whoTabs}<span style="flex:1"></span>${dayTabs}</div>
       <section class="card"><div class="eyebrow">${h(pack.name)}</div><div class="h-sec" style="margin-bottom:6px">In short</div><div class="rows">${inShort.map((x) => `<p>${h(x)}</p>`).join('')}</div></section>
+      <section class="card tonight"><div class="eyebrow">One job for tonight</div><p style="font-size:17px">${h(tonightJob(pack, prog, subjectBits))}</p></section>
+      ${(() => {
+        const sp = spacingOf(pack, prog);
+        return sp.due || sp.held ? `<p class="small-t muted" style="padding-inline:4px">Still remembered on a later day: ${sp.held} ${sp.held === 1 ? 'kind' : 'kinds'} of question. Due back for a check: ${sp.due}.${sp.stuck.length ? ` Paused for help: ${sp.stuck.map((x) => x.t.title).join(', ')}.` : ''}</p>` : '';
+      })()}
+      <section class="card no-print"><div class="h-sec" style="margin-bottom:4px">The week in a message</div><p class="small-t muted" style="margin-bottom:10px">${new Date().getDay() === 0 ? "It's Sunday: a" : 'A'} short summary of both boys' last 7 days, to send to the family on WhatsApp.</p><button class="btn primary full" data-act="parents-share">Share the summary</button></section>
       ${coming.length ? `<section class="card"><div class="h-sec" style="margin-bottom:4px">Tests coming up</div><p class="small-t muted" style="margin-bottom:10px">Our estimate from practice in the game, not a forecast of the school's mark.</p>
         <div class="rows">${coming.map((e) => {
           const b = subjectBits(e.subject);
@@ -12234,6 +12537,20 @@ Jordy's Science test, Tuesday 10 November: Planet Earth and Beyond. Written from
           <button class="btn primary full" type="submit">Save the mark</button>
         </form>
       </section>
+      ${(() => {
+        // How the game's practice tests line up with the school's marks, subject by subject.
+        const rows = subjectIds.map((id) => {
+          const mine = marks.filter((m) => m.subject === id);
+          const tests = exams.filter((e) => e.subject === id);
+          if (!mine.length || !tests.length) return '';
+          const school = Math.round(mine.reduce((a, m) => a + pctOf(m), 0) / mine.length);
+          const game = Math.round(tests.slice(0, 3).reduce((a, e) => a + e.pct, 0) / Math.min(3, tests.length));
+          const gap = game - school;
+          const say = gap >= 15 ? 'The game is kinder than school here, so aim for 90% in practice before a test.' : gap <= -15 ? 'He does better at school than in the game. The practice tests may be harder than the real one.' : 'The game and school agree, so the practice tests are a fair guide.';
+          return `<div class="row"><div class="row-top"><b>${h(subName(id))}</b><span class="num muted">Game ${game}% · School ${school}%</span></div><div class="small-t muted">${say}</div></div>`;
+        }).filter(Boolean);
+        return rows.length ? `<section class="card"><div class="h-sec" style="margin-bottom:4px">Game against school</div><p class="small-t muted" style="margin-bottom:10px">His last three practice tests next to his school marks.</p><div class="rows">${rows.join('')}</div></section>` : '';
+      })()}
       <section class="tiles">
         ${tile('flag', 'Time spent', timeText(t.secs), `<span class="chip num">${t.days} ${t.days === 1 ? 'day' : 'days'} active</span>`)}
         ${tile('target', 'Right first try', t.questions ? `${accuracy}%` : '–', `<span class="chip num">${RS.fmt(t.first_try)} of ${RS.fmt(t.questions)}</span>`)}
@@ -12286,6 +12603,55 @@ Jordy's Science test, Tuesday 10 November: Planet Earth and Beyond. Written from
       if (ui.parents === v) $('#mark-msg').textContent = 'That didn\'t save. Check the internet and try again.';
     }
   });
+  function weekSummary(data) {
+    const lines = [`Holeshot, week to ${stamp(Date.now())}`];
+    for (const pack of Object.values(RS.packs)) {
+      const d = data[pack.id];
+      if (!d) continue;
+      const t = d.totals;
+      const prog = d.progress || {};
+      const sp = spacingOf(pack, prog);
+      const next = planExam(pack);
+      lines.push('');
+      lines.push(`${pack.name}: ${t.questions ? `${RS.fmt(t.questions)} questions on ${t.days} ${t.days === 1 ? 'day' : 'days'}, about ${timeText(t.secs)}, ${shareOf(t.first_try, t.questions)}% right first try.` : 'no riding this week.'}`);
+      if (sp.held) lines.push(`Still remembered on a later day: ${sp.held} ${sp.held === 1 ? 'kind' : 'kinds'} of question.`);
+      const best = (d.exams || []).filter((e) => Date.now() - new Date(e.at) < 7 * 86400000).sort((a, b) => b.pct - a.pct)[0];
+      if (best) lines.push(`Best practice test: ${best.pct}% in ${(pack.subjects[best.subject] || { label: best.subject }).label}.`);
+      if (next) lines.push(`Next ${pack.testWord || 'exam'}: ${next.label}, ${shortDay(next.date)}.`);
+      lines.push(`This week: ${tonightJob(pack, prog, (id) => {
+        const sub = pack.subjects[id];
+        const m = prog.m || {};
+        const rows = (sub ? sub.topics.filter((x) => !x.warmup) : []).map((x) => ({ t: x, m: Math.round((100 * x.skills.reduce((a, s) => a + (m[s] || 0), 0)) / x.skills.length) }));
+        return { weakest: rows.sort((a, b) => a.m - b.m).slice(0, 3) };
+      })}`);
+    }
+    return lines.join('\n');
+  }
+  async function shareSummary() {
+    const v = ui.parents;
+    if (!v || !v.data) return;
+    let data = v.data;
+    // The summary is always the last 7 days, whatever the page is showing.
+    if (v.days !== 7) {
+      const res = await syncCall({ action: 'report', code: v.code, days: 7 });
+      if (res && res.ok) data = res.report;
+    }
+    const text = weekSummary(data);
+    try {
+      if (navigator.share) {
+        await navigator.share({ text });
+        return;
+      }
+    } catch (e) {
+      if (e && e.name === 'AbortError') return;
+    }
+    try {
+      await navigator.clipboard.writeText(text);
+      toast('Copied. Paste it into WhatsApp.');
+    } catch (e) {
+      toast("Couldn't copy it on this device.");
+    }
+  }
   function startRiderOver() {
     // The raised epoch lets this reset reach the rider's other devices.
     state.players[ui.who] = Object.assign(blankPlayer(PK()), { epoch: (P().epoch || 0) + 1, pin: P().pin });
@@ -12344,6 +12710,15 @@ Jordy's Science test, Tuesday 10 November: Planet Earth and Beyond. Written from
   });
 
   function render() {
+    try {
+      draw();
+    } catch (err) {
+      console.error(err);
+      // Progress is already saved, so starting the page again is safe.
+      $('#app').innerHTML = `<main class="pick"><section class="card lock"><div class="h-sec">Oops, the bike stalled</div><p class="small-t muted">Something went wrong on this screen. Your points and progress are saved.</p><button class="btn primary full" onclick="location.reload()">Start it up again</button></section></main>`;
+    }
+  }
+  function draw() {
     if (liveBuild) swapToLive();
     applyAccent();
     const app = $('#app');
@@ -12552,6 +12927,7 @@ Jordy's Science test, Tuesday 10 November: Planet Earth and Beyond. Written from
         stopSpeaking();
         save();
         ui.run = null;
+        dropRun();
         syncSoon();
         render();
         window.scrollTo(0, 0);
@@ -12611,6 +12987,29 @@ Jordy's Science test, Tuesday 10 November: Planet Earth and Beyond. Written from
         if (tab === 'voice') speakAs(GEAR.voice.items[id], GEAR.voice.items[id].sample);
         break;
       }
+      case 'resume': {
+        const x = savedRun();
+        dropRun();
+        if (!x) {
+          render();
+          break;
+        }
+        ui.subject = x.subject;
+        ui.result = null;
+        ui.run = { ...x.run, asked: new Set(x.run.asked), started: Date.now(), qStart: Date.now(), gate: false, listening: false };
+        audio();
+        nextQuestion();
+        break;
+      }
+      case 'guided':
+        P().guided = true;
+        save();
+        render();
+        break;
+      case 'resume-no':
+        dropRun();
+        render();
+        break;
       case 'moment-off':
         ui.moment = null;
         ui.tab = 'home';
@@ -12625,10 +13024,25 @@ Jordy's Science test, Tuesday 10 November: Planet Earth and Beyond. Written from
           render();
         }
         break;
+      case 'say-card': {
+        // Reads the words on the card, leaving out the buttons.
+        const box = el.closest('.sheet, .walk');
+        if (!box) break;
+        const copy = box.cloneNode(true);
+        copy.querySelectorAll('button, .walk-word, .walk-tile').forEach((b) => b.remove());
+        const words = box.querySelectorAll('.walk-word').length ? [...box.querySelectorAll('.walk-word')].map((b) => b.textContent).join(' ') : '';
+        speakAs(ui.who, `${copy.innerText.replace(/\s+/g, ' ').trim()} ${words}`.trim());
+        break;
+      }
+      case 'parents-share':
+        shareSummary();
+        break;
       case 'buy-try': {
         // Prices can change between versions, so nothing is bought until this page is known to be the live one.
         if (buying) break;
         buying = true;
+        el.disabled = true;
+        el.textContent = 'Checking...';
         const { tab, id: item } = ui.tryOn;
         checkBuild().then(async (found) => {
           // Buy against the latest saved copy, so a sale can't be made on points that another device has already spent.
