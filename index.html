@@ -9847,6 +9847,1865 @@ Jordy's Science test, Tuesday 10 November: Planet Earth and Beyond. Written from
   RS.packs.kash.skills.ns_moonpic.not = 'Look at how much is lit, then think of the order: almost none, a thin curve, half, more than half, all.';
 })(typeof window !== 'undefined' ? window : globalThis);
 
+/* EMS head start: Grade 7 Economic and Management Sciences basics, ready before Grade 7 starts.
+   Written for this app before the Grade 7 book arrives, so where they differ, the school's book wins.
+   The subject opens on 14 November 2026 (opens), and extra: true keeps it out of the bike and gear unlock counts.
+   Money sums are worked out from the numbers in each question, never typed in by hand. See ADDING-QUESTIONS.md. */
+(function (root) {
+  'use strict';
+  const RS = root.RS;
+  const { bank, fmt } = RS;
+  const pack = RS.packs.jordy;
+  const S = pack.skills;
+  const R = (n) => 'R' + fmt(n);
+
+  // ---------- Needs, wants and choices ----------
+  S.ems_wants = bank([
+    { q: `In economics, a need is…`, a: `something you must have to live`, w: [`something you would like but can live without`, `anything that costs a lot of money`, `anything your friends already have`], nope: { 'something you would like but can live without': `That describes a want. A need is something you can't live without.` }, why: `Needs are things like food, water, clothing and shelter. Without them you can't survive.` },
+    { q: `Which of these is a need?`, a: `Clean drinking water`, w: [`A new paint job for a dirt bike`, `A games console`, `A ticket to a supercross race`], why: `Your body can't live without water. The other three are nice to have.` },
+    { q: `Which of these is a want?`, a: `A new graphics kit for your bike`, w: [`A warm place to sleep`, `Food to eat`, `Clothes to keep you warm`], why: `A graphics kit makes the bike look good, but you can live without it. The other three are basic needs.` },
+    { q: `Which list has only basic needs in it?`, a: `Food, water, clothing and shelter`, w: [`Food, a cellphone, sweets and shelter`, `Water, a dirt bike, a TV and shelter`, `Clothing, a games console, water and toys`], h: `Look for the list with nothing in it you could live without.`, why: `These four keep you alive and safe. Each of the other lists has a want in it.` },
+    { tf: true, q: `True or false: shelter, a safe place to live, is a basic need.`, why: `Everyone needs somewhere safe and dry to live and sleep.` },
+    { tf: false, q: `True or false: if you want something badly enough, it becomes a need.`, why: `Wanting something a lot doesn't change what it is. A need is something you can't live without.` },
+    { q: `Goods are…`, a: `things you can see and touch, like a helmet`, w: [`work someone does for you, like a haircut`, `money you keep in a bank`, `things that are always free`], nope: { 'work someone does for you, like a haircut': `That is a service. Goods are things you can hold in your hands.` }, why: `A helmet, a tyre and a loaf of bread are all goods.` },
+    { q: `Services are…`, a: `work done for you, like fixing a bike`, w: [`things you can touch, like a tyre`, `food grown on a farm`, `money paid to the government`], nope: { 'things you can touch, like a tyre': `Those are goods. A service is work someone does for you.` }, why: `A mechanic, a doctor and a taxi driver all provide services. You pay for what they do, not for a thing to take home.` },
+    { q: `Which of these is a service?`, a: `A mechanic fixing a puncture`, w: [`A new inner tube`, `A loaf of bread`, `A bag of oranges`], why: `Fixing the puncture is work done for you. The other three are goods you can touch.` },
+    { q: `Which of these is a good?`, a: `A pair of riding boots`, w: [`A doctor checking a sore wrist`, `A taxi ride to school`, `A haircut at the barber`], why: `You can hold boots in your hands. The other three are services, where someone does something for you.` },
+    { q: `A bike shop sells you a new chain and fits it. What did you pay for?`, a: `A good and a service`, w: [`Only a good`, `Only a service`, `Neither a good nor a service`], nope: { 'Only a good': `The chain is a good, but someone also did the work of fitting it.`, 'Only a service': `Fitting it is a service, but the chain itself is a good you can touch.` }, why: `The chain is a good. Fitting it is a service.` },
+    { q: `In economics, scarcity means…`, a: `there isn't enough to meet everyone's wants`, w: [`there is more than enough of everything`, `something is very cheap`, `nobody wants to buy something`], why: `Money, time and materials are limited, but people's wants never run out.` },
+    { q: `Why do people have to choose what to buy?`, a: `Wants never end, but money runs out`, w: [`Everything in the shops is free`, `People only ever want one thing`, `Shops never run out of anything`], why: `This is scarcity. You can't have everything, so you choose what matters most.` },
+    { q: `The opportunity cost of a choice is…`, a: `the next best thing you give up`, w: [`the price on the label`, `the change you get back`, `the thing you chose`], nope: { 'the price on the label': `The price is the money you pay. The opportunity cost is the thing you miss out on.`, 'the thing you chose': `You get the thing you chose. The opportunity cost is what you didn't get.` }, why: `Every choice means giving something else up. The best thing you gave up is the opportunity cost.` },
+    { q: `You can pay for new gloves or a race entry, but not both. You choose the gloves. What is the opportunity cost?`, a: `The race entry`, w: [`The gloves`, `The money left in your wallet`, `Nothing, because you got the gloves`], nope: { 'The gloves': `You got the gloves. The opportunity cost is what you gave up to get them.` }, why: `The race entry is the next best thing you gave up to get the gloves.` },
+    { tf: false, q: `True or false: a service is something you can pick up and carry home.`, why: `A service is work done for you, like a haircut, so you can't carry it home. Goods are the things you can carry.` },
+    { q: `Things you would like to have but can live without are called ___.`, t: [`wants`, `want`], strict: true, h: `It is the opposite of needs.`, why: `Wants are nice to have, but you can live without them.` },
+    { q: `Things you can see and touch, like a tyre or a loaf of bread, are called ___.`, t: [`goods`, `good`], strict: true, h: `It is the word that goes with "services".`, why: `Goods are things you can touch. Work done for you is a service.` },
+    { q: `When there isn't enough of something to meet everyone's wants, it is called ___.`, t: [`scarcity`], h: `It starts with "s" and comes from a word that means hard to find.`, why: `Scarcity is why we have to choose: wants never run out, but money and materials do.` },
+  ]);
+
+  // ---------- The economy ----------
+  S.ems_economy = bank([
+    { q: `A producer is someone who…`, a: `makes goods or provides services`, w: [`only buys and uses things`, `collects taxes for the government`, `never sells anything`], nope: { 'only buys and uses things': `That is a consumer. A producer makes or provides what consumers buy.` }, why: `A farmer, a factory and a mechanic are all producers.` },
+    { q: `When you buy a pie at the tuck shop and eat it, you are…`, a: `a consumer`, w: [`a producer`, `a business`, `the government`], why: `You bought something and used it up, so you are a consumer.` },
+    { q: `A baker buys flour and sells the bread she bakes. She is…`, a: `both a consumer and a producer`, w: [`only a consumer`, `only a producer`, `neither a consumer nor a producer`], nope: { 'only a producer': `She makes bread, but she also buys the flour, and buying makes her a consumer too.` }, why: `She buys flour, so she is a consumer. She makes bread to sell, so she is a producer.` },
+    { tf: true, q: `True or false: everyone is a consumer.`, why: `Everyone uses goods and services, such as food, water and clothes.` },
+    { q: `In the economy, what do households do?`, a: `Work for businesses and spend their income`, w: [`Collect taxes from everyone`, `Make the country's laws`, `Print the country's money`], why: `People in households earn wages by working, then spend that money on goods and services.` },
+    { q: `Which group collects taxes and uses them for public services?`, a: `The government`, w: [`Households`, `Businesses`, `Consumers`], why: `The government uses tax money to pay for things like schools, clinics, roads and the police.` },
+    { q: `What do people in households give businesses in return for wages?`, a: `Their work`, w: [`Taxes`, `Public roads`, `Factories`], why: `Households provide work, also called labour. Businesses pay wages for it.` },
+    { q: `Which of these is paid for with tax money?`, a: `Public schools, clinics and roads`, w: [`Bike shops and fuel stations`, `Spaza shops and tuck shops`, `A private race track`], why: `The government collects taxes and spends them on public services that everyone can use.` },
+    { q: `Money that people and businesses must pay to the government is called…`, a: `tax`, w: [`a wage`, `profit`, `savings`], why: `Tax pays for public services such as schools, hospitals and roads.` },
+    { q: `The primary sector…`, a: `takes raw materials from nature`, w: [`turns raw materials into products`, `provides services such as transport`, `sells goods in shops`], nope: { 'turns raw materials into products': `That is the secondary sector. The primary sector gets the raw materials first.` }, why: `Farming, mining, fishing and forestry are all in the primary sector.` },
+    { q: `The secondary sector…`, a: `turns raw materials into products`, w: [`takes raw materials from nature`, `provides services such as banking`, `collects taxes`], why: `Factories that make things, such as bike frames, furniture or tinned food, are in the secondary sector.` },
+    { q: `The tertiary sector…`, a: `provides services`, w: [`grows crops and digs up minerals`, `makes goods in factories`, `catches fish at sea`], why: `Shops, transport, banks, schools and mechanics all provide services.` },
+    { q: `Which sector is a gold mine in?`, a: `Primary`, w: [`Secondary`, `Tertiary`, `None of the sectors`], why: `Mining takes gold straight out of the ground, so it is in the primary sector.` },
+    { q: `A factory turns steel into motorbike frames. Which sector is it in?`, a: `Secondary`, w: [`Primary`, `Tertiary`, `None of the sectors`], nope: { Primary: `The steel wasn't dug out of the ground here. The factory turns it into a new product.` }, why: `Making a product out of materials is the secondary sector.` },
+    { q: `A mechanic services dirt bikes. Which sector does she work in?`, a: `Tertiary`, w: [`Primary`, `Secondary`, `None of the sectors`], nope: { Secondary: `She doesn't make a new product. Servicing a bike is a service.` }, why: `Servicing a bike is work done for someone, which is a service.` },
+    { q: `A sugar cane farm in KwaZulu-Natal is in which sector?`, a: `Primary`, w: [`Secondary`, `Tertiary`, `None of the sectors`], why: `Farming grows crops straight from the land, so it is in the primary sector.` },
+    { q: `Which list goes primary, then secondary, then tertiary?`, a: `Mine iron ore, make a bike frame, sell the bike`, w: [`Make a bike frame, mine iron ore, sell the bike`, `Sell the bike, mine iron ore, make a bike frame`, `Mine iron ore, sell the bike, make a bike frame`], h: `What has to happen first before anything can be made?`, why: `First the raw material comes from nature, then a factory makes the product, then a shop sells it.` },
+    { tf: false, q: `True or false: a bank is in the secondary sector because it handles a lot of money.`, why: `A bank doesn't make a product. It provides a service, so it is in the tertiary sector.` },
+    { q: `Taking raw materials from nature, like coal, fish or wood, is the ___ sector.`, t: [`primary`, `primary sector`], h: `It is the sector that comes first.`, why: `The primary sector takes raw materials straight from nature.` },
+    { q: `Someone who buys and uses goods and services is a ___.`, t: [`consumer`, `a consumer`], h: `It is the opposite of a producer.`, why: `Consumers buy and use what producers make and provide.` },
+  ]);
+
+  // ---------- Entrepreneurs ----------
+  // The numbers for the money questions. Each answer is worked out from them.
+  const stall = { income: 850, costs: 320 };
+  const cupcake = { cost: 6, price: 10 };
+  const lemonade = { sold: 24, price: 8 };
+  const toastie = { sold: 30, price: 15, costs: 180 };
+  const wash = { income: 150, costs: 210 };
+  const puncture = { price: 40, patch: 15, fixed: 6 };
+  S.ems_entre = bank([
+    { q: `Which person is an entrepreneur?`, a: `Someone who starts a pancake stall with her savings`, w: [`Someone who buys a pancake at the stall`, `Someone paid a wage to flip pancakes`, `Someone who collects taxes`], nope: { 'Someone paid a wage to flip pancakes': `A worker earns a wage and doesn't risk their own money. The entrepreneur owns the business.` }, why: `She spotted a chance, put in her own money and took the risk, so she is the entrepreneur.` },
+    { q: `What is the risk an entrepreneur takes?`, a: `They might lose the money they put in`, w: [`They are sure to make a profit`, `They must pay for the country's roads`, `They can never take a day off`], why: `A business might not sell enough, and then the money put into it is lost.` },
+    { q: `Which quality helps an entrepreneur most when sales are slow?`, a: `Not giving up`, w: [`Waiting for someone else to fix it`, `Blaming the customers`, `Closing on the first bad day`], why: `Good entrepreneurs keep going and look for ways to do better.` },
+    { q: `What makes a good business idea?`, a: `It meets a need or want people will pay for`, w: [`It sells something nobody wants`, `It costs more to make than people will pay`, `It's the same as the stall next door, but dearer`], why: `If customers want it and will pay more than it costs, the business can make a profit.` },
+    { q: `Before market day, you ask classmates what they would buy. This is called…`, a: `market research`, w: [`advertising`, `budgeting`, `bartering`], nope: { advertising: `Advertising tells customers about your product. Here you are asking them questions first.` }, why: `Market research finds out what customers want before you spend money.` },
+    { q: `Why put up posters before market day?`, a: `To tell customers what you sell and for how much`, w: [`To lower your costs`, `To work out your profit`, `To count what you have left`], why: `This is advertising. Customers can't buy from you if they don't know about you.` },
+    { q: `The money you put in to start a business is called…`, a: `capital`, w: [`profit`, `a wage`, `tax`], why: `Capital is the money used to get a business going, such as buying the first stock.` },
+    { q: `The selling price is…`, a: `what a customer pays for one item`, w: [`what it cost you to make one item`, `the profit on one item`, `the money you start the business with`], nope: { 'what it cost you to make one item': `That is the cost price. The selling price is what the customer pays you.` }, why: `If you sell a cupcake for ${R(cupcake.price)}, its selling price is ${R(cupcake.price)}.` },
+    { q: `Which of these is a cost for a pancake stall on market day?`, a: `Flour, eggs and milk`, w: [`Money customers pay for pancakes`, `The profit at the end of the day`, `The number of pancakes sold`], nope: { 'Money customers pay for pancakes': `That is income, money coming in. A cost is money going out.` }, why: `You have to spend money on the ingredients, so they are costs.` },
+    {
+      q: `Your market day stall took in ${R(stall.income)}. Your costs were ${R(stall.costs)}. What was your profit?`,
+      a: R(stall.income - stall.costs),
+      w: [R(stall.income + stall.costs), R(stall.income), R(stall.costs)],
+      nope: { [R(stall.income + stall.costs)]: `You added the costs. Costs are money going out, so they come off the income.`, [R(stall.income)]: `That is the income. The costs still have to come off.` },
+      h: `Profit = income − costs.`,
+      why: `Profit = income − costs: ${R(stall.income)} − ${R(stall.costs)} = ${R(stall.income - stall.costs)}.`,
+    },
+    {
+      q: `You buy cupcakes for ${R(cupcake.cost)} each and sell them for ${R(cupcake.price)} each. What is your profit on each cupcake?`,
+      a: R(cupcake.price - cupcake.cost),
+      w: [R(cupcake.price + cupcake.cost), R(cupcake.price), R(cupcake.cost)],
+      nope: { [R(cupcake.price + cupcake.cost)]: `You added the two prices. Take what it cost you away from what you sold it for.` },
+      h: `Take what it cost you away from what the customer pays.`,
+      why: `Profit on one = selling price − cost price: ${R(cupcake.price)} − ${R(cupcake.cost)} = ${R(cupcake.price - cupcake.cost)}.`,
+    },
+    {
+      q: `You sell ${lemonade.sold} bottles of homemade lemonade at ${R(lemonade.price)} each. What is your income?`,
+      a: R(lemonade.sold * lemonade.price),
+      w: [R(lemonade.sold + lemonade.price), R((lemonade.sold * lemonade.price) / 2), R(lemonade.sold * lemonade.price * 10)],
+      nope: { [R(lemonade.sold + lemonade.price)]: `You added. Each of the ${lemonade.sold} bottles brings in ${R(lemonade.price)}, so multiply.` },
+      h: `Each bottle brings in the same amount. How many bottles were sold?`,
+      why: `Income = number sold × selling price: ${lemonade.sold} × ${R(lemonade.price)} = ${R(lemonade.sold * lemonade.price)}.`,
+    },
+    {
+      q: `You sell ${toastie.sold} toasted sandwiches at ${R(toastie.price)} each. The bread, cheese and tomatoes cost ${R(toastie.costs)}. What is your profit?`,
+      a: R(toastie.sold * toastie.price - toastie.costs),
+      w: [R(toastie.sold * toastie.price), R(toastie.sold * toastie.price + toastie.costs), R(toastie.costs)],
+      nope: { [R(toastie.sold * toastie.price)]: `That is the income. The costs still come off it.` },
+      h: `First work out the income, then take away the costs.`,
+      why: `Income: ${toastie.sold} × ${R(toastie.price)} = ${R(toastie.sold * toastie.price)}. Profit: ${R(toastie.sold * toastie.price)} − ${R(toastie.costs)} = ${R(toastie.sold * toastie.price - toastie.costs)}.`,
+    },
+    {
+      q: `Your bike-wash stand took in ${R(wash.income)}, but the soap, sponges and buckets cost ${R(wash.costs)}. What happened?`,
+      a: `A loss of ${R(wash.costs - wash.income)}`,
+      w: [`A profit of ${R(wash.costs - wash.income)}`, `A profit of ${R(wash.costs + wash.income)}`, `A loss of ${R(wash.costs + wash.income)}`],
+      nope: { [`A profit of ${R(wash.costs - wash.income)}`]: `The costs were bigger than the income, so money was lost, not made.` },
+      h: `Which is bigger, the money in or the money out?`,
+      why: `The costs were more than the income, so it is a loss: ${R(wash.costs)} − ${R(wash.income)} = ${R(wash.costs - wash.income)}.`,
+    },
+    {
+      q: `You fix punctures for ${R(puncture.price)} each. Each repair uses a patch that costs you ${R(puncture.patch)}. On Saturday you fix ${puncture.fixed}. What is your profit?`,
+      a: R(puncture.fixed * (puncture.price - puncture.patch)),
+      w: [R(puncture.fixed * puncture.price), R(puncture.price - puncture.patch), R(puncture.fixed * puncture.patch)],
+      nope: { [R(puncture.fixed * puncture.price)]: `That is the income. The patches still have to come off.`, [R(puncture.price - puncture.patch)]: `That is the profit on one puncture. You fixed ${puncture.fixed}.` },
+      h: `Work out the money in and the money out for all ${puncture.fixed} repairs.`,
+      why: `Income: ${puncture.fixed} × ${R(puncture.price)} = ${R(puncture.fixed * puncture.price)}. Costs: ${puncture.fixed} × ${R(puncture.patch)} = ${R(puncture.fixed * puncture.patch)}. Profit: ${R(puncture.fixed * puncture.price)} − ${R(puncture.fixed * puncture.patch)} = ${R(puncture.fixed * (puncture.price - puncture.patch))}.`,
+    },
+    { tf: true, q: `True or false: if your costs are bigger than your income, you make a loss.`, why: `You spent more than you took in, so you lost money.` },
+    { tf: false, q: `True or false: a business that sells a lot will always make a profit.`, why: `If its costs are bigger than its income, it still makes a loss.` },
+    { q: `Profit = income − ___.`, t: [`costs`, `cost`, `expenses`, `expense`], strict: true, h: `What do you take away from the money that came in?`, why: `Profit is what's left when the costs come off the income.` },
+    { q: `Someone who starts their own business and takes a risk to make a profit is an ___.`, t: [`entrepreneur`, `entrepreneurs`], h: `It's a French word that starts with "e".`, why: `An entrepreneur spots a need, starts a business and takes the risk.` },
+  ]);
+
+  // ---------- Budgets and saving ----------
+  // The numbers for the money questions. Each answer is worked out from them.
+  const pocket = { weekly: 200, tuck: 45, airtime: 30 };
+  const gloves = { price: 360, weekly: 40 };
+  const bikeJob = { earn: 650, transport: 150, lunch: 220, save: 100 };
+  const march = { income: 500, spent: 620 };
+  const shoes = { plain: 350, brand: 1200 };
+  const helmet = { price: 900, saved: 500, weekly: 50 };
+  const glovesWeeks = gloves.price / gloves.weekly;
+  const bikeJobLeft = bikeJob.earn - bikeJob.transport - bikeJob.lunch - bikeJob.save;
+  S.ems_budget = bank([
+    { q: `Which of these is income for you?`, a: `Money you earn washing bikes`, w: [`Money you spend on airtime`, `Money you pay for bus fare`, `Money you lend to a friend`], why: `Income is money that comes in. The other three are money going out.` },
+    { q: `An expense is…`, a: `money you spend`, w: [`money you earn`, `money someone gives you`, `money the bank pays you`], nope: { 'money you earn': `Money you earn comes in, so it is income. An expense is money going out.` }, why: `Bus fare, airtime and lunch are expenses: money going out.` },
+    { q: `Why make a budget?`, a: `To plan your money so it lasts and you can save`, w: [`So you never have to pay for needs`, `So the bank gives you free money`, `So you can spend more than you earn`], why: `A budget plans your income, spending and saving for a week, a month or a year.` },
+    { q: `In a budget, what should you pay for first?`, a: `Needs, such as food and school transport`, w: [`Wants, such as a new game`, `Treats from the tuck shop`, `A new graphics kit`], why: `Needs come first, then saving, then wants with what's left.` },
+    { q: `When your income is bigger than your expenses, the money left over is a…`, a: `surplus`, w: [`deficit`, `loss`, `debt`], nope: { deficit: `A deficit is when you spend more than you have. Money left over is a surplus.` }, why: `A surplus is extra money you can save.` },
+    { q: `When your expenses are bigger than your income, your budget has a…`, a: `deficit`, w: [`surplus`, `profit`, `bonus`], why: `A deficit means you are short of money, so you have to cut spending.` },
+    { q: `Saving means…`, a: `keeping some money aside to use later`, w: [`spending all your money at once`, `borrowing money from a friend`, `paying for things with a bank card`], why: `Saving helps you pay for something big later, or for an emergency.` },
+    { q: `Interest on your savings is…`, a: `extra money the bank pays you for saving`, w: [`money you pay the tuck shop`, `a fine for spending too much`, `the price of a bank card`], why: `Your savings are safe in the bank, and the bank pays you a little extra for keeping them there.` },
+    { q: `Swapping goods or services without using money is called…`, a: `bartering`, w: [`budgeting`, `saving`, `advertising`], why: `Long ago, before money, people swapped things, like a goat for a bag of grain.` },
+    { q: `Why did people start using money instead of bartering?`, a: `It was hard to find someone who wanted your goods`, w: [`People ran out of things to swap`, `Swapping was against the law everywhere`, `Goods could not be counted`], why: `With money, you don't have to find someone who wants exactly what you have. Everyone accepts money.` },
+    {
+      q: `You get ${R(pocket.weekly)} pocket money a week. You spend ${R(pocket.tuck)} at the tuck shop and ${R(pocket.airtime)} on airtime. How much is left?`,
+      a: R(pocket.weekly - pocket.tuck - pocket.airtime),
+      w: [R(pocket.tuck + pocket.airtime), R(pocket.weekly - pocket.tuck), R(pocket.weekly + pocket.tuck + pocket.airtime)],
+      nope: { [R(pocket.tuck + pocket.airtime)]: `That is what you spent. The question asks what is left.`, [R(pocket.weekly - pocket.tuck)]: `The airtime still has to come off too.` },
+      h: `Take both amounts away from the pocket money.`,
+      why: `${R(pocket.weekly)} − ${R(pocket.tuck)} − ${R(pocket.airtime)} = ${R(pocket.weekly - pocket.tuck - pocket.airtime)}.`,
+    },
+    {
+      q: `New riding gloves cost ${R(gloves.price)}. You save ${R(gloves.weekly)} a week. How many weeks will it take?`,
+      a: `${glovesWeeks} weeks`,
+      w: [`${glovesWeeks - 1} weeks`, `${glovesWeeks + 1} weeks`, `${glovesWeeks * 10} weeks`],
+      nope: { [`${glovesWeeks - 1} weeks`]: `After ${glovesWeeks - 1} weeks you have only ${R(gloves.weekly * (glovesWeeks - 1))}. That's not enough yet.`, [`${glovesWeeks + 1} weeks`]: `You'd already have enough after ${glovesWeeks} weeks.` },
+      h: `How many lots of ${R(gloves.weekly)} make ${R(gloves.price)}?`,
+      why: `${R(gloves.price)} ÷ ${R(gloves.weekly)} = ${glovesWeeks}, so it takes ${glovesWeeks} weeks.`,
+    },
+    {
+      q: `A new helmet costs ${R(helmet.price)}. You have saved ${R(helmet.saved)}, and you save ${R(helmet.weekly)} a week. How many more weeks until you can buy it?`,
+      a: `${(helmet.price - helmet.saved) / helmet.weekly} weeks`,
+      w: [`${helmet.price / helmet.weekly} weeks`, `${helmet.saved / helmet.weekly} weeks`, `${(helmet.price + helmet.saved) / helmet.weekly} weeks`],
+      nope: { [`${helmet.price / helmet.weekly} weeks`]: `That's how long it would take from nothing. You've already saved ${R(helmet.saved)}.` },
+      h: `First work out how much more you need.`,
+      why: `You still need ${R(helmet.price)} − ${R(helmet.saved)} = ${R(helmet.price - helmet.saved)}. ${R(helmet.price - helmet.saved)} ÷ ${R(helmet.weekly)} = ${(helmet.price - helmet.saved) / helmet.weekly} weeks.`,
+    },
+    {
+      q: `You earn ${R(bikeJob.earn)} a month washing bikes. Your budget: school transport ${R(bikeJob.transport)}, lunch ${R(bikeJob.lunch)} and savings ${R(bikeJob.save)}. How much is left for wants?`,
+      a: R(bikeJobLeft),
+      w: [R(bikeJobLeft + bikeJob.save), R(bikeJob.transport + bikeJob.lunch + bikeJob.save), R(bikeJob.earn - bikeJob.transport)],
+      nope: { [R(bikeJobLeft + bikeJob.save)]: `Savings are part of the plan too, so take them off before you work out what's left for wants.`, [R(bikeJob.transport + bikeJob.lunch + bikeJob.save)]: `That is everything in the plan. Take it away from the ${R(bikeJob.earn)} you earn.` },
+      h: `Take everything in the budget away from what you earn.`,
+      why: `${R(bikeJob.earn)} − ${R(bikeJob.transport)} − ${R(bikeJob.lunch)} − ${R(bikeJob.save)} = ${R(bikeJobLeft)}.`,
+    },
+    {
+      q: `In March your income was ${R(march.income)} and your expenses were ${R(march.spent)}. What does your budget show?`,
+      a: `A deficit of ${R(march.spent - march.income)}`,
+      w: [`A surplus of ${R(march.spent - march.income)}`, `A deficit of ${R(march.spent + march.income)}`, `A surplus of ${R(march.spent + march.income)}`],
+      nope: { [`A surplus of ${R(march.spent - march.income)}`]: `A surplus means money left over, but you spent more than came in.` },
+      h: `Was more money coming in or going out?`,
+      why: `Expenses were bigger than income, so it is a deficit: ${R(march.spent)} − ${R(march.income)} = ${R(march.spent - march.income)}.`,
+    },
+    {
+      q: `You need school shoes. A plain pair costs ${R(shoes.plain)} and a famous brand costs ${R(shoes.brand)}. In your budget, the extra ${R(shoes.brand - shoes.plain)} for the brand is…`,
+      a: `a want`,
+      w: [`a need`, `income`, `a saving`],
+      nope: { 'a need': `Shoes are a need, but the plain pair meets that need. Paying more for the name is a want.` },
+      why: `Shoes are a need, but the extra money only pays for the brand, and you could live without that.`,
+    },
+    { tf: false, q: `True or false: once you've made a budget, you never need to look at it again.`, why: `Check your budget as you go, so you can see if you're spending more than you planned.` },
+    { q: `Money that comes in, like pocket money or wages, is called ___.`, t: [`income`], h: `It is the opposite of expenses.`, why: `Income is money coming in. Expenses are money going out.` },
+    { q: `A plan for how you will spend and save your money is a ___.`, t: [`budget`, `a budget`], h: `It starts with "b".`, why: `A budget plans your money: needs first, then savings, then wants.` },
+  ]);
+
+  // ---------- The usual wrong thinking in each list ----------
+  S.ems_wants.not = `Ask yourself two things: could you live without it (then it's a want, not a need), and could you hold it in your hands (then it's a good, not a service)?`;
+  S.ems_economy.not = `Sort it by what is being done: taking from nature is primary, making a product is secondary and doing a service is tertiary. Making or providing is producing, and buying and using is consuming.`;
+  S.ems_entre.not = `Keep money in and money out apart: income is what customers pay you, costs are what you spend, and profit is what's left after the costs come off the income.`;
+  S.ems_budget.not = `Keep in and out apart: income comes in and expenses go out. A budget plans both, with needs first, then savings, then wants.`;
+
+  // ---------- The subject ----------
+  pack.subjects.ems = {
+    label: 'EMS head start',
+    source: 'Grade 7 Economic and Management Sciences',
+    scope: 'Term 1 and 2 basics: needs and wants, the economy, entrepreneurs and budgets',
+    note: `A head start written for this app before the Grade 7 book arrives, so where they differ, the school's book wins`,
+    examSize: 15,
+    extra: true,
+    opens: '2026-11-14',
+    topics: [
+      RS.section('ems_wants', 0, 'Needs, wants and choices', 'Needs and wants, goods and services, scarcity'),
+      RS.section('ems_economy', 1, 'The economy', 'Producers and consumers, who does what, and the three sectors'),
+      RS.section('ems_entre', 2, 'Entrepreneurs', 'Business ideas, profit and a school market day'),
+      RS.section('ems_budget', 3, 'Budgets and saving', 'Income, expenses, a simple budget and saving'),
+    ],
+  };
+  const T = (id) => pack.subjects.ems.topics.find((t) => t.id === id);
+
+  // ---------- Rule cards and track walks ----------
+  T('ems_wants').notes = [
+    `A need is something you must have to live, like food, water, clothing and shelter.`,
+    `A want is something you would like but can live without.`,
+    `Goods are things you can see and touch. Services are work someone does for you.`,
+    `Scarcity: money, time and materials are limited but wants never run out, so we must choose.`,
+    `The opportunity cost of a choice is the next best thing you give up.`,
+  ];
+  T('ems_wants').walk = [
+    { card: `Needs and wants`, say: `A need is something you must have to live: food, water, clothing and shelter. A want is something you would like, but can live without.`, eg: `Water on a hot race day is a need. A new graphics kit for your bike is a want.`, more: `Wanting something badly doesn't turn it into a need. Ask yourself: could I live without it?` },
+    { sort: [`Need`, `Want`], ask: `Need or want?`, items: [[`Clean drinking water`, 0, `Your body can't live without water.`], [`A games console`, 1, `It's fun, but you can live without it.`], [`A safe, dry place to sleep`, 0, `Shelter is a basic need.`], [`A new graphics kit`, 1, `The bike runs just as well without it.`], [`Food`, 0, `Your body needs food to live and grow.`], [`A second helmet in another colour`, 1, `One good helmet does the job.`], [`Warm clothes in winter`, 0, `Clothing is a basic need.`]] },
+    { card: `Goods and services`, say: `Goods are things you can see and touch. Services are work someone does for you.`, eg: `A new tyre is a good. The mechanic fitting it is giving you a service.`, more: `Many businesses sell both. A bike shop sells parts and also fixes bikes.` },
+    { card: `Scarcity means choosing`, say: `Money, time and materials are limited, but our wants never run out. This is called scarcity, and it means we have to choose.`, eg: `You have enough for new gloves or a race entry, but not both. You pick the gloves.`, more: `The race entry you gave up is the opportunity cost: the next best thing you didn't get.` },
+    { match: [[`Need`, `Something you must have to live`], [`Want`, `Something you'd like but can live without`], [`Goods`, `Things you can see and touch`], [`Services`, `Work someone does for you`], [`Scarcity`, `Not enough to meet everyone's wants`]], ask: `Tap a word, then tap what it means.` },
+  ];
+
+  T('ems_economy').notes = [
+    `Producers make goods or provide services. Consumers buy and use them, and most people are both.`,
+    `Households work for businesses, earn wages and spend them. The government collects taxes and pays for public services.`,
+    `The primary sector takes raw materials from nature: farming, mining, fishing and forestry.`,
+    `The secondary sector turns raw materials into products, usually in factories.`,
+    `The tertiary sector provides services, such as shops, transport, banks and mechanics.`,
+  ];
+  T('ems_economy').walk = [
+    { card: `Who's who in the economy`, say: `Producers make goods or provide services. Consumers buy and use them. Most people are both.`, eg: `A mechanic is a producer when she fixes your bike. When she buys a pie for lunch, she is a consumer.`, more: `The economy has three big groups: households, businesses and the government.` },
+    { match: [[`Households`, `Work for businesses and spend their wages`], [`Businesses`, `Make goods and services and pay wages`], [`Government`, `Collects taxes and pays for public services`], [`Tax`, `Money paid to the government`], [`Wages`, `Money paid to workers for their work`]], ask: `Tap one, then tap what it is or does.` },
+    { card: `Three sectors`, say: `The primary sector takes raw materials from nature. The secondary sector turns them into products. The tertiary sector provides services.`, eg: `Iron ore is mined (primary). A factory makes a steel bike frame (secondary). A bike shop sells you the bike (tertiary).`, more: `Primary means first, secondary means second and tertiary means third: the order things happen in.` },
+    { sort: [`Primary`, `Secondary`, `Tertiary`], ask: `Which sector is it in?`, items: [[`A coal mine`, 0, `Coal is dug straight out of the ground.`], [`A fishing boat`, 0, `Fish are taken straight from the sea.`], [`A factory that makes tyres`, 1, `It turns materials into a product.`], [`A sugar mill`, 1, `It turns sugar cane into sugar.`], [`A taxi`, 2, `Carrying people is a service.`], [`A bike mechanic`, 2, `Fixing bikes is a service.`], [`A bank`, 2, `Keeping money safe is a service.`]] },
+    { tap: `A farm takes raw materials from nature, so it is in the primary sector.`, find: `primary`, ask: `Which sector is a farm in? Tap the word.`, got: `Primary. Crops and animals come straight from nature.` },
+  ];
+
+  const pan = { income: 480, costs: 180 };
+  T('ems_entre').notes = [
+    `An entrepreneur starts a business to meet a need or want, and takes a risk to make a profit.`,
+    `Income = number sold × selling price.`,
+    `Profit = income − costs. If the costs are bigger than the income, it's a loss.`,
+    `Find out what customers want first (market research), then tell them about it (advertising).`,
+  ];
+  T('ems_entre').walk = [
+    { card: `What an entrepreneur does`, say: `An entrepreneur spots a need or a want, starts a business to meet it and takes a risk to make a profit.`, eg: `At the track, riders have muddy bikes and nowhere to wash them. You start a bike-wash stand.`, more: `The risk is losing the money you put in. Good entrepreneurs plan, work hard and don't give up.` },
+    { card: `Profit = income − costs`, say: `Income is the money customers pay you. Costs are the money you spend to run the business. Profit is what is left.`, eg: `A pancake stall takes in ${R(pan.income)} and spent ${R(pan.costs)} on flour, eggs and milk. Profit: ${R(pan.income)} − ${R(pan.costs)} = ${R(pan.income - pan.costs)}.`, more: `If the costs are bigger than the income, you make a loss.` },
+    { sort: [`Income (money in)`, `Cost (money out)`], ask: `For a market-day stall, is this income or a cost?`, items: [[`Money from selling cupcakes`, 0, `Customers paying you is money coming in.`], [`Buying flour and sugar`, 1, `You pay for the ingredients, so money goes out.`], [`Printing posters`, 1, `Advertising costs money.`], [`A customer paying for lemonade`, 0, `That money comes in to you.`], [`Paper cups and serviettes`, 1, `You have to buy them, so they are a cost.`], [`Selling a toasted sandwich`, 0, `Every sale brings in income.`]] },
+    { tap: `Profit is the money left after the costs come off the income.`, find: `profit`, ask: `What do we call the money that's left? Tap the word.`, got: `Profit. It's the reward for the risk the entrepreneur took.` },
+    { match: [[`Market research`, `Asking people what they would buy`], [`Capital`, `Money used to start the business`], [`Advertising`, `Telling people what you sell`], [`Selling price`, `What a customer pays for one item`], [`Loss`, `When costs are bigger than income`]], ask: `Tap a word, then tap what it means.` },
+  ];
+
+  const week = { income: 250, needs: 120, save: 50 };
+  T('ems_budget').notes = [
+    `Income is money coming in. Expenses are money going out.`,
+    `A budget is a plan for your money: needs first, then savings, then wants.`,
+    `More income than expenses gives a surplus. More expenses than income gives a deficit.`,
+    `Saving means keeping money aside for later. A bank keeps it safe and pays interest.`,
+    `Weeks to save up = amount still needed ÷ amount saved each week.`,
+  ];
+  T('ems_budget').walk = [
+    { card: `Money in, money out`, say: `Income is money that comes in, like pocket money or wages. Expenses are money that goes out, like bus fare or airtime.`, eg: `${R(150)} pocket money comes in on Friday. ${R(40)} at the tuck shop goes out on Monday.`, more: `If more goes out than comes in, you run short before the next pocket money.` },
+    { sort: [`Income`, `Expense`], ask: `Income or expense?`, items: [[`Pocket money`, 0, `It comes in to you.`], [`Airtime`, 1, `You pay for it, so money goes out.`], [`Wages for washing bikes`, 0, `You earn it, so it comes in.`], [`Bus fare to school`, 1, `Money goes out to pay for the ride.`], [`Money from selling old bike parts`, 0, `Selling brings money in.`], [`A movie ticket`, 1, `You pay for it, so it's an expense.`]] },
+    { card: `A budget is a plan`, say: `A budget plans how you will use your income: needs first, then savings, then wants.`, eg: `You get ${R(week.income)} a week: ${R(week.needs)} for lunch and transport, ${R(week.save)} into savings, and ${R(week.income - week.needs - week.save)} left for wants.`, more: `Money left over is a surplus. Spending more than you have is a deficit.` },
+    { match: [[`Surplus`, `Money left over after expenses`], [`Deficit`, `Spending more than your income`], [`Saving`, `Keeping money aside for later`], [`Interest`, `Extra money the bank pays on savings`], [`Budget`, `A plan for using your money`]], ask: `Tap a word, then tap what it means.` },
+    { sort: [`Need`, `Want`], ask: `In a budget, is this a need or a want?`, items: [[`Plain school shoes`, 0, `Shoes are clothing, which is a basic need.`], [`Paying extra for a famous brand`, 1, `Plain shoes meet the need, so the extra is a want.`], [`Bus fare to school`, 0, `You have to get to school.`], [`A new game`, 1, `It's fun, but you can live without it.`], [`Lunch`, 0, `Food is a basic need.`], [`A new graphics kit`, 1, `Your bike runs fine without it.`]] },
+  ];
+})(typeof window !== 'undefined' ? window : globalThis);
+
+/* Grade 7 head start, for Jordy's first year of Grade 7 in 2027. Whole numbers, exponents, fractions and decimals,
+   number patterns, input and output, algebra and integers, from the CAPS Grade 7 topics. Written for this app: every
+   question is original and gets fresh numbers each time. Where the school's book does something differently, the book wins.
+   The subject has opens: '2026-11-14', the day after the last Grade 6 test, so the game keeps it hidden until then,
+   and extra: true keeps its sections out of the bike and gear counts. */
+(function (root) {
+  'use strict';
+  const RS = root.RS;
+  const { ri, pick, shuffle, gcd, lcm, simp, factorsOf, primeFactors, isPrime, coprimeTop, fmt, money, fr, mixedStr, mc } = RS;
+  const S = RS.packs.jordy.skills;
+  const NAMES = ['Aya', 'Thabo', 'Zinhle', 'Sipho', 'Lerato', 'Dylan', 'Ryan', 'Naledi'];
+  const LETTERS = ['x', 'a', 'y', 'm', 'p'];
+
+  // ---------- helpers ----------
+  const SUP = '⁰¹²³⁴⁵⁶⁷⁸⁹';
+  const pw = (b, e) => (e === 1 ? String(b) : `${b}${String(e).split('').map((d) => SUP[+d]).join('')}`);
+  // Numbers below zero get the real minus sign, as the science questions do.
+  const sg = (n) => `${n < 0 ? '−' : ''}${fmt(Math.abs(n))}`;
+  const deg = (n) => `${sg(n)} °C`;
+  const metres = (n) => `${sg(n)} m`;
+  const rands = (n) => `${n < 0 ? '−' : ''}R${fmt(Math.abs(n))}`;
+  const times = (list) => list.join(' × ');
+  const andList = (xs) => (xs.length === 2 ? `${xs[0]} and ${xs[1]}` : `${xs.slice(0, -1).join(', ')} and ${xs[xs.length - 1]}`);
+  const groups = (pf) => {
+    const m = new Map();
+    for (const p of pf) m.set(p, (m.get(p) || 0) + 1);
+    return [...m.entries()];
+  };
+  const powForm = (gs) => gs.map(([p, e]) => pw(p, e)).join(' × ');
+  const nextPrime = (p) => {
+    let q = p + 1;
+    while (!isPrime(q)) q++;
+    return q;
+  };
+  // m × n + c as a rule: 3n + 2, 3x − 1, x + 4.
+  const lin = (m, c, v) => `${m === 1 ? '' : m}${v}${c > 0 ? ` + ${c}` : c < 0 ? ` − ${-c}` : ''}`;
+  const calc = (m, c, n) => `${m} × ${n}${c > 0 ? ` + ${c}` : c < 0 ? ` − ${-c}` : ''} = ${sg(m * n + c)}`;
+  const posRule = (m, c) => `${m === 1 ? 'Take the position' : `Multiply the position by ${m}`}${c > 0 ? `, then add ${c}` : c < 0 ? `, then subtract ${-c}` : ''}`;
+  const term = (c, v) => (c === 1 ? v : `${c}${v}`);
+  const tsq = (c, v) => `${c === 1 ? '' : c}${v}²`;
+  const SQ = (s) => `${s}²`;
+  const CB = (s) => `${s}³`;
+
+  // Multiple choice where each wrong option says why it is wrong. wrongs: [[text, why], ...]
+  const mcWhy = (q, right, wrongs, extra) => {
+    const r = String(right);
+    const nope = {};
+    const list = [];
+    for (const [w, why] of shuffle(wrongs)) {
+      const s = String(w);
+      if (s === r || list.includes(s)) continue;
+      list.push(s);
+      nope[s] = why;
+    }
+    return mc(q, r, list, Object.assign({ nope }, extra));
+  };
+  // Reasons for typed answers that come from a common slip, keyed by what the child would type.
+  const traps = (ans, list) => {
+    const out = {};
+    for (const [v, why] of list) if (Number.isInteger(v) && v >= 0 && v !== ans) out[String(v)] = why;
+    return out;
+  };
+  // Steps for a move along the number line, counting to zero first when it crosses zero.
+  const lineSteps = (s, c, show, unit) => {
+    const e = s + c;
+    const n = Math.abs(c);
+    const first = `Start at ${show(s)} and count ${c > 0 ? 'up' : 'down'} ${fmt(n)}${unit ? ` ${unit}` : ''}.`;
+    if (s !== 0 && e !== 0 && Math.sign(s) !== Math.sign(e)) {
+      const toZero = Math.abs(s);
+      const after = n - toZero;
+      return [first, `${toZero === 1 ? 'The first one takes' : `The first ${fmt(toZero)} take`} you to ${show(0)}.`, `${after === 1 ? 'The last one takes' : `The other ${fmt(after)} take`} you to ${show(e)}.`];
+    }
+    return [first, `You land on ${show(e)}.`];
+  };
+
+  // ---------- Whole numbers: prime factors, HCF, LCM, divisibility ----------
+  const ladder = (n, pf) => {
+    let x = n;
+    const out = [];
+    for (const p of pf.slice(0, -1)) {
+      out.push(`${fmt(x)} ÷ ${p} = ${fmt(x / p)}`);
+      x /= p;
+    }
+    return `Keep dividing by primes: ${out.join(', ')}. ${x} is prime, so stop.`;
+  };
+  S.g7_primes = (lvl) => {
+    const [lo, hi, len] = lvl === 1 ? [12, 60, 3] : lvl === 2 ? [40, 200, 3] : [48, 400, 4];
+    let n, pf;
+    do {
+      n = ri(lo, hi);
+      pf = primeFactors(n);
+    } while (pf.length < len || pf[pf.length - 1] > 13 || (lvl === 3 && groups(pf).length < 2));
+    const gs = groups(pf);
+    if (lvl === 2 && Math.random() < 0.5) {
+      const i = ri(0, pf.length - 1);
+      const rest = n / pf[i];
+      return {
+        kind: 'number',
+        q: `${fmt(n)} = ${pf.map((p, j) => (j === i ? '□' : p)).join(' × ')}. Which prime goes in the box?`,
+        answer: pf[i],
+        correct: String(pf[i]),
+        hint: 'Multiply the primes you can see, then divide.',
+        steps: [`${times(pf.filter((_, j) => j !== i))} = ${fmt(rest)}`, `${fmt(n)} ÷ ${fmt(rest)} = ${pf[i]}`, `${pf[i]} is prime, so it fits.`],
+      };
+    }
+    const k = gs.findIndex(([, e]) => e > 1);
+    // Powers need a repeated prime, and a second prime so that 64 isn't offered as its own answer.
+    if (lvl === 1 || k < 0 || gs.length < 2) {
+      const last = pf[pf.length - 1];
+      const swapped = pf.map((p, j) => (j === pf.length - 1 ? nextPrime(p) : p));
+      return mcWhy(`Which shows ${fmt(n)} as a product of prime factors?`, times(pf), [
+        [times([pf[0] * pf[1], ...pf.slice(2)]), `${pf[0] * pf[1]} is not prime, so it isn't finished. Split it into ${pf[0]} × ${pf[1]}.`],
+        [times(pf.slice(1)), `That only makes ${fmt(n / pf[0])}. A ${pf[0]} is missing.`],
+        [times([2, ...pf]), `That makes ${fmt(2 * n)}, not ${fmt(n)}. There is an extra 2.`],
+        [times(swapped), `That makes ${fmt((n / last) * nextPrime(last))}, not ${fmt(n)}.`],
+      ], {
+        hint: 'Every number must be prime, and together they must multiply back to the number.',
+        steps: [ladder(n, pf), `So ${fmt(n)} = ${times(pf)}`],
+      });
+    }
+    const [bp, be] = gs[k];
+    const withPow = (e2) => powForm(gs.map(([p, e], j) => [p, j === k ? e2 : e]));
+    const wrongs = [
+      [withPow(be + 1), `That has one ${bp} too many, so it makes ${fmt(n * bp)}.`],
+      [withPow(be - 1), `That is one ${bp} short, so it makes ${fmt(n / bp)}.`],
+      [powForm(gs.map(([p, e], j) => (j === k ? [bp ** be, 1] : [p, e]))), `${bp ** be} is not prime. Write it as ${pw(bp, be)}.`],
+    ];
+    const o = k === 0 ? 1 : 0;
+    if (gs[o][1] !== be) wrongs.push([powForm(gs.map(([p, e], j) => [p, j === k ? gs[o][1] : j === o ? be : e])), 'The powers have swapped places. Count each prime on its own.']);
+    return mcWhy(`Which shows ${fmt(n)} as a product of prime factors, written with powers?`, powForm(gs), wrongs, {
+      hint: 'Break it into primes first. Then count how many of each prime there are.',
+      steps: [ladder(n, pf), `So ${fmt(n)} = ${times(pf)}`, `Count each prime and write it as a power: ${powForm(gs)}`],
+    });
+  };
+
+  // The primes every list shares, counting repeats: [2, 2, 3] and [2, 3, 3] share [2, 3].
+  const common = (lists) =>
+    lists.slice(1).reduce((acc, l) => {
+      const left = l.slice();
+      return acc.filter((p) => {
+        const i = left.indexOf(p);
+        if (i < 0) return false;
+        left.splice(i, 1);
+        return true;
+      });
+    }, lists[0].slice());
+  S.g7_hcf = (lvl) => {
+    const cnt = lvl === 3 ? 3 : 2;
+    let g, ms;
+    do {
+      g = lvl === 1 ? ri(2, 6) : ri(3, 15);
+      ms = [];
+      while (ms.length < cnt) {
+        const m = ri(2, lvl === 1 ? 9 : 10);
+        if (!ms.includes(m)) ms.push(m);
+      }
+    } while (ms.reduce((x, y) => gcd(x, y)) !== 1 || g * Math.max(...ms) > (lvl === 1 ? 60 : 150));
+    const nums = ms.map((m) => g * m).sort((x, y) => x - y);
+    const story = lvl > 1 && Math.random() < 0.5;
+    let q;
+    if (!story) q = `What is the HCF (highest common factor) of ${andList(nums)}?`;
+    else if (cnt === 2) q = `A club has ${nums[0]} orange flags and ${nums[1]} white flags. It packs them into identical bundles with none left over. What is the largest number of bundles it can make?`;
+    else q = `A team manager has ${nums[0]} energy bars, ${nums[1]} bananas and ${nums[2]} bottles of water. She packs identical bags for the riders with nothing left over. What is the largest number of bags she can pack?`;
+    let steps;
+    if (Math.max(...nums) <= 60) {
+      steps = [...nums.map((x) => `Factors of ${x}: ${factorsOf(x).join('; ')}`), `The biggest factor in every list is ${g}.`];
+    } else {
+      const pfs = nums.map(primeFactors);
+      const shared = common(pfs);
+      steps = [...nums.map((x, i) => `${x} = ${times(pfs[i])}`), shared.length > 1 ? `The primes they all share: ${times(shared)} = ${g}` : `The only prime they all share is ${g}.`];
+    }
+    if (story) {
+      const each = nums.map((x) => x / g);
+      steps.push(cnt === 2 ? `So ${g} bundles, each with ${each[0]} orange and ${each[1]} white flags.` : `So ${g} bags, each with ${each[0]} energy bars, ${each[1]} bananas and ${each[2]} bottles of water.`);
+    }
+    return {
+      kind: 'number',
+      q,
+      answer: g,
+      correct: String(g),
+      hint: 'Find the biggest number that divides into all of them with nothing left over.',
+      steps,
+    };
+  };
+
+  S.g7_lcm = (lvl) => {
+    const cnt = lvl === 3 ? 3 : 2;
+    let ns, L;
+    do {
+      ns = [];
+      while (ns.length < cnt) {
+        const x = ri(2, lvl === 1 ? 10 : 15);
+        if (!ns.includes(x)) ns.push(x);
+      }
+      ns.sort((x, y) => x - y);
+      L = ns.reduce((x, y) => lcm(x, y));
+    } while (L / ns[cnt - 1] > 10 || (L === ns[cnt - 1] && Math.random() < 0.8));
+    const big = ns[cnt - 1];
+    const rest = ns.slice(0, -1);
+    const story = lvl > 1 && Math.random() < 0.5;
+    let q;
+    if (!story) q = `What is the LCM (lowest common multiple) of ${andList(ns)}?`;
+    else if (cnt === 2) q = `On a short practice track, one rider does a lap every ${ns[0]} minutes and another every ${ns[1]} minutes. They leave the start line together. After how many minutes are they next at the start line together?`;
+    else q = `Three riders leave the start line of a practice track together. Their laps take ${andList(ns)} minutes. After how many minutes are all three next at the start line together?`;
+    const list = Array.from({ length: L / big }, (_, i) => big * (i + 1));
+    return {
+      kind: 'number',
+      q,
+      ...(story ? { suffix: 'minutes' } : {}),
+      answer: L,
+      correct: story ? `${L} minutes` : String(L),
+      hint: `Count in ${big}s until you reach a number that ${rest.length === 1 ? `${rest[0]} also goes` : `${andList(rest)} also go`} into.`,
+      steps: [`Count in ${big}s: ${list.join('; ')}`, `${L} is the first one that ${rest.length === 1 ? `${rest[0]} also divides` : `${andList(rest)} both also divide`} into.`],
+    };
+  };
+
+  const RULE = { 2: 'the last digit is even', 3: 'the digits add up to a multiple of 3', 4: 'the last two digits make a number that divides by 4', 5: 'it ends in 0 or 5', 8: 'the last three digits make a number that divides by 8', 9: 'the digits add up to a multiple of 9' };
+  const digitSum = (n) => String(n).split('').reduce((a, c) => a + +c, 0);
+  const testFor = (n, d) => {
+    const s = String(n);
+    if (d === 3 || d === 9) return `${s.split('').join(' + ')} = ${digitSum(n)}, ${n % d === 0 ? 'a' : 'not a'} multiple of ${d}`;
+    if (d === 4) return `${+s.slice(-2)} ${n % 4 === 0 ? 'divides' : 'does not divide'} by 4`;
+    if (d === 8) return `${+s.slice(-3)} ${n % 8 === 0 ? 'divides' : 'does not divide'} by 8`;
+    return `it ends in ${s.slice(-1)}`;
+  };
+  // Each pair shares no factor, so passing both rules means dividing by their product.
+  const PAIRS = [[2, 3], [3, 4], [3, 5], [2, 9], [4, 9], [3, 8], [4, 5], [5, 9]];
+  S.g7_divis = (lvl) => {
+    const [a, b] = pick(PAIRS);
+    const [lo, hi] = lvl === 1 ? [100, 999] : lvl === 2 ? [1000, 9999] : [10000, 99999];
+    const make = (byA, byB) => {
+      let x;
+      do x = ri(lo, hi);
+      while ((x % a === 0) !== byA || (x % b === 0) !== byB);
+      return x;
+    };
+    const right = make(true, true);
+    const onlyA = make(true, false);
+    const onlyB = make(false, true);
+    const neither = make(false, false);
+    return mcWhy(`Which number divides exactly by both ${a} and ${b}?`, fmt(right), [
+      [fmt(onlyA), `It divides by ${a}, but not by ${b}: ${testFor(onlyA, b)}.`],
+      [fmt(onlyB), `It divides by ${b}, but not by ${a}: ${testFor(onlyB, a)}.`],
+      [fmt(neither), `It doesn't divide by ${a}: ${testFor(neither, a)}.`],
+    ], {
+      hint: `Test each number with the rule for ${a} and the rule for ${b}. It must pass both.`,
+      steps: [`Rule for ${a}: ${RULE[a]}. Rule for ${b}: ${RULE[b]}.`, `${fmt(right)}: ${testFor(right, a)}, and ${testFor(right, b)}.`, `So ${fmt(right)} ÷ ${a * b} = ${fmt(right / (a * b))} exactly.`],
+    });
+  };
+
+  // ---------- Exponents: squares, cubes, roots, powers, order of operations ----------
+  S.g7_sq_cube = (lvl) => {
+    const cube = lvl === 2 ? Math.random() < 0.4 : lvl === 3 ? Math.random() < 0.5 : false;
+    const n = cube ? (lvl === 3 ? pick([2, 3, 4, 5, 10]) : ri(2, 4)) : lvl === 1 ? ri(3, 10) : ri(lvl === 2 ? 5 : 8, 12);
+    const e = cube ? 3 : 2;
+    const v = n ** e;
+    const long = Array(e).fill(n).join(' × ');
+    const steps = cube ? [`${pw(n, 3)} = ${long}`, `${n} × ${n} = ${n * n}, then ${n * n} × ${n} = ${fmt(v)}`] : [`${pw(n, 2)} = ${long} = ${fmt(v)}`];
+    const hint = `The small ${e} says how many ${n}s to multiply together.`;
+    if (lvl === 1) {
+      return mcWhy(`What is ${pw(n, 2)}?`, fmt(v), [
+        [fmt(2 * n), `That is ${n} × 2. ${pw(n, 2)} means ${n} × ${n}.`],
+        [fmt(n + 2), `That is ${n} + 2. ${pw(n, 2)} means ${n} × ${n}.`],
+        [fmt((n + 1) ** 2), `That is ${pw(n + 1, 2)}, not ${pw(n, 2)}.`],
+        [fmt((n - 1) ** 2), `That is ${pw(n - 1, 2)}, not ${pw(n, 2)}.`],
+      ], { hint, steps });
+    }
+    const nope = traps(v, [[n * e, `That is ${n} × ${e}. ${pw(n, e)} means ${long}.`], ...(cube ? [[n * n, `That is ${pw(n, 2)}. A cube uses three ${n}s: ${long}.`]] : [])]);
+    return { kind: 'number', q: `What is ${pw(n, e)}?`, answer: v, correct: fmt(v), hint, steps, nope };
+  };
+
+  S.g7_roots = (lvl) => {
+    const t = lvl === 1 ? 'sq' : lvl === 2 ? pick(['sq', 'sq', 'cb']) : pick(['cb', 'mix', 'sq']);
+    if (t === 'mix') {
+      const s = ri(2, 12);
+      const c = ri(2, 5);
+      const plus = Math.random() < 0.6;
+      const ans = plus ? s + c : s * c;
+      return {
+        kind: 'number',
+        q: `√${s * s} ${plus ? '+' : '×'} ∛${c ** 3}`,
+        answer: ans,
+        correct: String(ans),
+        hint: 'Work out each root on its own first.',
+        steps: [`√${s * s} = ${s}, because ${s} × ${s} = ${s * s}`, `∛${c ** 3} = ${c}, because ${c} × ${c} × ${c} = ${c ** 3}`, `${s} ${plus ? '+' : '×'} ${c} = ${ans}`],
+      };
+    }
+    if (t === 'cb') {
+      const n = lvl === 2 ? ri(2, 3) : ri(2, 5);
+      const v = n ** 3;
+      return {
+        kind: 'number',
+        q: `What is ∛${v}?`,
+        answer: n,
+        correct: String(n),
+        hint: 'Which number, multiplied by itself three times, makes this?',
+        steps: [`Try ${n}: ${n} × ${n} × ${n} = ${v}`, `So ∛${v} = ${n}`],
+        nope: traps(n, [[v / 3, `That is ${v} ÷ 3. A cube root asks which number, used three times, makes ${v}.`]]),
+      };
+    }
+    const n = lvl === 1 ? ri(2, 10) : ri(4, 12);
+    const v = n * n;
+    return {
+      kind: 'number',
+      q: `What is √${v}?`,
+      answer: n,
+      correct: String(n),
+      hint: 'Which number, multiplied by itself, makes this?',
+      steps: [`Which number times itself makes ${v}?`, `${n} × ${n} = ${v}`, `So √${v} = ${n}`],
+      nope: traps(n, [[v / 2, `That is half of ${v}. A square root asks which number times itself makes ${v}.`]]),
+    };
+  };
+
+  S.g7_power_form = (lvl) => {
+    const mode = lvl === 1 ? pick(['write', 'mean']) : lvl === 2 ? pick(['write', 'mean', 'bigger']) : pick(['two', 'two', 'bigger']);
+    if (mode === 'write') {
+      const b = ri(2, 9);
+      const e = ri(3, 6);
+      const long = Array(e).fill(b).join(' × ');
+      return mcWhy(`Write ${long} as a power.`, pw(b, e), [
+        [pw(e, b), `That is ${e} multiplied by itself ${b} times. The number being multiplied is ${b}.`],
+        [`${b} × ${e}`, `That is ${b} lots of ${e}. A power means ${b} multiplied by itself.`],
+        [pw(b, e + 1), `Count again: there are ${e} of them, not ${e + 1}.`],
+        [pw(b, e - 1), `Count again: there are ${e} of them, not ${e - 1}.`],
+      ], {
+        hint: 'The repeated number is the base. Count how many times it appears: that is the exponent.',
+        steps: [`The number being multiplied is ${b}, so ${b} is the base.`, `There are ${e} of them, so the exponent is ${e}.`, `${long} = ${pw(b, e)}`],
+      });
+    }
+    if (mode === 'mean') {
+      const b = ri(2, 6);
+      const e = ri(3, 5);
+      const right = Array(e).fill(b).join(' × ');
+      return mcWhy(`What does ${pw(b, e)} mean?`, right, [
+        [`${b} × ${e}`, `That is only ${b * e}. The exponent says how many ${b}s to multiply, not what to multiply by.`],
+        [Array(e).fill(b).join(' + '), `That adds the ${b}s. A power multiplies them.`],
+        [Array(b).fill(e).join(' × '), `That multiplies ${e} by itself. In ${pw(b, e)} the base is ${b}.`],
+        [Array(e - 1).fill(b).join(' × '), `Count them: that has only ${e - 1} of them.`],
+        [Array(e + 1).fill(b).join(' × '), `Count them: that has ${e + 1} of them, one too many.`],
+      ], {
+        hint: 'The big number is the one being multiplied. The small number counts how many of them.',
+        steps: [`In ${pw(b, e)}, the base is ${b} and the exponent is ${e}.`, `So write ${b} down ${e} times and multiply: ${right} = ${fmt(b ** e)}`],
+      });
+    }
+    if (mode === 'bigger') {
+      const [a, b] = pick([[2, 3], [2, 4], [2, 5], [2, 6], [3, 4], [3, 5], [2, 7], [4, 5]]);
+      const A = pw(a, b);
+      const B = pw(b, a);
+      const va = a ** b;
+      const vb = b ** a;
+      const C = 'They are equal';
+      const options = [...shuffle([A, B]), C];
+      const right = va === vb ? C : va > vb ? A : B;
+      const nope = {};
+      for (const o of options) {
+        if (o === right) continue;
+        nope[o] = o === C ? `Work them out: ${fmt(va)} and ${fmt(vb)} are not the same.` : va === vb ? `Work them out: both are ${fmt(va)}.` : `${o} is only ${fmt(o === A ? va : vb)}.`;
+      }
+      return {
+        kind: 'mc',
+        keepOrder: true,
+        q: `Which is bigger: ${options[0]} or ${options[1]}?`,
+        options,
+        answer: options.indexOf(right),
+        correct: right,
+        hint: 'Work out each one by multiplying. Bigger-looking numbers don’t always win.',
+        steps: [`${A} = ${Array(b).fill(a).join(' × ')} = ${fmt(va)}`, `${B} = ${Array(a).fill(b).join(' × ')} = ${fmt(vb)}`, va === vb ? 'They are the same.' : `${right} is bigger.`],
+        nope,
+      };
+    }
+    const [p, q] = shuffle([2, 3, 5, 7]).slice(0, 2).sort((x, y) => x - y);
+    const e1 = ri(2, 4);
+    const e2 = ri(1, 3);
+    const long = [...Array(e1).fill(p), ...Array(e2).fill(q)].join(' × ');
+    const right = `${pw(p, e1)} × ${pw(q, e2)}`;
+    const wrongs = [
+      [pw(p * q, e1 + e2), `You can't join different bases. The ${p}s and the ${q}s each get their own power.`],
+      [`${pw(p, e1)} + ${pw(q, e2)}`, 'The numbers are multiplied, not added, so keep the × sign.'],
+      [pw(p, e1 + e2), `That counts every number as a ${p}, but some of them are ${q}s.`],
+    ];
+    if (e1 !== e2) wrongs.push([`${pw(p, e2)} × ${pw(q, e1)}`, 'The powers have swapped. Count each number on its own.']);
+    return mcWhy(`Write ${long} using powers.`, right, wrongs, {
+      hint: 'Count how many times each number appears. Each one gets its own power.',
+      steps: [`${p} appears ${e1 === 1 ? 'once' : `${e1} times`}, so ${pw(p, e1)}.`, `${q} appears ${e2 === 1 ? 'once' : `${e2} times`}, so ${pw(q, e2)}.`, `${long} = ${right}`],
+    });
+  };
+
+  S.g7_exp_order = (lvl) => {
+    const t = pick(lvl === 1 ? ['addSq', 'sqSub', 'addSq'] : lvl === 2 ? ['mulSq', 'brSq', 'cubeSub'] : ['diffSq', 'rootMul', 'brCube', 'mulBr']);
+    let q, ans, steps, trap;
+    if (t === 'addSq') {
+      const a = ri(2, 20);
+      const b = ri(2, 9);
+      q = `${a} + ${SQ(b)}`;
+      ans = a + b * b;
+      steps = [`Powers come before adding: ${SQ(b)} = ${b} × ${b} = ${b * b}`, `${a} + ${b * b} = ${ans}`];
+      trap = [(a + b) ** 2, `You added first. Work out ${SQ(b)} before you add.`];
+    } else if (t === 'sqSub') {
+      const b = ri(3, 10);
+      const a = ri(1, b * b - 1);
+      q = `${SQ(b)} − ${a}`;
+      ans = b * b - a;
+      steps = [`Powers first: ${SQ(b)} = ${b} × ${b} = ${b * b}`, `${b * b} − ${a} = ${ans}`];
+      trap = b > a ? [(b - a) ** 2, `You took away first. Work out ${SQ(b)} before you take away.`] : [2 * b - a, `${SQ(b)} means ${b} × ${b}, not ${b} × 2.`];
+    } else if (t === 'mulSq') {
+      const a = ri(2, 6);
+      const b = ri(2, 9);
+      q = `${a} × ${SQ(b)}`;
+      ans = a * b * b;
+      steps = [`Powers come before multiplying: ${SQ(b)} = ${b * b}`, `${a} × ${b * b} = ${ans}`];
+      trap = [(a * b) ** 2, `Only the ${b} is squared, not ${a} × ${b}.`];
+    } else if (t === 'brSq') {
+      const a = ri(2, 7);
+      const b = ri(2, 12 - a);
+      q = SQ(`(${a} + ${b})`);
+      ans = (a + b) ** 2;
+      steps = [`Brackets first: ${a} + ${b} = ${a + b}`, `${SQ(a + b)} = ${a + b} × ${a + b} = ${ans}`];
+      trap = [a * a + b * b, 'You squared each number on its own. Add inside the brackets first.'];
+    } else if (t === 'cubeSub') {
+      const b = ri(2, 5);
+      const a = ri(1, b ** 3 - 1);
+      q = `${CB(b)} − ${a}`;
+      ans = b ** 3 - a;
+      steps = [`Powers first: ${CB(b)} = ${b} × ${b} × ${b} = ${b ** 3}`, `${b ** 3} − ${a} = ${ans}`];
+      trap = [3 * b - a, `${CB(b)} means ${b} × ${b} × ${b}, not ${b} × 3.`];
+    } else if (t === 'diffSq') {
+      const a = ri(4, 12);
+      const b = ri(2, a - 1);
+      q = `${SQ(a)} − ${SQ(b)}`;
+      ans = a * a - b * b;
+      steps = [`Powers first: ${SQ(a)} = ${a * a} and ${SQ(b)} = ${b * b}`, `${a * a} − ${b * b} = ${ans}`];
+      trap = [(a - b) ** 2, 'You took away first. Square each number first.'];
+    } else if (t === 'rootMul') {
+      const s = ri(2, 10);
+      const c = ri(2, 5);
+      q = `√${s * s} × ${SQ(c)}`;
+      ans = s * c * c;
+      steps = [`Roots and powers first: √${s * s} = ${s} and ${SQ(c)} = ${c * c}`, `${s} × ${c * c} = ${ans}`];
+      trap = [s * c * 2, `${SQ(c)} means ${c} × ${c}, not ${c} × 2.`];
+    } else if (t === 'brCube') {
+      const b = ri(1, 10);
+      const a = b + ri(2, 4);
+      const c = ri(1, 20);
+      q = `${CB(`(${a} − ${b})`)} + ${c}`;
+      ans = (a - b) ** 3 + c;
+      steps = [`Brackets first: ${a} − ${b} = ${a - b}`, `Then the power: ${CB(a - b)} = ${(a - b) ** 3}`, `${(a - b) ** 3} + ${c} = ${ans}`];
+      trap = [3 * (a - b) + c, `${CB(a - b)} means ${a - b} × ${a - b} × ${a - b}, not ${a - b} × 3.`];
+    } else {
+      const a = ri(3, 9);
+      const b = ri(1, a * a - 1);
+      const c = ri(2, 5);
+      q = `${c} × (${SQ(a)} − ${b})`;
+      ans = c * (a * a - b);
+      steps = [`Inside the brackets, the power first: ${SQ(a)} = ${a * a}`, `${a * a} − ${b} = ${a * a - b}`, `${c} × ${a * a - b} = ${fmt(ans)}`];
+      trap = [c * a * a - b, `The ${c} multiplies everything in the brackets. Finish the brackets first.`];
+    }
+    return { kind: 'number', q, answer: ans, correct: fmt(ans), hint: 'Brackets first, then powers and roots, then × and ÷, then + and −.', steps, nope: traps(ans, [trap]) };
+  };
+
+  // ---------- Fractions and decimals ----------
+  S.g7_frac_add = (lvl) => {
+    let d1, d2;
+    if (lvl === 1) {
+      d1 = pick([2, 3, 4, 5]);
+      d2 = d1 * pick([2, 3]);
+    } else {
+      do {
+        d1 = ri(2, 8);
+        d2 = ri(2, 9);
+      } while (d1 === d2 || d1 % d2 === 0 || d2 % d1 === 0 || lcm(d1, d2) > 40);
+    }
+    if (Math.random() < 0.5) [d1, d2] = [d2, d1];
+    const L = lcm(d1, d2);
+    const w1 = lvl === 3 ? ri(1, 5) : 0;
+    const w2 = lvl === 3 ? ri(1, 4) : 0;
+    const a = coprimeTop(d1);
+    const b = coprimeTop(d2);
+    let first = { w: w1, n: a, d: d1, L: (w1 * d1 + a) * (L / d1) };
+    let second = { w: w2, n: b, d: d2, L: (w2 * d2 + b) * (L / d2) };
+    let plus = lvl === 1 || Math.random() < 0.55;
+    if (!plus && first.L < second.L) [first, second] = [second, first];
+    if (!plus && first.L === second.L) plus = true;
+    const N = plus ? first.L + second.L : first.L - second.L;
+    const s = simp(N, L);
+    const sign = plus ? '+' : '−';
+    const show = (f) => (f.w ? `${f.w}${fr(f.n, f.d)}` : fr(f.n, f.d));
+    let steps;
+    if (lvl === 3) {
+      const top = (f) => f.w * f.d + f.n;
+      steps = [`Change to improper fractions: ${show(first)} = ${fr(top(first), first.d)} and ${show(second)} = ${fr(top(second), second.d)}`, `Make the bottoms the same: ${fr(first.L, L)} ${sign} ${fr(second.L, L)} = ${fr(N, L)}`, `${fr(N, L)} = ${mixedStr(N, L)}`];
+    } else {
+      const change = [first, second].filter((f) => f.d !== L).map((f) => `${fr(f.n, f.d)} = ${fr(f.L, L)}`);
+      steps = [`${first.d} and ${second.d} both go into ${L}.`, `Make ${L} the bottom number: ${change.join(' and ')}`, `${fr(first.L, L)} ${sign} ${fr(second.L, L)} = ${fr(N, L)}`];
+      if (s.d !== L || N > L) steps.push(`That is the same as ${mixedStr(N, L)}.`);
+    }
+    const nope = {};
+    if (lvl < 3 && plus) nope[`${first.n + second.n}/${first.d + second.d}`] = 'You added the bottom numbers. Make the bottoms the same first, then add only the tops.';
+    return {
+      kind: 'fraction',
+      q: `${show(first)} ${sign} ${show(second)}`,
+      answer: { n: s.n, d: s.d },
+      correct: mixedStr(N, L),
+      hint: lvl === 3 ? 'Change both to improper fractions, then make the bottom numbers the same.' : `Find a bottom number that ${d1} and ${d2} both go into. Try ${L}.`,
+      steps,
+      nope,
+    };
+  };
+
+  S.g7_frac_whole = (lvl) => {
+    const d = pick([3, 4, 5, 6, 8, 10]);
+    const n = coprimeTop(d);
+    if (lvl === 1) {
+      const w = d * ri(2, 6);
+      const ans = (n * w) / d;
+      return {
+        kind: 'fraction',
+        q: Math.random() < 0.5 ? `${fr(n, d)} × ${w}` : `${w} × ${fr(n, d)}`,
+        answer: { n: ans, d: 1 },
+        correct: fmt(ans),
+        hint: 'Divide by the bottom number, then multiply by the top.',
+        steps: [`${fr(n, d)} of ${w}: ${w} ÷ ${d} = ${w / d}`, `${w / d} × ${n} = ${ans}`],
+      };
+    }
+    if (lvl === 2) {
+      let w;
+      do w = ri(2, 9);
+      while (w % d === 0);
+      const N = n * w;
+      const s = simp(N, d);
+      const steps = [`Multiply the top by ${w}: ${n} × ${w} = ${N}, so it is ${fr(N, d)}.`];
+      if (s.d !== d || N > d) steps.push(`${fr(N, d)} = ${mixedStr(N, d)}`);
+      return {
+        kind: 'fraction',
+        q: `${fr(n, d)} × ${w}`,
+        answer: { n: s.n, d: s.d },
+        correct: mixedStr(N, d),
+        hint: 'Multiply the top number by the whole number. The bottom stays the same.',
+        steps,
+        nope: { [`${N}/${d * w}`]: `You multiplied the bottom too. Only the top is multiplied: ${fr(N, d)}.` },
+      };
+    }
+    if (Math.random() < 0.5) {
+      const dd = pick([3, 4, 5, 8, 10]);
+      const nn = coprimeTop(dd);
+      let w;
+      do w = ri(3, 12);
+      while (w % dd === 0);
+      const N = nn * w;
+      const s = simp(N, dd);
+      const steps = [`${w} laps is ${w} lots of ${fr(nn, dd)}: ${fr(nn, dd)} × ${w} = ${fr(N, dd)}`];
+      if (s.d !== dd || N > dd) steps.push(`${fr(N, dd)} = ${mixedStr(N, dd)} litres`);
+      return {
+        kind: 'fraction',
+        q: `A pit bike uses ${fr(nn, dd)} of a litre of fuel every lap. How much fuel does it use in ${w} laps?`,
+        suffix: 'litres',
+        answer: { n: s.n, d: s.d },
+        correct: `${mixedStr(N, dd)} litres`,
+        hint: `Multiply the top by ${w}. The bottom stays the same.`,
+        steps,
+      };
+    }
+    const m = ri(1, 4);
+    const w = ri(2, 6);
+    const top = m * d + n;
+    const N = top * w;
+    const s = simp(N, d);
+    return {
+      kind: 'fraction',
+      q: `${m}${fr(n, d)} × ${w}`,
+      answer: { n: s.n, d: s.d },
+      correct: mixedStr(N, d),
+      hint: 'Change the mixed number to an improper fraction first.',
+      steps: [`${m}${fr(n, d)} = ${fr(top, d)}`, `${fr(top, d)} × ${w} = ${fr(N, d)}`, `${fr(N, d)} = ${mixedStr(N, d)}`],
+    };
+  };
+
+  S.g7_dec_pow10 = (lvl) => {
+    if (lvl === 3 && Math.random() < 0.5) {
+      const t = pick(['km', 'm', 'ml', 'kg']);
+      if (t === 'km') {
+        const c = ri(105, 995);
+        const ans = c * 10;
+        return { kind: 'number', q: `A motocross track is ${fmt(c / 100)} km long. How many metres is that?`, suffix: 'm', answer: ans, correct: `${fmt(ans)} m`, hint: '1 km = 1 000 m, so multiply by 1 000.', steps: ['1 km = 1 000 m', `${fmt(c / 100)} × 1 000 = ${fmt(ans)}`, 'The digits move three places to the left.'] };
+      }
+      if (t === 'm') {
+        const m = ri(1200, 48000);
+        const ans = m / 1000;
+        return { kind: 'number', q: `An enduro loop is ${fmt(m)} m long. How many kilometres is that?`, suffix: 'km', answer: ans, correct: `${fmt(ans)} km`, hint: '1 000 m = 1 km, so divide by 1 000.', steps: [`${fmt(m)} ÷ 1 000 = ${fmt(ans)}`, 'The digits move three places to the right.'] };
+      }
+      if (t === 'ml') {
+        const ml = ri(5, 250) * 100;
+        const ans = ml / 1000;
+        return { kind: 'number', q: `A fuel can holds ${fmt(ml)} ml. How many litres is that?`, suffix: 'litres', answer: ans, correct: `${fmt(ans)} litres`, hint: '1 000 ml = 1 litre, so divide by 1 000.', steps: [`${fmt(ml)} ÷ 1 000 = ${fmt(ans)}`, 'The digits move three places to the right.'] };
+      }
+      const t10 = ri(40, 75);
+      const ans = t10 * 100;
+      return { kind: 'number', q: `A rear tyre weighs ${fmt(t10 / 10)} kg. How many grams is that?`, suffix: 'g', answer: ans, correct: `${fmt(ans)} g`, hint: '1 kg = 1 000 g, so multiply by 1 000.', steps: [`${fmt(t10 / 10)} × 1 000 = ${fmt(ans)}`, 'The digits move three places to the left. Fill the empty places with zeros.'] };
+    }
+    const P = lvl === 3 ? pick([10, 100, 1000]) : pick([10, 100]);
+    const k = String(P).length - 1;
+    const mul = lvl === 1 ? true : lvl === 2 ? false : Math.random() < 0.5;
+    const s = mul ? ri(1, 3) : ri(0, 3 - k);
+    let N;
+    do N = ri(11, 9999);
+    while (N % 10 === 0);
+    const v = N / 10 ** s;
+    const ans = mul ? +((N * 10 ** k) / 10 ** s).toFixed(6) : +(N / 10 ** (s + k)).toFixed(6);
+    const back = mul ? +(N / 10 ** (s + k)).toFixed(6) : +((N * 10 ** k) / 10 ** s).toFixed(6);
+    const places = ['', 'one place', 'two places', 'three places'][k];
+    const steps = [`${mul ? 'Multiplying' : 'Dividing'} by ${fmt(P)} moves every digit ${places} to the ${mul ? 'left' : 'right'}.`, `${fmt(v)} ${mul ? '×' : '÷'} ${fmt(P)} = ${fmt(ans)}`];
+    if ((mul && Number.isInteger(ans) && String(ans).endsWith('0')) || (!mul && ans < 0.1)) steps.push('Fill any empty places with zeros.');
+    const why = `That moved the digits the wrong way. ${mul ? '× makes it bigger, so they move left.' : '÷ makes it smaller, so they move right.'}`;
+    return {
+      kind: 'number',
+      q: `${fmt(v)} ${mul ? '×' : '÷'} ${fmt(P)}`,
+      answer: ans,
+      correct: fmt(ans),
+      hint: `Count the zeros in ${fmt(P)}. ${mul ? '×' : '÷'} moves the digits that many places to the ${mul ? 'left' : 'right'}.`,
+      steps,
+      nope: { [String(back)]: why, [String(back).replace('.', ',')]: why },
+    };
+  };
+
+  // ---------- Number patterns ----------
+  S.g7_pat_term = (lvl) => {
+    const d = ri(2, lvl === 3 ? 12 : 9);
+    const down = lvl === 2 && Math.random() < 0.4;
+    const a = down ? d * ri(12, 20) + ri(1, 9) : ri(1, 25);
+    const step = down ? -d : d;
+    const seq = [0, 1, 2, 3].map((i) => a + i * step);
+    const k = lvl === 1 ? 5 : lvl === 2 ? ri(7, 10) : pick([20, 25, 30, 50, 100]);
+    const ans = a + (k - 1) * step;
+    const shown = seq.map((x) => fmt(x)).join('; ');
+    if (lvl === 1) {
+      return { kind: 'number', q: `What is the next term? ${shown}; ___`, answer: ans, correct: fmt(ans), hint: 'Find the jump between the terms first.', steps: [`Each term is ${d} more than the one before.`, `${fmt(seq[3])} + ${d} = ${fmt(ans)}`] };
+    }
+    if (lvl === 2) {
+      const more = [];
+      for (let i = 4; i < k; i++) more.push(fmt(a + i * step));
+      return {
+        kind: 'number',
+        q: `The pattern ${shown}; … keeps going the same way. What is the ${k}th term?`,
+        answer: ans,
+        correct: fmt(ans),
+        hint: 'Find the jump between the terms first, then keep going.',
+        steps: [`Each term is ${d} ${down ? 'less' : 'more'} than the one before.`, `Keep going: ${more.join('; ')}`, `The ${k}th term is ${fmt(ans)}.`],
+      };
+    }
+    return {
+      kind: 'number',
+      q: `The pattern ${shown}; … keeps going the same way. What is the ${k}th term?`,
+      answer: ans,
+      correct: fmt(ans),
+      hint: 'Don’t count all the way. Work out how many jumps there are from the first term.',
+      steps: [`The jump is ${d}.`, `From the 1st term to the ${k}th there are ${k - 1} jumps.`, `${a} + ${k - 1} × ${d} = ${a} + ${fmt((k - 1) * d)} = ${fmt(ans)}`],
+      nope: traps(ans, [[a + k * d, `That is ${k} jumps. From the 1st term to the ${k}th there are only ${k - 1}.`], [k * d, 'That leaves out where the pattern starts.']]),
+    };
+  };
+
+  S.g7_pat_rule = (lvl) => {
+    const d = ri(2, 9);
+    let a;
+    do a = ri(1, 15);
+    while (a === d);
+    const seq = [1, 2, 3, 4].map((n) => a + (n - 1) * d);
+    const shown = seq.join('; ');
+    const gives = (f) => [1, 2, 3, 4].map(f);
+    const same = (f) => gives(f).every((v, i) => v === seq[i]);
+    if (lvl < 3) {
+      const cands = [
+        [`Start at ${a} and add ${a} each time`, (n) => a * n],
+        [`Start at ${d} and add ${d} each time`, (n) => d * n],
+        [`Start at ${a} and add ${d + 1} each time`, (n) => a + (n - 1) * (d + 1)],
+        [`Start at ${a} and double each time`, (n) => a * 2 ** (n - 1)],
+        [`Start at ${seq[1]} and add ${d} each time`, (n) => seq[1] + (n - 1) * d],
+      ]
+        .filter(([, f]) => !same(f))
+        .map(([text, f]) => [text, `That gives ${gives(f).map(sg).join('; ')}, not ${shown}.`]);
+      return mcWhy(`Which rule describes this pattern? ${shown}; …`, `Start at ${a} and add ${d} each time`, cands, {
+        hint: 'Check the first term, then the jump between the terms.',
+        steps: [`The first term is ${a}.`, `${seq[1]} − ${seq[0]} = ${d}, and the jump stays ${d}.`, `So: start at ${a} and add ${d} each time.`],
+      });
+    }
+    const c = a - d;
+    const cands = [[d, a], [a, d], [d + 1, c - 1], [1, a - 1], [d, c + 1], [d - 1, c + 1]]
+      .filter(([m, k]) => m >= 1 && !(m === 1 && k === 0) && !same((n) => m * n + k))
+      .map(([m, k]) => {
+        const f = [1, 2, 3, 4].find((n) => m * n + k !== seq[n - 1]);
+        return [posRule(m, k), `Try position ${f}: ${calc(m, k, f)}, not ${seq[f - 1]}.`];
+      });
+    return mcWhy('Which rule gives each term from its position?', posRule(d, c), cands, {
+      visual: { type: 'table', head: ['Position', 1, 2, 3, 4], rows: [['Term', ...seq]] },
+      hint: 'The jump between the terms tells you what to multiply the position by.',
+      steps: [`The terms go up by ${d}, so multiply the position by ${d}.`, `Position 1: ${d} × 1 = ${d}. The term is ${a}, so ${c > 0 ? `add ${c}` : `subtract ${-c}`}.`, `Check position 3: ${calc(d, c, 3)}. It works.`],
+    });
+  };
+
+  S.g7_pat_nth = (lvl) => {
+    const d = lvl === 1 ? ri(2, 5) : ri(2, lvl === 2 ? 9 : 12);
+    let a;
+    do a = lvl === 1 ? ri(d + 1, d + 12) : lvl === 3 ? ri(1, d - 1) : ri(1, d + 15);
+    while (a === d);
+    const c = a - d;
+    const seq = [1, 2, 3, 4].map((n) => a + (n - 1) * d);
+    const cands = [[d, a], [a, d], [1, d], [d + 1, c - 1], [d, c + 1]]
+      .filter(([m, k]) => m >= 1 && [1, 2, 3, 4].some((n) => m * n + k !== seq[n - 1]))
+      .map(([m, k]) => {
+        const f = [1, 2, 3, 4].find((n) => m * n + k !== seq[n - 1]);
+        return [lin(m, k, 'n'), `Try n = ${f}: ${calc(m, k, f)}, not ${seq[f - 1]}.`];
+      });
+    return mcWhy(`Which rule gives the nth term of ${seq.join('; ')}; …?`, lin(d, c, 'n'), cands, {
+      hint: 'The jump goes in front of n. Then check the first term.',
+      steps: [`The jump is ${d}, so the rule starts with ${d}n.`, `When n = 1, ${d}n = ${d}, but the first term is ${a}. So ${c > 0 ? `add ${c}` : `subtract ${-c}`}: ${lin(d, c, 'n')}.`, `Check n = 2: ${calc(d, c, 2)}. It works.`],
+    });
+  };
+
+  S.g7_pat_which = (lvl) => {
+    const m = ri(2, 9);
+    const c = lvl === 3 ? ri(1 - m, 12) : ri(1, 12);
+    const n = lvl === 1 ? ri(6, 15) : ri(12, 60);
+    const v = m * n + c;
+    const seq = [1, 2, 3, 4].map((k) => m * k + c);
+    const q = lvl === 1
+      ? `The rule for a pattern is: ${posRule(m, c).charAt(0).toLowerCase()}${posRule(m, c).slice(1)}. Which position has the term ${fmt(v)}?`
+      : lvl === 2
+        ? `The nth term of a pattern is ${lin(m, c, 'n')}. For which value of n is the term ${fmt(v)}?`
+        : `The pattern ${seq.join('; ')}; … keeps going the same way. Which term number is ${fmt(v)}?`;
+    const steps = [];
+    if (lvl === 3) steps.push(`The jump is ${m} and the first term is ${m + c}, so the rule is ${lin(m, c, 'n')}.`);
+    if (c > 0) steps.push(`Undo + ${c}: ${fmt(v)} − ${c} = ${fmt(v - c)}`);
+    if (c < 0) steps.push(`Undo − ${-c}: ${fmt(v)} + ${-c} = ${fmt(v - c)}`);
+    steps.push(`Undo × ${m}: ${fmt(v - c)} ÷ ${m} = ${n}`, `Check: ${calc(m, c, n)}`);
+    return { kind: 'number', q, answer: n, correct: String(n), hint: 'Work backwards: undo the + or − first, then divide.', steps };
+  };
+
+  // ---------- Input and output: flow diagrams and tables ----------
+  const OP = {
+    mul: (k) => ({ t: `× ${k}`, f: (x) => x * k, show: (x) => `${fmt(x)} × ${k}`, back: (y) => [`Undo × ${k}: ${fmt(y)} ÷ ${k} = ${fmt(y / k)}`, y / k] }),
+    div: (k) => ({ t: `÷ ${k}`, f: (x) => x / k, show: (x) => `${fmt(x)} ÷ ${k}`, back: (y) => [`Undo ÷ ${k}: ${fmt(y)} × ${k} = ${fmt(y * k)}`, y * k] }),
+    add: (k) => ({ t: `+ ${k}`, f: (x) => x + k, show: (x) => `${fmt(x)} + ${k}`, back: (y) => [`Undo + ${k}: ${fmt(y)} − ${k} = ${fmt(y - k)}`, y - k] }),
+    sub: (k) => ({ t: `− ${k}`, f: (x) => x - k, show: (x) => `${fmt(x)} − ${k}`, back: (y) => [`Undo − ${k}: ${fmt(y)} + ${k} = ${fmt(y + k)}`, y + k] }),
+    sq: () => ({ t: 'squared', f: (x) => x * x, show: (x) => SQ(fmt(x)), back: (y) => [`Undo squared: √${fmt(y)} = ${fmt(Math.sqrt(y))}`, Math.sqrt(y)] }),
+  };
+  const forward = (x, ops) => {
+    let v = x;
+    const steps = [];
+    for (const o of ops) {
+      const nv = o.f(v);
+      steps.push(`${o.show(v)} = ${fmt(nv)}`);
+      v = nv;
+    }
+    return [v, steps];
+  };
+  const backward = (y, ops) => {
+    let v = y;
+    const steps = [];
+    for (const o of ops.slice().reverse()) {
+      const [s, nv] = o.back(v);
+      steps.push(s);
+      v = nv;
+    }
+    return [v, steps];
+  };
+
+  S.g7_flow_out = (lvl) => {
+    const a = ri(2, 9);
+    const b = ri(1, 15);
+    let x, ops, trap;
+    if (lvl === 1) {
+      x = ri(2, 12);
+      ops = [OP.mul(a), OP.add(b)];
+    } else if (lvl === 2) {
+      const t = pick(['sub', 'div', 'big']);
+      if (t === 'sub') {
+        x = ri(3, 15);
+        ops = [OP.mul(a), OP.sub(Math.min(b, a * x - 1))];
+      } else if (t === 'div') {
+        x = a * ri(2, 12);
+        ops = [OP.div(a), OP.add(b)];
+      } else {
+        x = ri(15, 40);
+        ops = [OP.mul(a), OP.add(b)];
+      }
+    } else {
+      const t = pick(['addFirst', 'square', 'subFirst']);
+      if (t === 'addFirst') {
+        x = ri(2, 15);
+        ops = [OP.add(b), OP.mul(a)];
+        trap = [a * x + b, 'You multiplied first. Follow the arrows: add first, then multiply.'];
+      } else if (t === 'square') {
+        x = ri(2, 12);
+        ops = [OP.sq(), OP.add(b)];
+        trap = [2 * x + b, `Squared means ${x} × ${x}, not ${x} × 2.`];
+      } else {
+        x = ri(b + 1, b + 15);
+        ops = [OP.sub(b), OP.mul(a)];
+        trap = [a * x - b, 'You multiplied first. Follow the arrows: take away first, then multiply.'];
+      }
+    }
+    const [y, steps] = forward(x, ops);
+    return {
+      kind: 'number',
+      q: 'What number comes out of this flow diagram?',
+      visual: { type: 'flow', items: [`Input ${fmt(x)}`, ...ops.map((o) => o.t), 'Output ?'] },
+      answer: y,
+      correct: fmt(y),
+      hint: 'Do the steps in order, from left to right.',
+      steps,
+      nope: trap ? traps(y, [trap]) : {},
+    };
+  };
+
+  S.g7_flow_back = (lvl) => {
+    const a = ri(2, 9);
+    const b = ri(1, 15);
+    let x, ops;
+    if (lvl === 1) {
+      x = ri(2, 15);
+      ops = [OP.mul(a), OP.add(b)];
+    } else if (lvl === 2) {
+      if (Math.random() < 0.5) {
+        x = ri(3, 20);
+        ops = [OP.mul(a), OP.sub(Math.min(b, a * x - 1))];
+      } else {
+        x = ri(2, 15);
+        ops = [OP.add(b), OP.mul(a)];
+      }
+    } else {
+      const t = pick(['div', 'sq', 'subFirst']);
+      if (t === 'div') {
+        x = a * ri(2, 12);
+        ops = [OP.div(a), OP.add(b)];
+      } else if (t === 'sq') {
+        x = ri(2, 12);
+        ops = [OP.sq(), OP.add(b)];
+      } else {
+        x = ri(b + 1, b + 12);
+        ops = [OP.sub(b), OP.mul(a)];
+      }
+    }
+    const [y] = forward(x, ops);
+    const [, steps] = backward(y, ops);
+    steps.push(`Check: put ${fmt(x)} in and ${fmt(y)} comes out.`);
+    // The usual slip is undoing the steps in the order they were done.
+    let w = y;
+    let whole = true;
+    for (const o of ops) {
+      w = o.back(w)[1];
+      if (!Number.isInteger(w) || w < 0) whole = false;
+    }
+    return {
+      kind: 'number',
+      q: 'What number went in?',
+      visual: { type: 'flow', items: ['Input ?', ...ops.map((o) => o.t), `Output ${fmt(y)}`] },
+      answer: x,
+      correct: fmt(x),
+      hint: 'Work backwards. Undo the last step first, with the opposite operation.',
+      steps,
+      nope: whole ? traps(x, [[w, 'You undid the steps in the wrong order. Undo the last step first.']]) : {},
+    };
+  };
+
+  S.g7_flow_rule = (lvl) => {
+    const m = ri(2, 9);
+    const xs = lvl === 1 ? [1, 2, 3, 4] : lvl === 2 ? [1, 2, 5, 10] : [2, 4, 7, 10];
+    let c;
+    do c = lvl === 1 ? ri(1, 9) : ri(-6, 12);
+    while (c === 0 || m * xs[0] + c < 1);
+    const ys = xs.map((x) => m * x + c);
+    const [x0, y0] = [xs[0], ys[0]];
+    const jy = ys[1] - ys[0];
+    const right = `y = ${lin(m, c, 'x')}`;
+    const cands = [[m + 1, y0 - (m + 1) * x0], [m - 1, y0 - (m - 1) * x0], [1, y0 - x0], [m, c + 1], [jy, y0 - jy * x0], [m, c - 1]]
+      .filter(([mm, cc]) => mm >= 1 && !(mm === m && cc === c))
+      .map(([mm, cc]) => {
+        const f = xs.find((x) => mm * x + cc !== m * x + c);
+        return f === undefined ? null : [`y = ${lin(mm, cc, 'x')}`, `It doesn't work for x = ${f}: ${calc(mm, cc, f)}, not ${m * f + c}.`];
+      })
+      .filter(Boolean);
+    const steps = lvl === 1
+      ? [`Each time x goes up by 1, y goes up by ${m}, so try y = ${m}x and something more.`, `x = 1: ${m} × 1 = ${m}, but y is ${y0}, so ${c > 0 ? `add ${c}` : `subtract ${-c}`}.`, `Check every column: ${xs.map((x) => calc(m, c, x)).join('; ')}`]
+      : ['Test each rule on every column, not only the first.', `${right}: ${xs.map((x) => calc(m, c, x)).join('; ')}`, 'It works for every column.'];
+    return mcWhy('Which rule fits this table?', right, cands, {
+      visual: { type: 'table', head: ['x', ...xs], rows: [['y', ...ys]] },
+      hint: 'Test each rule on every column. The right one works for all of them.',
+      steps,
+    });
+  };
+
+  S.g7_flow_table = (lvl) => {
+    const m = ri(2, lvl === 1 ? 6 : 9);
+    const c = lvl === 3 ? ri(1 - m, 12) : ri(1, 12);
+    const xs = [1, 2, 3, 4];
+    const ys = xs.map((x) => m * x + c);
+    const k = lvl === 1 ? ri(6, 10) : ri(10, 30);
+    const yk = m * k + c;
+    const findX = lvl === 3 && Math.random() < 0.5;
+    const rule = `y = ${lin(m, c, 'x')}`;
+    const steps = [`Each time x goes up by 1, y goes up by ${m}, so the rule starts with y = ${m}x.`, `When x = 1, ${m}x = ${m} and y is ${m + c}, so ${c > 0 ? `add ${c}` : c < 0 ? `subtract ${-c}` : 'nothing more is needed'}: ${rule}.`];
+    if (findX) {
+      if (c > 0) steps.push(`Work back from ${yk}. Undo + ${c}: ${yk} − ${c} = ${yk - c}`);
+      if (c < 0) steps.push(`Work back from ${yk}. Undo − ${-c}: ${yk} + ${-c} = ${yk - c}`);
+      steps.push(`Undo × ${m}: ${yk - c} ÷ ${m} = ${k}`);
+    } else steps.push(`When x = ${k}: ${calc(m, c, k)}`);
+    return {
+      kind: 'number',
+      q: `Every column of this table follows the same rule. What is the missing ${findX ? 'x' : 'y'} value?`,
+      visual: { type: 'table', head: ['x', ...xs, findX ? '?' : k], rows: [['y', ...ys, findX ? yk : '?']] },
+      answer: findX ? k : yk,
+      correct: String(findX ? k : yk),
+      hint: 'Find the rule from the columns you have, then use it on the missing one.',
+      steps,
+      nope: findX ? {} : traps(yk, [[m * k, `You found ${m}x but left out the ${c > 0 ? `+ ${c}` : `− ${-c}`}.`], [ys[3] + m, `That is the next column, x = 5. This column has x = ${k}.`]]),
+    };
+  };
+
+  // ---------- Algebraic expressions and equations ----------
+  S.g7_alg_value = (lvl) => {
+    const v = pick(['x', 'x', 'a', 'n', 'p']);
+    const k = ri(2, lvl === 3 ? 9 : 10);
+    const a = ri(2, 9);
+    const b = ri(1, lvl === 1 ? 20 : 12);
+    const t = lvl === 1 ? 'lin' : lvl === 2 ? pick(['sub', 'br', 'two']) : pick(['sq', 'asq', 'brsq']);
+    const glued = Number(`${a}${k}`);
+    const gluedWhy = `${a}${v} means ${a} × ${v}, not ${a}${k}.`;
+    let expr, ans, steps, trap, when = `${v} = ${k}`;
+    if (t === 'lin') {
+      expr = `${a}${v} + ${b}`;
+      ans = a * k + b;
+      steps = [`Put ${k} in place of ${v}: ${a} × ${k} + ${b}`, `${a} × ${k} = ${a * k}, then ${a * k} + ${b} = ${ans}`];
+      trap = [glued + b, gluedWhy];
+    } else if (t === 'sub') {
+      const c = ri(1, a * k - 1);
+      expr = `${a}${v} − ${c}`;
+      ans = a * k - c;
+      steps = [`Put ${k} in place of ${v}: ${a} × ${k} − ${c}`, `${a} × ${k} = ${a * k}, then ${a * k} − ${c} = ${ans}`];
+      trap = [glued - c, gluedWhy];
+    } else if (t === 'br') {
+      expr = `${a}(${v} + ${b})`;
+      ans = a * (k + b);
+      steps = [`Put ${k} in place of ${v}: ${a} × (${k} + ${b})`, `Brackets first: ${k} + ${b} = ${k + b}`, `${a} × ${k + b} = ${ans}`];
+      trap = [a * k + b, `Brackets first. The ${a} multiplies the whole bracket.`];
+    } else if (t === 'two') {
+      const k2 = ri(2, 10);
+      expr = `${a}x + ${term(b, 'y')}`;
+      when = `x = ${k} and y = ${k2}`;
+      ans = a * k + b * k2;
+      steps = [`Put the numbers in: ${a} × ${k} + ${b} × ${k2}`, `${a * k} + ${b * k2} = ${ans}`];
+      trap = [Number(`${a}${k}`) + Number(`${b}${k2}`), `${a}x means ${a} × x. A number next to a letter means multiply.`];
+    } else if (t === 'sq') {
+      expr = `${v}² + ${term(b, v)}`;
+      ans = k * k + b * k;
+      steps = [`Put ${k} in place of ${v}: ${SQ(k)} + ${b} × ${k}`, `${SQ(k)} = ${k * k} and ${b} × ${k} = ${b * k}`, `${k * k} + ${b * k} = ${ans}`];
+      trap = [2 * k + b * k, `${v}² means ${v} × ${v}, not 2 × ${v}.`];
+    } else if (t === 'asq') {
+      const c = Math.min(b, a * k * k - 1);
+      expr = `${a}${v}² − ${c}`;
+      ans = a * k * k - c;
+      steps = [`Put ${k} in place of ${v}: ${a} × ${SQ(k)} − ${c}`, `Power first: ${SQ(k)} = ${k * k}`, `${a} × ${k * k} = ${a * k * k}, then ${a * k * k} − ${c} = ${ans}`];
+      trap = [(a * k) ** 2 - c, `Only the ${v} is squared: ${a} × ${SQ(k)}, not ${SQ(`(${a} × ${k})`)}.`];
+    } else {
+      const bb = ri(1, 15 - k);
+      expr = SQ(`(${v} + ${bb})`);
+      ans = (k + bb) ** 2;
+      steps = [`Put ${k} in place of ${v}: ${SQ(`(${k} + ${bb})`)}`, `Brackets first: ${k} + ${bb} = ${k + bb}`, `${SQ(k + bb)} = ${ans}`];
+      trap = [k * k + bb * bb, 'Brackets first, then square the answer.'];
+    }
+    return { kind: 'number', q: `What is the value of ${expr} when ${when}?`, answer: ans, correct: fmt(ans), hint: 'Put the number in place of the letter. A number next to a letter means multiply.', steps, nope: traps(ans, [trap]) };
+  };
+
+  S.g7_alg_like = (lvl) => {
+    const v = pick(LETTERS);
+    const w = pick(LETTERS.filter((l) => l !== v));
+    const hint = 'Only like terms can be joined: the same letter with the same power.';
+    if (lvl === 1 && Math.random() < 0.3) {
+      const p = ri(2, 9);
+      let q;
+      do q = ri(2, 9);
+      while (q === p);
+      return mcWhy('Which pair are like terms?', `${p}${v} and ${q}${v}`, [
+        [`${p}${v} and ${p}${w}`, 'The letters are different, so they are unlike terms.'],
+        [`${v} and ${v}²`, `${v}² is ${v} × ${v}, a different kind of term from ${v}.`],
+        [`${q} and ${q}${v}`, `${q} has no letter, so it is a different kind of term from ${q}${v}.`],
+      ], { hint: 'Look only at the letter part. It must be exactly the same, power and all.', steps: ['Like terms have exactly the same letter part.', `${p}${v} and ${q}${v} both have just ${v}, so they are like terms.`] });
+    }
+    if (lvl === 1) {
+      let p, q;
+      do {
+        p = ri(2, 9);
+        q = ri(2, 9);
+      } while (p === q);
+      if (Math.random() < 0.6) {
+        const right = term(p + q, v);
+        return mcWhy(`Simplify: ${p}${v} + ${q}${v}`, right, [
+          [tsq(p + q, v), `Adding doesn't change the letter part: ${v} + ${v} is 2${v}, not ${v}².`],
+          [term(p * q, v), `You multiplied ${p} and ${q}. Like terms are added: ${p} + ${q}.`],
+          [String(p + q), `The ${v} can't disappear. You have ${p + q} lots of ${v}.`],
+          [tsq(p * q, v), 'That multiplies the terms. Here they are added.'],
+        ], { hint, steps: [`${p}${v} and ${q}${v} are like terms, so add the numbers in front.`, `${p} + ${q} = ${p + q}, so the answer is ${right}.`] });
+      }
+      const [big, small] = p > q ? [p, q] : [q, p];
+      const right = term(big - small, v);
+      return mcWhy(`Simplify: ${big}${v} − ${small}${v}`, right, [
+        [term(big + small, v), 'That adds. The sign says take away.'],
+        [String(big - small), `The ${v} can't disappear. You have ${big - small} lots of ${v} left.`],
+        [tsq(big - small, v), `Taking away doesn't change the letter part. It stays ${v}.`],
+      ], { hint, steps: [`${big}${v} and ${small}${v} are like terms, so take away the numbers in front.`, `${big} − ${small} = ${big - small}, so the answer is ${right}.`] });
+    }
+    if (lvl === 2) {
+      let p, r;
+      do {
+        p = ri(2, 9);
+        r = ri(2, 9);
+      } while (p * r === p + r);
+      const q = ri(2, 9);
+      const right = `${term(p + r, v)} + ${term(q, w)}`;
+      return mcWhy(`Simplify: ${p}${v} + ${q}${w} + ${r}${v}`, right, [
+        [`${p + q + r}${v}${w}`, `The ${v} terms and the ${w} term are unlike, so they can't be joined into one term.`],
+        [term(p + q + r, v), `${q}${w} is a different kind of term. It stays on its own.`],
+        [`${term(p * r, v)} + ${term(q, w)}`, `You multiplied ${p} and ${r}. Like terms are added.`],
+        [`${term(p + r, v)} + ${q}`, `The ${w} can't disappear.`],
+      ], { hint, steps: [`The like terms are ${p}${v} and ${r}${v}: ${p} + ${r} = ${p + r}, so ${term(p + r, v)}.`, `${q}${w} has a different letter, so it stays as it is.`, `Answer: ${right}`] });
+    }
+    const p = ri(3, 12);
+    const q = ri(1, p - 1);
+    const c2 = ri(1, 9);
+    const c1 = c2 + ri(1, 9);
+    const right = `${term(p - q, v)} + ${c1 + c2}`;
+    return mcWhy(`Simplify: ${term(p, v)} + ${c1} − ${term(q, v)} + ${c2}`, right, [
+      [`${term(p + q, v)} + ${c1 + c2}`, `The ${term(q, v)} has a minus sign in front of it, so take it away.`],
+      [`${term(p - q, v)} + ${c1 - c2}`, `Only the ${term(q, v)} has a minus sign. The ${c2} is added.`],
+      [term(p - q + c1 + c2, v), 'The numbers and the letter terms are unlike, so they stay apart.'],
+      [term(p - q, v), `The numbers ${c1} and ${c2} can't disappear.`],
+    ], { hint, steps: [`Put the like terms together: ${term(p, v)} − ${term(q, v)}, and ${c1} + ${c2}.`, `${p} − ${q} = ${p - q}, so ${term(p - q, v)}.`, `${c1} + ${c2} = ${c1 + c2}`, `Answer: ${right}`] });
+  };
+
+  S.g7_eq_solve = (lvl) => {
+    const v = pick(['x', 'x', 'y', 'm', 'n']);
+    const t = pick(lvl === 1 ? ['add', 'sub', 'add2'] : lvl === 2 ? ['mul', 'div', 'mul'] : ['two', 'twoSub', 'div']);
+    let eq, x, steps, nope;
+    if (t === 'add' || t === 'add2') {
+      x = ri(2, 40);
+      const a = ri(2, 30);
+      const b = x + a;
+      eq = t === 'add' ? `${v} + ${a} = ${b}` : `${a} + ${v} = ${b}`;
+      steps = [`What number plus ${a} makes ${b}? Undo + ${a} by taking ${a} away.`, `${v} = ${b} − ${a} = ${x}`, `Check: ${x} + ${a} = ${b}`];
+      nope = traps(x, [[b + a, `You added. To undo + ${a}, take ${a} away.`]]);
+    } else if (t === 'sub') {
+      const a = ri(2, 25);
+      const b = ri(1, 30);
+      x = a + b;
+      eq = `${v} − ${a} = ${b}`;
+      steps = [`Undo − ${a} by adding ${a} back.`, `${v} = ${b} + ${a} = ${x}`, `Check: ${x} − ${a} = ${b}`];
+      nope = traps(x, [[b - a, `You took away. To undo − ${a}, add ${a}.`]]);
+    } else if (t === 'mul') {
+      const a = ri(2, 12);
+      x = ri(2, 12);
+      const b = a * x;
+      eq = `${a}${v} = ${b}`;
+      steps = [`${a}${v} means ${a} × ${v}. Undo × ${a} by dividing.`, `${v} = ${b} ÷ ${a} = ${x}`, `Check: ${a} × ${x} = ${b}`];
+      nope = traps(x, [[b - a, `${a}${v} means ${a} × ${v}, so divide by ${a}. Don't take it away.`], [b * a, `You multiplied. To undo × ${a}, divide.`]]);
+    } else if (t === 'div') {
+      const a = ri(2, 9);
+      const b = ri(2, 12);
+      x = a * b;
+      eq = `${v} ÷ ${a} = ${b}`;
+      steps = [`Undo ÷ ${a} by multiplying.`, `${v} = ${b} × ${a} = ${x}`, `Check: ${x} ÷ ${a} = ${b}`];
+      nope = traps(x, [[a + b, `You added. To undo ÷ ${a}, multiply by ${a}.`]]);
+    } else {
+      const a = ri(2, 9);
+      x = ri(2, 15);
+      const b = t === 'two' ? ri(1, 20) : ri(1, a * x - 1);
+      const c = t === 'two' ? a * x + b : a * x - b;
+      eq = `${a}${v} ${t === 'two' ? '+' : '−'} ${b} = ${c}`;
+      const mid = a * x;
+      steps = [t === 'two' ? `Undo + ${b} first: ${c} − ${b} = ${mid}, so ${a}${v} = ${mid}` : `Undo − ${b} first: ${c} + ${b} = ${mid}, so ${a}${v} = ${mid}`, `Undo × ${a}: ${mid} ÷ ${a} = ${x}`, `Check: ${a} × ${x} ${t === 'two' ? '+' : '−'} ${b} = ${c}`];
+      nope = traps(x, [[mid, `That is ${a}${v}. Now undo the × ${a} too.`]]);
+    }
+    return {
+      kind: 'number',
+      q: `Solve: ${eq}`,
+      prefix: `${v} =`,
+      answer: x,
+      correct: String(x),
+      hint: lvl === 1 ? 'Undo the + or − by doing the opposite.' : t === 'mul' || t === 'div' ? 'Undo the × or ÷ by doing the opposite.' : 'Undo the + or − first, then the × or ÷.',
+      steps,
+      nope,
+    };
+  };
+
+  S.g7_eq_story = (lvl) => {
+    const name = pick(NAMES);
+    const k = pick(lvl === 1 ? ['more', 'laps'] : lvl === 2 ? ['fee', 'share', 'more'] : ['buy', 'fee', 'share']);
+    let setup, ask, what, eq, ans, link, undo, wrongs, show, extra = {};
+    if (k === 'more' || k === 'laps') {
+      const x = ri(4, 30);
+      const a = ri(3, 20);
+      const b = x + a;
+      if (k === 'more') {
+        setup = `${name} has some stickers. After getting ${a} more, ${name} has ${b}.`;
+        ask = `How many stickers did ${name} have at first?`;
+        what = `the number of stickers ${name} had at first`;
+        link = `x stickers plus the ${a} new ones make ${b}.`;
+        show = String(x);
+      } else {
+        setup = `${name} rode some laps on Saturday and ${a} laps on Sunday. That makes ${b} laps altogether.`;
+        ask = `How many laps did ${name} ride on Saturday?`;
+        what = `the number of laps on Saturday`;
+        link = `Saturday's x laps plus ${a} more make ${b}.`;
+        show = `${x} laps`;
+        extra = { suffix: 'laps' };
+      }
+      eq = `x + ${a} = ${b}`;
+      ans = x;
+      undo = [`Undo + ${a}: x = ${b} − ${a} = ${x}`];
+      wrongs = [[`x − ${a} = ${b}`, `The ${a} is added on, so it is + ${a}, not − ${a}.`], [`${a}x = ${b}`, `${a}x means ${a} × x. The ${a} is added, not multiplied.`], [`x = ${b} + ${a}`, `That adds ${a} again. The ${b} already includes the extra ${a}.`]];
+    } else if (k === 'fee') {
+      const x = ri(4, 30) * 10;
+      const n = ri(3, 9);
+      setup = `Every rider pays the same entry fee. ${n} riders pay ${money(n * x)} altogether.`;
+      ask = 'What is the entry fee for one rider?';
+      what = 'the entry fee for one rider, in rand';
+      link = `${n} riders paying x each is ${n} × x, written ${n}x.`;
+      eq = `${n}x = ${fmt(n * x)}`;
+      ans = x;
+      undo = [`Undo × ${n}: x = ${fmt(n * x)} ÷ ${n} = ${x}`];
+      wrongs = [[`x + ${n} = ${fmt(n * x)}`, 'Every rider pays the fee, so it is multiplied, not added.'], [`x ÷ ${n} = ${fmt(n * x)}`, `${n} riders pay x each, so that is ${n} × x.`], [`${fmt(n * x)}x = ${n}`, `The total is ${money(n * x)}, so it goes on its own side of the equals sign.`]];
+      show = money(x);
+      extra = { prefix: 'R' };
+    } else if (k === 'share') {
+      const e = ri(2, 9);
+      const n = ri(3, 8);
+      setup = `A drum of fuel is shared equally between ${n} bikes, and each bike gets ${e} litres.`;
+      ask = 'How many litres were in the drum?';
+      what = 'the number of litres in the drum';
+      link = `The drum's x litres shared between ${n} bikes gives ${e} each.`;
+      eq = `x ÷ ${n} = ${e}`;
+      ans = n * e;
+      undo = [`Undo ÷ ${n}: x = ${e} × ${n} = ${n * e}`];
+      wrongs = [[`${n}x = ${e}`, `That says ${n} drums hold only ${e} litres. The drum is shared, so divide: x ÷ ${n}.`], [`x − ${n} = ${e}`, 'Sharing equally means dividing, not taking away.'], [`${e} ÷ ${n} = x`, `That shares out ${e} litres, but ${e} litres is what one bike gets, not the whole drum.`]];
+      show = `${n * e} litres`;
+      extra = { suffix: 'litres' };
+    } else {
+      const x = ri(3, 12) * 5;
+      const n = ri(2, 6);
+      const b = ri(4, 30) * 5;
+      const T = n * x + b;
+      setup = `${name} buys ${n} tubes of grease at the same price and one can of chain lube for ${money(b)}. The total is ${money(T)}.`;
+      ask = 'How much does one tube of grease cost?';
+      what = 'the price of one tube, in rand';
+      link = `${n} tubes at x each is ${n}x, and the chain lube adds ${b}.`;
+      eq = `${n}x + ${b} = ${T}`;
+      ans = x;
+      undo = [`Undo + ${b}: ${T} − ${b} = ${n * x}, so ${n}x = ${n * x}`, `Undo × ${n}: x = ${n * x} ÷ ${n} = ${x}`];
+      wrongs = [[`${n}x − ${b} = ${T}`, `The chain lube adds to the total, so it is + ${b}.`], [`x + ${n} + ${b} = ${T}`, `${n} tubes at x each is ${n} × x, not x + ${n}.`], [`${n}(x + ${b}) = ${T}`, `That pays for the chain lube ${n} times, but there is only one can.`]];
+      show = money(x);
+      extra = { prefix: 'R' };
+    }
+    if (Math.random() < 0.5) {
+      return mcWhy(`${setup} Let x be ${what}. Which equation matches the story?`, eq, wrongs, {
+        hint: 'Read the story one step at a time and write down what happens to x.',
+        steps: [`x is ${what}.`, link, `So the equation is ${eq}.`],
+      });
+    }
+    return Object.assign({
+      kind: 'number',
+      q: `${setup} ${ask}`,
+      answer: ans,
+      correct: show,
+      hint: 'Call the unknown x, write an equation, then undo it.',
+      steps: [`Let x be ${what}. ${link}`, `The equation is ${eq}.`, ...undo],
+    }, extra);
+  };
+
+  // ---------- Integers ----------
+  S.g7_int_compare = (lvl) => {
+    if (lvl === 3) {
+      const temps = Math.random() < 0.4;
+      const show = temps ? deg : sg;
+      let vals;
+      do {
+        const set = new Set();
+        while (set.size < 4) set.add(ri(-20, 20));
+        vals = [...set];
+      } while (vals.filter((v) => v < 0).length < 2 || !vals.some((v) => v >= 0));
+      const list = (vs) => vs.map(show).join('; ');
+      const up = [...vals].sort((a, b) => a - b);
+      const negs = up.filter((v) => v < 0);
+      const rest = up.filter((v) => v >= 0);
+      const right = list(up);
+      return mcWhy(temps ? `Put these temperatures in order from coldest to warmest: ${list(shuffle(vals))}` : `Put these in order from smallest to biggest: ${list(shuffle(vals))}`, right, [
+        [list([...vals].sort((a, b) => Math.abs(a) - Math.abs(b) || a - b)), 'That ignores the minus signs. Numbers below zero come first, and the further below zero, the earlier.'],
+        [list([...up].reverse()), `That is from ${temps ? 'warmest to coldest' : 'biggest to smallest'}.`],
+        [list([...negs].reverse().concat(rest)), `${show(negs[negs.length - 1])} is closer to zero than ${show(negs[0])}, so it is ${temps ? 'warmer' : 'bigger'} and comes later.`],
+        [list(rest.concat(negs)), `Numbers below zero are ${temps ? 'colder' : 'smaller'} than zero and everything above it, so they come first.`],
+      ], {
+        hint: 'Picture a number line. The further left a number is, the smaller it is.',
+        steps: [`Below zero, from furthest to closest: ${negs.map(show).join('; ')}`, `Then ${rest.map(show).join('; ')}`, `In order: ${right}`],
+      });
+    }
+    const ctx = pick(lvl === 1 ? ['num', 'temp'] : ['temp', 'sea', 'num']);
+    const R = lvl === 1 ? 10 : 25;
+    let vals;
+    do {
+      const set = new Set();
+      const negs = ri(2, 3);
+      while (set.size < negs) set.add(-ri(1, R));
+      while (set.size < 4) set.add(ri(0, Math.ceil(R / 2)));
+      vals = [...set];
+    } while (Math.max(...vals) >= -Math.min(...vals));
+    const small = Math.random() < 0.5;
+    const { show, word, less, more } = {
+      num: { show: sg, word: small ? 'smallest' : 'biggest', less: 'smaller', more: 'bigger' },
+      temp: { show: deg, word: small ? 'coldest' : 'warmest', less: 'colder', more: 'warmer' },
+      sea: { show: metres, word: small ? 'lowest' : 'highest', less: 'lower', more: 'higher' },
+    }[ctx];
+    const q = { num: `Which number is the ${word}?`, temp: `These are four temperatures at dawn one winter morning. Which is the ${word}?`, sea: `These heights are measured from sea level. Which one is the ${word}?` }[ctx];
+    const r = small ? Math.min(...vals) : Math.max(...vals);
+    const sorted = [...vals].sort((a, b) => a - b);
+    return mcWhy(q, show(r), vals.filter((x) => x !== r).map((x) => [show(x), `${show(x)} is to the ${small ? 'right' : 'left'} of ${show(r)} on the number line, so it is ${small ? more : less}.`]), {
+      hint: 'Picture a number line. The further left, the smaller. Below zero, a bigger number after the minus is further left.',
+      steps: [`On a number line, from left to right: ${sorted.map(show).join('; ')}`, `The ${word} is the one furthest ${small ? 'left' : 'right'}: ${show(r)}.`],
+    });
+  };
+
+  S.g7_int_add = (lvl) => {
+    const k = pick(lvl === 1 ? ['warm', 'cool'] : lvl === 2 ? ['warm', 'cool', 'dive'] : ['cool', 'dive', 'mine', 'money']);
+    let s, c, q, show, unit;
+    if (k === 'warm') {
+      s = -ri(1, lvl === 1 ? 8 : 15);
+      c = ri(2, lvl === 1 ? 12 : 25);
+      show = deg;
+      unit = 'degrees';
+      q = `At 06:00 it was ${deg(s)} at a winter enduro in the Drakensberg. By 10:00 it was ${c} degrees warmer. What was the temperature at 10:00?`;
+    } else if (k === 'cool') {
+      do s = ri(-6, 12);
+      while (s === 0);
+      const drop = ri(3, lvl === 1 ? 12 : 20);
+      c = -drop;
+      show = deg;
+      unit = 'degrees';
+      q = `It was ${deg(s)} in Sutherland at sunset. By midnight it had dropped by ${drop} degrees. What was the temperature at midnight?`;
+    } else if (k === 'dive') {
+      s = -ri(6, 30);
+      const up = Math.random() < 0.6;
+      const d = up ? ri(2, -s - 1) : ri(2, 15);
+      c = up ? d : -d;
+      show = metres;
+      unit = 'm';
+      q = `A diver off the Durban coast is at ${metres(s)}, which is ${-s} m below sea level. She swims ${up ? 'up' : 'down'} ${d} m. Where is she now?`;
+    } else if (k === 'mine') {
+      s = -ri(20, 90) * 10;
+      const up = Math.random() < 0.5;
+      const d = (up ? ri(1, -s / 10 - 1) : ri(5, 60)) * 10;
+      c = up ? d : -d;
+      show = metres;
+      unit = 'm';
+      q = `A lift in a Johannesburg gold mine is at ${metres(s)}, which is ${fmt(-s)} m below the surface. It goes ${up ? 'up' : 'down'} ${fmt(d)} m. Where is it now?`;
+    } else {
+      const name = pick(NAMES);
+      s = -ri(2, 30) * 10;
+      c = ri(1, 50) * 10;
+      show = rands;
+      unit = 'rand';
+      q = `${name} owes the bike shop ${money(-s)}, so the account shows ${rands(s)}. ${name} pays in ${money(c)}. What does the account show now?`;
+    }
+    const e = s + c;
+    return mcWhy(q, show(e), [
+      [show(s - c), `That goes the wrong way. ${c > 0 ? 'Going up' : 'Going down'} means moving ${c > 0 ? 'right' : 'left'} on the number line.`],
+      [show(-e), e < 0 ? 'Check the sign: you land below zero, so it needs a minus.' : 'Check the sign: you land above zero, so there is no minus.'],
+      [show(Math.abs(s) + c), `That treats ${show(s)} as if it were ${show(Math.abs(s))}. Start below zero.`],
+      [show(e - Math.sign(c)), 'Count the jumps between the numbers, not the numbers themselves. That lands one short.'],
+      [show(-(Math.abs(s) + Math.abs(c))), `That adds ${fmt(Math.abs(s))} and ${fmt(Math.abs(c))} and puts a minus in front. Start at ${show(s)} and count ${c > 0 ? 'up' : 'down'} instead.`],
+    ], {
+      hint: 'Picture a number line. Warmer or up means move right. Colder or down means move left.',
+      steps: lineSteps(s, c, show, unit),
+    });
+  };
+
+  S.g7_int_diff = (lvl) => {
+    const k = pick(lvl === 1 ? ['temp'] : lvl === 2 ? ['temp', 'sea', 'money'] : ['both', 'sea', 'money', 'both']);
+    let q, lo, hi, show, extra, unitText;
+    if (k === 'temp') {
+      lo = -ri(2, 12);
+      hi = ri(3, 25);
+      show = deg;
+      q = `At dawn in Sutherland it was ${deg(lo)}. By 14:00 it was ${deg(hi)}. By how many degrees did it warm up?`;
+      extra = { suffix: 'degrees' };
+      unitText = 'degrees';
+    } else if (k === 'both') {
+      lo = -ri(10, 25);
+      hi = -ri(1, -lo - 2);
+      show = deg;
+      q = `On a cold night in the Drakensberg it was ${deg(lo)} at 04:00 and ${deg(hi)} at 07:00. How many degrees warmer was it at 07:00?`;
+      extra = { suffix: 'degrees' };
+      unitText = 'degrees';
+    } else if (k === 'sea') {
+      hi = ri(10, 80);
+      lo = -ri(5, 40);
+      show = metres;
+      q = `A drone films a diver off Umhlanga. The drone is at ${metres(hi)}, above sea level, and the diver is at ${metres(lo)}, below it. How far apart are they, straight up and down?`;
+      extra = { suffix: 'm' };
+      unitText = 'm';
+    } else {
+      const name = pick(NAMES);
+      lo = -ri(2, 20) * 10;
+      hi = ri(1, 40) * 10;
+      show = rands;
+      q = `${name} owed the bike shop money, and the account showed ${rands(lo)}. After washing bikes all weekend, it shows ${rands(hi)}. How much did ${name} earn?`;
+      extra = { prefix: 'R' };
+    }
+    const ans = hi - lo;
+    let steps, nope;
+    if (hi > 0) {
+      steps = [`From ${show(lo)} up to ${show(0)} is ${fmt(-lo)}.`, `From ${show(0)} up to ${show(hi)} is ${fmt(hi)}.`, `${fmt(-lo)} + ${fmt(hi)} = ${fmt(ans)}`];
+      nope = traps(ans, [[Math.abs(hi + lo), `You took one number from the other. The gap crosses zero, so add the two parts: ${fmt(-lo)} + ${fmt(hi)}.`]]);
+    } else {
+      steps = [`Both are below zero. Count up from ${show(lo)} to ${show(hi)}.`, `${fmt(-lo)} − ${fmt(-hi)} = ${fmt(ans)}`];
+      nope = traps(ans, [[-lo - hi, `You added. Both are below zero, so the gap is ${fmt(-lo)} − ${fmt(-hi)}.`]]);
+    }
+    return Object.assign({
+      kind: 'number',
+      q,
+      answer: ans,
+      correct: k === 'money' ? money(ans) : `${fmt(ans)} ${unitText}`,
+      hint: 'If the gap crosses zero, count up to zero first, then on to the other number.',
+      steps,
+      nope,
+    }, extra);
+  };
+
+  S.g7_int_calc = (lvl) => {
+    const t = pick(lvl === 1 ? ['negPlus', 'posMinus'] : lvl === 2 ? ['negPlus', 'posMinus', 'negMinus'] : ['plusNeg', 'minusNeg', 'minusNeg', 'negPlusNeg']);
+    let a, b, text, move, lead;
+    if (t === 'negPlus') {
+      a = -ri(2, 12);
+      b = ri(2, 15);
+      text = `${sg(a)} + ${b}`;
+      move = b;
+    } else if (t === 'posMinus') {
+      a = ri(1, 10);
+      b = ri(a + 1, a + 12);
+      text = `${a} − ${b}`;
+      move = -b;
+    } else if (t === 'negMinus') {
+      a = -ri(2, 15);
+      b = ri(2, 12);
+      text = `${sg(a)} − ${b}`;
+      move = -b;
+    } else if (t === 'minusNeg') {
+      do a = ri(-12, 10);
+      while (a === 0);
+      b = ri(2, 12);
+      text = `${sg(a)} − (−${b})`;
+      move = b;
+      lead = `Taking away a negative is the same as adding: ${text} = ${sg(a)} + ${b}`;
+    } else {
+      if (t === 'plusNeg') {
+        do a = ri(-10, 15);
+        while (a === 0);
+      } else a = -ri(2, 12);
+      b = ri(2, 12);
+      text = `${sg(a)} + (−${b})`;
+      move = -b;
+      lead = `Adding a negative is the same as taking away: ${text} = ${sg(a)} − ${b}`;
+    }
+    const e = a + move;
+    const wrongWay = t === 'minusNeg' ? 'Taking away a negative moves you right, the same as adding.' : t === 'plusNeg' || t === 'negPlusNeg' ? 'Adding a negative moves you left, the same as taking away.' : 'That moves the wrong way on the number line.';
+    return mcWhy(`Work out: ${text}`, sg(e), [
+      [sg(-e), 'The size is right, but check the sign. Where do you land on the number line?'],
+      [sg(a - move), wrongWay],
+      [sg(e - Math.sign(move)), 'Count the jumps between the numbers, not the numbers themselves. That lands one short.'],
+      [sg(Math.abs(a) + b), 'That adds the sizes and leaves out the signs.'],
+      [sg(-(Math.abs(a) + b)), 'That adds the sizes and keeps a minus sign. Follow the signs on a number line instead.'],
+      [sg(e + Math.sign(move)), 'Count the jumps again. That goes one too far.'],
+    ], {
+      hint: 'Start at the first number on a number line. Adding moves right, taking away moves left.',
+      steps: [...(lead ? [lead] : []), ...lineSteps(a, move, sg, '')],
+    });
+  };
+
+  // ---------- Why a wrong answer is wrong, when the question has no reason of its own ----------
+  const NOT = {
+    g7_primes: 'Every number in the answer must be prime, and together they must multiply back to the number you started with.',
+    g7_hcf: 'The HCF divides into every number, so it can never be bigger than the smallest one. If yours is, you may have found the LCM.',
+    g7_lcm: 'The LCM is a multiple of every number, so it can never be smaller than the biggest one. If yours is, you may have found the HCF.',
+    g7_divis: 'It has to pass both rules. Passing one of them isn’t enough.',
+    g7_sq_cube: 'The small number says how many times to multiply the number by itself. It never means multiply by the small number.',
+    g7_roots: 'A root asks which number, multiplied by itself, makes the number you have. It isn’t a half or a third of it.',
+    g7_power_form: 'The base is the number being multiplied. The exponent counts how many of them there are.',
+    g7_exp_order: 'Brackets first, then powers and roots, then × and ÷, then + and −.',
+    g7_frac_add: 'Make the bottom numbers the same before you add or take away. Never add the bottoms.',
+    g7_frac_whole: 'Multiply only the top by the whole number. The bottom says what size the pieces are.',
+    g7_dec_pow10: '× makes it bigger, so the digits move left. ÷ makes it smaller, so they move right. Count the zeros for the number of places.',
+    g7_pat_term: 'Find the jump first. From the first term to term number n there are n − 1 jumps.',
+    g7_pat_rule: 'Test the rule on the first few terms. It has to make every one of them.',
+    g7_pat_nth: 'The jump goes in front of n. Then check term 1 and fix it with + or −.',
+    g7_pat_which: 'Work backwards: undo the + or − first, then divide by the jump.',
+    g7_flow_out: 'Follow the arrows from left to right, one step at a time.',
+    g7_flow_back: 'Start at the output and undo the steps in reverse: the last step first.',
+    g7_flow_rule: 'A rule has to work for every column of the table, not only the first.',
+    g7_flow_table: 'Find the rule from the columns you have, then use it on the missing one.',
+    g7_alg_value: 'A number next to a letter means multiply: 3x is 3 × x. Brackets and powers come first.',
+    g7_alg_like: 'Only like terms can be joined: the same letter with the same power. Add or take away the numbers in front, and keep the letter.',
+    g7_eq_solve: 'Undo what was done to the letter: + becomes −, × becomes ÷. Then check by putting your answer back.',
+    g7_eq_story: 'Let x be the thing you don’t know, then write down what the story does to it, one step at a time.',
+    g7_int_compare: 'Picture a number line: everything to the left is smaller, so −9 is smaller than −2.',
+    g7_int_add: 'Picture a number line. Warmer or up means move right. Colder or down means move left.',
+    g7_int_diff: 'If the gap crosses zero, count to zero first, then on to the other number.',
+    g7_int_calc: 'Start at the first number on a number line. Adding moves right, taking away moves left, and taking away a negative moves right.',
+  };
+  for (const [id, text] of Object.entries(NOT)) S[id].not = text;
+
+  // ---------- The subject: rule cards and Track walks with each section ----------
+  const sec = (id, i, title, blurb, skills, notes, walk) => Object.assign(RS.section(id, i, title, blurb, skills), { notes, walk });
+  RS.packs.jordy.subjects.grade7 = {
+    label: 'Grade 7 head start',
+    source: 'Grade 7 maths (CAPS)',
+    scope: 'Number, patterns and algebra',
+    note: 'A head start on Grade 7, written for this app. Where the school’s book does it differently, the book wins',
+    opens: '2026-11-14',
+    extra: true,
+    examSize: 20,
+    startWith: ['g7_whole', 'g7_powers'],
+    topics: [
+      sec('g7_whole', 0, 'Whole numbers', 'Prime factors, HCF, LCM and divisibility', ['g7_primes', 'g7_hcf', 'g7_lcm', 'g7_divis'], [
+        'Prime factors: keep dividing by primes. 60 = 2 × 2 × 3 × 5',
+        'With powers: 60 = 2² × 3 × 5',
+        'HCF: the biggest number that divides into all of them. The HCF of 12 and 18 is 6.',
+        'LCM: the smallest number they all divide into. The LCM of 4 and 6 is 12.',
+        'Divides by 12? It must pass the rule for 3 and the rule for 4.',
+      ], [
+        { card: 'Breaking a number into primes', say: 'A prime has exactly two factors: 1 and itself. Every whole number bigger than 1 can be built by multiplying primes together, in only one way.', eg: 'Like stripping a bike down to its smallest parts: 36 = 2 × 2 × 3 × 3.', more: 'Divide by the smallest prime that fits, again and again, until what is left is prime. 36 ÷ 2 = 18, 18 ÷ 2 = 9, 9 ÷ 3 = 3.' },
+        { tap: 'Two riders lapping every 6 and 8 minutes meet again after the LCM, 24 minutes.', find: 'lcm', ask: 'HCF or LCM: which one tells you when they meet again? Tap it.', got: 'The LCM. You need a time that both lap times fit into, and the smallest one is 24 minutes.' },
+        { match: [['HCF of 12 and 18', '6'], ['LCM of 4 and 6', '12'], ['24 as primes', '2 × 2 × 2 × 3'], ['A prime number', '13'], ['Not a prime', '15']], ask: 'Tap one, then tap its answer.' },
+        { card: 'HCF or LCM?', say: 'Splitting things into equal groups with nothing left over? That is the HCF. Waiting for two things to line up again? That is the LCM.', eg: '24 orange and 36 white flags in identical bundles: the HCF is 12, so 12 bundles of 2 orange and 3 white.', more: 'The HCF is never bigger than the smallest number. The LCM is never smaller than the biggest number.' },
+        { sort: ['HCF', 'LCM'], ask: 'Which one does this job need?', items: [
+          ['Two riders lap in 4 and 6 minutes. When are they side by side at the line again?', 1, 'Waiting for the laps to line up: the LCM, 12 minutes.'],
+          ['Share 18 cones and 24 flags into identical piles with none left.', 0, 'Equal groups with nothing left over: the HCF, 6 piles.'],
+          ['Rolls come in packs of 6 and wors in packs of 8. What is the fewest of each so they match?', 1, 'Counting up until both packs fit: the LCM, 24.'],
+          ['Cut 12 m and 20 m of rope into equal pieces, as long as possible.', 0, 'The longest piece that fits into both: the HCF, 4 m.'],
+          ['Two lights flash every 3 and 5 seconds. When do they flash together again?', 1, 'Waiting for both to line up: the LCM, 15 seconds.'],
+          ['The most equal teams from 30 boys and 45 girls, with nobody left out.', 0, 'Equal groups: the HCF, 15 teams of 2 boys and 3 girls.'],
+        ] },
+      ]),
+      sec('g7_powers', 1, 'Exponents', 'Squares, cubes, roots and powers', ['g7_sq_cube', 'g7_roots', 'g7_power_form', 'g7_exp_order'], [
+        '5² means 5 × 5 = 25, not 5 × 2.',
+        '2³ means 2 × 2 × 2 = 8. The small number counts how many.',
+        '√49 = 7, because 7 × 7 = 49. ∛27 = 3, because 3 × 3 × 3 = 27.',
+        'Repeated multiplication as a power: 4 × 4 × 4 = 4³',
+        'Order: brackets, then powers and roots, then × and ÷, then + and −. 2 + 3² = 2 + 9 = 11',
+      ], [
+        { card: 'Base and exponent', say: 'In 2⁵, the 2 is the base and the small 5 is the exponent. The exponent tells you how many times to use the base in a multiplication.', eg: 'A rider doubles their practice laps each week: 2, 4, 8, 16, 32. By week 5 that is 2⁵ = 2 × 2 × 2 × 2 × 2 = 32.', more: '2⁵ is not 2 × 5 = 10. That is the trap everyone falls into once.' },
+        { tap: 'In 7³ the small 3 is called the exponent.', find: 'exponent', ask: 'What is the small number called? Tap the word.', got: 'The exponent, or power. It says use 7 three times: 7 × 7 × 7 = 343.' },
+        { match: [['3²', '9'], ['2³', '8'], ['√36', '6'], ['∛125', '5'], ['10²', '100']], ask: 'Tap one, then tap its value.' },
+        { card: 'Powers come early', say: 'In a long sum, do brackets first, then powers and roots, then × and ÷, then + and −.', eg: '3 + 4² = 3 + 16 = 19. If you add first, you get 7² = 49, which is wrong.', more: '(3 + 4)² is different. The brackets say add first, so it is 7² = 49.' },
+        { sort: ['Right', 'Wrong'], ask: 'Is it right?', items: [
+          ['5² = 25', 0, '5 × 5 = 25.'],
+          ['5² = 10', 1, 'That is 5 × 2. A square multiplies 5 by itself.'],
+          ['2³ = 6', 1, 'That is 2 × 3. 2³ = 2 × 2 × 2 = 8.'],
+          ['√81 = 9', 0, '9 × 9 = 81.'],
+          ['2 + 3² = 25', 1, 'The power comes first: 2 + 9 = 11. 25 comes from adding first.'],
+          ['4³ = 64', 0, '4 × 4 × 4 = 16 × 4 = 64.'],
+        ] },
+      ]),
+      sec('g7_fracdec', 2, 'Fractions and decimals', 'Unlike fractions, × a whole number, × and ÷ by 10, 100 and 1 000', ['g7_frac_add', 'g7_frac_whole', 'g7_dec_pow10'], [
+        'Adding or taking away: make the bottoms the same first. {1/2} + {1/3} = {3/6} + {2/6} = {5/6}',
+        'Mixed numbers: change them to improper fractions first. 1{1/2} = {3/2}',
+        'Fraction × whole number: multiply only the top. {2/3} × 5 = {10/3} = 3{1/3}',
+        '× 10, 100, 1 000: the digits move 1, 2, 3 places left. 2,5 × 100 = 250',
+        '÷ 10, 100, 1 000: the digits move 1, 2, 3 places right. 45 ÷ 1 000 = 0,045',
+      ], [
+        { card: 'Same-size pieces first', say: 'You can only add pieces of the same size. Change the fractions so their bottom numbers match, then add the tops.', eg: 'Half a pizza and a third of a pizza: cut both into sixths. {3/6} + {2/6} = {5/6}.', more: 'Never add the bottoms. {1/2} + {1/3} is not {2/5}, which is less than the half you started with.' },
+        { tap: 'To multiply a fraction by a whole number, multiply only the top.', find: 'top', ask: 'Which part of the fraction changes? Tap the word.', got: 'The top. {2/5} × 3 = {6/5}: three lots of two fifths is six fifths. The bottom only names the size of the pieces.' },
+        { match: [['{1/2} + {1/4}', '{3/4}'], ['{2/3} × 3', '2'], ['3,6 × 100', '360'], ['45 ÷ 1 000', '0,045'], ['{1/3} + {1/6}', '{1/2}']], ask: 'Tap a sum, then tap its answer.' },
+        { card: 'Sliding the digits', say: 'Multiplying by 10, 100 or 1 000 moves every digit 1, 2 or 3 places to the left. Dividing moves them to the right.', eg: 'A track is 2,35 km long. In metres: 2,35 × 1 000 = 2 350 m.', more: 'Count the zeros: 1 000 has three, so the digits move three places. Fill any gaps with zeros.' },
+        { sort: ['Bigger than the start', 'Smaller than the start'], ask: 'Is the answer bigger or smaller than the number you start with?', items: [
+          ['4,5 × 100', 0, '450. Multiplying by 100 makes it bigger.'],
+          ['4,5 ÷ 10', 1, '0,45. Dividing by 10 makes it smaller.'],
+          ['{2/3} × 6', 0, '4, which is more than {2/3}.'],
+          ['72 ÷ 1 000', 1, '0,072. The digits move three places right.'],
+          ['0,8 × 10', 0, '8. The digits move one place left.'],
+          ['{1/2} − {1/3}', 1, 'Taking away leaves less: {1/6}.'],
+        ] },
+      ]),
+      sec('g7_patterns', 3, 'Number patterns', 'Next term, rules in words and the nth term', ['g7_pat_term', 'g7_pat_rule', 'g7_pat_nth', 'g7_pat_which'], [
+        'Constant difference: the jump is the same every time. 5; 8; 11; 14 jumps by 3.',
+        'Rule in words: start at 5 and add 3 each time.',
+        'Rule from the position: 3n + 2. Check: n = 1 gives 5, n = 2 gives 8.',
+        'The jump goes in front of n. The number after it fixes the first term.',
+        'Which term is 62? Undo the rule: 62 − 2 = 60, then 60 ÷ 3 = 20, so the 20th term.',
+      ], [
+        { card: 'The jump', say: 'In 4; 7; 10; 13 each term is 3 more than the one before. A jump that stays the same is called a constant difference.', eg: 'Like cones set out every 3 m along a straight: 4 m, 7 m, 10 m and 13 m from the gate.', more: 'To find the next term, add the jump. To find the 50th term, use a rule instead of counting all the way.' },
+        { tap: 'In the rule 3n + 1 the letter n stands for the position.', find: 'position', ask: 'What does n stand for? Tap the word.', got: 'The position: 1st, 2nd, 3rd and so on. For the 10th term, n = 10, so 3 × 10 + 1 = 31.' },
+        { match: [['2; 4; 6; 8', '2n'], ['3; 5; 7; 9', '2n + 1'], ['5; 8; 11; 14', '3n + 2'], ['4; 8; 12; 16', '4n'], ['1; 4; 7; 10', '3n − 2']], ask: 'Tap a pattern, then tap its rule.' },
+        { card: 'Building the rule', say: 'Find the jump: it goes in front of n. Then check the first term and fix it with + or −.', eg: '6; 11; 16; 21 jumps by 5, so start with 5n. When n = 1, 5n = 5, but the first term is 6. Add 1: 5n + 1.', more: 'Always check a second term. n = 2 gives 5 × 2 + 1 = 11. It works.' },
+        { sort: ['Constant difference', 'Not constant'], ask: 'Does it jump by the same amount each time?', items: [
+          ['7; 12; 17; 22', 0, 'It goes up by 5 every time.'],
+          ['1; 2; 4; 8', 1, 'The jumps are 1, 2 and 4: it doubles.'],
+          ['30; 27; 24; 21', 0, 'It goes down by 3 every time.'],
+          ['1; 4; 9; 16', 1, 'The jumps are 3, 5 and 7. These are the square numbers.'],
+          ['2; 9; 16; 23', 0, 'It goes up by 7 every time.'],
+          ['1; 3; 6; 10', 1, 'The jumps are 2, 3 and 4, so they grow by 1.'],
+        ] },
+      ]),
+      sec('g7_inout', 4, 'Input and output', 'Flow diagrams, tables and working back', ['g7_flow_out', 'g7_flow_back', 'g7_flow_rule', 'g7_flow_table'], [
+        'A flow diagram works left to right. Input 4, × 3, + 2: 4 × 3 = 12, then 12 + 2 = 14.',
+        'y = 3x + 2 means take x, multiply by 3, then add 2.',
+        'Working back: undo the last step first. Output 20 from × 3 + 2: 20 − 2 = 18, then 18 ÷ 3 = 6.',
+        'Finding the rule: test it on every column, not just the first.',
+      ], [
+        { card: 'A machine with a rule', say: 'An input goes in, the rule changes it, and an output comes out. The same rule works on every input.', eg: 'A tyre shop charges R150 a tyre plus R50 for fitting. The rule is × 150 + 50. Input 4 tyres, and the output is R650.', more: 'With letters, that is y = 150x + 50, where x is the number of tyres and y is the price in rand.' },
+        { tap: 'To work backwards, undo the last step first.', find: 'last', ask: 'Which step do you undo first? Tap the word.', got: 'The last one. If the rule was × 3 then + 2, take away 2 first, then divide by 3.' },
+        { match: [['Input 5, rule × 2 + 1', '11'], ['Input 3, rule × 4 − 2', '10'], ['Output 13, rule × 3 + 1', 'Input 4'], ['Input 6, rule + 1 then × 2', '14'], ['Output 25, rule × 5', 'Input 5']], ask: 'Tap a machine, then tap what you get.' },
+        { card: 'Check every column', say: 'A rule must work for every input in the table. A rule that only fits the first column is the wrong rule.', eg: 'x is 1, 2, 3 and y is 5, 8, 11. Is it y = x + 4? For x = 1 it gives 5, but for x = 2 it gives 6, not 8. So no.', more: 'The y values jump by 3, so try 3x. When x = 1, 3x = 3, and 3 + 2 = 5, so y = 3x + 2. Check x = 3: 9 + 2 = 11.' },
+        { sort: ['Fits y = 2x + 3', 'Doesn’t fit'], ask: 'Does this pair fit the rule y = 2x + 3?', items: [
+          ['x = 1, y = 5', 0, '2 × 1 + 3 = 5'],
+          ['x = 4, y = 11', 0, '2 × 4 + 3 = 11'],
+          ['x = 5, y = 16', 1, '2 × 5 + 3 = 13, not 16.'],
+          ['x = 10, y = 23', 0, '2 × 10 + 3 = 23'],
+          ['x = 3, y = 12', 1, '2 × 3 + 3 = 9. 12 comes from adding first.'],
+          ['x = 0, y = 3', 0, '2 × 0 + 3 = 3'],
+        ] },
+      ]),
+      sec('g7_algebra', 5, 'Expressions and equations', 'Letters for numbers, like terms and solving', ['g7_alg_value', 'g7_alg_like', 'g7_eq_solve', 'g7_eq_story'], [
+        '3x means 3 × x. When x = 4, 3x = 12, not 34.',
+        'Like terms have the same letter part: 3a + 5a = 8a. But 3a + 2b stays as it is.',
+        'x² means x × x. When x = 5, x² = 25.',
+        'Solve by undoing: x + 7 = 15, so x = 15 − 7 = 8.',
+        '3x = 21, so x = 21 ÷ 3 = 7. x ÷ 4 = 6, so x = 6 × 4 = 24.',
+      ], [
+        { card: 'Letters stand for numbers', say: 'In algebra, a letter holds the place of a number we don’t know yet, or one that can change.', eg: 'If a lap takes x minutes, 5 laps take 5x minutes. When x = 3, that is 5 × 3 = 15 minutes.', more: 'A number stuck to a letter means multiply: 5x = 5 × x. It never means 53.' },
+        { tap: 'In 4a + 3b the terms 4a and 3b are unlike, so they stay apart.', find: 'unlike', ask: 'Can 4a and 3b be joined together? Tap the word that tells you.', got: 'Unlike. They have different letters, like adding helmets and boots, so 4a + 3b stays as it is.' },
+        { match: [['2x + 5x', '7x'], ['6a − 2a', '4a'], ['3x when x = 4', '12'], ['x + 9 = 14', 'x = 5'], ['4x = 28', 'x = 7']], ask: 'Tap one, then tap its answer.' },
+        { card: 'Solving is undoing', say: 'An equation balances: both sides are equal. To find the letter, undo what was done to it, and do the same to the other side.', eg: 'x − 4 = 9. The 4 was taken away, so add it back: x = 9 + 4 = 13.', more: 'Always check by putting your answer back in: 13 − 4 = 9. It balances.' },
+        { sort: ['x = 6', 'x = 8'], ask: 'Which answer does this equation have?', items: [
+          ['x + 2 = 8', 0, '8 − 2 = 6'],
+          ['x − 3 = 5', 1, '5 + 3 = 8'],
+          ['3x = 18', 0, '18 ÷ 3 = 6'],
+          ['x ÷ 2 = 4', 1, '4 × 2 = 8'],
+          ['2x + 1 = 17', 1, '17 − 1 = 16, then 16 ÷ 2 = 8'],
+          ['x ÷ 3 = 2', 0, '2 × 3 = 6'],
+        ] },
+      ]),
+      sec('g7_integers', 6, 'Integers', 'Below zero: temperatures, sea level and money owed', ['g7_int_compare', 'g7_int_add', 'g7_int_diff', 'g7_int_calc'], [
+        'Below zero, the bigger the number after the minus, the smaller it is. −8 is less than −3.',
+        'Adding moves up the number line: −5 + 7 = 2.',
+        'Taking away moves down: 3 − 8 = −5.',
+        'Crossing zero: from −4 to 6 is 4 up to 0, then 6 more. That is 10.',
+        'Taking away a negative is adding: 5 − (−2) = 7.',
+      ], [
+        { card: 'Numbers below zero', say: 'Integers are the whole numbers and their negatives: … −3, −2, −1, 0, 1, 2, 3 … A minus sign in front means below zero.', eg: 'On a winter morning in Sutherland it can be −6 °C: six degrees below freezing.', more: 'Owing money works the same way. If you owe R50, your balance is −R50.' },
+        { tap: 'On a number line, numbers get smaller as you go left.', find: 'left', ask: 'Which way do numbers get smaller? Tap the word.', got: 'Left. −9 is further left than −2, which makes −9 the smaller number.' },
+        { match: [['−3 + 5', '2'], ['4 − 9', '−5'], ['−2 − 6', '−8'], ['−7 + 7', '0'], ['5 − (−3)', '8']], ask: 'Tap a sum, then tap its answer.' },
+        { card: 'Walk it on the line', say: 'To add, move right. To take away, move left. If you cross zero, count to zero first.', eg: 'It is −4 °C at the start of an enduro and it warms up by 9 degrees. Up 4 to 0, then 5 more: 5 °C.', more: 'A diver 12 m below sea level who swims up 5 m is at −7 m, still under the water.' },
+        { sort: ['Less than −4', 'More than −4'], ask: 'Is it more or less than −4?', items: [
+          ['−7', 0, '−7 is further left, so it is less than −4.'],
+          ['−1', 1, '−1 is closer to zero, so it is more.'],
+          ['0', 1, 'Zero is more than any negative number.'],
+          ['−10', 0, 'Ten below zero is colder than four below.'],
+          ['3', 1, 'Every positive number is more than a negative one.'],
+          ['−5', 0, 'It is one step to the left of −4.'],
+        ] },
+      ]),
+    ],
+  };
+})(typeof window !== 'undefined' ? window : globalThis);
+
 /* Holeshot: the game screens. Progress saves on this device. */
 (function () {
   'use strict';
@@ -9854,6 +11713,14 @@ Jordy's Science test, Tuesday 10 November: Planet Earth and Beyond. Written from
   const h = RS.html;
   const $ = (s) => document.querySelector(s);
   const KEY = 'holeshot.v1';
+  // A subject with an opens date (the Grade 7 head start) stays hidden until that day. The tests still check it.
+  {
+    const d = new Date();
+    const today = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+    for (const pack of Object.values(RS.packs)) {
+      for (const [id, sub] of Object.entries(pack.subjects)) if (sub.opens && today < sub.opens) delete pack.subjects[id];
+    }
+  }
 
   /* filter colours the small bike on the track bar. The big pictures paint the plastics with coat, or hex. */
   const PAINTS = {
@@ -10130,7 +11997,7 @@ Jordy's Science test, Tuesday 10 November: Planet Earth and Beyond. Written from
   // ---------- staying up to date ----------
   // An open tab or a home screen app keeps running the page it first loaded, old prices and all. So it asks which version
   // is live when it comes back into view and every few minutes, and swaps over between races. build.mjs fills in BUILD.
-  const BUILD = '939a7052cc';
+  const BUILD = '8d50eb2f7f';
   const BACK_KEY = 'holeshot.back.v1';
   const TRIED_KEY = 'holeshot.tried.v1';
   let liveBuild = null;
@@ -11169,15 +13036,17 @@ Jordy's Science test, Tuesday 10 November: Planet Earth and Beyond. Written from
   }
 
   // ---------- the pits ----------
-  const sectionsCleared = (p) => Object.values(PK().subjects).reduce((n, sub) => n + clearedCount(p, sub), 0);
-  const sectionsTotal = () => Object.values(PK().subjects).reduce((n, sub) => n + racing(sub).length, 0);
-  const examsPassed = (p) => Object.values(p.examBy).filter((v) => v >= 80).length;
+  // Head-start subjects (extra: true) don't count towards unlocks, so prices and gates stay where Marc set them.
+  const gateSubjects = () => Object.values(PK().subjects).filter((sub) => !sub.extra);
+  const sectionsCleared = (p) => gateSubjects().reduce((n, sub) => n + clearedCount(p, sub), 0);
+  const sectionsTotal = () => gateSubjects().reduce((n, sub) => n + racing(sub).length, 0);
+  const examsPassed = (p) => Object.entries(p.examBy).filter(([k, v]) => v >= 80 && !(PK().subjects[k] || {}).extra).length;
   // What still stands in the way, apart from the points. Fewer subjects means fewer main events to pass.
   function stillNeeds(p, item) {
     if (item.rank && rankOf(p.earned) < item.rank) return `Reach ${RANKS[item.rank - 1][0]}`;
     const sections = item.cleared ? Math.ceil(item.cleared * sectionsTotal()) : 0;
     if (sections && sectionsCleared(p) < sections) return `Clear ${sections} sections (${sectionsCleared(p)} so far)`;
-    const exams = item.exams ? Math.min(item.exams, Object.keys(PK().subjects).length) : 0;
+    const exams = item.exams ? Math.min(item.exams, gateSubjects().length) : 0;
     if (exams && examsPassed(p) < exams) return `Score 80% in ${exams} main events (${examsPassed(p)} so far)`;
     return '';
   }
