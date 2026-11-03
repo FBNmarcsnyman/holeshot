@@ -8384,6 +8384,69 @@ Jordy's Science test, Tuesday 10 November: Planet Earth and Beyond. Written from
   });
 })(typeof window !== 'undefined' ? window : globalThis);
 
+/* Social Sciences, food and farming: more questions for the written list, so the main event has new ones to ask.
+   They ask him to use the ideas: sort a farm, put the steps in order, find the odd one out.
+   Original questions on the same content as the book. See ADDING-QUESTIONS.md. */
+(function (root) {
+  'use strict';
+  const RS = root.RS;
+
+  RS.addQuestions('kash', '2026-11-03-kash-farming', {
+    ss_farm: [
+      // ---------- Food collecting and early farming ----------
+      { q: `Long ago, a group of people picked wild berries, dug up roots and hunted buck. What were they?`, a: `Foragers, or food collectors`, w: [`Crop farmers`, `Stock farmers`, `Dairy farmers`], why: `They took their food from the wild instead of growing it or keeping animals. That makes them foragers.`, not: `Farmers grow crops or keep animals. These people only took what they found in nature.` },
+      { q: `Which of these is NOT collecting food from the wild?`, a: `Planting maize seeds in rows`, w: [`Picking wild berries`, `Catching fish in a river`, `Digging up wild roots`], why: `Planting seeds is farming. Foragers only collected what already grew or lived in nature.` },
+      { q: `Why could early farmers stay in one place, while foragers often moved on?`, a: `Their crops and animals were right there`, w: [`They bought their food at a shop`, `They didn't need to eat very much`, `Wild food never ran out for them`], why: `Foragers moved on when the wild food ran out. Farmers grew crops and kept animals where they lived, so they could settle.` },
+      { tf: false, q: `True or false: foragers planted crops in fields and kept herds of cattle.`, why: `Planting crops and keeping cattle is farming. Foragers collected their food from the wild.` },
+
+      // ---------- Crop farms and stock farms ----------
+      { q: `What is a crop farm?`, a: `A farm that grows plants, such as maize or fruit`, w: [`A farm that keeps cattle and sheep`, `A shop that sells fruit and vegetables`, `A factory that packs mealie meal`], why: `Crops are plants that farmers grow, such as maize, wheat, sugar cane and fruit.` },
+      { q: `Which one does NOT belong: maize, wheat, sugar cane or goats?`, a: `Goats`, w: [`Maize`, `Wheat`, `Sugar cane`], why: `Maize, wheat and sugar cane are crops. Goats are animals, so they belong on a stock farm.` },
+      { q: `Your riding boots are made of leather. Which kind of farm did the leather come from?`, a: `A stock farm`, w: [`A crop farm`, `A fruit farm`, `A sugar cane farm`], why: `Leather is made from animal skins, mostly from cattle, so it comes from a farm that keeps animals.`, nope: { 'A crop farm': `Crop farms grow plants. Leather comes from an animal's skin.` } },
+      { tf: true, q: `True or false: a dairy farm is a kind of stock farm.`, why: `A dairy farm keeps cows, and any farm that keeps animals is a stock farm.`, not: `Cows are animals, and a farm that keeps animals is a stock farm.` },
+      { q: `Maize, wheat and sugar cane are plants that farmers grow. They are called ___.`, strict: true, t: [`crops`, `crop`], why: `A farm that grows crops is a crop farm.`, h: `It starts with "c" and has five letters.` },
+      { q: `Sheep give us meat, and their ___ is spun into yarn for jerseys and blankets.`, strict: true, t: [`wool`], why: `Farmers cut the wool off the sheep, and it grows back again.`, h: `It's the thick, curly coat on a sheep's back.` },
+
+      // ---------- Subsistence farms and big farms ----------
+      { q: `A family grows maize and keeps a few goats, all to feed themselves. What kind of farm is it?`, a: `A subsistence farm`, w: [`A big farm that sells its food`, `A sugar cane farm`, `A poultry farm`], why: `The food is for the family, not for selling. That makes it a subsistence farm.` },
+      { q: `A Limpopo farm grows mangoes and sends them to shops all over the country. Which describes it?`, a: `A crop farm that sells its food`, w: [`A stock farm that sells its food`, `A crop farm that feeds the family`, `A stock farm that feeds the family`], why: `Mangoes are a crop, and this farm sells them. A big farm sells what it grows.`, nope: { 'A crop farm that feeds the family': `Mangoes are a crop, but this farm sends them to shops, so it is selling them.`, 'A stock farm that sells its food': `It does sell its food, but mangoes grow on trees. A stock farm keeps animals.` } },
+      { q: `Which tool is a subsistence farmer most likely to use?`, a: `A hoe`, w: [`A combine harvester`, `A milking machine`, `A crop-spraying aeroplane`], why: `Subsistence farms are small, so the family works by hand with simple tools such as hoes and spades. Big farms use big machines.` },
+      { q: `What is another name for a big farm that grows food to sell?`, a: `A commercial farm`, w: [`A subsistence farm`, `A family vegetable patch`, `A dairy factory`], why: `"Commercial" has to do with buying and selling. A commercial farm is run as a business.` },
+
+      // ---------- A dairy farm: from the cow to the shop ----------
+      { q: `Which list follows milk from the cow to your fridge?`, a: `Milking, factory, shop, home`, w: [`Factory, milking, shop, home`, `Milking, shop, factory, home`, `Shop, milking, factory, home`], why: `The cows are milked, the factory packs the milk, the shop sells it, and then you take it home.`, not: `The milk has to come out of the cow first, and it has to be packed before a shop can sell it.` },
+      { q: `A truck has just brought milk from the farm to the factory. What happens to it there?`, a: `It is heated to kill germs, then packed`, w: [`It is sent back to the farm`, `It is fed to the calves`, `It is sold straight to shoppers`], why: `Heating the milk kills germs, so it is safe to drink. Then it goes into bottles and cartons for the shops.`, nope: { 'It is sold straight to shoppers': `Shoppers get it later. First the factory makes the milk safe and packs it.` } },
+      { q: `Why is fresh milk kept cold on its way to the factory?`, a: `So that it doesn't go sour`, w: [`So that the cows give more milk`, `So that it turns into cheese`, `So that it's lighter to carry`], why: `Warm milk goes sour quickly. Keeping it cold keeps it fresh and safe.` },
+      { q: `A truck takes the milk from the dairy farm to the ___, where it is packed into bottles.`, t: [`factory`, `milk factory`, `dairy factory`, `dairy`], why: `The factory packs the milk. Then trucks take it to the shops.`, h: `It's a big building where workers and machines make or pack things.` },
+
+      // ---------- Processed and unprocessed food ----------
+      { q: `What does it mean when food is processed?`, a: `It has been changed, often in a factory`, w: [`It was eaten straight off the farm`, `It has gone bad and must be thrown out`, `It was grown without any rain`], why: `Cooking, drying, freezing, tinning, salting and making jam all change food. Food that has been changed like this is processed.` },
+      { q: `Which one does NOT belong: jam, tinned peaches, dried apricots or a fresh peach?`, a: `A fresh peach`, w: [`Jam`, `Tinned peaches`, `Dried apricots`], why: `The fresh peach is just as it came off the tree. The other three have been changed, so they are processed.` },
+      { q: `Why do factories dry, freeze or tin fruit and vegetables?`, a: `So that the food lasts longer`, w: [`So that the plants grow faster`, `So that the farm needs less rain`, `So that it looks just like fresh food`], why: `Fresh food goes off quickly. Dried, frozen or tinned food can be kept for much longer.` },
+      { q: `Which list shows wheat on its way to becoming bread?`, a: `Wheat field, mill, bakery, shop`, w: [`Mill, wheat field, bakery, shop`, `Wheat field, bakery, mill, shop`, `Bakery, mill, wheat field, shop`], why: `The wheat is harvested, the mill grinds it into flour, the bakery bakes the bread, and the shop sells it.`, h: `Bread is made from flour. Where does the flour come from?` },
+      { q: `Your snack at the enduro is biltong. Is it processed or unprocessed?`, a: `Processed: the meat was salted and dried`, w: [`Unprocessed: it's just meat`, `Unprocessed: it comes from a farm`, `Neither: it's only a snack`], why: `Biltong is raw meat that has been spiced, salted and dried. Changing food like that is processing.`, not: `Biltong starts as raw meat, but it has been changed a lot before you eat it.` },
+      { tf: true, q: `True or false: frozen peas are a processed food.`, why: `The peas were washed, heated quickly, frozen and packed in a factory. Freezing keeps them for months.` },
+
+      // ---------- Which crops grow where, and why ----------
+      { q: `A farmer wants to grow bananas. Which kind of place suits them best?`, a: `Hot, with plenty of rain`, w: [`Cold, with frost most nights`, `Dry, with almost no rain`, `High up, with snow in winter`], why: `Bananas are tropical fruit. In South Africa they grow in hot, wet parts of Limpopo, Mpumalanga and KwaZulu-Natal.` },
+      { q: `Which crop grows in huge fields in the Free State and North West?`, a: `Maize`, w: [`Bananas`, `Pineapples`, `Mangoes`], why: `The Free State and North West grow a lot of maize. Mills grind it into mealie meal for pap.`, nope: { 'Bananas': `Bananas need hot, wet weather all year. The Free State gets frost in winter.` } },
+      { q: `On an enduro ride through the dry Karoo, you pass lots of sheep but hardly any crop fields. Why?`, a: `It's too dry for most crops, but sheep can graze`, w: [`It rains too much there for crops`, `Sheep need very wet land to live`, `It's too cold for sheep anywhere else`], why: `The Karoo gets little rain. Most crops need more water, but sheep can live on the small bushes and grass.` },
+      { q: `On an enduro trail in the Western Cape, you pass farm after farm of fruit. Which fruit are you most likely to see?`, a: `Grapes`, w: [`Bananas`, `Mangoes`, `Pawpaws`], why: `Grapes like the Western Cape's cold, wet winters and warm, dry summers. Bananas, mangoes and pawpaws need hot weather with no frost.` },
+      { q: `What does a crop need from the place where it's planted?`, a: `Good soil, enough water and the right warmth`, w: [`Snow lying on it all year round`, `Strong wind blowing on it all day`, `No water at all for months`], why: `That's why farmers think about the climate, the rain and the soil before they choose a crop.` },
+      { tf: false, q: `True or false: the same crops grow well in every part of South Africa.`, why: `Each part has its own climate, rain and soil, so different crops grow well in different places.` },
+      { q: `Oudtshoorn in the Western Cape is famous for farms of big birds that can't fly. What are they?`, t: [`ostriches`, `ostrich`], why: `Oudtshoorn is called the ostrich capital of the world. Ostriches are farmed for their meat, eggs, feathers and leather.`, h: `They are the biggest birds in the world.` },
+
+      // ---------- Freshwater for farms ----------
+      { q: `Why do many farmers build dams on their farms?`, a: `To store water for the dry months`, w: [`To keep the rain from falling`, `To make the river water salty`, `To keep the cows away from the grass`], why: `A dam holds rain and river water, so there's water for crops and animals when it's dry.` },
+      { tf: false, q: `True or false: a farmer can water her crops with seawater.`, why: `Seawater is salty, and salt harms most crops. Farmers use freshwater from rain, rivers, dams and boreholes.` },
+      { q: `Pumping water from a river or dam to water crops in the fields is called ___.`, t: [`irrigation`, `irrigating`, `irrigate`], why: `Irrigation lets farmers grow crops even where there isn't enough rain.`, h: `It starts with "irr".` },
+
+      // ---------- Who works on farms ----------
+      { q: `Who does most of the work on a big farm?`, a: `Farm workers, who are paid for it`, w: [`Only the owner's young children`, `Shoppers from the supermarket`, `People who visit for the day`], why: `A big farm needs many hands. The owner pays farm workers, and machines help too.` },
+    ],
+  });
+})(typeof window !== 'undefined' ? window : globalThis);
+
 /* November 2026: rule cards, Track walks and wrong-answer tips for Jordy's nine Afrikaans racing sections,
    following the book's rules as the questions in bank-afrikaans.js state them. */
 (function (root) {
@@ -14029,7 +14092,7 @@ ${t && H > W && W < 600 ? '<li>Tip: turn your phone sideways for a bigger view.<
   // ---------- staying up to date ----------
   // An open tab or a home screen app keeps running the page it first loaded, old prices and all. So it asks which version
   // is live when it comes back into view and every few minutes, and swaps over between races. build.mjs fills in BUILD.
-  const BUILD = '597f562b60';
+  const BUILD = '9ac47b0d16';
   const BACK_KEY = 'holeshot.back.v1';
   const TRIED_KEY = 'holeshot.tried.v1';
   let liveBuild = null;
@@ -14701,6 +14764,7 @@ ${t && H > W && W < 600 ? '<li>Tip: turn your phone sideways for a bigger view.<
       ${guideCard(p)}
       ${examCard(pack)}
       ${planCard(p, pack)}
+      ${knownCard(p, sub)}
       <div class="home-grid">
         <section class="hero" aria-label="Today's moto">
           <div class="hero-photo mine">${rig(p, `${pack.name} on his ${BIKES[p.bike] ? BIKES[p.bike].label : 'Mini MX'} bike`)}<span class="chip on-photo ${doneToday ? '' : 'lime'}">${doneToday ? 'Done today' : 'Ready'}</span></div>
@@ -14709,7 +14773,7 @@ ${t && H > W && W < 600 ? '<li>Tip: turn your phone sideways for a bigger view.<
             <div class="trio">
               <div><b class="num">10</b><small>questions</small></div>
               <div><b class="num">6</b><small>minutes or so</small></div>
-              <div><b class="num">100+</b><small>points to win</small></div>
+              <div><b class="num">${{ 1: '100+', 0.5: '50+', 0: '0' }[payFor(p, sub, 'daily')]}</b><small>points to win</small></div>
             </div>
             <div class="strip">
               <div><b>Start</b><small class="num">${cleared} cleared</small></div>
@@ -15083,6 +15147,7 @@ ${t && H > W && W < 600 ? '<li>Tip: turn your phone sideways for a bigger view.<
           </div>
           <div class="stop-row"><div class="meter" style="flex:1" role="img" aria-label="${m} percent"><i style="width:${m}%"></i></div><span class="small-t num muted">${m}%</span>${stars(tp.stars || 0, 14)}</div>
           ${heldTopic(p, t) ? `<div><span class="chip good">${ic('check', 12)} Still remembered</span></div>` : seenTopic(p, t) && dueTopic(p, t) ? '<div><span class="chip warn">Due back: ride the comeback lap</span></div>' : ''}
+          ${starsOf(p, t.id) >= 3 ? `<div class="small-t muted">${payFor(p, sub, 'topic', t.id) ? 'You know this one: it pays half points once today.' : 'Paid today. It pays half again tomorrow.'}</div>` : ''}
           ${lists.length ? `<div class="small-t muted num">${fresh ? `${fresh} new question${fresh === 1 ? '' : 's'} to go` : 'All asked once. They come round again now.'}</div>` : ''}
           ${t.walk ? `<button class="btn small full walk-go" data-act="walk" data-id="${t.id}">${ic('route', 16)} Track walk: learn it first</button>` : ''}
           ${teachable(t) ? `<button class="btn small full walk-go" data-act="teach" data-id="${t.id}">${ic('spark', 16, true)} Maths lesson: see one done, then try</button>` : ''}
@@ -15098,6 +15163,7 @@ ${t && H > W && W < 600 ? '<li>Tip: turn your phone sideways for a bigger view.<
         <p class="small-t muted" style="margin-bottom:10px">${sub.scope}. ${sub.note}. Ride the sections in any order. A section is cleared when its bar is full at 100%.</p>
         ${list}
       </section>
+      ${knownCard(p, sub)}
       <div class="stops">
         ${stops.join('')}
         <article class="stop final mixed">
@@ -15759,14 +15825,57 @@ ${t && H > W && W < 600 ? '<li>Tip: turn your phone sideways for a bigger view.<
     return m < 0.45 ? 1 : m < 0.8 ? 2 : 3;
   };
 
+  // Points for what he already knows (Marc, 3 November 2026, after a known section was ridden six times in one
+  // evening). A section with 3 stars pays half on its first ride each day and nothing more that day. When every section
+  // of a subject has 3 stars, its moto, mixed lap and main event go the same way, so the points are in subjects that
+  // still need work until the day turns over. Comeback laps, fix-it laps, the hot lap, walks and lessons pay as before.
+  const starsOf = (p, id) => (p.topics[id] || {}).stars || 0;
+  const subjectKnown = (p, sub) => racing(sub).length > 0 && racing(sub).every((t) => starsOf(p, t.id) >= 3);
+  const payKey = (mode, topicId) => (mode === 'topic' ? topicId : `${ui.subject}:${mode}`);
+  function payFor(p, sub, mode, topicId) {
+    const known = mode === 'topic' ? starsOf(p, topicId) >= 3 : ['daily', 'mixed', 'exam'].includes(mode) && subjectKnown(p, sub);
+    if (!known) return 1;
+    return (p.knownPaid || {})[payKey(mode, topicId)] === dayKey() ? 0 : 0.5;
+  }
+  // Where full points are: the weakest section without 3 stars, in this subject first, then subjects with a test
+  // coming (soonest first), then the rest, with head-start subjects last.
+  function pointsAt(p) {
+    const pack = PK();
+    const soon = (id) => Math.min(999, ...(pack.exams || []).filter((e) => e.subject === id && daysUntil(e.date) >= 0).map((e) => daysUntil(e.date)));
+    const rank = (id) => [id === ui.subject ? 0 : 1, pack.subjects[id].extra ? 1 : 0, soon(id)];
+    const ids = Object.keys(pack.subjects).sort((a, b) => {
+      const [x, y] = [rank(a), rank(b)];
+      return x[0] - y[0] || x[1] - y[1] || x[2] - y[2];
+    });
+    for (const id of ids) {
+      const open = racing(pack.subjects[id]).filter((t) => starsOf(p, t.id) < 3);
+      if (open.length) return { id, sub: pack.subjects[id], t: open.sort((a, b) => mastery(p, a) - mastery(p, b))[0] };
+    }
+    return null;
+  }
+  const pointsBtn = (w, cls = 'btn primary full') => `<button class="${cls}" data-act="start" data-mode="topic" data-topic="${w.t.id}" data-subject="${w.id}">${w.id === ui.subject ? '' : `${h(w.sub.label)}: `}${h(w.t.title)} ${ic('arrow')}</button>`;
+  // Once every section of a subject has 3 stars: where the points are now, and a way to ask for the next topics.
+  function knownCard(p, sub) {
+    if (!subjectKnown(p, sub)) return '';
+    const where = pointsAt(p);
+    const asked = (p.asks || {})[ui.subject];
+    const recent = asked && gapDays(asked) <= 7;
+    return `<section class="card known-card"><div class="eyebrow">${h(sub.label)}</div><div class="h-sec" style="margin-bottom:4px">Every section has 3 stars</div>
+      <p class="small-t">You know ${h(sub.label)}, so each race here pays half once a day, then nothing until tomorrow. ${where ? `Full points are waiting in <b>${where.id === ui.subject ? '' : `${h(where.sub.label)}: `}${h(where.t.title)}</b>.` : 'Every section in every subject has 3 stars.'} ${recent ? `You asked for new ${h(sub.label)} work on ${shortDay(asked)}.` : 'Done it all? Ask Mom or Dad for the next topics.'}</p>
+      <div class="rows">${where ? pointsBtn(where) : ''}${recent ? '' : `<button class="btn full" data-act="ask-new">Ask for new ${h(sub.label)} work</button>`}</div></section>`;
+  }
+
   function startRun(mode, topicId) {
     const sub = SUB();
     // An old screen can still offer a lap after the list has emptied.
     if (mode === 'fix' && !fixList(P(), sub).length) mode = 'daily';
     if (mode === 'review' && !dueList(P(), sub).length) mode = 'daily';
+    // The half-pay ride of the day is used up as the race starts, so stopping part way can't buy another.
+    const pay = payFor(P(), sub, mode, topicId);
+    if (pay === 0.5) (P().knownPaid = P().knownPaid || {})[payKey(mode, topicId)] = dayKey();
     const n = mode === 'exam' ? sub.examSize : mode === 'review' ? Math.min(10, dueList(P(), sub).length) : mode === 'mixed' ? Math.min(10, racing(sub).length) : 10;
     ui.result = null;
-    ui.run = { id: uuid(), mode, topicId, queue: buildQueue(P(), sub, mode, topicId, n).map((slot) => (typeof slot === 'string' ? { skill: slot } : slot)), i: 0, total: n, q: null, typed: '', tries: 0, combo: 0, bestCombo: 0, pts: 0, score: 0, right: 0, log: [], extras: 0, asked: new Set(), sheet: null, heard: '', listening: false, started: Date.now(), halfPay: mode === 'topic' && ((P().topics[topicId] || {}).stars || 0) >= 3, fixed: [], fixNote: '', firstGiven: null, qStart: Date.now(), penalty: 0, gate: true, trace: [], before: Object.fromEntries(sub.topics.map((t) => [t.id, mastery(P(), t)])) };
+    ui.run = { id: uuid(), mode, topicId, queue: buildQueue(P(), sub, mode, topicId, n).map((slot) => (typeof slot === 'string' ? { skill: slot } : slot)), i: 0, total: n, q: null, typed: '', tries: 0, combo: 0, bestCombo: 0, pts: 0, score: 0, right: 0, log: [], extras: 0, asked: new Set(), sheet: null, heard: '', listening: false, started: Date.now(), pay, fixed: [], fixNote: '', firstGiven: null, qStart: Date.now(), penalty: 0, gate: true, trace: [], before: Object.fromEntries(sub.topics.map((t) => [t.id, mastery(P(), t)])) };
     audio();
     nextQuestion();
     if (mode === 'lap') {
@@ -15912,8 +16021,9 @@ ${t && H > W && W < 600 ? '<li>Tip: turn your phone sideways for a bigger view.<
   }
   function award(amount) {
     const p = P();
-    // A section with 3 stars already pays half, so nobody grinds what they know.
-    const n = ui.run.halfPay ? Math.ceil(amount / 2) : amount;
+    // What he already knows pays half or nothing (payFor). A race saved before that rule carries halfPay instead.
+    const rate = 'pay' in ui.run ? ui.run.pay : ui.run.halfPay ? 0.5 : 1;
+    const n = Math.ceil(amount * rate);
     p.points += n;
     p.earned += n;
     dayLog(p).pts += n;
@@ -16071,7 +16181,7 @@ ${t && H > W && W < 600 ? '<li>Tip: turn your phone sideways for a bigger view.<
     const oldGhost = p.ghost[gk];
     if (r.mode !== 'lap' && (!oldGhost || r.pts > oldGhost.pts)) p.ghost[gk] = { pts: r.pts, trace: [...r.trace.slice(0, r.i), r.pts] };
     p.runs = p.runs.slice(0, 30);
-    const x = { lap, label, pct, stars: earnedStars, pts: r.pts, bonus, bestCombo: r.bestCombo, right: r.right, total: r.total, second: r.log.filter((l) => l.ok && !l.firstTry && !l.bonus).length, mode: r.mode, topicId: r.topicId, missed: r.log.filter((l) => !l.ok), newBadges: [], streak: p.streak, halfPay: r.halfPay, newRank: rankNow > rankBefore ? RANKS[rankNow - 1][0] : '', fixed: new Set(r.fixed.filter((id) => !p.fix[id])).size, fixLeft: fixList(p, sub).length, stuck: stuckList(p, sub).length, held: r.log.filter((l) => l.ok && l.firstTry && !l.bonus).length, dueLeft: dueList(p, sub).length, mins: Math.round(dayLog(p).secs / 60), firstClears, moved, beatGhost: !!oldGhost && r.mode !== 'lap' && r.pts > oldGhost.pts };
+    const x = { lap, label, pct, stars: earnedStars, pts: r.pts, bonus, bestCombo: r.bestCombo, right: r.right, total: r.total, second: r.log.filter((l) => l.ok && !l.firstTry && !l.bonus).length, mode: r.mode, topicId: r.topicId, missed: r.log.filter((l) => !l.ok), newBadges: [], streak: p.streak, pay: 'pay' in r ? r.pay : r.halfPay ? 0.5 : 1, newRank: rankNow > rankBefore ? RANKS[rankNow - 1][0] : '', fixed: new Set(r.fixed.filter((id) => !p.fix[id])).size, fixLeft: fixList(p, sub).length, stuck: stuckList(p, sub).length, held: r.log.filter((l) => l.ok && l.firstTry && !l.bonus).length, dueLeft: dueList(p, sub).length, mins: Math.round(dayLog(p).secs / 60), firstClears, moved, beatGhost: !!oldGhost && r.mode !== 'lap' && r.pts > oldGhost.pts };
     for (const b of BADGES) {
       if (!p.badges.includes(b.id) && b.test(p, x, sub)) {
         p.badges.push(b.id);
@@ -16265,10 +16375,10 @@ ${t && H > W && W < 600 ? '<li>Tip: turn your phone sideways for a bigger view.<
       return `<div class="sheet" role="dialog" aria-label="Pull off the track?"><div class="sheet-head"><h2>Pull off the track?</h2></div><p class="muted">You keep the ${r.pts} points from this moto, but it won't count towards your streak${r.mode === 'lap' ? ' and your time goes in the bin' : ''}.</p><button class="btn primary full" data-act="unquit" data-primary>Keep riding</button><button class="btn full" data-act="quit-yes">Pull off</button></div>`;
     }
     if (s.type === 'marked') {
-      return `<div class="sheet good" role="status"><div class="sheet-head"><h2>Correct</h2><span class="pts num">+${s.pts}</span></div>${lineHTML(s)}<button class="btn primary full" data-act="next" data-primary>Next ${ic('arrow')}</button></div>`;
+      return `<div class="sheet good" role="status"><div class="sheet-head"><h2>Correct</h2>${s.pts ? `<span class="pts num">+${s.pts}</span>` : ''}</div>${lineHTML(s)}<button class="btn primary full" data-act="next" data-primary>Next ${ic('arrow')}</button></div>`;
     }
     if (s.type === 'right') {
-      return `<div class="sheet good" role="status"><div class="sheet-head"><h2>${s.title}</h2><span class="pts num">+${s.pts}</span></div>
+      return `<div class="sheet good" role="status"><div class="sheet-head"><h2>${s.title}</h2>${s.pts ? `<span class="pts num">+${s.pts}</span>` : ''}</div>
         ${lineHTML(s)}
         ${s.holeshot ? '<p class="small-t">First into the first corner: +10 bonus.</p>' : ''}
         ${s.mult > 1 ? `<p><span class="combo pop">${ic('bolt', 12, true)} ×${s.mult} full gas</span> ${r.combo} in a row</p>` : ''}
@@ -16386,6 +16496,7 @@ ${t && H > W && W < 600 ? '<li>Tip: turn your phone sideways for a bigger view.<
     const lap = x.lap;
     const title = !lap ? place : lap.record ? 'New lap record!' : lap.first ? 'First lap on the board' : lap.counts ? 'Lap done' : "Time didn't count";
     const again = `data-act="start" data-mode="${x.mode}" ${x.topicId ? `data-topic="${x.topicId}"` : ''}`;
+    const where = x.pay < 1 ? pointsAt(P()) : null;
     return `<div class="wrap" style="padding-bottom:32px;padding-left:max(16px,env(safe-area-inset-left,0px));max-width:720px">
       <section class="card result-head">
         <div class="result-photo mine">${rig(P(), '')}</div>
@@ -16409,14 +16520,17 @@ ${t && H > W && W < 600 ? '<li>Tip: turn your phone sideways for a bigger view.<
       ${x.second ? `<p class="small-t muted" style="padding-inline:4px">A right answer on the second try counts for half, so ${x.second} on the second try ${x.second === 1 ? 'brings' : 'bring'} the score to ${x.pct}%.</p>` : ''}
       ${lap && !lap.counts ? `<p class="small-t muted" style="padding-inline:4px">Get at least ${LAP_KEEP} right for your time to count.</p>` : ''}
       ${x.newRank ? `<section class="card"><div class="eyebrow">New rank</div><div class="h-sec" style="font-size:24px">${x.newRank}</div><p class="small-t muted">New gear is open in the pits.</p></section>` : ''}
-      ${x.halfPay ? '<p class="small-t muted" style="padding-inline:4px">You already have 3 stars here, so this section paid half points. A section that needs work pays in full.</p>' : ''}
+      ${x.pay < 1 ? (() => {
+        const what = x.mode === 'topic' ? 'this section (3 stars)' : `${h(SUB().label)} (every section has 3 stars)`;
+        return `<section class="card"><div class="h-sec" style="margin-bottom:4px">${x.pay ? 'Half points' : 'No points this time'}</div><p class="small-t">You already know ${what}, so ${x.pay ? 'it paid half. Ride it again today and it pays nothing.' : "you've had today's points from it. It pays half again tomorrow."} ${where ? 'Full points are waiting where you still have work to do:' : 'Every section in every subject has 3 stars. Ask Mom or Dad for new work.'}</p>${where ? `<div class="rows">${pointsBtn(where)}</div>` : ''}</section>`;
+      })() : ''}
       ${x.newBadges.length ? `<section class="card"><div class="h-sec" style="margin-bottom:8px">New badge${x.newBadges.length > 1 ? 's' : ''}</div><div class="badges">${x.newBadges.map((b) => `<div class="badge got"><b>${b.label}</b><small>${b.desc}</small></div>`).join('')}</div></section>` : ''}
       ${learnCard(x)}
       ${x.missed.length ? `<section class="card"><div class="h-sec" style="margin-bottom:8px">Look at these again</div><div class="log">${x.missed.map((m) => `<div class="log-item"><div>${h(m.q)}</div><div class="small-t" style="margin-top:2px"><b>Answer:</b> ${h(m.correct)}${m.given ? ` <span class="muted">(you said ${h(String(m.given))})</span>` : ''}</div><details><summary>Show the working</summary><ol>${m.steps.map((s) => `<li>${h(s)}</li>`).join('')}</ol></details></div>`).join('')}</div></section>` : ''}
       ${x.mode === 'fix' || x.fixLeft ? `<section class="card"><div class="h-sec" style="margin-bottom:6px">Fix list</div><p class="small-t">${x.fixed ? `${x.fixed} cleared. ` : ''}${x.fixLeft ? `${x.fixLeft} still to fix. Get each one right ${FIX_NEED} times in a row, then once more on another day.` : 'All clear for today. Anything waiting for another day comes back tomorrow.'}${x.stuck ? ` ${x.stuck} ${x.stuck === 1 ? 'is' : 'are'} resting for 2 days: try the Track walk or ask for help.` : ''}</p></section>` : ''}
       ${x.fixLeft ? `<button class="btn primary full" data-act="start" data-mode="fix">${x.mode === 'fix' ? 'Next fix-it lap' : 'Re-test what you missed'} ${ic('arrow')}</button>` : ''}
       ${x.mode === 'review' && x.dueLeft ? `<button class="btn primary full" data-act="start" data-mode="review">Next comeback lap ${ic('arrow')}</button>` : ''}
-      ${x.mode === 'fix' || x.mode === 'review' ? '' : `<button class="btn ${x.fixLeft ? '' : 'primary'} full" ${again}>Go again ${ic('arrow')}</button>`}
+      ${x.mode === 'fix' || x.mode === 'review' ? '' : `<button class="btn ${x.fixLeft || (x.pay < 1 && where) ? '' : 'primary'} full" ${again}>Go again ${ic('arrow')}</button>`}
       <button class="btn full" data-act="home">Back to the pits</button>
     </div>`;
   }
@@ -16918,6 +17032,12 @@ ${t && H > W && W < 600 ? '<li>Tip: turn your phone sideways for a bigger view.<
       inShort.push(`Next test: ${next.label}, ${whenText(daysUntil(next.date)).toLowerCase()}. ${readiness(b)[0]}${b.weakest.length ? `, and the section to practise most is ${b.weakest[0].t.title}` : ''}.`);
     }
     if (prog.fix) inShort.push(`${prog.fix} ${prog.fix === 1 ? 'kind of question is' : 'kinds of question are'} on the fix list, so a Fix-it lap is a good next ride.`);
+    // Easy rides: section races on a section he had already scored 90% or more in, worked out by the report.
+    const easy = d.easy || {};
+    if (easy.races) inShort.push(`${easy.races} of ${easy.of} section races were on sections he already knew (3 stars)${easy.top && easy.top.length ? `, mostly ${easy.top.map((x) => `${x.label} (${x.n})`).join(', ')}` : ''}, for ${RS.fmt(easy.pts)} points. A known section now pays half once a day, then nothing.`);
+    for (const [id, day] of Object.entries(prog.asks || {})) {
+      if (gapDays(day) <= 14) inShort.push(`On ${shortDay(day)} ${pack.name} asked for new ${subName(id)} work, because every section there has 3 stars. Send a photo of his next topic list or a test notice, and new sections get added.`);
+    }
     const shown = (n) => String(n).replace('.', ',');
     const pctOf = (m) => shareOf(Number(m.mark), Number(m.out_of));
     const subjectsMarked = [...new Set([...marks.map((m) => m.subject), ...exams.map((e) => e.subject)])];
@@ -17536,6 +17656,17 @@ ${t && H > W && W < 600 ? '<li>Tip: turn your phone sideways for a bigger view.<
       case 'walk-check':
         startWalkCheck(id);
         break;
+      case 'ask-new': {
+        // Shows on the parents' page, so a photo of the next topic list can become new sections.
+        const p = P();
+        p.asks = p.asks || {};
+        p.asks[ui.subject] = dayKey();
+        save();
+        syncSoon();
+        toast('Asked. Mom or Dad will see it on their page.');
+        render();
+        break;
+      }
       case 'walk-off':
         ui.walk = null;
         render();
