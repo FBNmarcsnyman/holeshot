@@ -573,6 +573,19 @@ details ol { margin: 6px 0 0; padding-left: 20px; }
 .side-tile.locked { opacity: .7; }
 .side-host { position: fixed; inset: 0; z-index: 30; background: #0F1116; touch-action: none; overscroll-behavior: none; }
 
+/* The maths lesson */
+.teach-work { background: var(--card-2); border-radius: 16px; padding: 10px 14px; display: grid; gap: 6px; }
+.teach-work .steps { font-size: 17px; gap: 5px; }
+.gap { display: inline-block; min-width: 2.4em; text-align: center; border: 2px dashed var(--accent); border-radius: 8px; padding: 0 6px; font-weight: 800; color: var(--accent); }
+.teach-done { flex: none; gap: 12px; }
+.teach-done .rows { display: grid; gap: 8px; }
+.teach-opts { list-style: none; margin: 0; padding: 0; display: grid; gap: 6px; }
+.teach-opts li { display: flex; gap: 10px; align-items: center; padding: 8px 12px; border-radius: 14px; background: var(--card-2); font-size: 17px; }
+.teach-opts li.right { box-shadow: inset 0 0 0 3px var(--good); }
+.teach-opts .opt-l { background: var(--card); }
+.teach-head { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+.teach-answer { font-size: 17px; }
+
 </style>
 <div id="app"></div>
 <div id="toast" class="toast" role="status" aria-live="polite" hidden></div>
@@ -879,6 +892,56 @@ details ol { margin: 6px 0 0; padding-left: 20px; }
     return -1;
   }
 
+  // ---------- the maths lesson: working with a gap ----------
+  // A lesson hands the working over a step at a time, so it has to know which step first gives the answer away.
+  // A step that also lists the other choices doesn't count, and nor does the answer as one item in a list of factors
+  // or multiples, because finding it in the list is the job. A comma only joins a number when a digit follows it.
+  const escRe = (s) => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  const findRe = new Map();
+  const findIn = (key, all) => {
+    const id = `${all ? 'g' : ''}|${key}`;
+    if (!findRe.has(id)) findRe.set(id, new RegExp(`(?<![\\p{L}\\p{N}])(?<!\\d,)${escRe(key)}(?![\\p{L}\\p{N}])(?!,\\d)`, all ? 'giu' : 'iu'));
+    const re = findRe.get(id);
+    re.lastIndex = 0;
+    return re;
+  };
+  const inList = (text, at, len) => /;\s*$/.test(text.slice(0, at)) || /^\s*;/.test(text.slice(at + len));
+  function answerKeys(q) {
+    const c = String(q.correct).replace(/\*\*/g, '').trim().replace(/\.$/, '');
+    const keys = [c, plain(c)];
+    if (q.kind !== 'mc' && typeof q.answer === 'number') keys.push(fmt(q.answer), String(q.answer));
+    return [...new Set(keys.filter(Boolean))].sort((a, b) => b.length - a.length);
+  }
+  function answerAt(q) {
+    const keys = answerKeys(q);
+    const others = q.kind === 'mc' ? q.options.filter((_, i) => i !== q.answer).map((o) => String(o).replace(/\*\*/g, '').trim()).filter(Boolean) : [];
+    for (let i = 0; i < q.steps.length; i++) {
+      const text = String(q.steps[i]);
+      if (others.some((o) => findIn(o).test(text))) continue;
+      for (const k of keys) {
+        for (const m of text.matchAll(findIn(k, true))) if (!inList(text, m.index, k.length)) return { i };
+      }
+    }
+    return null;
+  }
+  // Level 1 shows the working up to the answer and leaves the answer as a gap. Level 2 stops a step sooner.
+  // null means there's nothing left to show at that level, so the next question is his to do whole.
+  const GAP = '';
+  function fadeWork(q, level) {
+    const at = answerAt(q);
+    if (!at) {
+      const shown = q.steps.slice(0, q.steps.length - level);
+      return shown.length ? { shown, gap: null } : null;
+    }
+    const shown = q.steps.slice(0, at.i);
+    if (level >= 2) return shown.length ? { shown, gap: null } : null;
+    let gap = String(q.steps[at.i]);
+    for (const k of answerKeys(q)) gap = gap.replace(findIn(k, true), GAP);
+    // A gap with nothing round it teaches nothing.
+    if (!gap.includes(GAP) || !gap.replace(new RegExp(GAP, 'g'), '').replace(/[\s.,:;=]/g, '')) gap = null;
+    return shown.length || gap ? { shown, gap } : null;
+  }
+
   // ---------- reading the question aloud ----------
   const DEN_SINGULAR = { 2: 'half', 3: 'third', 4: 'quarter', 5: 'fifth', 6: 'sixth', 7: 'seventh', 8: 'eighth', 9: 'ninth', 10: 'tenth', 12: 'twelfth', 20: 'twentieth', 100: 'hundredth' };
   function fracWords(n, d) {
@@ -1038,7 +1101,7 @@ details ol { margin: 6px 0 0; padding-left: 20px; }
     return true;
   }
 
-  Object.assign(RS, { DEFAULT_HINT, receiptKey, carryPurchases, squarePurchases, carryPassword, shortHash, itemKey, pickUnseen, unseenCount, bank, addQuestions, addSection, ri, pick, shuffle, gcd, lcm, r2, roundTo, simp, factorsOf, primeFactors, isPrime, distinctDigits, coprimeTop, fmt, money, fr, mixedStr, plain, html, mc, parseValue, check, spoken, matchOption, speakable, wordsToInt, editDistance });
+  Object.assign(RS, { DEFAULT_HINT, GAP, answerAt, fadeWork, receiptKey, carryPurchases, squarePurchases, carryPassword, shortHash, itemKey, pickUnseen, unseenCount, bank, addQuestions, addSection, ri, pick, shuffle, gcd, lcm, r2, roundTo, simp, factorsOf, primeFactors, isPrime, distinctDigits, coprimeTop, fmt, money, fr, mixedStr, plain, html, mc, parseValue, check, spoken, matchOption, speakable, wordsToInt, editDistance });
 })(typeof window !== 'undefined' ? window : globalThis);
 
 /* Jordy: Grade 6 Term 4 maths, NumberSense Workbook 24, pages 1 to 24.
@@ -13929,7 +13992,7 @@ ${t && H > W && W < 600 ? '<li>Tip: turn your phone sideways for a bigger view.<
   // ---------- staying up to date ----------
   // An open tab or a home screen app keeps running the page it first loaded, old prices and all. So it asks which version
   // is live when it comes back into view and every few minutes, and swaps over between races. build.mjs fills in BUILD.
-  const BUILD = '68c563fbd6';
+  const BUILD = 'eaaea6bbce';
   const BACK_KEY = 'holeshot.back.v1';
   const TRIED_KEY = 'holeshot.tried.v1';
   let liveBuild = null;
@@ -14838,7 +14901,7 @@ ${t && H > W && W < 600 ? '<li>Tip: turn your phone sideways for a bigger view.<
     return `<section class="card" aria-label="Get some help">
       <div class="h-sec" style="margin-bottom:4px">Get some help with these</div>
       <p class="small-t muted" style="margin-bottom:10px">They've caught you out a lot, so they're resting for 2 days. Walk the section, or ask Mom or Dad to go through it with you.</p>
-      <div class="rows">${topics.map((t) => (t.walk ? `<button class="btn full" data-act="walk" data-id="${t.id}">${ic('route', 16)} Track walk: ${t.title}</button>` : `<div class="small-t"><b>${t.title}</b></div>${ruleCard(t, true)}`)).join('')}</div>
+      <div class="rows">${topics.map((t) => (t.walk || teachable(t) ? `${t.walk ? `<button class="btn full" data-act="walk" data-id="${t.id}">${ic('route', 16)} Track walk: ${t.title}</button>` : ''}${teachable(t) ? teachBtn(t) : ''}` : `<div class="small-t"><b>${t.title}</b></div>${ruleCard(t, true)}`)).join('')}</div>
     </section>`;
   }
 
@@ -14859,7 +14922,7 @@ ${t && H > W && W < 600 ? '<li>Tip: turn your phone sideways for a bigger view.<
       const jobs = [dueList(p, sub).length ? { kind: 'review' } : { kind: 'daily' }];
       if (n > 0) {
         const weak = racing(sub).filter((t) => !isCleared(p, t)).sort((a, b) => mastery(p, a) - mastery(p, b));
-        if (weak[0]) jobs.push({ kind: weak[0].walk && !(p.walked || {})[weak[0].id] ? 'walk' : 'topic', topic: weak[0].id });
+        if (weak[0]) jobs.push({ kind: (weak[0].walk || teachable(weak[0])) && !(p.walked || {})[weak[0].id] ? 'walk' : 'topic', topic: weak[0].id });
         if (n <= 2) jobs.push({ kind: 'exam' });
         else if (weak[1]) jobs.push({ kind: 'topic', topic: weak[1].id });
       }
@@ -14872,7 +14935,7 @@ ${t && H > W && W < 600 ? '<li>Tip: turn your phone sideways for a bigger view.<
       const go = `data-subject="${e.subject}" ${j.kind === 'walk' ? `data-act="walk" data-id="${j.topic}"` : `data-act="start" data-mode="${j.kind}" ${j.topic ? `data-topic="${j.topic}"` : ''}`}`;
       if (j.kind === 'review') return { text: 'Comeback lap: check what you learnt before', done: ran((r) => r.mode === 'review') || !dueList(p, sub).length, go };
       if (j.kind === 'daily') return { text: "Today's moto", done: p.dailyBy[e.subject] === today, go };
-      if (j.kind === 'walk') return { text: `Track walk: ${t.title}`, done: (p.walked || {})[j.topic] === today, go };
+      if (j.kind === 'walk') return { text: `${t.walk ? 'Track walk' : 'Maths lesson'}: ${t.title}`, done: (p.walked || {})[j.topic] === today, go };
       if (j.kind === 'topic') return { text: `Practise: ${t.title}`, done: ran((r) => r.mode === 'topic' && r.label === `${sub.label}: ${t.title}`), go };
       return { text: 'Main event practice test', done: ran((r) => r.mode === 'exam'), go };
     });
@@ -14985,6 +15048,7 @@ ${t && H > W && W < 600 ? '<li>Tip: turn your phone sideways for a bigger view.<
           ${heldTopic(p, t) ? `<div><span class="chip good">${ic('check', 12)} Still remembered</span></div>` : seenTopic(p, t) && dueTopic(p, t) ? '<div><span class="chip warn">Due back: ride the comeback lap</span></div>' : ''}
           ${lists.length ? `<div class="small-t muted num">${fresh ? `${fresh} new question${fresh === 1 ? '' : 's'} to go` : 'All asked once. They come round again now.'}</div>` : ''}
           ${t.walk ? `<button class="btn small full walk-go" data-act="walk" data-id="${t.id}">${ic('route', 16)} Track walk: learn it first</button>` : ''}
+          ${teachable(t) ? `<button class="btn small full walk-go" data-act="teach" data-id="${t.id}">${ic('spark', 16, true)} Maths lesson: see one done, then try</button>` : ''}
           ${ruleCard(t)}
         </div>
       </article>`;
@@ -15074,6 +15138,258 @@ ${t && H > W && W < 600 ? '<li>Tip: turn your phone sideways for a bigger view.<
       }
     }
     return shell(`<section class="card walk">${head}${body}</section>`);
+  }
+
+  // ---------- the maths lesson ----------
+  // Maths had no Track walk. A lesson teaches one kind of question the way the research found works best at this age
+  // (C:\Dev\Kids\Holeshot research\reports\Holeshot side games and tutorials.md, row 2): watch one worked out a step at a
+  // time, then try one like it. Right first time goes straight to the check. Wrong shows the working, then he finishes
+  // ones with the working shown up to a gap (RS.fadeWork), then with less of it, until he does one whole. Five questions
+  // with no help end it: three of the kind just learnt, one other kind from the section and one from a section he has ridden.
+  // Nothing is timed and nothing pays per question. The check can't fill a bar or clear anything, because a check straight
+  // after a lesson flatters; it puts its questions in tomorrow's comeback lap instead, which is the check that counts.
+  const TEACH_SUBJECTS = ['maths', 'grade7'];
+  const TEACH_PASS = 4;
+  const TEACH_FADES = 4;
+  for (const pack of Object.values(RS.packs)) {
+    for (const k of TEACH_SUBJECTS) for (const t of pack.subjects[k] ? pack.subjects[k].topics : []) t.teach = true;
+  }
+  const teachable = (t) => !!(t && t.teach);
+  const teachTopic = () => SUB().topics.find((t) => t.id === ui.run.topicId);
+  const teachBtn = (t, cls = 'btn full') => `<button class="${cls}" data-act="teach" data-id="${t.id}">${ic('spark', 16, true)} Maths lesson: ${t.title}</button>`;
+  // The kind he needs most: anything on his fix list, then weak ones he has met, then new ones, then the rest.
+  // Today's lessons and ones he has passed go to the back.
+  function teachSkill(p, t, not) {
+    const today = dayKey();
+    const taught = p.taught || {};
+    const need = (id) => {
+      const s = p.skills[id];
+      const f = p.fix[id];
+      const g = taught[id];
+      return (g && g.day === today ? 40 : 0) + (g && g.pass ? 20 : 0) + (f && (fixable(f) || resting(f)) ? 0 : s && s.seen ? 5 + 10 * (s.m || 0) : 10) + Math.random();
+    };
+    const pool = t.skills.filter((id) => id !== not);
+    return (pool.length ? pool : t.skills).map((id) => ({ id, n: need(id) })).sort((a, b) => a.n - b.n)[0].id;
+  }
+  // A fresh question of one kind, never one already asked in this lesson. Written lists keep to questions that start
+  // the same way as the example, so the try really is like it.
+  function teachMake(id, like) {
+    const r = ui.run;
+    const fn = PK().skills[id];
+    let q;
+    let key;
+    for (let n = 0; n < 30; n++) {
+      if (fn.items) {
+        const kin = like ? fn.items.filter((it) => kindOf(it.q) === like) : [];
+        q = fn.ask(RS.pick(kin.length > 1 ? kin : fn.items));
+      } else q = fn(2);
+      key = `${q.q}|${q.correct}`;
+      if (!r.asked.has(key)) break;
+    }
+    r.asked.add(key);
+    q.skill = id;
+    return q;
+  }
+  // Three of the kind just learnt, one other kind from this section, and one from another section he has ridden.
+  function teachChecks() {
+    const p = P();
+    const r = ui.run;
+    const t = teachTopic();
+    const met = (id) => !!(p.skills[id] && p.skills[id].seen);
+    const pickOf = (ids) => (ids.filter(met).length ? RS.pick(ids.filter(met)) : ids.length ? RS.pick(ids) : r.skill);
+    const same = pickOf(t.skills.filter((id) => id !== r.skill));
+    const before = racing(SUB()).filter((x) => x.id !== t.id).flatMap((x) => x.skills).filter(met);
+    const back = before.length ? RS.pick(before) : pickOf(t.skills.filter((id) => id !== r.skill && id !== same));
+    return [r.skill, same, r.skill, back, r.skill];
+  }
+  function startTeach(topicId, skill) {
+    const t = SUB().topics.find((x) => x.id === topicId);
+    if (!teachable(t)) return render();
+    stopVoice();
+    stopSpeaking();
+    audio();
+    ui.result = null;
+    ui.walk = null;
+    const id = skill && t.skills.includes(skill) ? skill : teachSkill(P(), t);
+    ui.run = { id: uuid(), mode: 'teach', topicId, skill: id, stage: 'example', level: 0, fades: 0, asked: new Set(), checks: [], checkI: 0, checkRight: 0, after: null, view: null, queue: [], i: 0, typed: '', tries: 0, combo: 0, pts: 0, sheet: null, watch: -1, heard: '', listening: false, started: Date.now(), qStart: Date.now(), firstGiven: null, struck: null, trace: [] };
+    // The example is the one with the most working to watch.
+    let q = null;
+    for (let n = 0; n < 8 && !(q && q.steps.length >= 3); n++) {
+      const next = teachMake(id);
+      if (!q || next.steps.length > q.steps.length) q = next;
+    }
+    ui.run.q = q;
+    ui.run.like = kindOf(q.q);
+    drawRun();
+    window.scrollTo(0, 0);
+  }
+  // Moves the lesson on after a sheet: to a try, a question with some of the working shown, the check, or the end.
+  function teachGo(next) {
+    const r = ui.run;
+    stopVoice();
+    stopSpeaking();
+    Object.assign(r, { typed: '', tries: 0, struck: null, sheet: null, heard: '', draft: '', firstGiven: null, qStart: Date.now(), view: null });
+    if (next.stage === 'done') return finishTeach();
+    if (next.stage === 'check') {
+      if (r.stage !== 'check') Object.assign(r, { stage: 'check', checks: teachChecks(), checkI: 0, checkRight: 0 });
+      r.q = teachMake(r.checks[r.checkI]);
+    } else if (next.stage === 'fade') {
+      r.fades++;
+      let q;
+      let view = null;
+      for (let n = 0; n < 6 && !view; n++) {
+        q = teachMake(r.skill, r.like);
+        view = RS.fadeWork(q, next.level);
+      }
+      // Nothing left to show at this level means he does the next one whole.
+      Object.assign(r, { stage: view ? 'fade' : 'try', level: next.level, view, q });
+    } else Object.assign(r, { stage: 'try', q: teachMake(r.skill, r.like) });
+    drawRun();
+    if (state.autoRead) readAloud();
+    const w = $('#ans-word');
+    if (w) w.focus();
+  }
+  function teachMark(ok, given) {
+    const r = ui.run;
+    const q = r.q;
+    sfx(ok ? 'right' : 'wrong');
+    if (r.stage === 'check') {
+      r.checkI++;
+      if (ok) r.checkRight++;
+      teachLog(q, ok, given);
+      const last = r.checkI >= r.checks.length;
+      const label = last ? 'See how you did' : 'Next question';
+      r.after = { stage: last ? 'done' : 'check' };
+      r.sheet = ok ? { type: 'teach-ok', title: 'Correct', text: '', next: label, line: charLine(true) } : { type: 'wrong', line: charLine(false), picked: given, step: -1, next: label };
+    } else if (ok) {
+      // Right first time: he knows it, so straight to the check. Right with help: hand over a bit more.
+      const up = r.stage === 'fade' ? r.level + 1 : 3;
+      r.after = up > 2 || r.fades >= TEACH_FADES ? { stage: 'check' } : { stage: 'fade', level: up };
+      const text = r.stage === 'try' ? "You know how this one works, so it's straight on to the check: 5 questions, no help." : r.after.stage === 'check' ? 'Now the check: 5 questions on your own.' : 'Now you do a bit more of it.';
+      r.sheet = { type: 'teach-ok', title: RS.pick(PRAISE), text, next: r.after.stage === 'check' ? 'On to the check' : 'Next one', line: charLine(true) };
+    } else {
+      // Wrong: the working step by step, then one with the working shown up to the answer.
+      r.after = r.fades >= TEACH_FADES ? { stage: 'check' } : { stage: 'fade', level: 1 };
+      r.sheet = { type: 'wrong', line: charLine(false), picked: given, step: -1, next: r.after.stage === 'check' ? 'On to the check' : 'Now finish one off' };
+    }
+    drawRun();
+    sayLine(r.sheet.line);
+  }
+  // Check answers go in the results log, and bring their kind back in tomorrow's comeback lap. They don't move a bar.
+  function teachLog(q, ok, given) {
+    const r = ui.run;
+    const p = P();
+    const s = p.skills[q.skill] || (p.skills[q.skill] = { seen: 0, ok: 0, m: 0 });
+    s.seen++;
+    const tomorrow = laterDay(dayKey(), 1);
+    if (!s.due || ((q.skill === r.skill || !ok) && s.due > tomorrow)) s.due = tomorrow;
+    save();
+    logRow('answer', {
+      id: uuid(),
+      answered_at: new Date().toISOString(),
+      mode: 'teach',
+      topic: (topicOf(q.skill) || {}).id,
+      skill: q.skill,
+      run_id: r.id,
+      q: RS.plain(q.q).slice(0, 400),
+      first_given: null,
+      given: given === undefined || given === null ? null : RS.plain(given).slice(0, 80),
+      correct: RS.plain(q.correct).slice(0, 160),
+      ok,
+      first_try: true,
+      bonus: false,
+      secs: Math.round((Date.now() - r.qStart) / 1000),
+    });
+  }
+  // A pass is 4 of 5. The first pass in a section pays the same as a first Track walk.
+  function finishTeach() {
+    const r = ui.run;
+    const p = P();
+    const t = teachTopic();
+    r.pass = r.checkRight >= TEACH_PASS;
+    p.taught = p.taught || {};
+    p.taught[r.skill] = { day: dayKey(), pass: r.pass || !!(p.taught[r.skill] && p.taught[r.skill].pass) };
+    p.walked = p.walked || {};
+    r.paid = r.pass && !p.walked[t.id];
+    if (r.paid) {
+      p.walked[t.id] = dayKey();
+      p.points += WALK_POINTS;
+      p.earned += WALK_POINTS;
+    }
+    const secs = Math.min(1200, Math.round((Date.now() - r.started) / 1000));
+    dayLog(p).secs = (dayLog(p).secs || 0) + secs;
+    save();
+    logRow('run', {
+      id: r.id,
+      finished_at: new Date().toISOString(),
+      mode: 'teach',
+      topic: t.id,
+      label: `Maths lesson: ${t.title}`,
+      pct: Math.round((100 * r.checkRight) / r.checks.length),
+      right_count: r.checkRight,
+      total: r.checks.length,
+      pts: r.paid ? WALK_POINTS : 0,
+      best_combo: 0,
+      secs,
+      fix_left: fixList(p, SUB()).length,
+      installed: !!navigator.standalone || matchMedia('(display-mode: standalone)').matches,
+    });
+    r.stage = 'done';
+    drawRun();
+    syncSoon();
+    sfx(r.pass ? 'fanfare' : 'combo');
+    if (r.pass) confetti();
+  }
+  function viewTeach() {
+    const r = ui.run;
+    const p = P();
+    const q = r.q;
+    const t = teachTopic();
+    const stage = { example: 'Watch', try: 'Your turn', fade: 'With help', check: `Check ${Math.min(r.checkI + (r.sheet ? 0 : 1), 5)} of 5`, done: 'Done' }[r.stage];
+    const pct = r.stage === 'done' ? 1 : r.stage === 'check' ? 0.45 + (0.55 * r.checkI) / 5 : r.stage === 'example' ? 0.08 : Math.min(0.4, 0.18 + 0.07 * r.fades);
+    const top = `<header class="run-top"><button class="round" data-act="quit" aria-label="Stop the lesson">${ic('x')}</button>${roadBar(pct, true)}<div class="run-score"><b>Lesson</b><small class="small-t muted">${stage}</small></div></header>`;
+    if (r.stage === 'done') {
+      const learnt = t.skills.filter((id) => ((p.taught || {})[id] || {}).pass).length;
+      const ride = `<button class="btn ${r.pass ? 'primary' : ''} full" data-act="start" data-mode="topic" data-topic="${t.id}" ${r.pass ? 'data-primary' : ''}>Ride this section ${ic('arrow')}</button>`;
+      const again = `<button class="btn ${r.pass ? '' : 'primary'} full" data-act="teach-again" ${r.pass ? '' : `data-id="${r.skill}" data-primary`}>${r.pass ? 'Learn another kind of question' : `Go through it again ${ic('arrow')}`}</button>`;
+      return `<section class="run" aria-label="Lesson finished">${top}<div class="run-body"><article class="q-card teach-done">
+        <div class="eyebrow">Maths lesson: ${h(t.title)}</div>
+        <h1 class="walk-title">${r.pass ? 'Lesson passed' : 'Nearly there'}</h1>
+        <p class="pts num">${r.checkRight} of ${r.checks.length} in the check</p>
+        <p>${r.pass ? `${r.paid ? `You earned <b class="num">${WALK_POINTS}</b> points for your first lesson in this section. ` : ''}These come back in tomorrow's comeback lap, to check they stuck.` : `A pass is ${TEACH_PASS} of 5. Watch it worked out once more, then have another go. No points lost.`}</p>
+        <p class="small-t muted num">Kinds of question learnt in this section: ${learnt} of ${t.skills.length}</p>
+        <div class="rows">${r.pass ? ride + again : again + ride}<button class="btn full" data-act="teach-off">Back to the track</button></div>
+      </article></div></section>`;
+    }
+    // Watching: the working appears under the question a step at a time, with the buttons where the answer pad would be.
+    const watched = r.stage === 'example' && r.watch >= q.steps.length - 1;
+    const read = `<button class="round small" data-act="say-card" aria-label="Read this aloud">${ic('speaker', 18)}</button>`;
+    const work = r.stage === 'example'
+      ? `<div class="teach-work"><div class="teach-head"><div class="eyebrow">Watch how it's done</div>${read}</div>${r.watch < 0 ? "<p>Here's one worked out, a step at a time. Then you try one just like it.</p>" : ''}${r.watch >= 0 ? `<ol class="steps">${q.steps.slice(0, r.watch + 1).map((x) => `<li>${h(x)}</li>`).join('')}</ol>` : ''}${watched ? `<p class="teach-answer"><b>The answer:</b> ${h(q.correct).replace(/\.$/, '')}</p>` : ''}</div>`
+      : r.view
+        ? `<div class="teach-work"><div class="teach-head"><div class="eyebrow">${r.view.gap ? 'Worked so far. You fill the gap' : 'Worked so far. You finish it'}</div>${read}</div><ol class="steps">${r.view.shown.map((x) => `<li>${h(x)}</li>`).join('')}${r.view.gap ? `<li>${h(r.view.gap).split(RS.GAP).join('<span class="gap">?</span>')}</li>` : ''}</ol></div>`
+        : '';
+    // While he watches, the choices are there to see, and the right one is ringed once the working reaches it.
+    const opts = r.stage === 'example' && q.kind === 'mc' ? `<ol class="teach-opts">${q.options.map((o, i) => `<li class="${watched && i === q.answer ? 'right' : ''}"><span class="opt-l">${'ABCD'[i]}</span><span>${h(o)}</span></li>`).join('')}</ol>` : '';
+    const watchDock = `<div class="dock">${watched ? `<button class="btn primary full" data-act="teach-try" data-primary>Your turn: one just like it ${ic('arrow')}</button>` : `<button class="btn primary full" data-act="teach-step" data-primary>${r.watch < 0 ? 'Show me' : 'Next step'} ${ic('arrow')}</button>`}${r.watch < 0 && t.skills.length > 1 ? '<button class="btn small" data-act="teach-other" style="justify-self:center">Teach me a different kind</button>' : ''}</div>`;
+    return `<section class="run" aria-label="Maths lesson">${top}
+      <div class="run-body">
+        <article class="q-card">
+          <div class="q-meta">
+            <img class="q-thumb" src="img/${t.img}.webp" alt="" decoding="async">
+            <div style="flex:1;min-width:0"><span class="eyebrow" style="display:block">Maths lesson</span><span class="small-t muted">${h(t.title)}</span></div>
+            <span class="chip num">${stage}</span>
+            <button class="round small" data-act="read" aria-label="Read the question aloud">${ic('speaker', 18)}</button>
+          </div>
+          <h1 class="q-text">${h(q.q)}</h1>
+          ${visual(q)}
+          ${opts}
+          ${work}
+        </article>
+        ${r.stage === 'example' ? watchDock : `<div class="dock">${dock(q)}</div>`}
+      </div>
+      ${sheetHTML()}
+    </section>`;
   }
 
   // ---------- the pits ----------
@@ -15539,6 +15855,7 @@ ${t && H > W && W < 600 ? '<li>Tip: turn your phone sideways for a bigger view.<
       }
       if (res.near) return toast(res.msg);
     }
+    if (r.mode === 'teach') return teachMark(res.ok, given);
     if (r.mode === 'exam') {
       settle(q, res.ok, true, given);
       if (res.ok) {
@@ -15849,6 +16166,12 @@ ${t && H > W && W < 600 ? '<li>Tip: turn your phone sideways for a bigger view.<
     const q = r.q;
     if (!s) return '';
     const steps = `<ol class="steps">${q.steps.map((x) => `<li>${h(x)}</li>`).join('')}</ol>`;
+    if (s.type === 'quit' && r.mode === 'teach') {
+      return `<div class="sheet" role="dialog" aria-label="Stop the lesson?"><div class="sheet-head"><h2>Stop the lesson?</h2></div><p class="muted">You can start it again from the Track any time.</p><button class="btn primary full" data-act="unquit" data-primary>Keep going</button><button class="btn full" data-act="quit-yes">Stop</button></div>`;
+    }
+    if (s.type === 'teach-ok') {
+      return `<div class="sheet good" role="status"><div class="sheet-head"><h2>${h(s.title)}</h2></div>${lineHTML(s)}${s.text ? `<p>${h(s.text)}</p>` : ''}<details><summary>Show the working</summary>${steps}</details><button class="btn primary full" data-act="next" data-primary>${h(s.next)} ${ic('arrow')}</button></div>`;
+    }
     if (s.type === 'quit') {
       return `<div class="sheet" role="dialog" aria-label="Pull off the track?"><div class="sheet-head"><h2>Pull off the track?</h2></div><p class="muted">You keep the ${r.pts} points from this moto, but it won't count towards your streak${r.mode === 'lap' ? ' and your time goes in the bin' : ''}.</p><button class="btn primary full" data-act="unquit" data-primary>Keep riding</button><button class="btn full" data-act="quit-yes">Pull off</button></div>`;
     }
@@ -15880,8 +16203,8 @@ ${t && H > W && W < 600 ? '<li>Tip: turn your phone sideways for a bigger view.<
       <p style="font-size:17px"><b>The right answer:</b> ${h(q.correct).replace(/\.$/, '')}</p>
       ${shown.length ? `<ol class="steps">${shown.map((x) => `<li>${h(x)}</li>`).join('')}</ol>` : ''}
       ${done ? ruleCard(topicOf(q.skill), true) : ''}
-      ${done && !q.bonus ? `<p class="small-t muted">It stays on your fix list until you get it right ${FIX_NEED} times in a row, and once more on another day.</p>` : ''}
-      ${done ? `<button class="btn primary full" data-act="next" data-primary>${similar ? 'Now try one like it' : 'Got it'} ${ic('arrow')}</button>` : `<button class="btn primary full" data-act="lesson-next" data-primary>${s.step < 0 ? 'Show me why' : 'Next step'} ${ic('arrow')}</button>`}
+      ${done && !q.bonus && r.mode !== 'teach' ? `<p class="small-t muted">It stays on your fix list until you get it right ${FIX_NEED} times in a row, and once more on another day.</p>` : ''}
+      ${done ? `<button class="btn primary full" data-act="next" data-primary>${s.next ? h(s.next) : similar ? 'Now try one like it' : 'Got it'} ${ic('arrow')}</button>` : `<button class="btn primary full" data-act="lesson-next" data-primary>${s.step < 0 ? 'Show me why' : 'Next step'} ${ic('arrow')}</button>`}
     </div>`;
   }
 
@@ -15895,6 +16218,7 @@ ${t && H > W && W < 600 ? '<li>Tip: turn your phone sideways for a bigger view.<
   }
   function viewRun() {
     const r = ui.run;
+    if (r.mode === 'teach') return viewTeach();
     const q = r.q;
     const t = topicOf(q.skill);
     const pct = (r.i + (r.sheet && r.sheet.type !== 'retry' && r.sheet.type !== 'quit' ? 1 : 0)) / r.queue.length;
@@ -15963,8 +16287,8 @@ ${t && H > W && W < 600 ? '<li>Tip: turn your phone sideways for a bigger view.<
 
   // ---------- results ----------
   const learnCard = (x) => {
-    const walks = [...new Set(x.missed.map((m) => topicOf(m.skill)))].filter((t) => t && t.walk);
-    return walks.length ? `<section class="card"><div class="h-sec" style="margin-bottom:4px">Learn it properly</div><p class="small-t muted" style="margin-bottom:10px">A Track walk teaches this, with nothing marked.</p><div class="rows">${walks.map((t) => `<button class="btn full" data-act="walk" data-id="${t.id}">${ic('route', 16)} ${t.title}</button>`).join('')}</div></section>` : '';
+    const walks = [...new Set(x.missed.map((m) => topicOf(m.skill)))].filter((t) => t && (t.walk || teachable(t)));
+    return walks.length ? `<section class="card"><div class="h-sec" style="margin-bottom:4px">Learn it properly</div><p class="small-t muted" style="margin-bottom:10px">${walks.some((t) => !t.walk) ? 'A lesson shows you one worked out, then lets you try.' : 'A Track walk teaches this, with nothing marked.'}</p><div class="rows">${walks.map((t) => (t.walk ? `<button class="btn full" data-act="walk" data-id="${t.id}">${ic('route', 16)} ${t.title}</button>` : teachBtn(t))).join('')}</div></section>` : '';
   };
   function viewResult() {
     const x = ui.result;
@@ -16424,7 +16748,7 @@ ${t && H > W && W < 600 ? '<li>Tip: turn your phone sideways for a bigger view.<
     const name = pack.name;
     if (sp.stuck.length) {
       const x = sp.stuck[0];
-      return `Sit with ${name} for 10 minutes on ${x.sub.label}: ${x.t.title}. It has caught him out so often that the game has paused it for 2 days. ${x.t.walk ? 'Open the Track, do its Track walk together, then let him ride the section.' : 'Read its rule card on the Track together, then let him ride the section.'}`;
+      return `Sit with ${name} for 10 minutes on ${x.sub.label}: ${x.t.title}. It has caught him out so often that the game has paused it for 2 days. ${x.t.walk ? 'Open the Track, do its Track walk together, then let him ride the section.' : teachable(x.t) ? 'Open the Track, do its maths lesson together, then let him ride the section.' : 'Read its rule card on the Track together, then let him ride the section.'}`;
     }
     const next = planExam(pack);
     const n = next ? daysUntil(next.date) : 99;
@@ -16901,8 +17225,34 @@ ${t && H > W && W < 600 ? '<li>Tip: turn your phone sideways for a bigger view.<
         drawRun();
         break;
       case 'next':
-        ui.run.i++;
-        nextQuestion();
+        if (ui.run.mode === 'teach') teachGo(ui.run.after);
+        else {
+          ui.run.i++;
+          nextQuestion();
+        }
+        break;
+      case 'teach':
+        if (el.dataset.subject && PK().subjects[el.dataset.subject]) ui.subject = el.dataset.subject;
+        startTeach(id);
+        break;
+      case 'teach-step':
+        ui.run.watch++;
+        drawRun();
+        break;
+      case 'teach-try':
+        teachGo({ stage: 'try' });
+        break;
+      case 'teach-other':
+        startTeach(ui.run.topicId, teachSkill(P(), teachTopic(), ui.run.skill));
+        break;
+      case 'teach-again':
+        startTeach(ui.run.topicId, id);
+        break;
+      case 'teach-off':
+        stopSpeaking();
+        ui.run = null;
+        render();
+        window.scrollTo(0, 0);
         break;
       case 'retry':
         ui.run.typed = '';
@@ -17036,7 +17386,7 @@ ${t && H > W && W < 600 ? '<li>Tip: turn your phone sideways for a bigger view.<
         break;
       case 'say-card': {
         // Reads the words on the card, leaving out the buttons.
-        const box = el.closest('.sheet, .walk');
+        const box = el.closest('.sheet, .walk, .teach-work');
         if (!box) break;
         const copy = box.cloneNode(true);
         copy.querySelectorAll('button, .walk-word, .walk-tile').forEach((b) => b.remove());
@@ -17081,6 +17431,10 @@ ${t && H > W && W < 600 ? '<li>Tip: turn your phone sideways for a bigger view.<
       }
       case 'walk':
         if (el.dataset.subject && PK().subjects[el.dataset.subject]) ui.subject = el.dataset.subject;
+        if (!(SUB().topics.find((t) => t.id === id) || {}).walk) {
+          startTeach(id);
+          break;
+        }
         ui.result = null;
         ui.walk = { id };
         walkStep(0);
@@ -17173,7 +17527,7 @@ ${t && H > W && W < 600 ? '<li>Tip: turn your phone sideways for a bigger view.<
   document.addEventListener('keydown', (e) => {
     const r = ui.run;
     if (!r || e.ctrlKey || e.metaKey || e.altKey) return;
-    if (r.sheet) {
+    if (r.sheet || r.stage === 'done' || r.stage === 'example') {
       if (e.key === 'Enter' && !e.repeat && !e.target.closest('summary')) {
         const b = document.querySelector('[data-primary]');
         if (b) {
