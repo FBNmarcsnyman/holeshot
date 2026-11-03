@@ -585,6 +585,9 @@ details ol { margin: 6px 0 0; padding-left: 20px; }
 .teach-opts .opt-l { background: var(--card); }
 .teach-head { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
 .teach-answer { font-size: 17px; }
+/* After a wrong answer in a walk's check: the walk screen that taught it */
+.walk-back { background: var(--card-2); border-left: 4px solid var(--accent); border-radius: 10px; padding: 8px 12px; margin: 8px 0; }
+.walk-back p { margin: 4px 0 0; }
 
 </style>
 <div id="app"></div>
@@ -942,6 +945,40 @@ details ol { margin: 6px 0 0; padding-left: 20px; }
     return shown.length || gap ? { shown, gap } : null;
   }
 
+  // ---------- the check after a Track walk: the screen that taught it ----------
+  // A wrong answer in a walk's check points back to the walk. Each card, tap line, matched pair and sorted sentence is
+  // scored by the words it shares with the question, its answer and its working, and a word that is on several screens
+  // counts for less. null when nothing shares a word that tells the screens apart; the rule card does the job then.
+  const SMALL = new Set('that this with from what which when where they them their there then than have does into your about would could should these those were been also only just very each other some more most'.split(' '));
+  const wordsOf = (text) => new Set((plain(String(text)).toLowerCase().match(/\p{L}[\p{L}'-]{3,}/gu) || []).filter((w) => !SMALL.has(w)));
+  const walkLines = new WeakMap();
+  function linesOf(walk) {
+    if (walkLines.has(walk)) return walkLines.get(walk);
+    const lines = [];
+    walk.forEach((s, i) => {
+      if (s.card) lines.push({ i, text: `**${s.card}** ${s.say} ${s.eg}`, from: `${s.card} ${s.say} ${s.eg}` });
+      else if (s.tap) lines.push({ i, text: `${s.tap} ${s.got}`, from: `${s.tap} ${s.got}` });
+      else if (s.match) for (const [a, b] of s.match) lines.push({ i, text: `${a} → ${b}`, from: `${a} ${b}` });
+      else if (s.sort) for (const [it, pile, why] of s.items) lines.push({ i, text: `**${s.sort[pile]}:** ${it} ${why}`, from: `${it} ${s.sort[pile]} ${why}` });
+    });
+    for (const l of lines) l.words = wordsOf(l.from);
+    walkLines.set(walk, lines);
+    return lines;
+  }
+  function walkPoint(walk, q) {
+    if (!walk || !walk.length) return null;
+    const lines = linesOf(walk);
+    const asked = wordsOf([q.q, q.correct, ...(q.steps || [])].join(' '));
+    const screens = (w) => new Set(lines.filter((l) => l.words.has(w)).map((l) => l.i)).size;
+    let best = null;
+    for (const l of lines) {
+      let score = 0;
+      for (const w of l.words) if (asked.has(w)) score += 1 / screens(w);
+      if (!best || score > best.score) best = { step: l.i, text: l.text, score };
+    }
+    return best && best.score >= 2 ? best : null;
+  }
+
   // ---------- reading the question aloud ----------
   const DEN_SINGULAR = { 2: 'half', 3: 'third', 4: 'quarter', 5: 'fifth', 6: 'sixth', 7: 'seventh', 8: 'eighth', 9: 'ninth', 10: 'tenth', 12: 'twelfth', 20: 'twentieth', 100: 'hundredth' };
   function fracWords(n, d) {
@@ -1101,7 +1138,7 @@ details ol { margin: 6px 0 0; padding-left: 20px; }
     return true;
   }
 
-  Object.assign(RS, { DEFAULT_HINT, GAP, answerAt, fadeWork, receiptKey, carryPurchases, squarePurchases, carryPassword, shortHash, itemKey, pickUnseen, unseenCount, bank, addQuestions, addSection, ri, pick, shuffle, gcd, lcm, r2, roundTo, simp, factorsOf, primeFactors, isPrime, distinctDigits, coprimeTop, fmt, money, fr, mixedStr, plain, html, mc, parseValue, check, spoken, matchOption, speakable, wordsToInt, editDistance });
+  Object.assign(RS, { DEFAULT_HINT, GAP, answerAt, fadeWork, walkPoint, receiptKey, carryPurchases, squarePurchases, carryPassword, shortHash, itemKey, pickUnseen, unseenCount, bank, addQuestions, addSection, ri, pick, shuffle, gcd, lcm, r2, roundTo, simp, factorsOf, primeFactors, isPrime, distinctDigits, coprimeTop, fmt, money, fr, mixedStr, plain, html, mc, parseValue, check, spoken, matchOption, speakable, wordsToInt, editDistance });
 })(typeof window !== 'undefined' ? window : globalThis);
 
 /* Jordy: Grade 6 Term 4 maths, NumberSense Workbook 24, pages 1 to 24.
@@ -13992,7 +14029,7 @@ ${t && H > W && W < 600 ? '<li>Tip: turn your phone sideways for a bigger view.<
   // ---------- staying up to date ----------
   // An open tab or a home screen app keeps running the page it first loaded, old prices and all. So it asks which version
   // is live when it comes back into view and every few minutes, and swaps over between races. build.mjs fills in BUILD.
-  const BUILD = 'eaaea6bbce';
+  const BUILD = '597f562b60';
   const BACK_KEY = 'holeshot.back.v1';
   const TRIED_KEY = 'holeshot.tried.v1';
   let liveBuild = null;
@@ -14879,7 +14916,7 @@ ${t && H > W && W < 600 ? '<li>Tip: turn your phone sideways for a bigger view.<
       <ol class="guide-list">
         <li><b>Drop the gate</b> for today's moto: 10 questions on what you need most.</li>
         <li><b>Get one wrong?</b> You get a hint, then a lesson, then one like it. That's how it sticks.</li>
-        <li><b>Track walks</b> teach a section before you race it. Comeback laps check it stuck on a later day.</li>
+        <li><b>Track walks</b> teach a section before you race it, then check it with 6 quick questions. Comeback laps check it stuck on a later day.</li>
         <li><b>Points</b> buy bikes and kit in the Pits. Save up for something big.</li>
       </ol>
       <button class="btn dark small" data-act="guided">Got it</button>
@@ -15085,7 +15122,14 @@ ${t && H > W && W < 600 ? '<li>Tip: turn your phone sideways for a bigger view.<
 
   // ---------- the track walk ----------
   // Riders walk a track before they race it. A walk teaches one section with things to tap and sort, and nothing is marked.
+  // A check with the walk out of sight ends it (research row 1, in the report named at the maths lesson): six questions,
+  // four from this section and two from sections he has ridden, each marked at once, and a wrong one shows the walk screen
+  // that taught it when one clearly matches (RS.walkPoint). It runs on the maths lesson's check, so like that check it
+  // can't fill a bar or clear anything and its questions come back in tomorrow's comeback lap. The first pass pays the
+  // walk's points; finishing the walk alone no longer does.
   const WALK_POINTS = 30;
+  const WALK_CHECK = 6;
+  const WALK_PASS = 5;
   const walkTopic = () => SUB().topics.find((t) => t.id === ui.walk.id);
   const plainWord = (w) => w.replace(/[^\p{L}\p{N}'-]/gu, '').toLowerCase();
   function walkStep(i) {
@@ -15095,18 +15139,41 @@ ${t && H > W && W < 600 ? '<li>Tip: turn your phone sideways for a bigger view.<
     if (step.match) Object.assign(ui.walk, { left: RS.shuffle(step.match.map((_, n) => n)), right: RS.shuffle(step.match.map((_, n) => n)), pick: null, joined: [] });
   }
   function finishWalk() {
-    const p = P();
-    const w = ui.walk;
-    w.i = walkTopic().walk.length;
-    p.walked = p.walked || {};
-    w.paid = !p.walked[w.id];
-    if (w.paid) {
-      p.walked[w.id] = dayKey();
-      p.points += WALK_POINTS;
-      p.earned += WALK_POINTS;
-      save();
-    }
+    ui.walk.i = walkTopic().walk.length;
     sfx('combo');
+  }
+  // Four from this section, spread over its kinds of question, then two from other sections he has ridden (from two
+  // of them when he has), mixed in.
+  // The first is always from this section. With nothing else ridden yet, all six are from here.
+  function walkChecks(t) {
+    const p = P();
+    const met = (id) => !!(p.skills[id] && p.skills[id].seen);
+    const here = [];
+    while (here.length < WALK_CHECK) here.push(...RS.shuffle(t.skills));
+    const ridden = RS.shuffle(racing(SUB()).filter((x) => x.id !== t.id && x.skills.some(met)));
+    const before = ridden.length ? [0, 1].map((n) => RS.pick(ridden[n % ridden.length].skills.filter(met))) : [];
+    const mine = here.slice(0, WALK_CHECK - before.length);
+    return [mine[0], ...RS.shuffle([...mine.slice(1), ...before])];
+  }
+  function startWalkCheck(topicId) {
+    const t = SUB().topics.find((x) => x.id === topicId);
+    if (!t || !t.walk) return render();
+    stopVoice();
+    stopSpeaking();
+    audio();
+    ui.result = null;
+    ui.walk = null;
+    ui.run = { id: uuid(), mode: 'teach', kind: 'walk', topicId, skill: null, stage: 'check', level: 0, fades: 0, asked: new Set(), checks: walkChecks(t), checkI: 0, checkRight: 0, after: null, view: null, queue: [], i: 0, typed: '', tries: 0, combo: 0, pts: 0, sheet: null, watch: -1, heard: '', listening: false, started: Date.now(), qStart: Date.now(), firstGiven: null, struck: null, trace: [] };
+    teachGo({ stage: 'check' });
+    window.scrollTo(0, 0);
+  }
+  // Where a check question was taught: the walk screen that clearly matches it, from this walk or the walk of the
+  // section it came from. Nothing when none does; the rule card covers it then.
+  function walkBack(q) {
+    const t = topicOf(q.skill);
+    const at = t && RS.walkPoint(t.walk, q);
+    if (!at) return '';
+    return `<div class="walk-back"><div class="eyebrow">${t.id === ui.run.topicId ? `On the walk, screen ${at.step + 1}` : `On the ${h(t.title)} walk`}</div><p>${h(at.text)}</p></div>`;
   }
   function viewWalk() {
     const w = ui.walk;
@@ -15118,8 +15185,9 @@ ${t && H > W && W < 600 ? '<li>Tip: turn your phone sideways for a bigger view.<
       <div class="meter" role="img" aria-label="Step ${Math.min(w.i + 1, steps)} of ${steps}"><i style="width:${Math.round((100 * w.i) / steps)}%"></i></div>`;
     let body;
     if (w.i >= steps) {
-      body = `<h2 class="walk-title">Track walked</h2><p>${w.paid ? `You earned <b class="num">${WALK_POINTS}</b> points for walking this section.` : 'You know this track. The points are for the first walk.'} Now ride it for real.</p>
-        <button class="btn primary full" data-act="start" data-mode="topic" data-topic="${t.id}">Ride this section ${ic('arrow')}</button>
+      const passed = (P().walked || {})[t.id];
+      body = `<h2 class="walk-title">Track walked</h2><p>Now a quick check, with the walk out of sight: ${WALK_CHECK} questions on your own. Get ${WALK_PASS} right to pass${passed ? '. The points were for your first pass, but it still shows what stuck.' : ` and earn <b class="num">${WALK_POINTS}</b> points.`}</p>
+        <button class="btn primary full" data-act="walk-check" data-id="${t.id}">Start the check ${ic('arrow')}</button>
         <button class="btn full" data-act="walk-off">Back to the track</button>`;
     } else {
       const step = t.walk[w.i];
@@ -15282,12 +15350,13 @@ ${t && H > W && W < 600 ? '<li>Tip: turn your phone sideways for a bigger view.<
     const s = p.skills[q.skill] || (p.skills[q.skill] = { seen: 0, ok: 0, m: 0 });
     s.seen++;
     const tomorrow = laterDay(dayKey(), 1);
-    if (!s.due || ((q.skill === r.skill || !ok) && s.due > tomorrow)) s.due = tomorrow;
+    const taught = r.kind === 'walk' ? (topicOf(q.skill) || {}).id === r.topicId : q.skill === r.skill;
+    if (!s.due || ((taught || !ok) && s.due > tomorrow)) s.due = tomorrow;
     save();
     logRow('answer', {
       id: uuid(),
       answered_at: new Date().toISOString(),
-      mode: 'teach',
+      mode: r.kind === 'walk' ? 'walk' : 'teach',
       topic: (topicOf(q.skill) || {}).id,
       skill: q.skill,
       run_id: r.id,
@@ -15301,14 +15370,17 @@ ${t && H > W && W < 600 ? '<li>Tip: turn your phone sideways for a bigger view.<
       secs: Math.round((Date.now() - r.qStart) / 1000),
     });
   }
-  // A pass is 4 of 5. The first pass in a section pays the same as a first Track walk.
+  // A pass is 4 of 5, or 5 of 6 after a walk. The first pass in a section pays the walk's points, once, whichever it was.
   function finishTeach() {
     const r = ui.run;
     const p = P();
     const t = teachTopic();
-    r.pass = r.checkRight >= TEACH_PASS;
-    p.taught = p.taught || {};
-    p.taught[r.skill] = { day: dayKey(), pass: r.pass || !!(p.taught[r.skill] && p.taught[r.skill].pass) };
+    const walk = r.kind === 'walk';
+    r.pass = r.checkRight >= (walk ? WALK_PASS : TEACH_PASS);
+    if (!walk) {
+      p.taught = p.taught || {};
+      p.taught[r.skill] = { day: dayKey(), pass: r.pass || !!(p.taught[r.skill] && p.taught[r.skill].pass) };
+    }
     p.walked = p.walked || {};
     r.paid = r.pass && !p.walked[t.id];
     if (r.paid) {
@@ -15322,9 +15394,9 @@ ${t && H > W && W < 600 ? '<li>Tip: turn your phone sideways for a bigger view.<
     logRow('run', {
       id: r.id,
       finished_at: new Date().toISOString(),
-      mode: 'teach',
+      mode: walk ? 'walk' : 'teach',
       topic: t.id,
-      label: `Maths lesson: ${t.title}`,
+      label: `${walk ? 'Track walk' : 'Maths lesson'}: ${t.title}`,
       pct: Math.round((100 * r.checkRight) / r.checks.length),
       right_count: r.checkRight,
       total: r.checks.length,
@@ -15345,9 +15417,22 @@ ${t && H > W && W < 600 ? '<li>Tip: turn your phone sideways for a bigger view.<
     const p = P();
     const q = r.q;
     const t = teachTopic();
-    const stage = { example: 'Watch', try: 'Your turn', fade: 'With help', check: `Check ${Math.min(r.checkI + (r.sheet ? 0 : 1), 5)} of 5`, done: 'Done' }[r.stage];
-    const pct = r.stage === 'done' ? 1 : r.stage === 'check' ? 0.45 + (0.55 * r.checkI) / 5 : r.stage === 'example' ? 0.08 : Math.min(0.4, 0.18 + 0.07 * r.fades);
-    const top = `<header class="run-top"><button class="round" data-act="quit" aria-label="Stop the lesson">${ic('x')}</button>${roadBar(pct, true)}<div class="run-score"><b>Lesson</b><small class="small-t muted">${stage}</small></div></header>`;
+    const walk = r.kind === 'walk';
+    const n = r.checks.length;
+    const stage = { example: 'Watch', try: 'Your turn', fade: 'With help', check: `Check ${Math.min(r.checkI + (r.sheet ? 0 : 1), n)} of ${n}`, done: 'Done' }[r.stage];
+    const pct = r.stage === 'done' ? 1 : r.stage === 'check' ? (walk ? 0 : 0.45) + ((walk ? 1 : 0.55) * r.checkI) / n : r.stage === 'example' ? 0.08 : Math.min(0.4, 0.18 + 0.07 * r.fades);
+    const top = `<header class="run-top"><button class="round" data-act="quit" aria-label="${walk ? 'Stop the check' : 'Stop the lesson'}">${ic('x')}</button>${roadBar(pct, true)}<div class="run-score"><b>${walk ? 'Check' : 'Lesson'}</b><small class="small-t muted">${stage}</small></div></header>`;
+    if (r.stage === 'done' && walk) {
+      const ride = `<button class="btn ${r.pass ? 'primary' : ''} full" data-act="start" data-mode="topic" data-topic="${t.id}" ${r.pass ? 'data-primary' : ''}>Ride this section ${ic('arrow')}</button>`;
+      const again = `<button class="btn primary full" data-act="walk-check" data-id="${t.id}" data-primary>Try the check again ${ic('arrow')}</button><button class="btn full" data-act="walk" data-id="${t.id}">Walk it again first</button>`;
+      return `<section class="run" aria-label="Check finished">${top}<div class="run-body"><article class="q-card teach-done">
+        <div class="eyebrow">Track walk: ${h(t.title)}</div>
+        <h1 class="walk-title">${r.pass ? 'Check passed' : 'Nearly there'}</h1>
+        <p class="pts num">${r.checkRight} of ${n} in the check</p>
+        <p>${r.pass ? `${r.paid ? `You earned <b class="num">${WALK_POINTS}</b> points for walking this section. ` : ''}These come back in tomorrow's comeback lap, to check they stuck.` : `A pass is ${WALK_PASS} of ${n}. Try the check again with new questions, or walk it again first. No points lost.`}</p>
+        <div class="rows">${r.pass ? ride : again + ride}<button class="btn full" data-act="teach-off">Back to the track</button></div>
+      </article></div></section>`;
+    }
     if (r.stage === 'done') {
       const learnt = t.skills.filter((id) => ((p.taught || {})[id] || {}).pass).length;
       const ride = `<button class="btn ${r.pass ? 'primary' : ''} full" data-act="start" data-mode="topic" data-topic="${t.id}" ${r.pass ? 'data-primary' : ''}>Ride this section ${ic('arrow')}</button>`;
@@ -15361,6 +15446,8 @@ ${t && H > W && W < 600 ? '<li>Tip: turn your phone sideways for a bigger view.<
         <div class="rows">${r.pass ? ride + again : again + ride}<button class="btn full" data-act="teach-off">Back to the track</button></div>
       </article></div></section>`;
     }
+    // A check question from another section says which one it's from.
+    const from = (walk && topicOf(q.skill)) || t;
     // Watching: the working appears under the question a step at a time, with the buttons where the answer pad would be.
     const watched = r.stage === 'example' && r.watch >= q.steps.length - 1;
     const read = `<button class="round small" data-act="say-card" aria-label="Read this aloud">${ic('speaker', 18)}</button>`;
@@ -15372,12 +15459,12 @@ ${t && H > W && W < 600 ? '<li>Tip: turn your phone sideways for a bigger view.<
     // While he watches, the choices are there to see, and the right one is ringed once the working reaches it.
     const opts = r.stage === 'example' && q.kind === 'mc' ? `<ol class="teach-opts">${q.options.map((o, i) => `<li class="${watched && i === q.answer ? 'right' : ''}"><span class="opt-l">${'ABCD'[i]}</span><span>${h(o)}</span></li>`).join('')}</ol>` : '';
     const watchDock = `<div class="dock">${watched ? `<button class="btn primary full" data-act="teach-try" data-primary>Your turn: one just like it ${ic('arrow')}</button>` : `<button class="btn primary full" data-act="teach-step" data-primary>${r.watch < 0 ? 'Show me' : 'Next step'} ${ic('arrow')}</button>`}${r.watch < 0 && t.skills.length > 1 ? '<button class="btn small" data-act="teach-other" style="justify-self:center">Teach me a different kind</button>' : ''}</div>`;
-    return `<section class="run" aria-label="Maths lesson">${top}
+    return `<section class="run" aria-label="${walk ? 'Track walk check' : 'Maths lesson'}">${top}
       <div class="run-body">
         <article class="q-card">
           <div class="q-meta">
-            <img class="q-thumb" src="img/${t.img}.webp" alt="" decoding="async">
-            <div style="flex:1;min-width:0"><span class="eyebrow" style="display:block">Maths lesson</span><span class="small-t muted">${h(t.title)}</span></div>
+            <img class="q-thumb" src="img/${from.img}.webp" alt="" decoding="async">
+            <div style="flex:1;min-width:0"><span class="eyebrow" style="display:block">${walk ? 'Track walk check' : 'Maths lesson'}</span><span class="small-t muted">${h(from.title)}</span></div>
             <span class="chip num">${stage}</span>
             <button class="round small" data-act="read" aria-label="Read the question aloud">${ic('speaker', 18)}</button>
           </div>
@@ -16166,11 +16253,13 @@ ${t && H > W && W < 600 ? '<li>Tip: turn your phone sideways for a bigger view.<
     const q = r.q;
     if (!s) return '';
     const steps = `<ol class="steps">${q.steps.map((x) => `<li>${h(x)}</li>`).join('')}</ol>`;
+    const walk = r.kind === 'walk';
     if (s.type === 'quit' && r.mode === 'teach') {
-      return `<div class="sheet" role="dialog" aria-label="Stop the lesson?"><div class="sheet-head"><h2>Stop the lesson?</h2></div><p class="muted">You can start it again from the Track any time.</p><button class="btn primary full" data-act="unquit" data-primary>Keep going</button><button class="btn full" data-act="quit-yes">Stop</button></div>`;
+      const what = walk ? 'check' : 'lesson';
+      return `<div class="sheet" role="dialog" aria-label="Stop the ${what}?"><div class="sheet-head"><h2>Stop the ${what}?</h2></div><p class="muted">${walk ? 'You can walk it again from the Track any time, and the check comes at the end.' : 'You can start it again from the Track any time.'}</p><button class="btn primary full" data-act="unquit" data-primary>Keep going</button><button class="btn full" data-act="quit-yes">Stop</button></div>`;
     }
     if (s.type === 'teach-ok') {
-      return `<div class="sheet good" role="status"><div class="sheet-head"><h2>${h(s.title)}</h2></div>${lineHTML(s)}${s.text ? `<p>${h(s.text)}</p>` : ''}<details><summary>Show the working</summary>${steps}</details><button class="btn primary full" data-act="next" data-primary>${h(s.next)} ${ic('arrow')}</button></div>`;
+      return `<div class="sheet good" role="status"><div class="sheet-head"><h2>${h(s.title)}</h2></div>${lineHTML(s)}${s.text ? `<p>${h(s.text)}</p>` : ''}<details><summary>Show the working</summary>${steps}${walk ? walkBack(q) : ''}</details><button class="btn primary full" data-act="next" data-primary>${h(s.next)} ${ic('arrow')}</button></div>`;
     }
     if (s.type === 'quit') {
       return `<div class="sheet" role="dialog" aria-label="Pull off the track?"><div class="sheet-head"><h2>Pull off the track?</h2></div><p class="muted">You keep the ${r.pts} points from this moto, but it won't count towards your streak${r.mode === 'lap' ? ' and your time goes in the bin' : ''}.</p><button class="btn primary full" data-act="unquit" data-primary>Keep riding</button><button class="btn full" data-act="quit-yes">Pull off</button></div>`;
@@ -16202,6 +16291,7 @@ ${t && H > W && W < 600 ? '<li>Tip: turn your phone sideways for a bigger view.<
       ${why && picked ? `<p class="small-t">${h(why)}</p>` : ''}
       <p style="font-size:17px"><b>The right answer:</b> ${h(q.correct).replace(/\.$/, '')}</p>
       ${shown.length ? `<ol class="steps">${shown.map((x) => `<li>${h(x)}</li>`).join('')}</ol>` : ''}
+      ${done && walk ? walkBack(q) : ''}
       ${done ? ruleCard(topicOf(q.skill), true) : ''}
       ${done && !q.bonus && r.mode !== 'teach' ? `<p class="small-t muted">It stays on your fix list until you get it right ${FIX_NEED} times in a row, and once more on another day.</p>` : ''}
       ${done ? `<button class="btn primary full" data-act="next" data-primary>${s.next ? h(s.next) : similar ? 'Now try one like it' : 'Got it'} ${ic('arrow')}</button>` : `<button class="btn primary full" data-act="lesson-next" data-primary>${s.step < 0 ? 'Show me why' : 'Next step'} ${ic('arrow')}</button>`}
@@ -16288,7 +16378,7 @@ ${t && H > W && W < 600 ? '<li>Tip: turn your phone sideways for a bigger view.<
   // ---------- results ----------
   const learnCard = (x) => {
     const walks = [...new Set(x.missed.map((m) => topicOf(m.skill)))].filter((t) => t && (t.walk || teachable(t)));
-    return walks.length ? `<section class="card"><div class="h-sec" style="margin-bottom:4px">Learn it properly</div><p class="small-t muted" style="margin-bottom:10px">${walks.some((t) => !t.walk) ? 'A lesson shows you one worked out, then lets you try.' : 'A Track walk teaches this, with nothing marked.'}</p><div class="rows">${walks.map((t) => (t.walk ? `<button class="btn full" data-act="walk" data-id="${t.id}">${ic('route', 16)} ${t.title}</button>` : teachBtn(t))).join('')}</div></section>` : '';
+    return walks.length ? `<section class="card"><div class="h-sec" style="margin-bottom:4px">Learn it properly</div><p class="small-t muted" style="margin-bottom:10px">${walks.some((t) => !t.walk) ? 'A lesson shows you one worked out, then lets you try.' : 'A Track walk teaches this, then a quick check shows it went in.'}</p><div class="rows">${walks.map((t) => (t.walk ? `<button class="btn full" data-act="walk" data-id="${t.id}">${ic('route', 16)} ${t.title}</button>` : teachBtn(t))).join('')}</div></section>` : '';
   };
   function viewResult() {
     const x = ui.result;
@@ -17435,11 +17525,16 @@ ${t && H > W && W < 600 ? '<li>Tip: turn your phone sideways for a bigger view.<
           startTeach(id);
           break;
         }
+        stopSpeaking();
         ui.result = null;
+        ui.run = null;
         ui.walk = { id };
         walkStep(0);
         render();
         window.scrollTo(0, 0);
+        break;
+      case 'walk-check':
+        startWalkCheck(id);
         break;
       case 'walk-off':
         ui.walk = null;
