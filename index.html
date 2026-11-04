@@ -788,6 +788,34 @@ body:has(.ph[data-boy="kash"]) { --ph-wash: #FFD2BD; }
   .ph-more summary::after { content: ""; }
 }
 
+/* A Holeshot touch (4 November 2026): the start-gate photo with the Holeshot name, his race number plate on his tile,
+   and an orange, chequered-edged focus card, so the page reads as Holeshot results while matching Family Fit's cards. */
+.ph-banner { position: relative; isolation: isolate; overflow: hidden; border-radius: 28px; min-height: 176px; padding: 12px 14px 16px; display: grid; align-content: space-between; background: #2C3B4D; color: #fff; }
+.ph-banner .photo { position: absolute; inset: 0; z-index: -2; width: 100%; height: 100%; object-fit: cover; object-position: 50% 62%; }
+.ph-banner::after { content: ""; position: absolute; inset: 0; z-index: -1; background: linear-gradient(to top, rgba(8, 9, 12, .78), rgba(8, 9, 12, .1) 70%), linear-gradient(to bottom, rgba(8, 9, 12, .45), rgba(8, 9, 12, 0) 40%); }
+.ph-banner-top { display: flex; align-items: center; gap: 8px; }
+.ph-brand { flex: 1; font-family: var(--display); font-weight: 800; font-size: 22px; letter-spacing: -.04em; }
+.ph-banner .ph-glass { background: rgba(255, 255, 255, .18); color: #fff; backdrop-filter: blur(10px); }
+.ph-banner .ph-date { display: grid; gap: 2px; margin-top: 46px; }
+.ph-banner .ph-date span { font-family: var(--body); font-size: 12px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--lime); }
+.ph-banner .ph-date b { font-family: var(--display); font-weight: 800; font-size: 26px; line-height: 1.1; letter-spacing: -.02em; color: #fff; }
+.ph-boy .plate { min-width: 46px; height: 40px; padding: 0 7px; font-size: 20px; border-width: 3px; border-radius: 10px; }
+.ph-boy.on { box-shadow: var(--shadow), inset 0 0 0 2px var(--accent); }
+.ph-ring-fg { stroke: var(--accent); }
+.ph-flag { display: inline-flex; align-items: center; gap: 6px; color: var(--accent); }
+.ph-flag svg { display: inline; }
+.ph-focus { position: relative; overflow: hidden; padding-top: 26px; }
+.ph-focus::before { content: ""; position: absolute; left: 0; right: 0; top: 0; height: 10px; background: repeating-conic-gradient(var(--ink) 0 25%, var(--card) 0 50%) 0 0 / 10px 10px; opacity: .9; }
+.ph-wd.today { background: var(--accent); }
+.ph-wd.today span, .ph-wd.today b { color: var(--accent-ink); }
+@media print {
+  .ph-banner { min-height: 0; background: none; color: #15161B; border: 1px solid #ccc; }
+  .ph-banner .photo, .ph-banner::after { display: none; }
+  .ph-banner .ph-date { margin-top: 6px; }
+  .ph-banner .ph-date b { color: #15161B; }
+  .ph-banner .ph-date span { color: #444; }
+}
+
 </style>
 <div id="app"></div>
 <div id="toast" class="toast" role="status" aria-live="polite" hidden></div>
@@ -14291,7 +14319,7 @@ ${t && H > W && W < 600 ? '<li>Tip: turn your phone sideways for a bigger view.<
   // ---------- staying up to date ----------
   // An open tab or a home screen app keeps running the page it first loaded, old prices and all. So it asks which version
   // is live when it comes back into view and every few minutes, and swaps over between races. build.mjs fills in BUILD.
-  const BUILD = '914352eeb4';
+  const BUILD = 'd2bf39029e';
   const BACK_KEY = 'holeshot.back.v1';
   const TRIED_KEY = 'holeshot.tried.v1';
   let liveBuild = null;
@@ -17221,7 +17249,7 @@ ${t && H > W && W < 600 ? '<li>Tip: turn your phone sideways for a bigger view.<
     const boyTiles = Object.values(RS.packs).filter((x) => v.data[x.id]).map((x) => {
       const dx = v.data[x.id];
       const job = tonightJob(x, dx.progress || {}, bitsFor(x, dx).subjectBits);
-      return `<button class="ph-boy boy-${x.id} ${v.who === x.id ? 'on' : ''}" data-act="parents-who" data-id="${x.id}" aria-pressed="${v.who === x.id}"><span class="ph-av">${h(x.name[0])}</span><span class="ph-boy-txt"><b>${h(x.name)}</b><small>Tonight: ${h(job.title)}</small></span></button>`;
+      return `<button class="ph-boy boy-${x.id} ${v.who === x.id ? 'on' : ''}" data-act="parents-who" data-id="${x.id}" aria-pressed="${v.who === x.id}">${(dx.progress || {}).plate ? plate(dx.progress.plate) : `<span class="ph-av">${h(x.name[0])}</span>`}<span class="ph-boy-txt"><b>${h(x.name)}</b><small>Tonight: ${h(job.title)}</small></span></button>`;
     }).join('');
     const dayTabs = [7, 30].map((n) => `<button class="ph-segb ${v.days === n ? 'on' : ''}" data-act="parents-days" data-id="${n}" aria-pressed="${v.days === n}">${n} days</button>`).join('');
     const span = v.days === 7 ? 'week' : `${v.days} days`;
@@ -17266,10 +17294,9 @@ ${t && H > W && W < 600 ? '<li>Tip: turn your phone sideways for a bigger view.<
     const now = new Date();
     const r = 27;
     const round = 2 * Math.PI * r;
-    const header = `<header class="ph-top">
-      <div class="ph-date"><span>${now.toLocaleDateString('en-ZA', { weekday: 'long' })}</span><b>${now.toLocaleDateString('en-ZA', { day: 'numeric', month: 'long' })}</b></div>
-      <button class="btn small no-print ph-glass" data-act="parents-print">Print</button>
-      <button class="round no-print ph-glass" data-act="parents-off" aria-label="Close the results">${ic('x')}</button>
+    const header = `<header class="ph-banner">${photo('main-event', 'Riders lined up at the start gate under floodlights')}
+      <div class="ph-banner-top"><span class="ph-brand">Holeshot</span><button class="btn small no-print ph-glass" data-act="parents-print">Print</button><button class="round no-print ph-glass" data-act="parents-off" aria-label="Close the results">${ic('x')}</button></div>
+      <div class="ph-date"><span>Race report</span><b>${now.toLocaleDateString('en-ZA', { weekday: 'long' })} ${now.getDate()} ${now.toLocaleDateString('en-ZA', { month: 'long' })}</b></div>
     </header>`;
     const intro = `<div class="ph-intro">
       <div class="ph-intro-txt"><div class="ph-eyebrow2">${h(pack.grade || '')} · ${v.busy ? 'fetching...' : `last ${span}`}</div><h1 class="ph-h1">${h(name)}'s ${v.days === 7 ? 'week' : 'month'}</h1>
@@ -17282,10 +17309,10 @@ ${t && H > W && W < 600 ? '<li>Tip: turn your phone sideways for a bigger view.<
       return `<div class="ph-nextup"><span class="muted">Next up</span><b>${h(nextUp.label)} test, ${whenText(daysUntil(nextUp.date)).toLowerCase()}</b><span class="chip ${tone}">${ic(icon, 14)} ${word}</span></div>`;
     })() : '';
     const focus = `<div class="ph-focus-wrap"><section class="card ph-focus">
-      <div class="ph-focus-top"><span class="eyebrow">Tonight's focus</span><span class="small-t muted">about ${job.mins} min</span></div>
+      <div class="ph-focus-top"><span class="eyebrow ph-flag">${ic('flag', 14)} Tonight's focus</span><span class="small-t muted">about ${job.mins} min</span></div>
       <h2 class="ph-focus-title">${h(job.title)}</h2>
       <p class="ph-focus-text">${h(job.text)}</p>
-      <button class="btn dark ph-pill no-print" data-act="parents-job">Share this job ${ic('arrow', 18)}</button>
+      <button class="btn primary ph-pill no-print" data-act="parents-job">Share this job ${ic('arrow', 18)}</button>
     </section>${nextLine}</div>`;
     const weekCells = v.days <= 7
       ? `<div class="ph-wk" role="img" aria-label="Rode on ${t.days} of the last ${v.days} days">${strip.map((s, i) => `<div class="ph-wd ${i === strip.length - 1 ? 'today' : ''} ${s.x ? 'on' : ''}"><span>${s.dt.toLocaleDateString('en-ZA', { weekday: 'narrow' })}</span><b class="num">${s.dt.getDate()}</b><i><em style="height:${s.x ? Math.max(18, Math.round((100 * s.x.secs) / peakSecs)) : 0}%"></em></i></div>`).join('')}</div>`
