@@ -209,6 +209,8 @@ svg { display: block; }
 .walk-tile.done { background: var(--good-soft); color: var(--good); }
 .walk-go { margin-top: 2px; }
 .rig > i.rainbow { transition: background-color 1.6s ease; }
+/* The photo's own plastic laid back over the paint, so the moulding, shine and shadow show through like real plastic. */
+.rig > i.mould { mix-blend-mode: overlay; filter: contrast(1.8) brightness(1.05); }
 .rig > i { -webkit-mask-size: 100% 100%; mask-size: 100% 100%; -webkit-mask-repeat: no-repeat; mask-repeat: no-repeat; }
 .lock-need { font-weight: 600; }
 .rank-line { display: flex; justify-content: space-between; gap: 8px; flex-wrap: wrap; }
@@ -14528,6 +14530,19 @@ ${t && H > W && W < 600 ? '<li>Tip: turn your phone sideways for a bigger view.<
     camo: { label: 'Camo', cost: 6000, rank: 3, w: 120, h: 90, art: '<rect width="120" height="90" fill="#59683F"/><path d="M0 20C20 5 45 8 55 25S40 55 20 50-10 35 0 20Z" fill="#2F3A24"/><path d="M70 0C90-6 115 5 118 22S95 48 78 38 60 8 70 0Z" fill="#8A8458"/><path d="M60 58C78 48 105 55 112 70S90 96 72 88 48 68 60 58Z" fill="#2F3A24"/><path d="M8 62C20 54 38 62 38 74S22 92 10 86 0 70 8 62Z" fill="#8A8458"/>' },
     mud: { label: 'Mud splat', cost: 7000, rank: 3, w: 100, h: 80, art: '<g fill="#5B3A1E"><path d="M18 14C30 4 46 10 44 24S24 38 14 30 8 20 18 14Z"/><circle cx="56" cy="12" r="5"/><circle cx="8" cy="46" r="4"/><path d="M62 44C74 36 92 42 90 56S70 72 60 64 52 50 62 44Z"/><circle cx="38" cy="58" r="7"/><circle cx="86" cy="24" r="3"/></g>' },
     flame: { label: 'Flames', cost: 8000, rank: 3, w: 130, h: 80, turn: -10, art: '<rect width="130" height="80" fill="#15161B"/><path d="M0 80C16 70 14 52 6 40C20 46 26 44 26 28C36 38 42 34 44 14C56 30 60 44 56 58C64 52 68 52 72 62C80 56 84 62 86 80Z" fill="#F97316"/><path d="M16 80C26 72 26 60 22 52C30 58 36 54 36 44C44 52 48 62 44 80Z" fill="#FDE047"/>' },
+    // Kits added 4 November 2026: big shapes like a real graphics kit, in a few colours each.
+    speedW: { label: 'Speed lines white', cost: 3000, rank: 2, w: 240, h: 240, turn: -24, swatch: 0.24, art: '<rect y="60" width="240" height="52" fill="#FFFFFF"/><rect y="124" width="240" height="14" fill="#FFFFFF"/><rect y="148" width="240" height="6" fill="#FFFFFF"/>' },
+    speedK: { label: 'Speed lines black', cost: 3000, rank: 2, w: 240, h: 240, turn: -24, swatch: 0.24, art: '<rect y="60" width="240" height="52" fill="#15161B"/><rect y="124" width="240" height="14" fill="#15161B"/><rect y="148" width="240" height="6" fill="#15161B"/>' },
+    speedY: { label: 'Speed lines yellow', cost: 3500, rank: 2, w: 240, h: 240, turn: -24, swatch: 0.24, art: '<rect y="60" width="240" height="52" fill="#F2C200"/><rect y="124" width="240" height="14" fill="#F2C200"/><rect y="148" width="240" height="6" fill="#F2C200"/>' },
+    dotsW: { label: 'Halftone white', cost: 4500, rank: 2, w: 120, h: 120, turn: -20, swatch: 0.4, art: '<g fill="#FFFFFF"><circle cx="10" cy="12" r="9"/><circle cx="30" cy="12" r="9"/><circle cx="50" cy="12" r="9"/><circle cx="70" cy="12" r="9"/><circle cx="90" cy="12" r="9"/><circle cx="110" cy="12" r="9"/><circle cx="20" cy="32" r="7.2"/><circle cx="40" cy="32" r="7.2"/><circle cx="60" cy="32" r="7.2"/><circle cx="80" cy="32" r="7.2"/><circle cx="100" cy="32" r="7.2"/><circle cx="120" cy="32" r="7.2"/><circle cx="10" cy="52" r="5.6"/><circle cx="30" cy="52" r="5.6"/><circle cx="50" cy="52" r="5.6"/><circle cx="70" cy="52" r="5.6"/><circle cx="90" cy="52" r="5.6"/><circle cx="110" cy="52" r="5.6"/><circle cx="20" cy="72" r="4.2"/><circle cx="40" cy="72" r="4.2"/><circle cx="60" cy="72" r="4.2"/><circle cx="80" cy="72" r="4.2"/><circle cx="100" cy="72" r="4.2"/><circle cx="120" cy="72" r="4.2"/><circle cx="10" cy="92" r="2.8"/><circle cx="30" cy="92" r="2.8"/><circle cx="50" cy="92" r="2.8"/><circle cx="70" cy="92" r="2.8"/><circle cx="90" cy="92" r="2.8"/><circle cx="110" cy="92" r="2.8"/><circle cx="20" cy="110" r="1.6"/><circle cx="40" cy="110" r="1.6"/><circle cx="60" cy="110" r="1.6"/><circle cx="80" cy="110" r="1.6"/><circle cx="100" cy="110" r="1.6"/><circle cx="120" cy="110" r="1.6"/></g>' },
+    dotsK: { label: 'Halftone black', cost: 4500, rank: 2, w: 120, h: 120, turn: -20, swatch: 0.4, art: '<g fill="#15161B"><circle cx="10" cy="12" r="9"/><circle cx="30" cy="12" r="9"/><circle cx="50" cy="12" r="9"/><circle cx="70" cy="12" r="9"/><circle cx="90" cy="12" r="9"/><circle cx="110" cy="12" r="9"/><circle cx="20" cy="32" r="7.2"/><circle cx="40" cy="32" r="7.2"/><circle cx="60" cy="32" r="7.2"/><circle cx="80" cy="32" r="7.2"/><circle cx="100" cy="32" r="7.2"/><circle cx="120" cy="32" r="7.2"/><circle cx="10" cy="52" r="5.6"/><circle cx="30" cy="52" r="5.6"/><circle cx="50" cy="52" r="5.6"/><circle cx="70" cy="52" r="5.6"/><circle cx="90" cy="52" r="5.6"/><circle cx="110" cy="52" r="5.6"/><circle cx="20" cy="72" r="4.2"/><circle cx="40" cy="72" r="4.2"/><circle cx="60" cy="72" r="4.2"/><circle cx="80" cy="72" r="4.2"/><circle cx="100" cy="72" r="4.2"/><circle cx="120" cy="72" r="4.2"/><circle cx="10" cy="92" r="2.8"/><circle cx="30" cy="92" r="2.8"/><circle cx="50" cy="92" r="2.8"/><circle cx="70" cy="92" r="2.8"/><circle cx="90" cy="92" r="2.8"/><circle cx="110" cy="92" r="2.8"/><circle cx="20" cy="110" r="1.6"/><circle cx="40" cy="110" r="1.6"/><circle cx="60" cy="110" r="1.6"/><circle cx="80" cy="110" r="1.6"/><circle cx="100" cy="110" r="1.6"/><circle cx="120" cy="110" r="1.6"/></g>' },
+    topoW: { label: 'Topo white', cost: 6000, rank: 3, w: 200, h: 120, turn: -14, swatch: 0.3, art: '<path d="M0 14Q50 -6 100 14T200 14M0 44Q50 28 100 44T200 44M0 72Q50 50 100 72T200 72M0 100Q50 86 100 100T200 100" fill="none" stroke="#FFFFFF" stroke-width="9"/>' },
+    topoK: { label: 'Topo black', cost: 6000, rank: 3, w: 200, h: 120, turn: -14, swatch: 0.3, art: '<path d="M0 14Q50 -6 100 14T200 14M0 44Q50 28 100 44T200 44M0 72Q50 50 100 72T200 72M0 100Q50 86 100 100T200 100" fill="none" stroke="#15161B" stroke-width="9"/>' },
+    sharkW: { label: 'Shark teeth white', cost: 7000, rank: 3, w: 80, h: 150, turn: -16, swatch: 0.4, art: '<path d="M0 40L40 104L80 40V70L40 134L0 70Z" fill="#FFFFFF"/>' },
+    sharkK: { label: 'Shark teeth black', cost: 7000, rank: 3, w: 80, h: 150, turn: -16, swatch: 0.4, art: '<path d="M0 40L40 104L80 40V70L40 134L0 70Z" fill="#15161B"/>' },
+    factoryR: { label: 'Factory red', cost: 9000, rank: 3, w: 260, h: 260, turn: -32, swatch: 0.26, art: '<rect y="70" width="260" height="84" fill="#D4262F"/><rect y="164" width="260" height="14" fill="#FFFFFF"/><rect y="54" width="260" height="6" fill="#FFFFFF"/>' },
+    factoryB: { label: 'Factory blue', cost: 9000, rank: 3, w: 260, h: 260, turn: -32, swatch: 0.26, art: '<rect y="70" width="260" height="84" fill="#1F5FE0"/><rect y="164" width="260" height="14" fill="#FFFFFF"/><rect y="54" width="260" height="6" fill="#FFFFFF"/>' },
+    factoryK: { label: 'Factory black', cost: 9000, rank: 3, w: 260, h: 260, turn: -32, swatch: 0.26, art: '<rect y="70" width="260" height="84" fill="#15161B"/><rect y="164" width="260" height="14" fill="#F2C200"/><rect y="54" width="260" height="6" fill="#F2C200"/>' },
     tiger: { label: 'Tiger', cost: 10000, rank: 4, w: 70, h: 60, turn: 20, art: '<path d="M0 0L40 8L0 16ZM70 20L26 28L70 38ZM0 40L44 46L0 56Z" fill="#15161B"/>' },
     carbon: { label: 'Carbon', cost: 14000, rank: 4, w: 12, h: 12, art: '<rect width="12" height="12" fill="#2B2F36"/><path d="M0 0L6 6L0 12M6 0L12 6L6 12" stroke="#596273" stroke-width="2" fill="none"/>' },
     goldline: { label: 'Gold pinstripe', cost: 25000, rank: 5, w: 30, h: 30, turn: -30, art: '<rect width="30" height="30" fill="#15161B"/><rect y="4" width="30" height="4" fill="#E5B92B"/><rect y="13" width="30" height="1.5" fill="#FFF3C4"/>' },
@@ -14584,7 +14599,7 @@ ${t && H > W && W < 600 ? '<li>Tip: turn your phone sideways for a bigger view.<
       oRainbow: { label: 'Rainbow', cost: 8000, rank: 3, c: '#F2C200', c2: '#23262C', look: 'rainbow' },
       oGold: { label: 'Gold mirror', cost: 10000, rank: 4, c: '#E0A800', c2: '#23262C', shine: true },
     } },
-    kit: { title: 'Race kit', items: {
+    kit: { title: 'Jersey', items: {
       kStock: { label: 'Club grey', cost: 0, c: '#8A93A1', c2: '#D5D9E0', p: '#4B5361' },
       kBlue: { label: 'Club blue', cost: 2000, c: '#1F5FE0', c2: '#FFFFFF', p: '#16264D' },
       kGreen: { label: 'Club green', cost: 2000, c: '#0B8457', c2: '#FFFFFF', p: '#0B2E22' },
@@ -14614,28 +14629,28 @@ ${t && H > W && W < 600 ? '<li>Tip: turn your phone sideways for a bigger view.<
     // Every voice is free to choose (Marc, 4 November 2026). Original characters, spoken by the free voices already on the device, so how they sound differs a little between devices.
     // prefer lists voice names to look for on Apple, Windows, Android and Chrome. Pitch and speed do the rest.
     voice: { title: 'Voice', items: {
-      vStock: { label: 'Standard', cost: 0, c: '#8A93A1', c2: '#3B4250', sample: 'This is the standard voice. Tap Read to hear a question.' },
-      vDave: { label: 'Big Dave', cost: 0, c: '#E9501C', c2: '#15161B', prefer: ['Daniel', 'Google UK English Male', 'Microsoft Ryan', 'Microsoft George', 'Microsoft David', 'Mark'], pitch: 0.75, rate: 1.08,
+      vStock: { label: 'Standard', cost: 0, c: '#8A93A1', c2: '#3B4250', woman: true, prefer: ['Leah', 'Tessa', 'Sonia', 'Libby', 'Samantha', 'Karen', 'Google UK English Female', 'Zira'], sample: 'This is the standard voice. Tap Read to hear a question.' },
+      vDave: { label: 'Big Dave', cost: 0, c: '#E9501C', c2: '#15161B', prefer: ['Christopher', 'Aaron', 'Guy', 'Eric', 'Nathan', 'Evan', 'Tom', 'Alex', 'Mark'], pitch: 0.75, rate: 1.08,
         sample: 'Welcome to the track! I am Big Dave, and this is going to be a big one!',
         right: ['And that is a huge holeshot!', 'What a line! The crowd is on its feet!', 'Ladies and gentlemen, that answer was pinned flat!', 'Oh, sent that one right over the triple!'],
         wrong: ['Oh! Down in the first corner! But back up again!', 'A big wobble there, folks. Plenty of laps left!', 'Ooh, that one went into the hay bales!'] },
-      vPiet: { label: 'Oom Piet', cost: 0, c: '#7A5C2E', c2: '#F2C200', prefer: ['Daniel', 'Ralph', 'Microsoft David', 'Google UK English Male', 'Mark'], pitch: 0.7, rate: 0.82,
+      vPiet: { label: 'Oom Piet', cost: 0, c: '#7A5C2E', c2: '#F2C200', prefer: ['Luke', 'Arthur', 'Daniel', 'Thomas', 'Oliver', 'Google UK English Male', 'George'], pitch: 0.7, rate: 0.82,
         sample: 'Ja nee. Sit down, my boy. Oom Piet will help you with this one.',
         right: ['Ja nee, that is lekker, my boy.', 'Now that is how you plough a straight line.', 'Mooi so! Your ouma will be proud.', 'Clever like a jackal, this one.'],
         wrong: ['Ag shame, man. Try again, hey.', 'Eish. Even my old bakkie stalls sometimes.', 'Nee wat, that one is not it. Drink some water.'] },
-      vRik: { label: 'Rookie Rik', cost: 0, c: '#2FA8E8', c2: '#FFFFFF', prefer: ['Junior', 'Samantha', 'Google US English', 'Microsoft Zira', 'Karen'], pitch: 1.6, rate: 1.18,
+      vRik: { label: 'Rookie Rik', cost: 0, c: '#2FA8E8', c2: '#FFFFFF', prefer: ['Brian', 'Evan', 'Andrew', 'Alex', 'Nathan', 'Steffan', 'Junior'], pitch: 1.6, rate: 1.18,
         sample: 'Hi! I am Rookie Rik! I am going to beat you to the first corner!',
         right: ['Yes! Even I did not know that one!', 'Whoa! Can you do my homework too?', 'Braaap! You are so good it is annoying!', 'Nice one! I am telling everyone it was me.'],
         wrong: ['Whoa, I nearly picked that one too!', 'Oops! Even the pros stall it sometimes.', 'Wrong turn, champ! Back on the track, you have got this.'] },
-      vSpanner: { label: 'Uncle Spanner', cost: 0, c: '#4A5568', c2: '#F2C200', prefer: ['Rishi', 'Fred', 'Microsoft David', 'Google UK English Male', 'Daniel'], pitch: 0.85, rate: 0.9,
+      vSpanner: { label: 'Uncle Spanner', cost: 0, c: '#4A5568', c2: '#F2C200', prefer: ['Connor', 'Malcolm', 'Ryan', 'Gordon', 'Rishi', 'Daniel', 'Google UK English Male', 'George'], pitch: 0.85, rate: 0.9,
         sample: 'Uncle Spanner here. I have seen your riding. We need to talk.',
         right: ['Finally! I can put my spanner down.', 'Hmm. Not bad. Do not tell anyone I said so.', 'Correct. I almost smiled. Almost.', 'Good. That is the first thing today that has worked properly.'],
         wrong: ['Not that one. Every engine needs a second kick.', 'Hmm. Let us take that apart and see how it works.', 'Close. Even a good mechanic checks the manual.', 'Put the spanner down a sec. Have a look at your rule card.'] },
-      vDad: { label: 'Dozy Dad', cost: 0, c: '#0E9AA7', c2: '#FFFFFF', prefer: ['Ralph', 'Fred', 'Mark', 'Microsoft David', 'Google US English'], pitch: 0.6, rate: 0.8,
+      vDad: { label: 'Dozy Dad', cost: 0, c: '#0E9AA7', c2: '#FFFFFF', prefer: ['William', 'Gordon', 'Lee', 'Thomas', 'Jamie', 'Oliver', 'Google UK English Male', 'David'], pitch: 0.6, rate: 0.8,
         sample: 'Howzit, my boy. I was going to help, but I have lost my glasses. Oh, they are on my head.',
         right: ['Yes! That calls for a boerewors roll.', 'Well done, my boy. Now, where did I put my keys?', 'Correct! Wait, was I meant to be watching?', 'Lekker! I am so proud I could have a nap.'],
         wrong: ['Ag, no. Never mind. I once put diesel in the petrol bike.', 'Not quite. Let us think about it over a boerewors roll.', 'Oops. I did that too. Yesterday. With the lawnmower.'] },
-      vTurbo: { label: 'Turbo the robot', cost: 0, c: '#5B3DF5', c2: '#B7E021', prefer: ['Zarvox', 'Trinoids', 'Fred', 'Microsoft David', 'Google US English'], pitch: 0.3, rate: 1,
+      vTurbo: { label: 'Turbo the robot', cost: 0, robot: true, c: '#5B3DF5', c2: '#B7E021', prefer: ['Zarvox', 'Trinoids', 'David', 'Fred', 'Steffan', 'Eric'], pitch: 0.3, rate: 1,
         sample: 'Beep boop. I am Turbo. Your pit crew robot. Systems ready.',
         right: ['Answer correct. Happiness levels rising.', 'Beep boop. Excellent. Engine at full power.', 'Calculation complete. You are awesome.'],
         wrong: ['Error. Error. Please try again, human.', 'Does not compute. Checking the rule card.', 'Warning. Wrong answer detected. No damage done.'] },
@@ -14700,6 +14715,11 @@ ${t && H > W && W < 600 ? '<li>Tip: turn your phone sideways for a bigger view.<
       bGold: { label: 'Gold', cost: 22000, rank: 5, c: '#C8960F', c2: '#17181D', shine: true },
     } },
   };
+  // Pants come with the jersey of the same name: buying either gets both, so they share its id, price and receipt.
+  // Plain kits get bands in the jersey colour, so no two pants look the same.
+  GEAR.pants = { title: 'Pants', items: Object.fromEntries(Object.entries(GEAR.kit.items).map(([id, k]) => [id, {
+    label: k.label, cost: k.cost, rank: k.rank, c: k.p, c2: k.look || !k.cost ? k.c2 : k.c, look: k.look || (k.cost ? 'band' : undefined),
+  }])) };
   const BADGES = [
     { id: 'first', label: 'First moto', desc: 'Finish your first moto', test: (p) => p.runsDone >= 1 },
     { id: 'lap', label: 'Lap record', desc: 'Beat your own hot lap time', test: (p, x) => x && x.lap && x.lap.record },
@@ -14802,7 +14822,7 @@ ${t && H > W && W < 600 ? '<li>Tip: turn your phone sideways for a bigger view.<
   // ---------- staying up to date ----------
   // An open tab or a home screen app keeps running the page it first loaded, old prices and all. So it asks which version
   // is live when it comes back into view and every few minutes, and swaps over between races. build.mjs fills in BUILD.
-  const BUILD = '9b9ab36195';
+  const BUILD = '7a30109766';
   const BACK_KEY = 'holeshot.back.v1';
   const TRIED_KEY = 'holeshot.tried.v1';
   let liveBuild = null;
@@ -15109,6 +15129,16 @@ ${t && H > W && W < 600 ? '<li>Tip: turn your phone sideways for a bigger view.<
     const mid = [(a[0] + b[0] + c[0] + d[0]) / 4, (a[1] + b[1] + c[1] + d[1]) / 4];
     const m = [...unit(across, squeeze), ...unit(down), ...mid].map((n) => n.toFixed(3)).join(' ');
     const face = opts.bold ? "font-family:Anton,Impact,'Arial Narrow',sans-serif;font-weight:400;letter-spacing:-.01em" : 'font-family:var(--display);font-weight:800';
+    // A race number stays exactly where and at the angle it always was. To look printed rather than stamped on, the ink is
+    // a soft black multiplied into the board, so it takes the board's own light and shadow, with a faint vinyl sheen on top.
+    if (opts.bold) {
+      const ink = opts.fill || '#22252B';
+      const gloss = `gl${++svgNo}`;
+      const at = `transform="matrix(${m}) skewX(-6)" y="${(size * 0.37).toFixed(1)}" font-size="${size.toFixed(1)}" text-anchor="middle"`;
+      return `<defs><linearGradient id="${gloss}" x1="0" y1="0" x2="0.35" y2="1"><stop offset="0" stop-color="#fff" stop-opacity=".34"/><stop offset=".42" stop-color="#fff" stop-opacity=".06"/><stop offset=".43" stop-color="#fff" stop-opacity="0"/></linearGradient></defs>
+        <g style="mix-blend-mode:multiply"><text ${at} fill="${ink}" stroke="${ink}" stroke-width="${(size * 0.012).toFixed(2)}" stroke-linejoin="miter" style="${face};paint-order:stroke">${text}</text></g>
+        <text ${at} fill="url(#${gloss})" style="${face}">${text}</text>`;
+    }
     return `<text transform="matrix(${m}) skewX(${opts.bold ? -6 : -8})" y="${(size * (opts.bold ? 0.37 : 0.36)).toFixed(1)}" font-size="${size.toFixed(1)}" text-anchor="middle" fill="${fill}" ${line} style="${face};paint-order:stroke">${text}</text>`;
   };
   const SHOT_PARTS = ['shade', 'plastic', 'helmet', 'peak', 'lens', 'jersey', 'chest', 'knee', 'pants', 'gloves', 'boots', 'boots2'];
@@ -15166,6 +15196,7 @@ ${t && H > W && W < 600 ? '<li>Tip: turn your phone sideways for a bigger view.<
     ready(id);
     const pickG = (slot) => GEAR[slot].items[p.gear[slot]] || Object.values(GEAR[slot].items)[0];
     const kit = pickG('kit');
+    const pants = GEAR.pants.items[p.gear.pants || p.gear.kit] || GEAR.pants.items.kStock;
     const paint = PAINTS[p.paint] || PAINTS.orange;
     const jersey = kit.team ? paint.hex : kit.c;
     const helmet = pickG('helmet');
@@ -15180,10 +15211,10 @@ ${t && H > W && W < 600 ? '<li>Tip: turn your phone sideways for a bigger view.<
     const alt = label === undefined ? `Rider on a ${BIKES[id].label} bike in ${paint.label}` : label;
     return `<div class="rig" style="aspect-ratio:${spot.w}/${spot.h}">
       <img class="shot" src="img/photo-${id}.webp" alt="${alt}" width="${spot.w}" height="${spot.h}" decoding="sync">
-      ${paint.rainbow ? coat('plastic', rainbowNow || paint.hex, 'rainbow') : coat('plastic', paint.coat || paint.hex)}${sticker && sticker.art ? coat('plastic', stickerSheet(sticker, spot)) : ''}
-      ${coat('pants', kit.p)}${coat('pants', lookFill(kit.look, kit.c2))}${coat('boots', boots.c)}${coat('boots', lookFill(boots.look, boots.lc || boots.c2))}${coat('boots', shine(boots))}${coat('boots2', boots.c2)}
+      ${paint.rainbow ? coat('plastic', rainbowNow || paint.hex, 'rainbow') : coat('plastic', paint.coat || paint.hex)}${sticker && sticker.art ? coat('plastic', stickerSheet(sticker, spot)) : ''}${coat('plastic', `url(img/photo-${id}.webp) 0 0 / 100% 100%`, 'mould')}
+      ${coat('pants', pants.c)}${coat('pants', lookFill(pants.look, pants.c2))}${coat('boots', boots.c)}${coat('boots', lookFill(boots.look, boots.lc || boots.c2))}${coat('boots', shine(boots))}${coat('boots2', boots.c2)}
       ${coat('jersey', jersey)}${coat('jersey', lookFill(kit.look, kit.c2))}${coat('jersey', shine(kit))}
-      ${coat('chest', chest.cost ? chest.c : jersey)}${coat('chest', lookFill(chest.look, chest.c2))}${coat('chest', shine(chest))}${coat('knee', knee.cost ? knee.c : kit.p)}${coat('knee', lookFill(knee.look, knee.c2))}${coat('knee', shine(knee))}
+      ${coat('chest', chest.cost ? chest.c : jersey)}${coat('chest', lookFill(chest.look, chest.c2))}${coat('chest', shine(chest))}${coat('knee', knee.cost ? knee.c : pants.c)}${coat('knee', lookFill(knee.look, knee.c2))}${coat('knee', shine(knee))}
       ${coat('gloves', gloves.c)}${coat('gloves', lookFill(gloves.look, gloves.c2))}${coat('gloves', shine(gloves))}
       ${coat('helmet', helmet.team ? paint.hex : helmet.c)}${coat('helmet', lookFill(helmet.look, helmet.lc || helmet.c2))}${coat('helmet', shine(helmet))}${coat('peak', helmet.c2)}
       ${coat('lens', LENS[goggles.look] || goggles.c)}${coat('lens', shine(goggles))}
@@ -15863,7 +15894,7 @@ ${t && H > W && W < 600 ? '<li>Tip: turn your phone sideways for a bigger view.<
     r.draft = '';
     r.struck = null;
     drawRun();
-    if (state.autoRead) readAloud();
+    readNext();
   }
   function redoMark(ok) {
     const r = ui.run;
@@ -16157,7 +16188,7 @@ ${t && H > W && W < 600 ? '<li>Tip: turn your phone sideways for a bigger view.<
       Object.assign(r, { stage: view ? 'fade' : 'try', level: next.level, view, q });
     } else Object.assign(r, { stage: 'try', q: teachMake(r.skill, r.like) });
     drawRun();
-    if (state.autoRead) readAloud();
+    readNext();
     const w = $('#ans-word');
     if (w) w.focus();
   }
@@ -16359,10 +16390,10 @@ ${t && H > W && W < 600 ? '<li>Tip: turn your phone sideways for a bigger view.<
     const need = stillNeeds(p, item);
     return need || `${RS.fmt(item.cost)} points`;
   };
-  const PIT_TABS = [['helmet', 'Helmet'], ['goggles', 'Goggles'], ['kit', 'Race kit'], ['chest', 'Chest guard'], ['knee', 'Knee guards'], ['gloves', 'Gloves'], ['boots', 'Boots'], ['paint', 'Bike colour'], ['sticker', 'Stickers'], ['number', 'Number'], ['voice', 'Voice'], ['bike', 'Bikes'], ['badges', 'Badges']];
+  const PIT_TABS = [['helmet', 'Helmet'], ['goggles', 'Goggles'], ['kit', 'Jersey'], ['pants', 'Pants'], ['chest', 'Chest guard'], ['knee', 'Knee guards'], ['gloves', 'Gloves'], ['boots', 'Boots'], ['paint', 'Bike colour'], ['sticker', 'Stickers'], ['number', 'Number'], ['voice', 'Voice'], ['bike', 'Bikes'], ['badges', 'Badges']];
   const shopOf = (tab) => (tab === 'paint' ? PAINTS : tab === 'sticker' ? STICKERS : tab === 'bike' ? BIKES : GEAR[tab].items);
   const ownedOf = (p, tab) => (tab === 'paint' ? p.ownedP : tab === 'sticker' ? p.ownedS : tab === 'bike' ? p.ownedB : p.ownedG);
-  const wearing = (p, tab) => (tab === 'paint' ? p.paint : tab === 'sticker' ? p.sticker : tab === 'bike' ? p.bike : p.gear[tab] || Object.keys(GEAR[tab].items)[0]);
+  const wearing = (p, tab) => (tab === 'paint' ? p.paint : tab === 'sticker' ? p.sticker : tab === 'bike' ? p.bike : p.gear[tab] || (tab === 'pants' && p.gear.kit) || Object.keys(GEAR[tab].items)[0]);
   const hasItem = (p, tab, id) => ownedOf(p, tab).includes(id) || shopOf(tab)[id].cost === 0;
   function wear(p, tab, id) {
     if (tab === 'paint') p.paint = id;
@@ -16379,7 +16410,7 @@ ${t && H > W && W < 600 ? '<li>Tip: turn your phone sideways for a bigger view.<
   }
   function swatchFor(p, tab, item, mark) {
     if (tab === 'sticker' && item.art) {
-      const fill = stickerFill(item, 0.5);
+      const fill = stickerFill(item, item.swatch || 0.5);
       return `<span class="swatch"><svg class="swatch-art" viewBox="0 0 46 46" aria-hidden="true"><defs>${fill.def}</defs><rect width="46" height="46" fill="${PAINTS[p.paint].hex}"/><rect width="46" height="46" fill="url(#${fill.id})"/></svg><span class="swatch-mark">${mark}</span></span>`;
     }
     if (tab === 'sticker') return `<span class="swatch" style="--c:${PAINTS[p.paint].hex}"><span class="swatch-mark">${mark}</span></span>`;
@@ -16425,7 +16456,7 @@ ${t && H > W && W < 600 ? '<li>Tip: turn your phone sideways for a bigger view.<
     const tab = ui.pit;
     const show = tried(p);
     const tabBtn = ([id, label]) => `<button class="pit-tab ${tab === id ? 'on' : ''}" data-act="pit" data-id="${id}" aria-pressed="${tab === id}">${label}</button>`;
-    const groups = [['Bike', ['bike', 'paint', 'sticker', 'number']], ['Rider', ['helmet', 'goggles', 'kit', 'chest', 'knee', 'gloves', 'boots']], ['Extras', ['voice', 'badges']]];
+    const groups = [['Bike', ['bike', 'paint', 'sticker', 'number']], ['Rider', ['helmet', 'goggles', 'kit', 'pants', 'chest', 'knee', 'gloves', 'boots']], ['Extras', ['voice', 'badges']]];
     const tabs = groups.map(([name, ids]) => `<div class="pit-group"><span class="eyebrow">${name}</span>${ids.map((id) => tabBtn(PIT_TABS.find((x) => x[0] === id))).join('')}</div>`).join('');
     let body;
     if (tab === 'number') {
@@ -16449,7 +16480,7 @@ ${t && H > W && W < 600 ? '<li>Tip: turn your phone sideways for a bigger view.<
       body = `<div class="h-sec" style="margin-bottom:10px">Bikes</div><div class="rides">${rides}</div>`;
     } else {
       const group = PIT_TABS.find(([id]) => id === tab)[1];
-      const note = tab === 'paint' ? 'Your colour paints the bike and the whole app.' : tab === 'sticker' ? 'Sticker kits go on over your bike colour.' : tab === 'voice' ? 'Tap one to hear it. They read your questions when you tap Read, and react to your answers.' : 'Tap to try it on. Top gear needs a higher rank, and it isn\'t cheap.';
+      const note = tab === 'paint' ? 'Your colour paints the bike and the whole app.' : tab === 'sticker' ? 'Sticker kits go on over your bike colour.' : tab === 'kit' ? 'Every jersey comes with its own pants. Wear it with any pants you have.' : tab === 'pants' ? 'Pants come with the jersey of the same name, so buying one gets you both.' : tab === 'voice' ? `Tap one to hear it. They react to your answers, and when you tap Read, a voice on this device that suits them reads the question.${goodVoices() || IOS ? '' : ' On a laptop, questions sound best in Microsoft Edge.'}` : 'Tap to try it on. Top gear needs a higher rank, and it isn\'t cheap.';
       body = `<div class="h-sec" style="margin-bottom:4px">${group}</div><p class="small-t muted" style="margin-bottom:10px">${note}</p><div class="paints">${pitItems(p, tab)}</div>`;
     }
     return shell(`
@@ -16779,7 +16810,7 @@ ${t && H > W && W < 600 ? '<li>Tip: turn your phone sideways for a bigger view.<
     r.redo = null;
     r.prove = null;
     drawRun();
-    if (state.autoRead) readAloud();
+    readNext();
     const w = $('#ans-word');
     if (w) w.focus();
   }
@@ -17616,58 +17647,77 @@ ${t && H > W && W < 600 ? '<li>Tip: turn your phone sideways for a bigger view.<
   }
 
   // ---------- reading aloud ----------
+  let readNo = 0;
   function stopSpeaking() {
+    readNo++;
     if (window.speechSynthesis) window.speechSynthesis.cancel();
     if (typeof stopClip === 'function') stopClip();
   }
   const voiceOf = (p) => GEAR.voice.items[p.gear.voice] || GEAR.voice.items.vStock;
-  // Questions are new every time, so the device's own voices read them. The free good ones are Edge's "Natural" voices
-  // on Windows, Chrome's "Google" voices, and on an iPad the "Enhanced" or "Premium" voices once they're downloaded.
+  // When holeshot-say can't read a question, the device's own voices do. The free good ones are Edge's "Natural" voices
+  // on Windows and Chrome's "Google" voices; Safari on an iPad only ever offers its basic ones.
   // A good voice comes first, then English (South Africa), then UK. Old robotic and novelty voices are a last resort.
   const VOICE_GOOD = /natural|neural|premium|enhanced|siri/i;
   const VOICE_OK = /google|online/i;
   const VOICE_BAD = /\b(zarvox|trinoids|albert|bad news|bahh|bells|boing|bubbles|cellos|good news|jester|organ|superstar|whisper|wobble|junior|ralph|fred|kathy|princess|eddy|flo|grandma|grandpa|reed|rocko|sandy|shelley|espeak|compact)\b/i;
-  const VOICE_MALE = /\b(male|luke|willem|ryan|thomas|guy|andrew|brian|christopher|davis|eric|roger|steffan|william|connor|mitchell|david|mark|george|daniel|arthur|aaron|alex|evan|nathan|tom|rishi|lee|gordon|oliver)\b/i;
+  const VOICE_MALE = /\b(male|luke|willem|ryan|thomas|guy|andrew|brian|christopher|davis|eric|roger|steffan|william|connor|mitchell|david|mark|george|daniel|arthur|aaron|alex|evan|nathan|tom|rishi|lee|gordon|oliver|malcolm|jamie|fred|ralph|albert|eddy|reed|rocko|grandpa|junior)\b/i;
   let voicePicks = {};
   if (window.speechSynthesis && window.speechSynthesis.addEventListener) window.speechSynthesis.addEventListener('voiceschanged', () => { voicePicks = {}; });
-  function pickVoice(lang, who) {
-    const key = `${lang}|${who.label || ''}`;
-    if (voicePicks[key] !== undefined) return voicePicks[key];
+  // Characters choose in this order, and each one avoids a voice an earlier one took, so they sound different.
+  const CAST_ORDER = ['vStock', 'vPiet', 'vDave', 'vSpanner', 'vDad', 'vRik', 'vTurbo'];
+  const named = (v, n) => new RegExp(`\\b${n}\\b`, 'i').test(v.name);
+  function castVoices(lang) {
+    if (voicePicks[lang] !== undefined) return voicePicks[lang];
     const voices = window.speechSynthesis.getVoices();
     const want = lang.replace('_', '-').toLowerCase();
-    // The characters are all men; the Standard voice has no prefer list.
-    const male = !!who.prefer;
-    let best = null;
-    let top = -Infinity;
-    for (const v of voices) {
-      const vl = (v.lang || '').replace('_', '-').toLowerCase();
-      if (vl.slice(0, 2) !== want.slice(0, 2)) continue;
-      const id = `${v.name} ${v.voiceURI || ''}`;
-      let score = VOICE_GOOD.test(id) ? 40 : VOICE_OK.test(id) ? 20 : 0;
-      if (VOICE_BAD.test(v.name)) score -= 60;
-      if (vl === want) score += 15;
-      else if (want.startsWith('en') && vl === 'en-gb') score += 10;
-      else if (want.startsWith('en') && /^en-(au|ie|nz)/.test(vl)) score += 5;
-      if (VOICE_MALE.test(v.name) === male) score += 6;
-      if (who.prefer && who.prefer.some((n) => v.name.includes(n))) score += 8;
-      if (v.localService) score += 1;
-      if (score > top) {
-        top = score;
-        best = v;
+    const mine = voices.filter((v) => (v.lang || '').replace('_', '-').toLowerCase().slice(0, 2) === want.slice(0, 2));
+    // No voice for this language (often Afrikaans on an iPad): the English voices read it, as before.
+    if (!mine.length && !want.startsWith('en')) return castVoices('en-ZA');
+    const taken = new Set();
+    const cast = {};
+    for (const id of CAST_ORDER) {
+      const who = GEAR.voice.items[id];
+      if (!who) continue;
+      let best = null;
+      let top = -Infinity;
+      for (const v of mine) {
+        const vl = (v.lang || '').replace('_', '-').toLowerCase();
+        const key = `${v.name} ${v.voiceURI || ''}`;
+        let score = VOICE_GOOD.test(key) ? 40 : VOICE_OK.test(key) ? 20 : 0;
+        if (VOICE_BAD.test(v.name) && !who.robot) score -= 60;
+        if (vl === want) score += 6;
+        const at = (who.prefer || []).findIndex((n) => named(v, n));
+        if (at >= 0) score += 30 - at * 2;
+        if (!who.robot && VOICE_MALE.test(v.name) === !!who.woman) score -= 50;
+        if (taken.has(v)) score -= 35;
+        if (v.localService) score += 1;
+        if (score > top) {
+          top = score;
+          best = v;
+        }
       }
+      if (best) taken.add(best);
+      cast[id] = best;
     }
-    // No voice for this language (often Afrikaans on an iPad): the best English voice reads it, as before.
-    if (!best && !want.startsWith('en')) best = pickVoice('en-ZA', who);
-    if (voices.length) voicePicks[key] = best;
-    return best;
+    if (voices.length) voicePicks[lang] = cast;
+    return cast;
   }
+  function pickVoice(lang, who) {
+    const id = Object.keys(GEAR.voice.items).find((k) => GEAR.voice.items[k] === who) || 'vStock';
+    return castVoices(lang)[id] || null;
+  }
+  // Safari on an iPad never lets a website use downloaded voices, and downloading a better copy can even hide the basic one,
+  // so an iPad gets no download tip. An iPad can call itself a Mac, so a touch screen gives it away.
+  const IOS = /iPad|iPhone|iPod/.test(navigator.userAgent) || (/Macintosh/.test(navigator.userAgent) && navigator.maxTouchPoints > 1);
+  // True when the device has a natural-sounding English voice, for the tip in the pit.
+  const goodVoices = () => !!window.speechSynthesis && window.speechSynthesis.getVoices().some((v) => /^en/i.test(v.lang || '') && VOICE_GOOD.test(`${v.name} ${v.voiceURI || ''}`));
   function dress(u, who, lang) {
     const v = pickVoice(lang, who);
     if (v) u.voice = v;
     u.lang = v ? v.lang : lang;
     // Good voices sound strained when pushed, so a character only nudges the speed and pitch.
     u.rate = Math.min(1.1, Math.max(0.88, 1 + ((who.rate || 0.97) - 1) * 0.5));
-    u.pitch = Math.min(1.1, Math.max(0.9, 1 + ((who.pitch || 1) - 1) * 0.15));
+    u.pitch = who.robot ? 0.6 : Math.min(1.1, Math.max(0.9, 1 + ((who.pitch || 1) - 1) * 0.15));
     return u;
   }
   // ---------- recorded character lines ----------
@@ -17684,26 +17734,35 @@ ${t && H > W && W < 600 ? '<li>Tip: turn your phone sideways for a bigger view.<
       clipNow = null;
     }
   }
-  async function playClip(src) {
+  // Called from a tap, so an iPad lets the sound start.
+  function wakeAudio() {
     if (!ac) {
       try {
         ac = new (window.AudioContext || window.webkitAudioContext)();
       } catch (e) {
-        return false;
+        return null;
       }
     }
+    if (ac.state === 'suspended') ac.resume();
+    return ac;
+  }
+  const decode = (b) => new Promise((ok, no) => ac.decodeAudioData(b, ok, no));
+  function startBuffer(buf) {
+    stopSpeaking();
+    const node = ac.createBufferSource();
+    node.buffer = buf;
+    node.connect(ac.destination);
+    node.start();
+    clipNow = node;
+  }
+  async function playClip(src) {
+    if (!wakeAudio()) return false;
     try {
-      if (ac.state === 'suspended') ac.resume();
       const buf = await (clipBank[src] || (clipBank[src] = fetch(src).then((res) => {
         if (!res.ok) throw new Error('no clip');
         return res.arrayBuffer();
-      }).then((b) => new Promise((ok, no) => ac.decodeAudioData(b, ok, no)))));
-      stopSpeaking();
-      const node = ac.createBufferSource();
-      node.buffer = buf;
-      node.connect(ac.destination);
-      node.start();
-      clipNow = node;
+      }).then(decode)));
+      startBuffer(buf);
       return true;
     } catch (e) {
       delete clipBank[src];
@@ -17742,15 +17801,64 @@ ${t && H > W && W < 600 ? '<li>Tip: turn your phone sideways for a bigger view.<
     if (line && state.sound) sayAs(P().gear.voice || 'vStock', line);
   }
   const lineHTML = (s) => (s.line ? `<p class="char-line"><b>${h(voiceOf(P()).label)}:</b> ${h(s.line)}</p>` : '');
+  // ---------- questions in the character's own voice ----------
+  // holeshot-say reads a question with the same voice that recorded the character's lines, so Big Dave sounds like Big Dave
+  // on an iPad too, where Safari only offers its basic voices. It needs the internet and a linked device, and Kokoro only
+  // speaks English, so Afrikaans and isiZulu stay with the device. If anything fails, the device's voice reads it as before.
+  const SAY_URL = 'https://kyosepbdxjwugunylvyo.supabase.co/functions/v1/holeshot-say';
+  const sayBank = new Map();
+  let sayOff = false;
+  const sayLang = (q) => !q.lang || /^en/i.test(q.lang);
+  function fetchSay(id, text) {
+    if (sayOff || !SYNC_ON || !syncToken || navigator.onLine === false || !wakeAudio()) return Promise.resolve(null);
+    const key = `${id}|${text}`;
+    if (!sayBank.has(key)) {
+      if (sayBank.size >= 30) sayBank.delete(sayBank.keys().next().value);
+      const got = fetch(SAY_URL, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ token: syncToken, voice: id, text }) })
+        .then((res) => {
+          // Not switched on yet, or today's allowance is used up: the device reads for the rest of this visit.
+          if (res.status === 503 || res.status === 429) sayOff = true;
+          return res.ok ? res.arrayBuffer().then(decode) : null;
+        })
+        .catch(() => null)
+        .then((buf) => {
+          if (!buf) sayBank.delete(key);
+          return buf;
+        });
+      sayBank.set(key, got);
+    }
+    return sayBank.get(key);
+  }
+  function readText(q) {
+    let text = RS.speakable(q.q);
+    if (q.visual && q.visual.type === 'flow') text += '. ' + q.visual.items.map(RS.speakable).join(', then ');
+    if (q.kind === 'mc') text += '. ' + q.options.map((o, i) => `${'ABCD'[i]}: ${RS.speakable(o)}`).join('. ');
+    return text;
+  }
   function readAloud() {
     const r = ui.run;
-    if (!r || !window.speechSynthesis) return;
+    if (!r) return;
     stopSpeaking();
-    let text = RS.speakable(r.q.q);
-    if (r.q.visual && r.q.visual.type === 'flow') text += '. ' + r.q.visual.items.map(RS.speakable).join(', then ');
-    if (r.q.kind === 'mc') text += '. ' + r.q.options.map((o, i) => `${'ABCD'[i]}: ${RS.speakable(o)}`).join('. ');
-    const u = dress(new SpeechSynthesisUtterance(text), voiceOf(P()), r.q.lang || 'en-ZA');
-    window.speechSynthesis.speak(u);
+    r.readOn = true;
+    const q = r.q;
+    const text = readText(q);
+    const device = () => {
+      if (window.speechSynthesis && ui.run && ui.run.q === q) window.speechSynthesis.speak(dress(new SpeechSynthesisUtterance(text), voiceOf(P()), q.lang || 'en-ZA'));
+    };
+    if (!sayLang(q)) return device();
+    const asked = readNo;
+    fetchSay(P().gear.voice || 'vStock', text).then((buf) => {
+      // Moved on, tapped again or stopped while it was on its way: say nothing.
+      if (asked !== readNo || !ui.run || ui.run.q !== q) return;
+      if (buf) startBuffer(buf);
+      else device();
+    });
+  }
+  // Once he has used Read in a race, the next question's reading is fetched as it appears, so his tap plays at once.
+  function readNext() {
+    if (state.autoRead) return readAloud();
+    const r = ui.run;
+    if (r && r.readOn && r.q && sayLang(r.q)) fetchSay(P().gear.voice || 'vStock', readText(r.q));
   }
 
   // ---------- sound and confetti ----------
@@ -18808,7 +18916,7 @@ ${t && H > W && W < 600 ? '<li>Tip: turn your phone sideways for a bigger view.<
               ui.moment = { title: `Your new ${shopOf(tab)[item].label} bike` };
               confetti();
               sfx('fanfare');
-            } else toast(`${shopOf(tab)[item].label} is yours.`);
+            } else toast(tab === 'kit' || tab === 'pants' ? `${shopOf(tab)[item].label} jersey and pants are yours.` : `${shopOf(tab)[item].label} is yours.`);
             save();
             render();
           }
