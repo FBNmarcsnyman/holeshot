@@ -589,32 +589,124 @@ details ol { margin: 6px 0 0; padding-left: 20px; }
 .walk-back { background: var(--card-2); border-left: 4px solid var(--accent); border-radius: 10px; padding: 8px 12px; margin: 8px 0; }
 .walk-back p { margin: 4px 0 0; }
 
-/* Parents' page as cards (4 November 2026): a dark top card like Family Fit's check bar, then one idea per card.
-   Everything compares a boy with his own last period, never with his brother. */
-.ph-tabs { flex-direction: row; flex-wrap: wrap; }
-.ph-hero { --ph-bg: #15161B; background: var(--ph-bg); color: #fff; display: grid; gap: 12px; padding: 18px; }
-@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .ph-hero { --ph-bg: #2A2D36; } }
-:root[data-theme="dark"] .ph-hero { --ph-bg: #2A2D36; }
-.ph-eyebrow { font-size: 12px; font-weight: 600; letter-spacing: .04em; text-transform: uppercase; color: rgba(255, 255, 255, .7); }
-.ph-head { font-family: var(--display); font-weight: 700; font-size: 24px; line-height: 1.15; letter-spacing: -.01em; }
+/* Parents' page as cards (4 November 2026). Layout ideas Marc picked from app screenshots: a date header on a soft wash
+   of the boy's colour (his Family Fit colour: mint for Jordy, peach for Kash), a tile per boy, one big focus card with a
+   single dark button, a calendar-style week, and pastel subject tiles. A boy is only ever compared with his own past. */
+:root {
+  --t0: #FFE9DF; --t0i: #9A3412; --t1: #E3EEFB; --t1i: #264A7A; --t2: #FFF1D6; --t2i: #7A4F00;
+  --t3: #E3F4EA; --t3i: #1D6B42; --t4: #FDE7E7; --t4i: #A61F26; --t5: #ECE8FF; --t5i: #4A30C9;
+  --ph-wash: #E9ECEF;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --t0: #3A2117; --t0i: #FFB08F; --t1: #14273D; --t1i: #B5D6FF; --t2: #33260E; --t2i: #FFD58A;
+    --t3: #12301F; --t3i: #8FE8B5; --t4: #3A1816; --t4i: #FFB3AD; --t5: #221C44; --t5i: #CFC6FF;
+  }
+}
+:root[data-theme="dark"] {
+  --t0: #3A2117; --t0i: #FFB08F; --t1: #14273D; --t1i: #B5D6FF; --t2: #33260E; --t2i: #FFD58A;
+  --t3: #12301F; --t3i: #8FE8B5; --t4: #3A1816; --t4i: #FFB3AD; --t5: #221C44; --t5i: #CFC6FF;
+}
+.tint-0 { --tb: var(--t0); --ti: var(--t0i); }
+.tint-1 { --tb: var(--t1); --ti: var(--t1i); }
+.tint-2 { --tb: var(--t2); --ti: var(--t2i); }
+.tint-3 { --tb: var(--t3); --ti: var(--t3i); }
+.tint-4 { --tb: var(--t4); --ti: var(--t4i); }
+.tint-5 { --tb: var(--t5); --ti: var(--t5i); }
+.boy-jordy { --tb: var(--t3); --ti: var(--t3i); }
+.boy-kash { --tb: var(--t0); --ti: var(--t0i); }
+
+/* The wash of his colour behind the top of the page */
+body:has(.ph) { background-image: linear-gradient(180deg, var(--ph-wash) 0, var(--lot) 560px); background-repeat: no-repeat; }
+body:has(.ph[data-boy="jordy"]) { --ph-wash: #BFE6CE; }
+body:has(.ph[data-boy="kash"]) { --ph-wash: #FFD2BD; }
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) body:has(.ph[data-boy="jordy"]) { --ph-wash: #133826; }
+  :root:not([data-theme="light"]) body:has(.ph[data-boy="kash"]) { --ph-wash: #43251A; }
+}
+:root[data-theme="dark"] body:has(.ph[data-boy="jordy"]) { --ph-wash: #133826; }
+:root[data-theme="dark"] body:has(.ph[data-boy="kash"]) { --ph-wash: #43251A; }
+
+.ph { gap: 14px; }
+.ph-top { display: flex; align-items: center; gap: 8px; }
+.ph-date { flex: 1; min-width: 0; display: grid; line-height: 1.1; }
+.ph-date span { font-family: var(--display); font-weight: 700; font-size: 26px; letter-spacing: -.02em; }
+.ph-date b { font-family: var(--display); font-weight: 600; font-size: 20px; color: var(--ink-2); letter-spacing: -.01em; }
+.ph-glass { background: color-mix(in srgb, var(--card) 70%, transparent); box-shadow: none; backdrop-filter: blur(8px); }
+
+/* A tile per boy: his name and, in words only, what tonight holds. Tapping one opens his page. */
+.ph-boys { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+.ph-boy { display: flex; align-items: center; gap: 10px; text-align: left; min-height: 64px; padding: 10px 12px; border-radius: 22px; background: color-mix(in srgb, var(--card) 72%, transparent); color: var(--ink); transition: transform .08s ease; }
+.ph-boy:active { transform: scale(.98); }
+.ph-boy.on { background: var(--card); box-shadow: var(--shadow), inset 0 0 0 2px var(--ti); }
+.ph-av { flex: none; width: 40px; height: 40px; border-radius: 50%; display: grid; place-items: center; background: var(--tb); color: var(--ti); font-family: var(--display); font-weight: 800; font-size: 19px; }
+.ph-boy-txt { display: grid; min-width: 0; }
+.ph-boy-txt b { font-weight: 700; font-size: 15px; }
+.ph-boy-txt small { font-size: 12px; color: var(--ink-2); line-height: 1.3; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; }
+
+/* His name, the period switch and a ring of days ridden */
+.ph-intro { display: flex; align-items: center; gap: 12px; padding: 4px 2px; }
+.ph-intro-txt { flex: 1; min-width: 0; display: grid; gap: 4px; }
+.ph-eyebrow2 { font-size: 12px; font-weight: 600; letter-spacing: .04em; text-transform: uppercase; color: var(--ink-2); }
+.ph-h1 { font-family: var(--display); font-weight: 800; font-size: 32px; line-height: 1.05; letter-spacing: -.025em; }
+.ph-seg { display: inline-flex; justify-self: start; gap: 2px; padding: 3px; border-radius: 999px; background: color-mix(in srgb, var(--card) 60%, transparent); margin-top: 4px; }
+.ph-segb { min-height: 36px; padding: 0 14px; border-radius: 999px; font-size: 13px; font-weight: 600; color: var(--ink-2); }
+.ph-segb.on { background: var(--ink); color: var(--card); }
+.ph-ringbox { position: relative; flex: none; width: 92px; height: 92px; }
+.ph-ringbox svg { width: 100%; height: 100%; }
+.ph-ring-bg { fill: none; stroke: color-mix(in srgb, var(--ink) 10%, transparent); stroke-width: 6; }
+.ph-ring-fg { fill: none; stroke: var(--ink); stroke-width: 6; stroke-linecap: round; }
+.ph-ringbox > span { position: absolute; inset: 0; display: grid; place-content: center; text-align: center; line-height: 1.05; }
+.ph-ringbox b { font-family: var(--display); font-weight: 700; font-size: 19px; }
+.ph-ringbox small { font-size: 10px; color: var(--ink-2); }
+
+/* Tonight's focus: the one big card, with a single dark button, and what's next tucked under it */
+.ph-focus-wrap { border-radius: 32px; padding: 6px; background: color-mix(in srgb, var(--card) 50%, transparent); display: grid; }
+.ph-focus { border-radius: 28px; padding: 20px; display: grid; gap: 10px; }
+.ph-focus-top { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+.ph-focus-title { font-family: var(--display); font-weight: 700; font-size: 25px; line-height: 1.15; letter-spacing: -.015em; }
+.ph-focus-text { color: var(--ink-2); font-size: 15px; }
+.ph-pill { min-height: 52px; margin-top: 6px; width: 100%; font-size: 16px; }
+.ph-nextup { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; padding: 12px 14px 8px; font-size: 14px; }
+.ph-nextup b { flex: 1; min-width: 0; font-weight: 600; }
+.ph-nextup .chip svg { display: inline; }
+
+/* His week: day letters over dates, today as a dark pill, a bar for how long he rode */
+.ph-week { display: grid; gap: 12px; }
+.ph-week .ph-title { margin-bottom: 0; }
+.ph-wk { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 4px; }
+.ph-wd { display: grid; justify-items: center; gap: 4px; padding: 8px 0 10px; border-radius: 999px; }
+.ph-wd span { font-size: 11px; font-weight: 600; color: var(--ink-3); }
+.ph-wd b { font-family: var(--display); font-weight: 700; font-size: 17px; }
+.ph-wd i { display: flex; align-items: flex-end; justify-content: center; height: 30px; width: 10px; }
+.ph-wd em { display: block; width: 10px; border-radius: 999px; background: var(--ti, var(--good)); }
+.ph-wd:not(.on) i::after { content: ""; width: 5px; height: 5px; border-radius: 50%; background: var(--line); }
+.ph[data-boy="jordy"] .ph-wd em, .ph[data-boy="jordy"] .ph-cal .lv3 { --ti: var(--t3i); }
+.ph[data-boy="kash"] .ph-wd em, .ph[data-boy="kash"] .ph-cal .lv3 { --ti: var(--t0i); }
+.ph-wd.today { background: var(--ink); }
+.ph-wd.today span, .ph-wd.today b { color: var(--card); }
+.ph-wd.today em { background: var(--lime); }
+.ph-wd.today:not(.on) i::after { background: color-mix(in srgb, var(--card) 40%, transparent); }
+.ph-cal { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 5px; }
+.ph-cal > span { text-align: center; font-size: 11px; font-weight: 600; color: var(--ink-3); }
+.ph-cal > b { display: grid; place-items: center; aspect-ratio: 1; border-radius: 12px; font-size: 13px; font-weight: 600; background: var(--card-2); color: var(--ink-3); }
+.ph[data-boy="jordy"] .ph-cal { --c1: var(--t3); --ci: var(--t3i); }
+.ph[data-boy="kash"] .ph-cal { --c1: var(--t0); --ci: var(--t0i); }
+.ph-cal > b.lv1 { background: var(--c1); color: var(--ci); }
+.ph-cal > b.lv2 { background: color-mix(in srgb, var(--ci) 45%, var(--c1)); color: var(--card); }
+.ph-cal > b.lv3 { background: var(--ci); color: var(--card); }
+.ph-cal > b.today { box-shadow: inset 0 0 0 2px var(--ink); }
 .ph-stats { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
-.ph-stats > div { background: rgba(255, 255, 255, .08); border-radius: 16px; padding: 10px; display: grid; gap: 2px; align-content: start; min-width: 0; }
-.ph-stats b { font-family: var(--display); font-size: 22px; font-weight: 700; line-height: 1.1; }
-.ph-stats b small { font-size: 14px; color: rgba(255, 255, 255, .6); font-weight: 600; }
-.ph-stats span { font-size: 12px; color: rgba(255, 255, 255, .72); }
-.ph-stats .ph-delta { font-size: 12px; font-weight: 700; color: rgba(255, 255, 255, .72); }
-.ph-stats .ph-delta.up { color: var(--lime); }
-.ph-strip { display: grid; grid-template-columns: repeat(var(--n), minmax(0, 1fr)); gap: 6px; height: 76px; }
-.ph-strip.many { gap: 2px; }
-.ph-day { display: grid; grid-template-rows: minmax(0, 1fr) auto; justify-items: center; gap: 4px; min-width: 0; }
-.ph-day i { align-self: end; width: 100%; max-width: 32px; border-radius: 6px; background: var(--lime); }
-.ph-strip.many .ph-day i { border-radius: 2px; }
-.ph-day.off i { width: 6px; height: 6px !important; border-radius: 50%; background: rgba(255, 255, 255, .25); }
-.ph-day span { font-size: 11px; line-height: 14px; height: 14px; color: rgba(255, 255, 255, .6); }
-.ph-day.today span { color: #fff; font-weight: 700; }
-.ph-foot { font-size: 12px; color: rgba(255, 255, 255, .65); }
+.ph-stats > div { background: var(--tb); border-radius: 18px; padding: 12px 10px; display: grid; gap: 2px; align-content: start; min-width: 0; }
+.ph-stats b { font-family: var(--display); font-size: 21px; font-weight: 700; line-height: 1.1; color: var(--ti); white-space: nowrap; }
+.ph-stats span { font-size: 12px; color: var(--ink-2); }
+.ph-stats .ph-delta { font-size: 12px; font-weight: 700; color: var(--ink-2); }
+.ph-stats .ph-delta.up { color: var(--good); }
+
+/* Praise, requests and the rest of the cards */
 .ph-praise { background: var(--good-soft); display: grid; gap: 8px; }
 .ph-praise .eyebrow { color: var(--good); }
+.ph-praise .chip.good { background: var(--card); }
 .ph-ask { background: var(--warn-soft); display: grid; gap: 6px; }
 .ph-ask .eyebrow { color: var(--warn); }
 .ph-big { font-family: var(--display); font-weight: 700; font-size: 19px; line-height: 1.25; }
@@ -625,10 +717,11 @@ details ol { margin: 6px 0 0; padding-left: 20px; }
 .ph-list { display: grid; gap: 12px; }
 .ph-test { display: grid; grid-template-columns: 56px minmax(0, 1fr); gap: 12px; align-items: start; }
 .ph-test + .ph-test { border-top: 1px solid var(--line); padding-top: 12px; }
-.ph-count { width: 56px; height: 56px; border-radius: 16px; background: var(--violet-soft); color: var(--violet); display: grid; place-content: center; text-align: center; line-height: 1; }
+.ph-count { width: 56px; height: 56px; border-radius: 18px; background: var(--card-2); color: var(--ink); display: grid; place-content: center; text-align: center; line-height: 1; }
 .ph-count b { font-family: var(--display); font-weight: 800; font-size: 22px; }
-.ph-count small { font-size: 11px; font-weight: 600; }
-.ph-count.soon { background: var(--accent); color: var(--accent-ink); }
+.ph-count small { font-size: 11px; font-weight: 600; color: var(--ink-2); }
+.ph-count.soon { background: var(--ink); color: var(--card); }
+.ph-count.soon small { color: var(--card); }
 .ph-test-body { display: grid; gap: 6px; min-width: 0; }
 .ph-test-body .chip svg { display: inline; }
 .ph-bullet { position: relative; height: 10px; border-radius: 999px; background: var(--card-2); margin: 4px 0; }
@@ -653,47 +746,47 @@ details ol { margin: 6px 0 0; padding-left: 20px; }
 .ph-legend i { width: 10px; height: 10px; border-radius: 3px; flex: none; align-self: center; }
 .ph-legend b { font-weight: 600; }
 .ph-facts { list-style: none; margin: 12px 0 0; padding: 0; display: grid; gap: 8px; }
-.ph-facts li { display: grid; grid-template-columns: 18px minmax(0, 1fr); gap: 10px; align-items: start; background: var(--card-2); border-radius: 14px; padding: 10px 12px; font-size: 14px; }
+.ph-facts li { display: grid; grid-template-columns: 18px minmax(0, 1fr); gap: 10px; align-items: start; background: var(--card-2); border-radius: 16px; padding: 10px 12px; font-size: 14px; }
 .ph-facts svg { color: var(--ink-2); margin-top: 1px; }
 .ph-talk { display: grid; gap: 8px; }
-.ph-q { font-family: var(--display); font-weight: 600; font-size: 18px; line-height: 1.3; }
+.ph-q { font-family: var(--display); font-weight: 600; font-size: 19px; line-height: 1.3; }
 .ph-reveal summary, .ph-more summary { list-style: none; cursor: pointer; min-height: 44px; display: flex; align-items: center; gap: 8px; font-weight: 600; }
-.ph-reveal summary::-webkit-details-marker, .ph-more summary::-webkit-details-marker, .ph-sub summary::-webkit-details-marker { display: none; }
-.ph-reveal summary { color: var(--violet); }
+.ph-reveal summary::-webkit-details-marker, .ph-more summary::-webkit-details-marker, .ph-subt summary::-webkit-details-marker { display: none; }
+.ph-reveal summary { justify-self: start; padding: 0 18px; border-radius: 999px; background: var(--card-2); color: var(--ink); }
 .ph-reveal[open] summary { display: none; }
-.ph-reveal p { background: var(--card-2); border-radius: 14px; padding: 10px 12px; }
+.ph-reveal p { background: var(--card-2); border-radius: 16px; padding: 10px 12px; }
 .ph-more { border-top: 1px solid var(--line); }
 .ph-more summary::after { content: "+"; margin-left: auto; font-size: 20px; color: var(--ink-3); }
 .ph-more[open] summary::after { content: "\2013"; }
 .ph-more[open] > :not(summary) { margin-bottom: 12px; }
-.ph-sub { border-radius: 16px; background: var(--card-2); }
-.ph-sub summary { list-style: none; cursor: pointer; display: grid; gap: 6px; padding: 12px 14px; }
-.ph-sub summary .meter { display: block; background: var(--card); }
-.ph-sub summary > span { display: block; }
-.ph-sub-top { display: flex !important; align-items: center; gap: 8px; }
-.ph-sub-top b { flex: 1; font-weight: 600; }
-.ph-sub-top svg { color: var(--ink-3); transition: transform .15s ease; }
-.ph-sub[open] .ph-sub-top svg { transform: rotate(90deg); }
-.ph-tricky { color: var(--warn); font-weight: 700; }
-.ph-secs { display: grid; gap: 2px; padding: 0 10px 10px; }
-.ph-sec { display: flex; align-items: center; gap: 6px; padding: 8px 4px; border-top: 1px solid var(--line); font-size: 14px; }
+
+/* Subjects as pastel tiles, two to a row; an open one spreads across both columns to list its sections */
+.ph-tiles { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; margin-bottom: 10px; }
+.ph-subt { border-radius: 22px; background: var(--tb); min-width: 0; }
+.ph-subt[open] { grid-column: 1 / -1; }
+.ph-subt summary { list-style: none; cursor: pointer; display: grid; gap: 4px; padding: 14px; min-height: 120px; align-content: start; }
+.ph-subt-top { display: flex; align-items: flex-start; justify-content: space-between; gap: 6px; }
+.ph-subt-top b { font-weight: 700; font-size: 15px; color: var(--ti); line-height: 1.2; min-width: 0; hyphens: auto; }
+.ph-mring { flex: none; width: 34px; height: 34px; border-radius: 50%; display: grid; place-items: center; background: conic-gradient(var(--ti) calc(var(--p) * 1%), color-mix(in srgb, var(--ti) 16%, transparent) 0); }
+.ph-mring > span { width: 26px; height: 26px; border-radius: 50%; display: grid; place-items: center; background: var(--tb); font-size: 10px; font-weight: 700; color: var(--ti); }
+.ph-subt-n { font-family: var(--display); font-weight: 700; font-size: 24px; line-height: 1.1; margin-top: 6px; }
+.ph-subt-n small { font-family: var(--body); font-size: 12px; font-weight: 500; color: var(--ink-2); }
+.ph-subt-sub { font-size: 12px; color: var(--ink-2); }
+.ph-tag { justify-self: start; margin-top: 4px; padding: 2px 9px; border-radius: 999px; background: var(--card); color: var(--warn); font-size: 12px; font-weight: 700; }
+.ph-secs { display: grid; padding: 0 12px 12px; }
+.ph-sec { display: flex; align-items: center; gap: 6px; padding: 9px 4px; border-top: 1px solid color-mix(in srgb, var(--ti) 18%, transparent); font-size: 14px; }
 .ph-sec > span:first-child { flex: 1; min-width: 0; }
+.ph-sec .chip:not(.good):not(.warn) { background: var(--card); }
 .ph-sub-h { font-family: var(--display); font-weight: 700; font-size: 16px; margin: 14px 0 2px; }
 .ph-ask-line { background: var(--warn-soft); border-radius: 12px; padding: 8px 12px; margin-bottom: 10px; }
 .report .mark-form { margin-bottom: 12px; }
 @media print {
-  .ph-hero { background: #fff !important; color: #15161B !important; border: 1px solid #ccc; }
-  .ph-hero .ph-eyebrow, .ph-hero .ph-foot, .ph-stats span, .ph-stats b small, .ph-day span { color: #444 !important; }
-  .ph-stats > div { background: #f2f2f2; }
-  .ph-day i { background: #15161B !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  body:has(.ph) { background: #fff !important; }
+  .ph-focus-wrap { background: none; padding: 0; }
+  .ph-subt, .ph-stats > div, .ph-cal > b, .ph-wd.today { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
   .ph-reveal summary { display: none; }
   .ph-more summary::after { content: ""; }
 }
-.ph-next { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; background: rgba(255, 255, 255, .08); border-radius: 14px; padding: 8px 12px; font-size: 14px; }
-.ph-next span:first-of-type { flex: 1; min-width: 0; }
-@media print { .ph-next { background: #f2f2f2; } }
-.ph-praise .chip.good { background: var(--card); }
-.ph-stats b { white-space: nowrap; }
 
 </style>
 <div id="app"></div>
@@ -14198,7 +14291,7 @@ ${t && H > W && W < 600 ? '<li>Tip: turn your phone sideways for a bigger view.<
   // ---------- staying up to date ----------
   // An open tab or a home screen app keeps running the page it first loaded, old prices and all. So it asks which version
   // is live when it comes back into view and every few minutes, and swaps over between races. build.mjs fills in BUILD.
-  const BUILD = '554e430f5f';
+  const BUILD = '914352eeb4';
   const BACK_KEY = 'holeshot.back.v1';
   const TRIED_KEY = 'holeshot.tried.v1';
   let liveBuild = null;
@@ -17062,19 +17155,46 @@ ${t && H > W && W < 600 ? '<li>Tip: turn your phone sideways for a bigger view.<
     const stuck = sp.stuck.find((x) => next && n <= 2 && x.sub === pack.subjects[next.subject]) || (next && n <= 2 ? null : sp.stuck[0]);
     if (stuck) {
       const x = stuck;
-      return `Sit with ${name} for 10 minutes on ${x.sub.label}: ${x.t.title}. It has caught him out so often that the game has paused it for 2 days. ${x.t.walk ? 'Open the Track, do its Track walk together, then let him ride the section.' : teachable(x.t) ? 'Open the Track, do its maths lesson together, then let him ride the section.' : 'Read its rule card on the Track together, then let him ride the section.'}`;
+      return { title: `${x.sub.label}: ${x.t.title}`, mins: 10, text: `Sit with ${name} for 10 minutes on ${x.sub.label}: ${x.t.title}. It has caught him out so often that the game has paused it for 2 days. ${x.t.walk ? 'Open the Track, do its Track walk together, then let him ride the section.' : teachable(x.t) ? 'Open the Track, do its maths lesson together, then let him ride the section.' : 'Read its rule card on the Track together, then let him ride the section.'}` };
     }
     if (next && n <= 2) {
       const b = subjectBits(next.subject);
       const weak = b.weakest[0];
-      return `${next.label} is ${whenText(n).toLowerCase()}. Ask ${name} to finish today's plan on his Home screen${weak ? (weak.t.notes ? `, then ask him three questions from the rule card for ${weak.t.title} on the Track` : `, then let him ride ${weak.t.title} once more`) : ''}. Short and calm beats long and late.`;
+      return { title: `${next.label} test ${whenText(n).toLowerCase()}`, mins: 20, text: `${next.label} is ${whenText(n).toLowerCase()}. Ask ${name} to finish today's plan on his Home screen${weak ? (weak.t.notes ? `, then ask him three questions from the rule card for ${weak.t.title} on the Track` : `, then let him ride ${weak.t.title} once more`) : ''}. Short and calm beats long and late.` };
     }
-    if (sp.due >= 8) return `${sp.due} kinds of question are due back for a check. Ask ${name} to ride the comeback lap on his Home screen. It takes about 5 minutes.`;
+    // He has 3 stars on a whole subject and asked for more: the photo that adds new sections is the job.
+    const ask = Object.entries(prog.asks || {}).find(([id, day]) => gapDays(day) <= 7 && pack.subjects[id]);
+    if (ask) {
+      const label = pack.subjects[ask[0]].label;
+      return { title: `New ${label} work`, mins: 2, text: `${name} has 3 stars on every ${label} section and asked for new work. Send a photo of his next ${label} topic list or a test notice, and new sections get added.` };
+    }
+    if (sp.due >= 8) return { title: 'A comeback lap', mins: 5, text: `${sp.due} kinds of question are due back for a check. Ask ${name} to ride the comeback lap on his Home screen. It takes about 5 minutes.` };
     if (next) {
       const b = subjectBits(next.subject);
-      if (b.weakest[0]) return `Ask ${name} to explain ${b.weakest[0].t.title} (${next.label}) to you in his own words. Teaching it back is one of the best ways to make it stick.`;
+      if (b.weakest[0]) return { title: `Explain ${b.weakest[0].t.title}`, mins: 5, text: `Ask ${name} to explain ${b.weakest[0].t.title} (${next.label}) to you in his own words. Teaching it back is one of the best ways to make it stick.` };
     }
-    return `Ask ${name} what he learnt this week, and let him show you one Track walk.`;
+    return { title: 'Show me a Track walk', mins: 10, text: `Ask ${name} what he learnt this week, and let him show you one Track walk.` };
+  }
+  // Section strengths and per-subject counts from one boy's report, for his page and the both-boys strip.
+  function bitsFor(pack, d) {
+    const prog = d.progress || {};
+    const exams = d.exams || [];
+    const strengthOf = (t) => Math.round((100 * t.skills.reduce((a, id) => a + ((prog.m && prog.m[id]) || 0), 0)) / t.skills.length);
+    const sectionsOf = (id) => (pack.subjects[id] ? pack.subjects[id].topics.filter((x) => !x.warmup) : []).map((x) => ({ t: x, m: strengthOf(x) }));
+    const subjectBits = (id) => {
+      const rows = sectionsOf(id);
+      const tests = exams.filter((e) => e.subject === id);
+      return {
+        cleared: rows.filter((x) => x.m === 100).length,
+        total: rows.length,
+        avg: rows.length ? Math.round(rows.reduce((a, x) => a + x.m, 0) / rows.length) : 0,
+        weakest: rows.slice().sort((a, b) => a.m - b.m).slice(0, 3),
+        latest: tests.length ? tests[0].pct : null,
+        best: tests.length ? Math.max(...tests.map((e) => e.pct)) : null,
+        tests: tests.length,
+      };
+    };
+    return { sectionsOf, subjectBits };
   }
   function viewParents() {
     const v = ui.parents;
@@ -17098,29 +17218,19 @@ ${t && H > W && W < 600 ? '<li>Tip: turn your phone sideways for a bigger view.<
     const older = parseInt(String(pack.grade || '').replace(/\D/g, ''), 10) >= 6;
     const subName = (id) => (pack.subjects[id] ? pack.subjects[id].label : id);
     const topicOf = (sid, tid) => (pack.subjects[sid] ? pack.subjects[sid].topics.find((x) => x.id === tid) : null);
-    const whoTabs = Object.values(RS.packs).map((x) => `<button class="pit-tab ${v.who === x.id ? 'on' : ''}" data-act="parents-who" data-id="${x.id}" aria-pressed="${v.who === x.id}">${x.name}</button>`).join('');
-    const dayTabs = [7, 30].map((n) => `<button class="pit-tab ${v.days === n ? 'on' : ''}" data-act="parents-days" data-id="${n}" aria-pressed="${v.days === n}">${n} days</button>`).join('');
+    const boyTiles = Object.values(RS.packs).filter((x) => v.data[x.id]).map((x) => {
+      const dx = v.data[x.id];
+      const job = tonightJob(x, dx.progress || {}, bitsFor(x, dx).subjectBits);
+      return `<button class="ph-boy boy-${x.id} ${v.who === x.id ? 'on' : ''}" data-act="parents-who" data-id="${x.id}" aria-pressed="${v.who === x.id}"><span class="ph-av">${h(x.name[0])}</span><span class="ph-boy-txt"><b>${h(x.name)}</b><small>Tonight: ${h(job.title)}</small></span></button>`;
+    }).join('');
+    const dayTabs = [7, 30].map((n) => `<button class="ph-segb ${v.days === n ? 'on' : ''}" data-act="parents-days" data-id="${n}" aria-pressed="${v.days === n}">${n} days</button>`).join('');
     const span = v.days === 7 ? 'week' : `${v.days} days`;
     const weak = weakSpots(pack, d);
     const prior = d.prior || {};
     const exams = d.exams || [];
     const marks = d.marks || [];
     const sp = spacingOf(pack, prog);
-    const strengthOf = (t) => Math.round((100 * t.skills.reduce((a, id) => a + ((prog.m && prog.m[id]) || 0), 0)) / t.skills.length);
-    const sectionsOf = (id) => (pack.subjects[id] ? pack.subjects[id].topics.filter((x) => !x.warmup) : []).map((x) => ({ t: x, m: strengthOf(x) }));
-    const subjectBits = (id) => {
-      const rows = sectionsOf(id);
-      const tests = exams.filter((e) => e.subject === id);
-      return {
-        cleared: rows.filter((x) => x.m === 100).length,
-        total: rows.length,
-        avg: rows.length ? Math.round(rows.reduce((a, x) => a + x.m, 0) / rows.length) : 0,
-        weakest: rows.slice().sort((a, b) => a.m - b.m).slice(0, 3),
-        latest: tests.length ? tests[0].pct : null,
-        best: tests.length ? Math.max(...tests.map((e) => e.pct)) : null,
-        tests: tests.length,
-      };
-    };
+    const { sectionsOf, subjectBits } = bitsFor(pack, d);
     // An estimate from practice in the game. It says so on the page, because it isn't a forecast of a school mark.
     const readiness = (b) => {
       if (b.latest === null && b.avg === 0) return ['Not started', 'bad', 'flag'];
@@ -17136,7 +17246,8 @@ ${t && H > W && W < 600 ? '<li>Tip: turn your phone sideways for a bigger view.<
     const shown = (n) => String(n).replace('.', ',');
     const pctOf = (m) => shareOf(Number(m.mark), Number(m.out_of));
 
-    // The top card: how much he rode, against his own last period and never against his brother.
+    // Top: the day, his name with a ring for days ridden, tonight's focus, then his week. Arrows only ever compare him
+    // with his own period before, never with his brother.
     const delta = (diff, say) => (!hasPrior ? '' : diff === 0 ? '<span class="ph-delta">same</span>' : `<span class="ph-delta ${diff > 0 ? 'up' : 'down'}">${diff > 0 ? '▲' : '▼'} ${say(Math.abs(diff))}</span>`);
     const byDay = new Map(d.daily.map((x) => [x.day, x]));
     const strip = [];
@@ -17151,21 +17262,43 @@ ${t && H > W && W < 600 ? '<li>Tip: turn your phone sideways for a bigger view.<
       const m = Math.round(secs / 60);
       return m >= 60 ? `${Math.floor(m / 60)}h ${m % 60}m` : `${m} min`;
     };
-    const dayLabel = (s, i) => (v.days <= 7 ? s.dt.toLocaleDateString('en-ZA', { weekday: 'narrow' }) : (strip.length - 1 - i) % 7 === 0 ? s.dt.getDate() : '');
-    const hero = `<section class="card ph-hero">
-      <div class="ph-eyebrow">${h(name)} · ${h(pack.grade || '')} · last ${span}</div>
-      <p class="ph-head">${t.questions ? `Rode on ${t.days} of the last ${v.days} days` : `No riding in the last ${span}`}</p>
-      ${nextUp ? (() => {
-        const [word, tone] = readiness(subjectBits(nextUp.subject));
-        return `<p class="ph-next">${ic('flag', 16)}<span>Next test: <b>${h(nextUp.label)}</b>, ${whenText(daysUntil(nextUp.date)).toLowerCase()}</span><span class="chip ${tone}">${word}</span></p>`;
-      })() : ''}
+    const dm = (dt) => `${dt.getDate()} ${dt.toLocaleDateString('en-ZA', { month: 'short' })}`;
+    const now = new Date();
+    const r = 27;
+    const round = 2 * Math.PI * r;
+    const header = `<header class="ph-top">
+      <div class="ph-date"><span>${now.toLocaleDateString('en-ZA', { weekday: 'long' })}</span><b>${now.toLocaleDateString('en-ZA', { day: 'numeric', month: 'long' })}</b></div>
+      <button class="btn small no-print ph-glass" data-act="parents-print">Print</button>
+      <button class="round no-print ph-glass" data-act="parents-off" aria-label="Close the results">${ic('x')}</button>
+    </header>`;
+    const intro = `<div class="ph-intro">
+      <div class="ph-intro-txt"><div class="ph-eyebrow2">${h(pack.grade || '')} · ${v.busy ? 'fetching...' : `last ${span}`}</div><h1 class="ph-h1">${h(name)}'s ${v.days === 7 ? 'week' : 'month'}</h1>
+        <div class="ph-seg no-print" role="group" aria-label="Period">${dayTabs}</div></div>
+      <div class="ph-ringbox"><svg viewBox="0 0 64 64" role="img" aria-label="Rode on ${t.days} of the last ${v.days} days"><circle cx="32" cy="32" r="${r}" class="ph-ring-bg"/><circle cx="32" cy="32" r="${r}" class="ph-ring-fg" stroke-dasharray="${((round * Math.min(t.days, v.days)) / v.days).toFixed(1)} ${round.toFixed(1)}" transform="rotate(-90 32 32)"/></svg><span><b class="num">${t.days}/${v.days}</b><small>days ridden</small></span></div>
+    </div>`;
+    const job = tonightJob(pack, prog, subjectBits);
+    const nextLine = nextUp ? (() => {
+      const [word, tone, icon] = readiness(subjectBits(nextUp.subject));
+      return `<div class="ph-nextup"><span class="muted">Next up</span><b>${h(nextUp.label)} test, ${whenText(daysUntil(nextUp.date)).toLowerCase()}</b><span class="chip ${tone}">${ic(icon, 14)} ${word}</span></div>`;
+    })() : '';
+    const focus = `<div class="ph-focus-wrap"><section class="card ph-focus">
+      <div class="ph-focus-top"><span class="eyebrow">Tonight's focus</span><span class="small-t muted">about ${job.mins} min</span></div>
+      <h2 class="ph-focus-title">${h(job.title)}</h2>
+      <p class="ph-focus-text">${h(job.text)}</p>
+      <button class="btn dark ph-pill no-print" data-act="parents-job">Share this job ${ic('arrow', 18)}</button>
+    </section>${nextLine}</div>`;
+    const weekCells = v.days <= 7
+      ? `<div class="ph-wk" role="img" aria-label="Rode on ${t.days} of the last ${v.days} days">${strip.map((s, i) => `<div class="ph-wd ${i === strip.length - 1 ? 'today' : ''} ${s.x ? 'on' : ''}"><span>${s.dt.toLocaleDateString('en-ZA', { weekday: 'narrow' })}</span><b class="num">${s.dt.getDate()}</b><i><em style="height:${s.x ? Math.max(18, Math.round((100 * s.x.secs) / peakSecs)) : 0}%"></em></i></div>`).join('')}</div>`
+      : `<div class="ph-cal" role="img" aria-label="Rode on ${t.days} of the last ${v.days} days">${['M', 'T', 'W', 'T', 'F', 'S', 'S'].map((x) => `<span>${x}</span>`).join('')}${'<i></i>'.repeat((strip[0].dt.getDay() + 6) % 7)}${strip.map((s, i) => `<b class="num lv${s.x ? Math.min(3, 1 + Math.floor((3 * s.x.secs) / (peakSecs + 1))) : 0} ${i === strip.length - 1 ? 'today' : ''}">${s.dt.getDate()}</b>`).join('')}</div>`;
+    const weekCard = `<section class="card ph-week">
+      <div class="ph-title"><h2 class="h-sec">${v.days === 7 ? 'This week' : 'Last 30 days'}</h2><span class="small-t muted num">${dm(strip[0].dt)} – ${dm(strip[strip.length - 1].dt)}</span></div>
+      ${weekCells}
       <div class="ph-stats">
-        <div><b class="num">${shortTime(t.secs)}</b><span>time</span>${delta(t.secs - (prior.secs || 0), shortTime)}</div>
-        <div><b class="num">${RS.fmt(t.questions)}</b><span>questions</span>${delta(t.questions - (prior.questions || 0), (n) => RS.fmt(n))}</div>
-        <div><b class="num">${t.questions ? `${accuracy}%` : '–'}</b><span>right first try</span>${t.questions ? delta(accuracy - shareOf(prior.first_try || 0, prior.questions || 0), (n) => `${n} pts`) : ''}</div>
+        <div class="tint-5"><b class="num">${shortTime(t.secs)}</b><span>time</span>${delta(t.secs - (prior.secs || 0), shortTime)}</div>
+        <div class="tint-1"><b class="num">${RS.fmt(t.questions)}</b><span>questions</span>${delta(t.questions - (prior.questions || 0), (n) => RS.fmt(n))}</div>
+        <div class="tint-2"><b class="num">${t.questions ? `${accuracy}%` : '–'}</b><span>right first try</span>${t.questions ? delta(accuracy - shareOf(prior.first_try || 0, prior.questions || 0), (n) => `${n} pts`) : ''}</div>
       </div>
-      <div class="ph-strip ${v.days > 7 ? 'many' : ''}" style="--n:${strip.length}" role="img" aria-label="Rode on ${t.days} of the last ${v.days} days">${strip.map((s, i) => `<div class="ph-day ${s.x ? '' : 'off'} ${i === strip.length - 1 ? 'today' : ''}"><i style="height:${s.x ? Math.max(10, Math.round((100 * s.x.secs) / peakSecs)) : 0}%"></i><span>${dayLabel(s, i)}</span></div>`).join('')}</div>
-      <p class="ph-foot">${hasPrior ? `Arrows compare with the ${v.days} days before${prior.days ? `, when he rode on ${prior.days}` : ''}.` : `Arrows will compare with the ${span} before, once there is one.`}</p>
+      <p class="small-t muted">${hasPrior ? `Arrows compare with the ${v.days} days before${prior.days ? `, when he rode on ${prior.days}` : ''}.` : `Arrows will compare with the ${span} before, once there is one.`}</p>
     </section>`;
 
     // Something real to praise, with words that praise how he did it.
@@ -17186,7 +17319,7 @@ ${t && H > W && W < 600 ? '<li>Tip: turn your phone sideways for a bigger view.<
     }
     const praiseCard = praise ? `<section class="card ph-praise"><div class="eyebrow">Worth a high five</div>${praise}<p class="small-t muted">Praise the way he did it, not how clever he is.</p></section>` : '';
 
-    const asks = Object.entries(prog.asks || {}).filter(([, day]) => gapDays(day) <= 14);
+    const asks = Object.entries(prog.asks || {}).filter(([id, day]) => gapDays(day) <= 14 && job.title !== `New ${subName(id)} work`);
     const askCards = asks.map(([id, day]) => `<section class="card ph-ask"><div class="eyebrow">${h(name)} asked for new work</div><p>On ${shortDay(day)} he asked for new ${h(subName(id))} work, because every section there has 3 stars. Send a photo of his next topic list or a test notice, and new sections get added.</p></section>`).join('');
 
     // Tests: days to go, a plain readiness word, and a bar with the aim marked on it.
@@ -17254,15 +17387,18 @@ ${t && H > W && W < 600 ? '<li>Tip: turn your phone sideways for a bigger view.<
 
     // Subjects fold open to their sections, weakest first, with this period's tricky ones marked.
     const subjectsCard = `<section class="card"><div class="ph-title"><h2 class="h-sec">By subject</h2><span class="small-t muted">Tap one for its sections</span></div>
-      <div class="ph-list">${subjectIds.map((id) => {
+      <div class="ph-tiles">${subjectIds.map((id, i) => {
         const s = d.subjects.find((x) => x.subject === id);
         const b = subjectBits(id);
         const tricky = new Map(weak.filter((g) => g.subject === subName(id)).map((g) => [g.topic, shareOf(g.ok, g.n)]));
-        return `<details class="ph-sub"><summary><span class="ph-sub-top"><b>${h(subName(id))}</b><span class="small-t muted num">${b.cleared} of ${b.total} cleared</span>${ic('next', 18)}</span>
-          <span class="meter"><i style="width:${b.avg}%"></i></span>
-          <span class="small-t muted num">Strength ${b.avg}% · ${s ? `${shareOf(s.first_try, s.n)}% right first try, ${timeText(s.secs)}` : `no practice this ${span}`}${tricky.size ? ` · <b class="ph-tricky">${tricky.size} tricky this ${span}</b>` : ''}</span></summary>
-          <div class="ph-secs">${sectionsOf(id).sort((a, x) => a.m - x.m).map((x) => `<div class="ph-sec"><span>${h(x.t.title)}</span>${tricky.has(x.t.id) ? `<span class="chip warn">Tricky: ${tricky.get(x.t.id)}%</span>` : ''}<span class="chip ${x.m === 100 ? 'good' : x.m ? 'violet' : ''}">${x.m === 100 ? 'Cleared' : x.m ? `${x.m}%` : 'Not started'}</span></div>`).join('')}</div></details>`;
-      }).join('')}</div></section>`;
+        return `<details class="ph-subt tint-${i % 6}"><summary>
+          <span class="ph-subt-top"><b>${h(subName(id))}</b><span class="ph-mring" style="--p:${b.avg}" role="img" aria-label="Strength ${b.avg} percent"><span class="num">${b.avg}</span></span></span>
+          <span class="ph-subt-n num">${b.cleared}<small> of ${b.total} cleared</small></span>
+          <span class="ph-subt-sub">${s ? `${shareOf(s.first_try, s.n)}% first try · ${shortTime(s.secs)}` : `Not ridden this ${span}`}</span>
+          ${tricky.size ? `<span class="ph-tag">${tricky.size} tricky</span>` : ''}</summary>
+          <div class="ph-secs">${sectionsOf(id).sort((a, x) => a.m - x.m).map((x) => `<div class="ph-sec"><span>${h(x.t.title)}</span>${tricky.has(x.t.id) ? `<span class="chip warn">Tricky: ${tricky.get(x.t.id)}%</span>` : ''}<span class="chip ${x.m === 100 ? 'good' : ''}">${x.m === 100 ? 'Cleared' : x.m ? `${x.m}%` : 'Not started'}</span></div>`).join('')}</div></details>`;
+      }).join('')}</div>
+      <p class="small-t muted">The number in each ring is his strength: how much of that subject he has mastered in the game.</p></section>`;
 
     // School marks, the game's practice tests beside them, and adding a new one.
     const subjectsMarked = [...new Set([...marks.map((m) => m.subject), ...exams.map((e) => e.subject)])];
@@ -17303,12 +17439,13 @@ ${t && H > W && W < 600 ? '<li>Tip: turn your phone sideways for a bigger view.<
       <details class="ph-more"><summary>Latest races (${d.runs.length})</summary><div class="log">${d.runs.map((r) => `<div class="log-item"><div class="row-top"><b>${h(subName(r.subject))}: ${h(r.label || r.mode)}</b><span class="num">${r.pct}%</span></div><div class="small-t muted num">${stamp(r.at)} · ${r.right} of ${r.total} right · ${timeText(r.secs || 0)}</div></div>`).join('') || '<p class="small-t muted">No races in this period.</p>'}</div></details>
       <p class="small-t muted">In the game: rank ${rankOf(prog.earned || 0)} (${RANKS[rankOf(prog.earned || 0) - 1][0]}), ${RS.fmt(prog.points || 0)} points to spend${prog.walked ? `, ${prog.walked} Track ${prog.walked === 1 ? 'walk' : 'walks'} done` : ''}.</p></section>`;
 
-    return `<div class="wrap report" style="padding-bottom:32px;max-width:720px">
-      <header class="top"><div class="top-who"><h1>Results</h1><div class="small-t muted">${v.busy ? 'Fetching...' : `Last ${v.days} days`}</div></div><button class="btn small no-print" data-act="parents-print">Print</button><button class="round no-print" data-act="parents-off" aria-label="Close the results">${ic('x')}</button></header>
-      <div class="pit-tabs ph-tabs no-print" role="group" aria-label="Rider and period">${whoTabs}<span style="flex:1"></span>${dayTabs}</div>
-      ${hero}
+    return `<div class="wrap report ph" data-boy="${v.who}" style="padding-bottom:32px;max-width:720px">
+      ${header}
+      <div class="ph-boys no-print" role="group" aria-label="Rider">${boyTiles}</div>
+      ${intro}
+      ${focus}
+      ${weekCard}
       ${praiseCard}
-      <section class="card tonight"><div class="eyebrow">One job for tonight</div><p style="font-size:17px">${h(tonightJob(pack, prog, subjectBits))}</p></section>
       ${askCards}
       ${testsCard}
       ${talkCard}
@@ -17364,7 +17501,7 @@ ${t && H > W && W < 600 ? '<li>Tip: turn your phone sideways for a bigger view.<
         const m = prog.m || {};
         const rows = (sub ? sub.topics.filter((x) => !x.warmup) : []).map((x) => ({ t: x, m: Math.round((100 * x.skills.reduce((a, s) => a + (m[s] || 0), 0)) / x.skills.length) }));
         return { weakest: rows.sort((a, b) => a.m - b.m).slice(0, 3) };
-      })}`);
+      }).text}`);
     }
     return lines.join('\n');
   }
@@ -17377,7 +17514,9 @@ ${t && H > W && W < 600 ? '<li>Tip: turn your phone sideways for a bigger view.<
       const res = await syncCall({ action: 'report', code: v.code, days: 7 });
       if (res && res.ok) data = res.report;
     }
-    const text = weekSummary(data);
+    shareText(weekSummary(data));
+  }
+  async function shareText(text) {
     try {
       if (navigator.share) {
         await navigator.share({ text });
@@ -17810,6 +17949,16 @@ ${t && H > W && W < 600 ? '<li>Tip: turn your phone sideways for a bigger view.<
       case 'parents-share':
         shareSummary();
         break;
+      case 'parents-job': {
+        // Tonight's job, to send to the other parent: the same words as the card, nothing else from the report.
+        const v = ui.parents;
+        const pk = RS.packs[v.who];
+        const dx = v.data && v.data[v.who];
+        if (!dx) break;
+        const job = tonightJob(pk, dx.progress || {}, bitsFor(pk, dx).subjectBits);
+        shareText(`${pk.name}, tonight: ${job.text}`);
+        break;
+      }
       case 'buy-try': {
         // Prices can change between versions, so nothing is bought until this page is known to be the live one.
         if (buying) break;
