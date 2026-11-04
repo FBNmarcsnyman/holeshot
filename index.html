@@ -589,6 +589,112 @@ details ol { margin: 6px 0 0; padding-left: 20px; }
 .walk-back { background: var(--card-2); border-left: 4px solid var(--accent); border-radius: 10px; padding: 8px 12px; margin: 8px 0; }
 .walk-back p { margin: 4px 0 0; }
 
+/* Parents' page as cards (4 November 2026): a dark top card like Family Fit's check bar, then one idea per card.
+   Everything compares a boy with his own last period, never with his brother. */
+.ph-tabs { flex-direction: row; flex-wrap: wrap; }
+.ph-hero { --ph-bg: #15161B; background: var(--ph-bg); color: #fff; display: grid; gap: 12px; padding: 18px; }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .ph-hero { --ph-bg: #2A2D36; } }
+:root[data-theme="dark"] .ph-hero { --ph-bg: #2A2D36; }
+.ph-eyebrow { font-size: 12px; font-weight: 600; letter-spacing: .04em; text-transform: uppercase; color: rgba(255, 255, 255, .7); }
+.ph-head { font-family: var(--display); font-weight: 700; font-size: 24px; line-height: 1.15; letter-spacing: -.01em; }
+.ph-stats { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
+.ph-stats > div { background: rgba(255, 255, 255, .08); border-radius: 16px; padding: 10px; display: grid; gap: 2px; align-content: start; min-width: 0; }
+.ph-stats b { font-family: var(--display); font-size: 22px; font-weight: 700; line-height: 1.1; }
+.ph-stats b small { font-size: 14px; color: rgba(255, 255, 255, .6); font-weight: 600; }
+.ph-stats span { font-size: 12px; color: rgba(255, 255, 255, .72); }
+.ph-stats .ph-delta { font-size: 12px; font-weight: 700; color: rgba(255, 255, 255, .72); }
+.ph-stats .ph-delta.up { color: var(--lime); }
+.ph-strip { display: grid; grid-template-columns: repeat(var(--n), minmax(0, 1fr)); gap: 6px; height: 76px; }
+.ph-strip.many { gap: 2px; }
+.ph-day { display: grid; grid-template-rows: minmax(0, 1fr) auto; justify-items: center; gap: 4px; min-width: 0; }
+.ph-day i { align-self: end; width: 100%; max-width: 32px; border-radius: 6px; background: var(--lime); }
+.ph-strip.many .ph-day i { border-radius: 2px; }
+.ph-day.off i { width: 6px; height: 6px !important; border-radius: 50%; background: rgba(255, 255, 255, .25); }
+.ph-day span { font-size: 11px; line-height: 14px; height: 14px; color: rgba(255, 255, 255, .6); }
+.ph-day.today span { color: #fff; font-weight: 700; }
+.ph-foot { font-size: 12px; color: rgba(255, 255, 255, .65); }
+.ph-praise { background: var(--good-soft); display: grid; gap: 8px; }
+.ph-praise .eyebrow { color: var(--good); }
+.ph-ask { background: var(--warn-soft); display: grid; gap: 6px; }
+.ph-ask .eyebrow { color: var(--warn); }
+.ph-big { font-family: var(--display); font-weight: 700; font-size: 19px; line-height: 1.25; }
+.ph-say { font-weight: 600; }
+.ph-chips { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
+.ph-chips .chip { white-space: normal; }
+.ph-title { display: flex; align-items: baseline; justify-content: space-between; gap: 10px; flex-wrap: wrap; margin-bottom: 10px; }
+.ph-list { display: grid; gap: 12px; }
+.ph-test { display: grid; grid-template-columns: 56px minmax(0, 1fr); gap: 12px; align-items: start; }
+.ph-test + .ph-test { border-top: 1px solid var(--line); padding-top: 12px; }
+.ph-count { width: 56px; height: 56px; border-radius: 16px; background: var(--violet-soft); color: var(--violet); display: grid; place-content: center; text-align: center; line-height: 1; }
+.ph-count b { font-family: var(--display); font-weight: 800; font-size: 22px; }
+.ph-count small { font-size: 11px; font-weight: 600; }
+.ph-count.soon { background: var(--accent); color: var(--accent-ink); }
+.ph-test-body { display: grid; gap: 6px; min-width: 0; }
+.ph-test-body .chip svg { display: inline; }
+.ph-bullet { position: relative; height: 10px; border-radius: 999px; background: var(--card-2); margin: 4px 0; }
+.ph-bullet > i { position: absolute; left: 0; top: 0; bottom: 0; border-radius: 999px; background: var(--accent); }
+.ph-bullet > b { position: absolute; left: 80%; top: -4px; bottom: -4px; width: 3px; border-radius: 2px; background: var(--ink); }
+.ph-bullet > em { position: absolute; top: 50%; width: 14px; height: 14px; margin: -7px 0 0 -7px; border-radius: 50%; background: var(--card); box-shadow: inset 0 0 0 3px var(--violet); }
+.ph-key { display: flex; flex-wrap: wrap; gap: 6px 14px; margin: 12px 0 4px; }
+.ph-key span { display: inline-flex; align-items: center; gap: 6px; }
+.ph-key i { display: inline-block; }
+.k-fill { width: 18px; height: 8px; border-radius: 999px; background: var(--accent); }
+.k-dot { width: 12px; height: 12px; border-radius: 50%; box-shadow: inset 0 0 0 3px var(--violet); }
+.k-line { width: 3px; height: 14px; border-radius: 2px; background: var(--ink); }
+.ph-bands { display: flex; height: 14px; border-radius: 999px; overflow: hidden; gap: 2px; margin-bottom: 10px; }
+.ph-bands i, .ph-legend i { display: block; }
+.b-hard { background: var(--warn); }
+.b-stretch { background: var(--good); }
+.b-near { background: var(--violet); }
+.b-easy { background: var(--ink-3); }
+.b-few { background: var(--line); }
+.ph-legend { display: grid; gap: 4px; margin-bottom: 10px; font-size: 14px; }
+.ph-legend span { display: flex; align-items: baseline; gap: 6px; flex-wrap: wrap; }
+.ph-legend i { width: 10px; height: 10px; border-radius: 3px; flex: none; align-self: center; }
+.ph-legend b { font-weight: 600; }
+.ph-facts { list-style: none; margin: 12px 0 0; padding: 0; display: grid; gap: 8px; }
+.ph-facts li { display: grid; grid-template-columns: 18px minmax(0, 1fr); gap: 10px; align-items: start; background: var(--card-2); border-radius: 14px; padding: 10px 12px; font-size: 14px; }
+.ph-facts svg { color: var(--ink-2); margin-top: 1px; }
+.ph-talk { display: grid; gap: 8px; }
+.ph-q { font-family: var(--display); font-weight: 600; font-size: 18px; line-height: 1.3; }
+.ph-reveal summary, .ph-more summary { list-style: none; cursor: pointer; min-height: 44px; display: flex; align-items: center; gap: 8px; font-weight: 600; }
+.ph-reveal summary::-webkit-details-marker, .ph-more summary::-webkit-details-marker, .ph-sub summary::-webkit-details-marker { display: none; }
+.ph-reveal summary { color: var(--violet); }
+.ph-reveal[open] summary { display: none; }
+.ph-reveal p { background: var(--card-2); border-radius: 14px; padding: 10px 12px; }
+.ph-more { border-top: 1px solid var(--line); }
+.ph-more summary::after { content: "+"; margin-left: auto; font-size: 20px; color: var(--ink-3); }
+.ph-more[open] summary::after { content: "\2013"; }
+.ph-more[open] > :not(summary) { margin-bottom: 12px; }
+.ph-sub { border-radius: 16px; background: var(--card-2); }
+.ph-sub summary { list-style: none; cursor: pointer; display: grid; gap: 6px; padding: 12px 14px; }
+.ph-sub summary .meter { display: block; background: var(--card); }
+.ph-sub summary > span { display: block; }
+.ph-sub-top { display: flex !important; align-items: center; gap: 8px; }
+.ph-sub-top b { flex: 1; font-weight: 600; }
+.ph-sub-top svg { color: var(--ink-3); transition: transform .15s ease; }
+.ph-sub[open] .ph-sub-top svg { transform: rotate(90deg); }
+.ph-tricky { color: var(--warn); font-weight: 700; }
+.ph-secs { display: grid; gap: 2px; padding: 0 10px 10px; }
+.ph-sec { display: flex; align-items: center; gap: 6px; padding: 8px 4px; border-top: 1px solid var(--line); font-size: 14px; }
+.ph-sec > span:first-child { flex: 1; min-width: 0; }
+.ph-sub-h { font-family: var(--display); font-weight: 700; font-size: 16px; margin: 14px 0 2px; }
+.ph-ask-line { background: var(--warn-soft); border-radius: 12px; padding: 8px 12px; margin-bottom: 10px; }
+.report .mark-form { margin-bottom: 12px; }
+@media print {
+  .ph-hero { background: #fff !important; color: #15161B !important; border: 1px solid #ccc; }
+  .ph-hero .ph-eyebrow, .ph-hero .ph-foot, .ph-stats span, .ph-stats b small, .ph-day span { color: #444 !important; }
+  .ph-stats > div { background: #f2f2f2; }
+  .ph-day i { background: #15161B !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  .ph-reveal summary { display: none; }
+  .ph-more summary::after { content: ""; }
+}
+.ph-next { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; background: rgba(255, 255, 255, .08); border-radius: 14px; padding: 8px 12px; font-size: 14px; }
+.ph-next span:first-of-type { flex: 1; min-width: 0; }
+@media print { .ph-next { background: #f2f2f2; } }
+.ph-praise .chip.good { background: var(--card); }
+.ph-stats b { white-space: nowrap; }
+
 </style>
 <div id="app"></div>
 <div id="toast" class="toast" role="status" aria-live="polite" hidden></div>
@@ -14092,7 +14198,7 @@ ${t && H > W && W < 600 ? '<li>Tip: turn your phone sideways for a bigger view.<
   // ---------- staying up to date ----------
   // An open tab or a home screen app keeps running the page it first loaded, old prices and all. So it asks which version
   // is live when it comes back into view and every few minutes, and swaps over between races. build.mjs fills in BUILD.
-  const BUILD = '9ac47b0d16';
+  const BUILD = '554e430f5f';
   const BACK_KEY = 'holeshot.back.v1';
   const TRIED_KEY = 'holeshot.tried.v1';
   let liveBuild = null;
@@ -16950,12 +17056,14 @@ ${t && H > W && W < 600 ? '<li>Tip: turn your phone sideways for a bigger view.<
   function tonightJob(pack, prog, subjectBits) {
     const sp = spacingOf(pack, prog);
     const name = pack.name;
-    if (sp.stuck.length) {
-      const x = sp.stuck[0];
-      return `Sit with ${name} for 10 minutes on ${x.sub.label}: ${x.t.title}. It has caught him out so often that the game has paused it for 2 days. ${x.t.walk ? 'Open the Track, do its Track walk together, then let him ride the section.' : teachable(x.t) ? 'Open the Track, do its maths lesson together, then let him ride the section.' : 'Read its rule card on the Track together, then let him ride the section.'}`;
-    }
     const next = planExam(pack);
     const n = next ? daysUntil(next.date) : 99;
+    // A test in the next two days comes first, unless what's paused for help is in that very subject.
+    const stuck = sp.stuck.find((x) => next && n <= 2 && x.sub === pack.subjects[next.subject]) || (next && n <= 2 ? null : sp.stuck[0]);
+    if (stuck) {
+      const x = stuck;
+      return `Sit with ${name} for 10 minutes on ${x.sub.label}: ${x.t.title}. It has caught him out so often that the game has paused it for 2 days. ${x.t.walk ? 'Open the Track, do its Track walk together, then let him ride the section.' : teachable(x.t) ? 'Open the Track, do its maths lesson together, then let him ride the section.' : 'Read its rule card on the Track together, then let him ride the section.'}`;
+    }
     if (next && n <= 2) {
       const b = subjectBits(next.subject);
       const weak = b.weakest[0];
@@ -16985,19 +17093,23 @@ ${t && H > W && W < 600 ? '<li>Tip: turn your phone sideways for a bigger view.<
     const d = v.data[v.who];
     const t = d.totals;
     const prog = d.progress || {};
+    const name = pack.name;
+    // Ideas to say out loud are pitched at his age: the older boy is asked to plan and explain, the younger one to show.
+    const older = parseInt(String(pack.grade || '').replace(/\D/g, ''), 10) >= 6;
     const subName = (id) => (pack.subjects[id] ? pack.subjects[id].label : id);
+    const topicOf = (sid, tid) => (pack.subjects[sid] ? pack.subjects[sid].topics.find((x) => x.id === tid) : null);
     const whoTabs = Object.values(RS.packs).map((x) => `<button class="pit-tab ${v.who === x.id ? 'on' : ''}" data-act="parents-who" data-id="${x.id}" aria-pressed="${v.who === x.id}">${x.name}</button>`).join('');
     const dayTabs = [7, 30].map((n) => `<button class="pit-tab ${v.days === n ? 'on' : ''}" data-act="parents-days" data-id="${n}" aria-pressed="${v.days === n}">${n} days</button>`).join('');
+    const span = v.days === 7 ? 'week' : `${v.days} days`;
     const weak = weakSpots(pack, d);
-    const next = nextExam(pack);
-    const peak = Math.max(1, ...d.daily.map((x) => x.n));
     const prior = d.prior || {};
     const exams = d.exams || [];
     const marks = d.marks || [];
+    const sp = spacingOf(pack, prog);
     const strengthOf = (t) => Math.round((100 * t.skills.reduce((a, id) => a + ((prog.m && prog.m[id]) || 0), 0)) / t.skills.length);
+    const sectionsOf = (id) => (pack.subjects[id] ? pack.subjects[id].topics.filter((x) => !x.warmup) : []).map((x) => ({ t: x, m: strengthOf(x) }));
     const subjectBits = (id) => {
-      const sub = pack.subjects[id];
-      const rows = (sub ? sub.topics.filter((x) => !x.warmup) : []).map((x) => ({ t: x, m: strengthOf(x) }));
+      const rows = sectionsOf(id);
       const tests = exams.filter((e) => e.subject === id);
       return {
         cleared: rows.filter((x) => x.m === 100).length,
@@ -17011,113 +17123,200 @@ ${t && H > W && W < 600 ? '<li>Tip: turn your phone sideways for a bigger view.<
     };
     // An estimate from practice in the game. It says so on the page, because it isn't a forecast of a school mark.
     const readiness = (b) => {
-      if (b.latest === null && b.avg === 0) return ['Not started', 'bad'];
-      if (b.latest !== null && b.latest >= 80 && b.avg >= 70) return ['Looking ready', 'good'];
-      if ((b.latest !== null && b.latest >= 60) || b.avg >= 50) return ['Getting there', 'warn'];
-      return ['Needs work', 'bad'];
+      if (b.latest === null && b.avg === 0) return ['Not started', 'bad', 'flag'];
+      if (b.latest !== null && b.latest >= 80 && b.avg >= 70) return ['Looking ready', 'good', 'check'];
+      if ((b.latest !== null && b.latest >= 60) || b.avg >= 50) return ['Almost', 'warn', 'target'];
+      return ['Not yet', 'bad', 'flag'];
     };
     const coming = (pack.exams || []).filter((e) => daysUntil(e.date) >= 0 && pack.subjects[e.subject]);
     const gone = (pack.exams || []).filter((e) => daysUntil(e.date) < 0 && pack.subjects[e.subject] && !marks.some((m) => m.subject === e.subject && m.taken === e.date));
     const accuracy = shareOf(t.first_try, t.questions);
-    const priorAccuracy = shareOf(prior.first_try || 0, prior.questions || 0);
-    const inShort = [];
-    if (t.questions) {
-      const change = prior.questions ? (t.questions > prior.questions ? `, up from ${RS.fmt(prior.questions)} the ${v.days} days before` : t.questions < prior.questions ? `, down from ${RS.fmt(prior.questions)} the ${v.days} days before` : ', the same as the period before') : '';
-      inShort.push(`${pack.name} answered ${RS.fmt(t.questions)} questions on ${t.days} ${t.days === 1 ? 'day' : 'days'}, about ${timeText(t.secs)}${change}.`);
-      const move = prior.questions ? accuracy - priorAccuracy : 0;
-      inShort.push(`${accuracy}% were right first try${move > 0 ? `, up ${move} points` : move < 0 ? `, down ${-move} points` : ''}.`);
-    } else inShort.push(`${pack.name} hasn't ridden in the last ${v.days} days.`);
-    if (next) {
-      const b = subjectBits(next.subject);
-      inShort.push(`Next test: ${next.label}, ${whenText(daysUntil(next.date)).toLowerCase()}. ${readiness(b)[0]}${b.weakest.length ? `, and the section to practise most is ${b.weakest[0].t.title}` : ''}.`);
-    }
-    if (prog.fix) inShort.push(`${prog.fix} ${prog.fix === 1 ? 'kind of question is' : 'kinds of question are'} on the fix list, so a Fix-it lap is a good next ride.`);
-    // Easy rides: section races on a section he had already scored 90% or more in, worked out by the report.
-    const easy = d.easy || {};
-    if (easy.races) inShort.push(`${easy.races} of ${easy.of} section races were on sections he already knew (3 stars)${easy.top && easy.top.length ? `, mostly ${easy.top.map((x) => `${x.label} (${x.n})`).join(', ')}` : ''}, for ${RS.fmt(easy.pts)} points. A known section now pays half once a day, then nothing.`);
-    for (const [id, day] of Object.entries(prog.asks || {})) {
-      if (gapDays(day) <= 14) inShort.push(`On ${shortDay(day)} ${pack.name} asked for new ${subName(id)} work, because every section there has 3 stars. Send a photo of his next topic list or a test notice, and new sections get added.`);
-    }
+    const hasPrior = (prior.questions || 0) > 0;
+    const subjectIds = Object.keys(pack.subjects);
     const shown = (n) => String(n).replace('.', ',');
     const pctOf = (m) => shareOf(Number(m.mark), Number(m.out_of));
+
+    // The top card: how much he rode, against his own last period and never against his brother.
+    const delta = (diff, say) => (!hasPrior ? '' : diff === 0 ? '<span class="ph-delta">same</span>' : `<span class="ph-delta ${diff > 0 ? 'up' : 'down'}">${diff > 0 ? '▲' : '▼'} ${say(Math.abs(diff))}</span>`);
+    const byDay = new Map(d.daily.map((x) => [x.day, x]));
+    const strip = [];
+    for (let i = v.days - 1; i >= 0; i--) {
+      const dt = new Date();
+      dt.setDate(dt.getDate() - i);
+      strip.push({ dt, x: byDay.get(dayKey(dt)) });
+    }
+    const peakSecs = Math.max(60, ...strip.map((s) => (s.x ? s.x.secs : 0)));
+    const nextUp = planExam(pack);
+    const shortTime = (secs) => {
+      const m = Math.round(secs / 60);
+      return m >= 60 ? `${Math.floor(m / 60)}h ${m % 60}m` : `${m} min`;
+    };
+    const dayLabel = (s, i) => (v.days <= 7 ? s.dt.toLocaleDateString('en-ZA', { weekday: 'narrow' }) : (strip.length - 1 - i) % 7 === 0 ? s.dt.getDate() : '');
+    const hero = `<section class="card ph-hero">
+      <div class="ph-eyebrow">${h(name)} · ${h(pack.grade || '')} · last ${span}</div>
+      <p class="ph-head">${t.questions ? `Rode on ${t.days} of the last ${v.days} days` : `No riding in the last ${span}`}</p>
+      ${nextUp ? (() => {
+        const [word, tone] = readiness(subjectBits(nextUp.subject));
+        return `<p class="ph-next">${ic('flag', 16)}<span>Next test: <b>${h(nextUp.label)}</b>, ${whenText(daysUntil(nextUp.date)).toLowerCase()}</span><span class="chip ${tone}">${word}</span></p>`;
+      })() : ''}
+      <div class="ph-stats">
+        <div><b class="num">${shortTime(t.secs)}</b><span>time</span>${delta(t.secs - (prior.secs || 0), shortTime)}</div>
+        <div><b class="num">${RS.fmt(t.questions)}</b><span>questions</span>${delta(t.questions - (prior.questions || 0), (n) => RS.fmt(n))}</div>
+        <div><b class="num">${t.questions ? `${accuracy}%` : '–'}</b><span>right first try</span>${t.questions ? delta(accuracy - shareOf(prior.first_try || 0, prior.questions || 0), (n) => `${n} pts`) : ''}</div>
+      </div>
+      <div class="ph-strip ${v.days > 7 ? 'many' : ''}" style="--n:${strip.length}" role="img" aria-label="Rode on ${t.days} of the last ${v.days} days">${strip.map((s, i) => `<div class="ph-day ${s.x ? '' : 'off'} ${i === strip.length - 1 ? 'today' : ''}"><i style="height:${s.x ? Math.max(10, Math.round((100 * s.x.secs) / peakSecs)) : 0}%"></i><span>${dayLabel(s, i)}</span></div>`).join('')}</div>
+      <p class="ph-foot">${hasPrior ? `Arrows compare with the ${v.days} days before${prior.days ? `, when he rode on ${prior.days}` : ''}.` : `Arrows will compare with the ${span} before, once there is one.`}</p>
+    </section>`;
+
+    // Something real to praise, with words that praise how he did it.
+    const firsts = (d.firsts || []).map((f) => ({ ...f, title: (topicOf(f.subject, f.topic) || {}).title || f.label }));
+    const bestExam = exams.filter((e) => Date.now() - new Date(e.at) < v.days * 86400000).sort((a, b) => b.pct - a.pct)[0];
+    let praise = '';
+    if (firsts.length) {
+      // The line to say uses a section that isn't also paused for help, so the page doesn't praise and worry about one thing.
+      const fine = (f) => !sp.stuck.some((x) => x.t.id === f.topic);
+      const top = h((firsts.find((f) => fine(f) && !f.title.endsWith('?')) || firsts.find(fine) || firsts[0]).title.replace(/^The /, 'the ').replace(/\?$/, ''));
+      praise = `<p class="ph-big">${firsts.length === 1 ? `${top} reached 3 stars for the first time.` : `${firsts.length} sections reached 3 stars for the first time.`}</p>
+        ${firsts.length > 1 ? `<div class="ph-chips">${firsts.slice(0, 6).map((f) => `<span class="chip good">${h(f.title)}</span>`).join('')}${firsts.length > 6 ? `<span class="chip">+${firsts.length - 6} more</span>` : ''}</div>` : ''}
+        <p class="ph-say">${older ? `Try: "You got ${top} to 3 stars. What did you do differently this time?"` : `Try: "You cracked ${top}! Show me how you do one."`}</p>`;
+    } else if (bestExam && bestExam.pct >= 70) {
+      praise = `<p class="ph-big">${bestExam.pct}% in a ${h(subName(bestExam.subject))} practice test.</p><p class="ph-say">${older ? 'Try: "What did you do to get ready for that one?"' : 'Try: "Show me the hardest one you got right."'}</p>`;
+    } else if (sp.held >= 5) {
+      praise = `<p class="ph-big">${sp.held} kinds of question still remembered on a later day.</p><p class="ph-say">That's learning that lasts, not just a good evening. Tell him you noticed.</p>`;
+    }
+    const praiseCard = praise ? `<section class="card ph-praise"><div class="eyebrow">Worth a high five</div>${praise}<p class="small-t muted">Praise the way he did it, not how clever he is.</p></section>` : '';
+
+    const asks = Object.entries(prog.asks || {}).filter(([, day]) => gapDays(day) <= 14);
+    const askCards = asks.map(([id, day]) => `<section class="card ph-ask"><div class="eyebrow">${h(name)} asked for new work</div><p>On ${shortDay(day)} he asked for new ${h(subName(id))} work, because every section there has 3 stars. Send a photo of his next topic list or a test notice, and new sections get added.</p></section>`).join('');
+
+    // Tests: days to go, a plain readiness word, and a bar with the aim marked on it.
+    const bullet = (b) => `<div class="ph-bullet" role="img" aria-label="Strength ${b.avg} percent${b.latest === null ? '' : `, latest practice test ${b.latest} percent`}, aim 80 percent"><i style="width:${b.avg}%"></i><b></b>${b.latest === null ? '' : `<em style="left:${b.latest}%"></em>`}</div>`;
+    const testsCard = coming.length ? `<section class="card"><div class="ph-title"><h2 class="h-sec">Tests coming up</h2></div>
+      <div class="ph-list">${coming.map((e) => {
+        const b = subjectBits(e.subject);
+        const [word, tone, icon] = readiness(b);
+        const n = daysUntil(e.date);
+        return `<div class="ph-test"><div class="ph-count ${n <= 2 ? 'soon' : ''}"><b class="num">${n === 0 ? '!' : n}</b><small>${n === 0 ? 'today' : n === 1 ? 'day' : 'days'}</small></div>
+          <div class="ph-test-body"><div class="row-top"><b>${h(e.label)}</b><span class="chip ${tone}">${ic(icon, 14)} ${word}</span></div>
+          <div class="small-t muted num">${shortDay(e.date)} · ${b.cleared} of ${b.total} sections cleared · ${b.latest === null ? 'no practice test yet' : `practice test ${b.latest}%`}</div>
+          ${bullet(b)}
+          ${b.weakest.length && b.avg < 100 ? `<div class="ph-chips"><span class="small-t muted">Practise next:</span>${b.weakest.filter((x) => x.m < 100).map((x) => `<span class="chip">${h(x.t.title)}</span>`).join('')}</div>` : ''}</div></div>`;
+      }).join('')}</div>
+      <div class="ph-key small-t muted"><span><i class="k-fill"></i>Strength: how much he has mastered</span><span><i class="k-dot"></i>Latest practice test</span><span><i class="k-line"></i>Aim: 80%</span></div>
+      <p class="small-t muted">Our estimate from practice in the game, not a forecast of the school's mark.</p></section>` : '';
+
+    // How he practised: where his answers went, rushing and late nights, said as facts about the riding, not about him.
+    const groups = {};
+    for (const s of d.skills) {
+      const g = groups[`${s.subject}/${s.topic || s.skill}`] || (groups[`${s.subject}/${s.topic || s.skill}`] = { n: 0, ok: 0 });
+      g.n += s.n;
+      g.ok += s.first_try;
+    }
+    const bands = { hard: 0, stretch: 0, near: 0, easy: 0, few: 0 };
+    for (const g of Object.values(groups)) {
+      const r = g.ok / g.n;
+      bands[g.n < 4 ? 'few' : r >= 0.9 ? 'easy' : r >= 0.8 ? 'near' : r >= 0.5 ? 'stretch' : 'hard'] += g.n;
+    }
+    const all = Object.values(bands).reduce((a, n) => a + n, 0);
+    const pc = (k) => shareOf(bands[k], all);
+    const bandInfo = [['hard', 'Too hard for now', 'under 50% right'], ['stretch', 'Stretch zone', '50 to 80% right'], ['near', 'Nearly there', '80 to 90% right'], ['easy', 'Easy for him', '90% or more right'], ['few', 'Too few to tell', 'under 4 answers']].filter(([k]) => bands[k]);
+    const practiceSay = pc('easy') >= 50 ? `Most of his answers (${pc('easy')}%) were on sections he already finds easy. Learning grows fastest in the stretch zone.`
+      : pc('hard') >= 30 ? `${pc('hard')}% of his answers were on sections that are too hard for now. A Track walk or lesson before racing them will help.`
+      : pc('stretch') >= 30 ? `Good: ${pc('stretch')}% of his answers were in the stretch zone, where learning grows fastest.`
+      : 'A fair mix of easy and harder sections.';
+    const facts = [];
+    const quick = d.quick;
+    if (quick && t.questions) {
+      if (!quick.n) facts.push(['check', 'Careful riding: no answers were tapped in under 2 seconds.']);
+      else if (quick.ok / quick.n >= 0.7) facts.push(['bolt', `${quick.n} quick answers (under 2 seconds), and most were right: that's fast recall, not rushing.`]);
+      else facts.push(['bolt', `${quick.n} ${quick.n === 1 ? 'answer was' : 'answers were'} tapped in under 2 seconds${quick.exam === quick.n ? ', all in practice tests' : ''}, and ${quick.ok ? `only ${quick.ok}` : 'none'} right. Quick misses usually mean rushing. Ask: "Did the test feel long?"`]);
+    }
+    if (d.late && d.late.n) facts.push(['flag', `${d.late.n} answers came after 9 pm, on ${d.late.days} ${d.late.days === 1 ? 'evening' : 'evenings'}. An earlier slot is better for remembering, and for sleep.`]);
+    const easy = d.easy || {};
+    if (easy.races) facts.push(['star', `${easy.races} of ${easy.of} section races were on sections he already had 3 stars in${easy.top && easy.top.length ? `, mostly ${easy.top.map((x) => `${x.label} (${x.n})`).join(', ')}` : ''}. Those now pay half once a day.`]);
+    if (sp.held || sp.due) facts.push(['spark', `Still remembered on a later day: ${sp.held} ${sp.held === 1 ? 'kind' : 'kinds'} of question. Due back for a check: ${sp.due}.${sp.stuck.length ? ` Paused for help: ${sp.stuck.map((x) => x.t.title).join(', ')}.` : ''}`]);
+    if (prog.fix) facts.push(['wrench', `${prog.fix} ${prog.fix === 1 ? 'kind of question is' : 'kinds of question are'} on his fix list. A Fix-it lap clears them.`]);
+    const practiceCard = t.questions ? `<section class="card"><div class="ph-title"><h2 class="h-sec">How he practised</h2></div>
+      <div class="ph-bands" role="img" aria-label="${bandInfo.map(([k, label]) => `${label} ${pc(k)} percent`).join(', ')}">${bandInfo.map(([k]) => `<i class="b-${k}" style="flex:${bands[k]}"></i>`).join('')}</div>
+      <div class="ph-legend">${bandInfo.map(([k, label, note]) => `<span><i class="b-${k}"></i><b>${label}</b> ${pc(k)}% <small class="muted">${note}</small></span>`).join('')}</div>
+      <p>${practiceSay}</p>
+      ${facts.length ? `<ul class="ph-facts">${facts.map(([icon, text]) => `<li>${ic(icon, 18)}<span>${h(text)}</span></li>`).join('')}</ul>` : ''}</section>` : '';
+
+    // One real mistake to talk about, the answer behind a tap, and the full list behind another.
+    const pick = d.mistakes.find((m) => !m.ok && weak[0] && m.topic === weak[0].topic) || d.mistakes.find((m) => !m.ok) || d.mistakes[0];
+    const said = (m) => (m.first_given || m.given ? ` <span class="muted">(he said ${h(String(m.first_given || m.given))})</span>` : ' <span class="muted">(skipped)</span>');
+    const talkCard = pick ? `<section class="card ph-talk"><div class="eyebrow">Talk about this one</div>
+      <p class="ph-q">${h(pick.q)}</p>
+      <details class="ph-reveal"><summary>Show the answer</summary><p><b>Answer:</b> ${h(pick.correct || '')}${said(pick)}</p></details>
+      <p class="small-t muted">${h(subName(pick.subject))}${topicOf(pick.subject, pick.topic) ? `: ${h(topicOf(pick.subject, pick.topic).title)}` : ''} · ${stamp(pick.at)}</p>
+      <p class="ph-say">${older ? 'Ask: "Talk me through how you would do this one."' : 'Sit with him and ask: "Show me how you would do this one."'} Mistakes show what to practise next.</p>
+      <details class="ph-more"><summary>All his latest mistakes (${d.mistakes.length})</summary><div class="log">${d.mistakes.map((m) => `<div class="log-item"><div>${h(m.q)}</div><div class="small-t" style="margin-top:2px"><b>Answer:</b> ${h(m.correct || '')}${said(m)}</div><div class="small-t muted">${h(subName(m.subject))} · ${stamp(m.at)}${m.ok ? ' · right on the second try' : ''}</div></div>`).join('')}</div></details></section>` : '';
+
+    // Subjects fold open to their sections, weakest first, with this period's tricky ones marked.
+    const subjectsCard = `<section class="card"><div class="ph-title"><h2 class="h-sec">By subject</h2><span class="small-t muted">Tap one for its sections</span></div>
+      <div class="ph-list">${subjectIds.map((id) => {
+        const s = d.subjects.find((x) => x.subject === id);
+        const b = subjectBits(id);
+        const tricky = new Map(weak.filter((g) => g.subject === subName(id)).map((g) => [g.topic, shareOf(g.ok, g.n)]));
+        return `<details class="ph-sub"><summary><span class="ph-sub-top"><b>${h(subName(id))}</b><span class="small-t muted num">${b.cleared} of ${b.total} cleared</span>${ic('next', 18)}</span>
+          <span class="meter"><i style="width:${b.avg}%"></i></span>
+          <span class="small-t muted num">Strength ${b.avg}% · ${s ? `${shareOf(s.first_try, s.n)}% right first try, ${timeText(s.secs)}` : `no practice this ${span}`}${tricky.size ? ` · <b class="ph-tricky">${tricky.size} tricky this ${span}</b>` : ''}</span></summary>
+          <div class="ph-secs">${sectionsOf(id).sort((a, x) => a.m - x.m).map((x) => `<div class="ph-sec"><span>${h(x.t.title)}</span>${tricky.has(x.t.id) ? `<span class="chip warn">Tricky: ${tricky.get(x.t.id)}%</span>` : ''}<span class="chip ${x.m === 100 ? 'good' : x.m ? 'violet' : ''}">${x.m === 100 ? 'Cleared' : x.m ? `${x.m}%` : 'Not started'}</span></div>`).join('')}</div></details>`;
+      }).join('')}</div></section>`;
+
+    // School marks, the game's practice tests beside them, and adding a new one.
     const subjectsMarked = [...new Set([...marks.map((m) => m.subject), ...exams.map((e) => e.subject)])];
-    const subjectIds = Object.keys(pack.subjects);
+    const against = subjectIds.map((id) => {
+      const mine = marks.filter((m) => m.subject === id);
+      const tests = exams.filter((e) => e.subject === id);
+      if (!mine.length || !tests.length) return '';
+      const school = Math.round(mine.reduce((a, m) => a + pctOf(m), 0) / mine.length);
+      const game = Math.round(tests.slice(0, 3).reduce((a, e) => a + e.pct, 0) / Math.min(3, tests.length));
+      const gap = game - school;
+      const say = gap >= 15 ? 'The game is kinder than school here, so aim for 90% in practice before a test.' : gap <= -15 ? 'He does better at school than in the game. The practice tests may be harder than the real one.' : 'The game and school agree, so the practice tests are a fair guide.';
+      return `<div class="row"><div class="row-top"><b>${h(subName(id))}</b><span class="num muted">Game ${game}% · School ${school}%</span></div><div class="small-t muted">${say}</div></div>`;
+    }).filter(Boolean);
+    const marksCard = `<section class="card"><div class="ph-title"><h2 class="h-sec">Marks</h2><span class="small-t muted">School marks next to the game's practice tests</span></div>
+      ${gone.length ? `<p class="ph-ask-line small-t"><b>Add when it's back:</b> ${gone.map((e) => `${h(e.label)} (${shortDay(e.date)})`).join(', ')}</p>` : ''}
+      <div class="rows">${subjectsMarked.map((id) => {
+        const mine = marks.filter((m) => m.subject === id);
+        const b = subjectBits(id);
+        const avg = mine.length ? Math.round(mine.reduce((a, m) => a + pctOf(m), 0) / mine.length) : null;
+        return `<div class="row"><div class="row-top"><b>${h(subName(id))}</b><span class="num muted">${avg === null ? 'No school marks' : `School average ${avg}%`}</span></div>${avg === null ? '' : `<div class="meter" role="img" aria-label="${avg} percent"><i style="width:${avg}%"></i></div>`}<div class="small-t muted num">${mine.length} school ${mine.length === 1 ? 'mark' : 'marks'} · ${b.best === null ? 'No practice test yet' : `${b.tests} practice ${b.tests === 1 ? 'test' : 'tests'}, best ${b.best}%`}</div></div>`;
+      }).join('') || '<p class="small-t muted">No marks yet.</p>'}</div>
+      ${against.length ? `<div class="ph-sub-h">Game against school</div><p class="small-t muted">His last three practice tests next to his school marks.</p><div class="rows">${against.join('')}</div>` : ''}
+      ${marks.length ? `<details class="ph-more" ${v.confirmDel ? 'open' : ''}><summary>Every school mark (${marks.length})</summary><div class="log">${marks.map((m) => `<div class="log-item"><div class="row-top"><b>${h(m.label)}</b><span class="num">${shown(m.mark)}/${shown(m.out_of)} · ${pctOf(m)}%</span></div><div class="small-t muted num">${h(subName(m.subject))}${m.taken ? ` · ${stamp(`${m.taken}T12:00:00`)}` : ''}${m.note ? ` · ${h(m.note)}` : ''} <button class="link-btn no-print" data-act="mark-del" data-id="${m.id}">${v.confirmDel === m.id ? 'Tap again to delete' : 'Delete'}</button></div></div>`).join('')}</div></details>` : ''}
+      <details class="ph-more no-print"><summary>Add a school mark</summary>
+      <form id="mark-form" class="mark-form" autocomplete="off">
+        <select id="mark-subject" aria-label="Subject">${subjectIds.map((id) => `<option value="${id}">${h(pack.subjects[id].label)}</option>`).join('')}</select>
+        <input id="mark-label" type="text" maxlength="80" placeholder="Which test? For example: Term 4 Maths test" aria-label="Which test">
+        <input id="mark-date" type="date" value="${dayKey()}" aria-label="Date of the test">
+        <div class="mark-two"><input id="mark-got" type="text" inputmode="decimal" placeholder="Mark" aria-label="Mark"><input id="mark-of" type="text" inputmode="decimal" placeholder="Out of" aria-label="Out of"></div>
+        <p id="mark-msg" class="small-t muted" role="status"></p>
+        <button class="btn primary full" type="submit">Save the mark</button>
+      </form></details></section>`;
+
+    const peak = Math.max(1, ...d.daily.map((x) => x.n));
+    const moreCard = `<section class="card"><div class="ph-title"><h2 class="h-sec">More detail</h2></div>
+      <details class="ph-more"><summary>Day by day</summary><div class="rows">${d.daily.slice().reverse().map((x) => `<div class="row"><div class="row-top"><b>${stamp(`${x.day}T12:00:00`)}</b><span class="num muted">${timeText(x.secs)}</span></div><div class="meter" role="img" aria-label="${x.n} questions"><i style="width:${shareOf(x.n, peak)}%"></i></div><div class="small-t muted num">${x.n} questions · ${shareOf(x.first_try, x.n)}% right first try</div></div>`).join('') || '<p class="small-t muted">No answers in this period.</p>'}</div></details>
+      <details class="ph-more"><summary>Practice tests (${exams.length})</summary><div class="log">${exams.slice(0, 12).map((e) => `<div class="log-item"><div class="row-top"><b>${h(subName(e.subject))}: Main event</b><span class="num">${e.pct}%</span></div><div class="small-t muted num">${stamp(e.at)} · ${e.right} of ${e.total} right · ${timeText(e.secs || 0)}</div></div>`).join('') || '<p class="small-t muted">No practice tests yet.</p>'}</div></details>
+      <details class="ph-more"><summary>Latest races (${d.runs.length})</summary><div class="log">${d.runs.map((r) => `<div class="log-item"><div class="row-top"><b>${h(subName(r.subject))}: ${h(r.label || r.mode)}</b><span class="num">${r.pct}%</span></div><div class="small-t muted num">${stamp(r.at)} · ${r.right} of ${r.total} right · ${timeText(r.secs || 0)}</div></div>`).join('') || '<p class="small-t muted">No races in this period.</p>'}</div></details>
+      <p class="small-t muted">In the game: rank ${rankOf(prog.earned || 0)} (${RANKS[rankOf(prog.earned || 0) - 1][0]}), ${RS.fmt(prog.points || 0)} points to spend${prog.walked ? `, ${prog.walked} Track ${prog.walked === 1 ? 'walk' : 'walks'} done` : ''}.</p></section>`;
+
     return `<div class="wrap report" style="padding-bottom:32px;max-width:720px">
       <header class="top"><div class="top-who"><h1>Results</h1><div class="small-t muted">${v.busy ? 'Fetching...' : `Last ${v.days} days`}</div></div><button class="btn small no-print" data-act="parents-print">Print</button><button class="round no-print" data-act="parents-off" aria-label="Close the results">${ic('x')}</button></header>
-      <div class="pit-tabs no-print" role="group" aria-label="Rider and period">${whoTabs}<span style="flex:1"></span>${dayTabs}</div>
-      <section class="card"><div class="eyebrow">${h(pack.name)}</div><div class="h-sec" style="margin-bottom:6px">In short</div><div class="rows">${inShort.map((x) => `<p>${h(x)}</p>`).join('')}</div></section>
+      <div class="pit-tabs ph-tabs no-print" role="group" aria-label="Rider and period">${whoTabs}<span style="flex:1"></span>${dayTabs}</div>
+      ${hero}
+      ${praiseCard}
       <section class="card tonight"><div class="eyebrow">One job for tonight</div><p style="font-size:17px">${h(tonightJob(pack, prog, subjectBits))}</p></section>
-      ${(() => {
-        const sp = spacingOf(pack, prog);
-        return sp.due || sp.held ? `<p class="small-t muted" style="padding-inline:4px">Still remembered on a later day: ${sp.held} ${sp.held === 1 ? 'kind' : 'kinds'} of question. Due back for a check: ${sp.due}.${sp.stuck.length ? ` Paused for help: ${sp.stuck.map((x) => x.t.title).join(', ')}.` : ''}</p>` : '';
-      })()}
+      ${askCards}
+      ${testsCard}
+      ${talkCard}
+      ${practiceCard}
+      ${subjectsCard}
+      ${marksCard}
       <section class="card no-print"><div class="h-sec" style="margin-bottom:4px">The week in a message</div><p class="small-t muted" style="margin-bottom:10px">${new Date().getDay() === 0 ? "It's Sunday: a" : 'A'} short summary of both boys' last 7 days, to send to the family on WhatsApp.</p><button class="btn primary full" data-act="parents-share">Share the summary</button></section>
-      ${coming.length ? `<section class="card"><div class="h-sec" style="margin-bottom:4px">Tests coming up</div><p class="small-t muted" style="margin-bottom:10px">Our estimate from practice in the game, not a forecast of the school's mark.</p>
-        <div class="rows">${coming.map((e) => {
-          const b = subjectBits(e.subject);
-          const [word, tone] = readiness(b);
-          return `<div class="row"><div class="row-top"><b>${h(e.label)}: ${shortDay(e.date)}</b><span class="chip ${tone}">${word}</span></div><div class="meter" role="img" aria-label="${b.avg} percent strength"><i style="width:${b.avg}%"></i></div><div class="small-t muted num">${whenText(daysUntil(e.date))} · Strength ${b.avg}% · ${b.cleared} of ${b.total} sections cleared · ${b.latest === null ? 'No practice test yet' : `Practice test ${b.latest}%, best ${b.best}%`}</div>${b.weakest.length && b.avg < 100 ? `<div class="small-t">Practise next: ${b.weakest.map((x) => h(x.t.title)).join(', ')}</div>` : ''}</div>`;
-        }).join('')}</div></section>` : ''}
-      <section class="card"><div class="h-sec" style="margin-bottom:4px">Marks</div><p class="small-t muted" style="margin-bottom:10px">School marks you've added, next to the game's practice tests.</p>
-        ${gone.length ? `<p class="small-t" style="margin-bottom:10px"><b>Add when it's back:</b> ${gone.map((e) => `${h(e.label)} (${shortDay(e.date)})`).join(', ')}</p>` : ''}
-        <div class="rows">${subjectsMarked.map((id) => {
-          const mine = marks.filter((m) => m.subject === id);
-          const b = subjectBits(id);
-          const avg = mine.length ? Math.round(mine.reduce((a, m) => a + pctOf(m), 0) / mine.length) : null;
-          return `<div class="row"><div class="row-top"><b>${h(subName(id))}</b><span class="num muted">${avg === null ? 'No school marks' : `School average ${avg}%`}</span></div>${avg === null ? '' : `<div class="meter" role="img" aria-label="${avg} percent"><i style="width:${avg}%"></i></div>`}<div class="small-t muted num">${mine.length} school ${mine.length === 1 ? 'mark' : 'marks'} · ${b.best === null ? 'No practice test yet' : `${b.tests} practice ${b.tests === 1 ? 'test' : 'tests'}, best ${b.best}%`}</div></div>`;
-        }).join('') || '<p class="small-t muted">No marks yet.</p>'}</div>
-        ${marks.length ? `<div class="h-sec" style="font-size:16px;margin:14px 0 6px">School marks</div><div class="log">${marks.map((m) => `<div class="log-item"><div class="row-top"><b>${h(m.label)}</b><span class="num">${shown(m.mark)}/${shown(m.out_of)} · ${pctOf(m)}%</span></div><div class="small-t muted num">${h(subName(m.subject))}${m.taken ? ` · ${stamp(`${m.taken}T12:00:00`)}` : ''}${m.note ? ` · ${h(m.note)}` : ''} <button class="link-btn no-print" data-act="mark-del" data-id="${m.id}">${v.confirmDel === m.id ? 'Tap again to delete' : 'Delete'}</button></div></div>`).join('')}</div>` : ''}
-        <form id="mark-form" class="mark-form no-print" autocomplete="off">
-          <div class="h-sec" style="font-size:16px;margin-top:14px">Add a school mark</div>
-          <select id="mark-subject" aria-label="Subject">${subjectIds.map((id) => `<option value="${id}">${h(pack.subjects[id].label)}</option>`).join('')}</select>
-          <input id="mark-label" type="text" maxlength="80" placeholder="Which test? For example: Term 4 Maths test" aria-label="Which test">
-          <input id="mark-date" type="date" value="${dayKey()}" aria-label="Date of the test">
-          <div class="mark-two"><input id="mark-got" type="text" inputmode="decimal" placeholder="Mark" aria-label="Mark"><input id="mark-of" type="text" inputmode="decimal" placeholder="Out of" aria-label="Out of"></div>
-          <p id="mark-msg" class="small-t muted" role="status"></p>
-          <button class="btn primary full" type="submit">Save the mark</button>
-        </form>
-      </section>
-      ${(() => {
-        // How the game's practice tests line up with the school's marks, subject by subject.
-        const rows = subjectIds.map((id) => {
-          const mine = marks.filter((m) => m.subject === id);
-          const tests = exams.filter((e) => e.subject === id);
-          if (!mine.length || !tests.length) return '';
-          const school = Math.round(mine.reduce((a, m) => a + pctOf(m), 0) / mine.length);
-          const game = Math.round(tests.slice(0, 3).reduce((a, e) => a + e.pct, 0) / Math.min(3, tests.length));
-          const gap = game - school;
-          const say = gap >= 15 ? 'The game is kinder than school here, so aim for 90% in practice before a test.' : gap <= -15 ? 'He does better at school than in the game. The practice tests may be harder than the real one.' : 'The game and school agree, so the practice tests are a fair guide.';
-          return `<div class="row"><div class="row-top"><b>${h(subName(id))}</b><span class="num muted">Game ${game}% · School ${school}%</span></div><div class="small-t muted">${say}</div></div>`;
-        }).filter(Boolean);
-        return rows.length ? `<section class="card"><div class="h-sec" style="margin-bottom:4px">Game against school</div><p class="small-t muted" style="margin-bottom:10px">His last three practice tests next to his school marks.</p><div class="rows">${rows.join('')}</div></section>` : '';
-      })()}
-      <section class="tiles">
-        ${tile('flag', 'Time spent', timeText(t.secs), `<span class="chip num">${t.days} ${t.days === 1 ? 'day' : 'days'} active</span>`)}
-        ${tile('target', 'Right first try', t.questions ? `${accuracy}%` : '–', `<span class="chip num">${RS.fmt(t.first_try)} of ${RS.fmt(t.questions)}</span>`)}
-        ${tile('star', 'Rank', `${rankOf(prog.earned || 0)}`, `<span class="chip">${RANKS[rankOf(prog.earned || 0) - 1][0]}</span>`)}
-        ${tile('wrench', 'On the fix list', `${prog.fix || 0}`, `<span class="chip num">${RS.fmt(prog.points || 0)} points</span>`)}
-      </section>
-      <section class="card"><div class="h-sec" style="margin-bottom:4px">Needs work</div><p class="small-t muted" style="margin-bottom:10px">Sections with at least 4 answers in this period, weakest first.</p>
-        <div class="rows">${weak.map((g) => `<div class="row"><div class="row-top"><b>${h(g.title)}</b><span class="num muted">${shareOf(g.ok, g.n)}%</span></div><div class="meter" role="img" aria-label="${shareOf(g.ok, g.n)} percent right first try"><i style="width:${shareOf(g.ok, g.n)}%"></i></div><div class="small-t muted num">${h(g.subject)} · ${g.ok} of ${g.n} right first try</div></div>`).join('') || '<p class="small-t muted">Nothing stands out yet.</p>'}</div>
-      </section>
-      <section class="card"><div class="h-sec" style="margin-bottom:10px">By subject</div>
-        <div class="rows">${subjectIds.map((id) => {
-          const s = d.subjects.find((x) => x.subject === id);
-          const b = subjectBits(id);
-          return `<div class="row"><div class="row-top"><b>${h(subName(id))}</b><span class="num muted">${s ? `${shareOf(s.first_try, s.n)}% right first try` : 'No practice this period'}</span></div><div class="meter" role="img" aria-label="${b.avg} percent strength"><i style="width:${b.avg}%"></i></div><div class="small-t muted num">Strength ${b.avg}% · ${b.cleared} of ${b.total} sections cleared${s ? ` · ${RS.fmt(s.n)} questions · ${timeText(s.secs)}` : ''}</div></div>`;
-        }).join('')}</div>
-        ${prog.walked ? `<p class="small-t muted" style="margin-top:10px">Track walks done: ${prog.walked}</p>` : ''}
-      </section>
-      ${exams.length ? `<section class="card"><div class="h-sec" style="margin-bottom:10px">Practice tests</div><div class="log">${exams.slice(0, 12).map((e) => `<div class="log-item"><div class="row-top"><b>${h(subName(e.subject))}: Main event</b><span class="num">${e.pct}%</span></div><div class="small-t muted num">${stamp(e.at)} · ${e.right} of ${e.total} right · ${timeText(e.secs || 0)}</div></div>`).join('')}</div></section>` : ''}
-      <section class="card"><div class="h-sec" style="margin-bottom:10px">Day by day</div>
-        <div class="rows">${d.daily.slice().reverse().map((x) => `<div class="row"><div class="row-top"><b>${stamp(`${x.day}T12:00:00`)}</b><span class="num muted">${timeText(x.secs)}</span></div><div class="meter" role="img" aria-label="${x.n} questions"><i style="width:${shareOf(x.n, peak)}%"></i></div><div class="small-t muted num">${x.n} questions · ${shareOf(x.first_try, x.n)}% right first try</div></div>`).join('') || '<p class="small-t muted">No answers in this period.</p>'}</div>
-      </section>
-      <section class="card"><div class="h-sec" style="margin-bottom:10px">Latest mistakes</div>
-        <div class="log">${d.mistakes.map((m) => `<div class="log-item"><div>${h(m.q)}</div><div class="small-t" style="margin-top:2px"><b>Answer:</b> ${h(m.correct || '')}${m.first_given || m.given ? ` <span class="muted">(said ${h(String(m.first_given || m.given))})</span>` : ' <span class="muted">(skipped)</span>'}</div><div class="small-t muted">${h(subName(m.subject))} · ${stamp(m.at)}${m.ok ? ' · right on the second try' : ''}</div></div>`).join('') || '<p class="small-t muted">No mistakes in this period.</p>'}</div>
-      </section>
-      <section class="card"><div class="h-sec" style="margin-bottom:10px">Latest races</div>
-        <div class="log">${d.runs.map((r) => `<div class="log-item"><div class="row-top"><b>${h(subName(r.subject))}: ${h(r.label || r.mode)}</b><span class="num">${r.pct}%</span></div><div class="small-t muted num">${stamp(r.at)} · ${r.right} of ${r.total} right · ${timeText(r.secs || 0)}</div></div>`).join('') || '<p class="small-t muted">No races in this period.</p>'}</div>
-      </section>
+      ${moreCard}
     </div>`;
   }
   document.addEventListener('submit', async (e) => {
@@ -17154,6 +17353,8 @@ ${t && H > W && W < 600 ? '<li>Tip: turn your phone sideways for a bigger view.<
       const next = planExam(pack);
       lines.push('');
       lines.push(`${pack.name}: ${t.questions ? `${RS.fmt(t.questions)} questions on ${t.days} ${t.days === 1 ? 'day' : 'days'}, about ${timeText(t.secs)}, ${shareOf(t.first_try, t.questions)}% right first try.` : 'no riding this week.'}`);
+      const firsts = (d.firsts || []).map((f) => f.label);
+      if (firsts.length) lines.push(`New 3 stars: ${firsts.slice(0, 4).join(', ')}${firsts.length > 4 ? ` and ${firsts.length - 4} more` : ''}.`);
       if (sp.held) lines.push(`Still remembered on a later day: ${sp.held} ${sp.held === 1 ? 'kind' : 'kinds'} of question.`);
       const best = (d.exams || []).filter((e) => Date.now() - new Date(e.at) < 7 * 86400000).sort((a, b) => b.pct - a.pct)[0];
       if (best) lines.push(`Best practice test: ${best.pct}% in ${(pack.subjects[best.subject] || { label: best.subject }).label}.`);
@@ -17510,6 +17711,8 @@ ${t && H > W && W < 600 ? '<li>Tip: turn your phone sideways for a bigger view.<
         window.scrollTo(0, 0);
         break;
       case 'parents-print':
+        // Folded parts print open.
+        document.querySelectorAll('.report details').forEach((x) => { x.open = true; });
         window.print();
         break;
       case 'mark-del': {
