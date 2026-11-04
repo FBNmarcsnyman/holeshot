@@ -816,6 +816,16 @@ body:has(.ph[data-boy="kash"]) { --ph-wash: #FFD2BD; }
   .ph-banner .ph-date span { color: #444; }
 }
 
+/* Learning it properly (4 November 2026): the lesson card's button wakes once there has been time to take it in,
+   "your turn" asks the missed question again, and a very quick maths answer is asked to show a step. */
+.btn[data-wait] { position: relative; overflow: hidden; opacity: 1; }
+.btn[data-wait]::after { content: ""; position: absolute; inset: 0; background: rgba(255, 255, 255, .28); transform-origin: left; animation: wake var(--wait, 2000ms) linear forwards; }
+@keyframes wake { from { transform: scaleX(0); } to { transform: scaleX(1); } }
+@media (prefers-reduced-motion: reduce) { .btn[data-wait]::after { animation: none; } }
+.redo-tag { display: inline-flex; align-items: center; gap: 6px; align-self: start; padding: 6px 12px; border-radius: 999px; background: var(--warn-soft); color: var(--warn); font-size: 13px; font-weight: 700; }
+.redo-tag svg { display: inline; }
+.prove-in { width: 100%; height: 56px; border-radius: 16px; border: 3px solid var(--accent); background: var(--card); color: var(--ink); text-align: center; font: 800 26px/1 var(--display); }
+
 </style>
 <div id="app"></div>
 <div id="toast" class="toast" role="status" aria-live="polite" hidden></div>
@@ -14319,7 +14329,7 @@ ${t && H > W && W < 600 ? '<li>Tip: turn your phone sideways for a bigger view.<
   // ---------- staying up to date ----------
   // An open tab or a home screen app keeps running the page it first loaded, old prices and all. So it asks which version
   // is live when it comes back into view and every few minutes, and swaps over between races. build.mjs fills in BUILD.
-  const BUILD = 'd2bf39029e';
+  const BUILD = 'e8ba1bd210';
   const BACK_KEY = 'holeshot.back.v1';
   const TRIED_KEY = 'holeshot.tried.v1';
   let liveBuild = null;
@@ -15347,8 +15357,76 @@ ${t && H > W && W < 600 ? '<li>Tip: turn your phone sideways for a bigger view.<
       r.queue.splice(r.i + 1, 0, { skill: q.skill, bonus: true, depth: depth + 1, like: kindOf(q.q) });
       r.extras++;
     }
-    return { type: 'wrong', line: charLine(false), picked: given, step: -1 };
+    // The very question he missed comes back once more at the end of the race, to show it stuck.
+    if (r.mode !== 'teach' && !q.again && (r.finals || 0) < 3) {
+      r.queue.push({ skill: q.skill, exact: true, bonus: true, again: true });
+      r.finals = (r.finals || 0) + 1;
+    }
+    return { type: 'wrong', line: charLine(false), picked: given, step: -1, at: Date.now() };
   }
+  // How long a step of the lesson card stays before its button wakes: long enough to read it, or hear it read.
+  function lessonWait(q, sh) {
+    const text = sh.step < 0 ? `${sh.picked || ''} ${q.correct}` : String(q.steps[sh.step] || '');
+    const words = RS.plain(text).split(/\s+/).filter(Boolean).length;
+    return Math.min(6000, Math.max(1500, 900 + 280 * words));
+  }
+  // Reads a line of the lesson card after whatever is already being said.
+  function sayStep(text) {
+    if (!text || !state.sound || !window.speechSynthesis || !ui.run || !ui.run.q) return;
+    window.speechSynthesis.speak(dress(new SpeechSynthesisUtterance(RS.speakable(String(text))), voiceOf(P()), ui.run.q.lang || 'en-ZA'));
+  }
+  // "Your turn": after the lesson, the same question again, which he must get right before the race goes on.
+  function startRedo() {
+    const r = ui.run;
+    const q = r.q;
+    if (q.kind === 'mc') {
+      const order = RS.shuffle(q.options.map((_, i) => i));
+      q.answer = order.indexOf(q.answer);
+      q.options = order.map((i) => q.options[i]);
+    }
+    r.redo = { tries: 0 };
+    r.sheet = null;
+    r.typed = '';
+    r.draft = '';
+    r.struck = null;
+    drawRun();
+    if (state.autoRead) readAloud();
+  }
+  function redoMark(ok) {
+    const r = ui.run;
+    if (ok) {
+      r.redo = null;
+      r.q.redone = true;
+      r.sheet = { type: 'redo-ok', line: charLine(true) };
+      sfx('right');
+    } else {
+      r.redo.tries++;
+      const giveUp = r.redo.tries >= 3;
+      if (giveUp) {
+        r.redo = null;
+        r.q.redone = true;
+      }
+      r.sheet = { type: 'redo-wrong', giveUp, at: Date.now() };
+      sfx('wrong');
+      sayStep(`The right answer is ${r.q.correct}`);
+    }
+    drawRun();
+  }
+  // A very quick right answer to a maths question with several steps of working: he shows one middle step.
+  // The gap is a number the working finds on the way, never one from the question or the answer itself.
+  const numsIn = (text) => (RS.plain(String(text)).match(/\d+(?:[ \u00a0]\d{3})*(?:[.,]\d+)?/g) || []).map((n) => n.replace(/[ \u00a0]/g, '').replace(',', '.'));
+  function proveGap(q) {
+    if (!q.steps || q.steps.length < 3 || PK().skills[q.skill].items) return null;
+    const known = new Set([...numsIn(q.q), ...numsIn(q.correct), ...(q.visual ? numsIn(JSON.stringify(q.visual)) : [])].map(Number));
+    const order = q.steps.slice(0, -1).map((_, i) => i).sort((a, b) => Math.abs(a - (q.steps.length - 1) / 2) - Math.abs(b - (q.steps.length - 1) / 2));
+    for (const i of order) {
+      const text = RS.plain(String(q.steps[i]));
+      const found = (text.match(/\d+(?:[ \u00a0]\d{3})*(?:[.,]\d+)?/g) || []).find((n) => !known.has(Number(n.replace(/[ \u00a0]/g, '').replace(',', '.'))));
+      if (found) return { i, text: text.replace(found, '____'), want: Number(found.replace(/[ \u00a0]/g, '').replace(',', '.')) };
+    }
+    return null;
+  }
+  const tooQuick = (q, secs) => q.steps && secs < 2 + 1.5 * q.steps.length;
   const ruleCard = (t, open) => (t && t.notes ? `<details class="rules" ${open ? 'open' : ''}><summary>${ic('spark', 14, true)} Rule card</summary><ul>${t.notes.map((n) => `<li>${h(n)}</li>`).join('')}</ul></details>` : '');
 
   // ---------- the track ----------
@@ -16151,6 +16229,7 @@ ${t && H > W && W < 600 ? '<li>Tip: turn your phone sideways for a bigger view.<
     keepRun();
     q.skill = slot.skill;
     q.bonus = !!slot.bonus;
+    q.again = !!slot.again;
     r.q = q;
     r.typed = '';
     r.tries = 0;
@@ -16160,6 +16239,11 @@ ${t && H > W && W < 600 ? '<li>Tip: turn your phone sideways for a bigger view.<
     r.fixNote = '';
     r.firstGiven = null;
     r.qStart = Date.now();
+    r.away = 0;
+    r.leftAt = null;
+    r.flag = null;
+    r.redo = null;
+    r.prove = null;
     drawRun();
     if (state.autoRead) readAloud();
     const w = $('#ans-word');
@@ -16244,6 +16328,8 @@ ${t && H > W && W < 600 ? '<li>Tip: turn your phone sideways for a bigger view.<
       first_try: firstTry,
       bonus: q.bonus,
       secs: Math.round((Date.now() - r.qStart) / 1000),
+      away: r.away >= 1 ? Math.round(r.away) : null,
+      flag: r.flag || null,
     });
   }
   function award(amount) {
@@ -16279,7 +16365,29 @@ ${t && H > W && W < 600 ? '<li>Tip: turn your phone sideways for a bigger view.<
       }
       if (res.near) return toast(res.msg);
     }
+    if (r.redo) return redoMark(res.ok);
     if (r.mode === 'teach') return teachMark(res.ok, given);
+    if (r.leftAt) awayEnd();
+    // Time outside the game during the question (another app, a browser, a calculator): a right answer earns
+    // nothing and counts as not known first time, so it comes back to practise.
+    const left = r.mode !== 'lap' && r.away >= 3;
+    if (left && res.ok) {
+      r.flag = 'left';
+      settle(q, true, false, given);
+      r.combo = 0;
+      r.sheet = { type: 'left', line: '' };
+      sfx('wrong');
+      return drawRun();
+    }
+    if (left) r.flag = 'left';
+    if (r.mode === 'exam' && res.ok && !q.bonus && tooQuick(q, (Date.now() - r.qStart) / 1000) && proveGap(q)) {
+      r.prove = { gap: proveGap(q), given, at: Date.now(), exam: true };
+      r.sheet = { type: 'prove' };
+      drawRun();
+      const box = $('#prove-in');
+      if (box) box.focus({ preventScroll: true });
+      return;
+    }
     if (r.mode === 'exam') {
       settle(q, res.ok, true, given);
       if (res.ok) {
@@ -16290,7 +16398,9 @@ ${t && H > W && W < 600 ? '<li>Tip: turn your phone sideways for a bigger view.<
       r.sheet = res.ok ? { type: 'marked', pts: award(q.bonus ? 5 : 10), line: charLine(true) } : lesson(r, q, given);
       sfx(res.ok ? 'right' : 'wrong');
       drawRun();
-      return sayLine(r.sheet.line);
+      sayLine(r.sheet.line);
+      if (r.sheet.type === 'wrong') sayStep(`The right answer is ${q.correct}`);
+      return;
     }
     if (r.mode === 'lap') {
       settle(q, res.ok, true, given);
@@ -16307,6 +16417,18 @@ ${t && H > W && W < 600 ? '<li>Tip: turn your phone sideways for a bigger view.<
       }
       r.i++;
       return nextQuestion();
+    }
+    const secs = (Date.now() - r.qStart) / 1000;
+    if (res.ok && r.tries === 0 && !q.bonus && tooQuick(q, secs)) {
+      const gap = proveGap(q);
+      if (gap) {
+        r.prove = { gap, given, at: Date.now() };
+        r.sheet = { type: 'prove' };
+        drawRun();
+        const box = $('#prove-in');
+        if (box) box.focus({ preventScroll: true });
+        return;
+      }
     }
     if (res.ok) {
       const first = r.tries === 0;
@@ -16336,6 +16458,7 @@ ${t && H > W && W < 600 ? '<li>Tip: turn your phone sideways for a bigger view.<
     }
     drawRun();
     sayLine(r.sheet.line);
+    if (r.sheet.type === 'wrong') sayStep(`The right answer is ${q.correct}`);
   }
 
   function finishRun() {
@@ -16584,6 +16707,37 @@ ${t && H > W && W < 600 ? '<li>Tip: turn your phone sideways for a bigger view.<
       </div>${skip}`;
   }
 
+  // A button that wakes once there has been time to take the card in.
+  function waitAttr(sh, ms) {
+    if (!sh.at) return '';
+    sh.ready = sh.at + ms;
+    const left = Math.round(sh.ready - Date.now());
+    return left > 0 ? ` disabled data-wait="${left}" style="--wait:${left}ms"` : '';
+  }
+  // Quick right answer, step shown: full points. Not shown: no points, and it goes on the fix list.
+  function proveDone(ok) {
+    const r = ui.run;
+    const q = r.q;
+    const pr = r.prove;
+    r.prove = null;
+    r.flag = ok ? 'prove-ok' : 'prove-miss';
+    if (ok) {
+      r.combo++;
+      r.bestCombo = Math.max(r.bestCombo, r.combo);
+      const mult = pr.exam ? 1 : r.combo >= 6 ? 3 : r.combo >= 3 ? 2 : 1;
+      const holeshot = !pr.exam && r.i === 0;
+      const paid = award(10 * mult + (holeshot ? 10 : 0));
+      settle(q, true, true, pr.given);
+      r.sheet = pr.exam ? { type: 'marked', pts: paid, line: charLine(true) } : { type: 'right', title: 'Proved it!', pts: paid, mult, holeshot, line: charLine(true) };
+      sfx('right');
+    } else {
+      settle(q, true, false, pr.given);
+      r.combo = 0;
+      r.sheet = { type: 'prove-miss', at: Date.now() };
+      sfx('wrong');
+    }
+    drawRun();
+  }
   function sheetHTML() {
     const r = ui.run;
     const s = r.sheet;
@@ -16617,6 +16771,38 @@ ${t && H > W && W < 600 ? '<li>Tip: turn your phone sideways for a bigger view.<
     if (s.type === 'retry') {
       return `<div class="sheet warn" role="status"><div class="sheet-head"><h2>Stalled it</h2></div>${lineHTML(s)}<p style="font-size:17px">${h(hintFor(q))}</p>${ruleCard(topicOf(q.skill))}<button class="btn primary full" data-act="retry" data-primary>Kick it over</button></div>`;
     }
+    if (s.type === 'left') {
+      return `<div class="sheet warn" role="status"><div class="sheet-head"><h2>You left the game</h2></div>
+        <p>The game was put away for ${Math.round(r.away)} seconds during this question. An answer found outside the game earns no points, and this one comes back to practise.</p>
+        <p class="small-t muted">Work it out here, on paper if you need to.</p>
+        <button class="btn primary full" data-act="next" data-primary>Next ${ic('arrow')}</button></div>`;
+    }
+    if (s.type === 'prove') {
+      const g = r.prove.gap;
+      return `<div class="sheet" role="dialog" aria-label="Prove it"><div class="sheet-head"><h2>Quick! Prove it</h2></div>
+        <p>That was fast. Fill in the missing number in the working to keep the points.</p>
+        <ol class="steps">${q.steps.slice(0, g.i).map((x) => `<li>${h(x)}</li>`).join('')}<li><b>${h(g.text)}</b></li></ol>
+        <input id="prove-in" class="prove-in" type="text" inputmode="decimal" autocomplete="off" spellcheck="false" aria-label="The missing number">
+        <button class="btn primary full" data-act="prove-check" data-primary>Check ${ic('arrow')}</button>
+        <button class="btn full" data-act="prove-skip">I can't show it</button></div>`;
+    }
+    if (s.type === 'prove-miss') {
+      return `<div class="sheet bad" role="status"><div class="sheet-head"><h2>No working, no points</h2></div>
+        <p>The answer was right, but the working wasn't there, so it earns nothing this time and goes on your fix list.</p>
+        ${steps}
+        <p class="small-t muted">Work these out on paper, and show Mom or Dad how you did it.</p>
+        <button class="btn primary full" data-act="next" data-primary${waitAttr(s, 3000)}>Next ${ic('arrow')}</button></div>`;
+    }
+    if (s.type === 'redo-ok') {
+      const similar = r.queue[r.i + 1] && r.queue[r.i + 1].depth;
+      return `<div class="sheet good" role="status"><div class="sheet-head"><h2>Locked in</h2></div>${lineHTML(s)}<p>Now you've got it.</p><button class="btn primary full" data-act="next" data-primary>${similar ? 'Now try one like it' : 'Next'} ${ic('arrow')}</button></div>`;
+    }
+    if (s.type === 'redo-wrong') {
+      return `<div class="sheet warn" role="status"><div class="sheet-head"><h2>Not quite</h2><button class="round small" data-act="say-card" aria-label="Read this aloud">${ic('speaker', 18)}</button></div>
+        <p style="font-size:17px"><b>The right answer:</b> ${h(q.correct).replace(/\.$/, '')}</p>
+        ${s.giveUp ? '<p class="small-t muted">It comes back at the end of the race for one more look.</p>' : '<p class="small-t muted">Look at it once more, then answer it the right way.</p>'}
+        <button class="btn primary full" data-act="${s.giveUp ? 'next' : 'redo-again'}" data-primary${waitAttr(s, 2500)}>${s.giveUp ? 'Next' : 'Try again'} ${ic('arrow')}</button></div>`;
+    }
     // They go through it a step at a time, and can't move on until they have.
     const picked = s.picked === undefined || s.picked === null ? '' : String(s.picked);
     const why = (q.nope && q.nope[picked]) || q.not || PK().skills[q.skill].not || '';
@@ -16631,7 +16817,7 @@ ${t && H > W && W < 600 ? '<li>Tip: turn your phone sideways for a bigger view.<
       ${done && walk ? walkBack(q) : ''}
       ${done ? ruleCard(topicOf(q.skill), true) : ''}
       ${done && !q.bonus && r.mode !== 'teach' ? `<p class="small-t muted">It stays on your fix list until you get it right ${FIX_NEED} times in a row, and once more on another day.</p>` : ''}
-      ${done ? `<button class="btn primary full" data-act="next" data-primary>${s.next ? h(s.next) : similar ? 'Now try one like it' : 'Got it'} ${ic('arrow')}</button>` : `<button class="btn primary full" data-act="lesson-next" data-primary>${s.step < 0 ? 'Show me why' : 'Next step'} ${ic('arrow')}</button>`}
+      ${done ? `<button class="btn primary full" data-act="next" data-primary${waitAttr(s, lessonWait(q, s))}>${s.next ? h(s.next) : r.mode !== 'teach' && !q.redone ? 'Your turn' : similar ? 'Now try one like it' : 'Got it'} ${ic('arrow')}</button>` : `<button class="btn primary full" data-act="lesson-next" data-primary${waitAttr(s, lessonWait(q, s))}>${s.step < 0 ? 'Show me why' : 'Next step'} ${ic('arrow')}</button>`}
     </div>`;
   }
 
@@ -16663,11 +16849,11 @@ ${t && H > W && W < 600 ? '<li>Tip: turn your phone sideways for a bigger view.<
         <article class="q-card ${!q.visual && RS.plain(q.q).length <= 30 ? 'bare' : ''}">
           <div class="q-meta">
             <img class="q-thumb" src="img/${t.img}.webp" alt="" decoding="async">
-            <div style="flex:1;min-width:0"><span class="eyebrow" style="display:block">${t.stop}</span><span class="small-t muted">${q.bonus ? 'Try one like it' : t.title}</span></div>
+            <div style="flex:1;min-width:0"><span class="eyebrow" style="display:block">${t.stop}</span><span class="small-t muted">${r.redo ? 'Your turn' : q.again ? 'One more look' : q.bonus ? 'Try one like it' : t.title}</span></div>
             <span class="chip num">${r.i + 1} of ${r.queue.length}</span>
             <button class="round small" data-act="read" aria-label="Read the question aloud">${ic('speaker', 18)}</button>
           </div>
-          ${q.exact ? '<div class="eyebrow">This one caught you out</div>' : ''}
+          ${r.redo ? `<div class="redo-tag">${ic('wrench', 14)} Your turn: answer it the right way to carry on</div>` : q.again ? '<div class="eyebrow">Back for one more look: you missed this earlier</div>' : q.exact ? '<div class="eyebrow">This one caught you out</div>' : ''}
           <h1 class="q-text">${h(q.q)}</h1>
           ${visual(q)}
         </article>
@@ -16682,6 +16868,15 @@ ${t && H > W && W < 600 ? '<li>Tip: turn your phone sideways for a bigger view.<
       if (ui.run) ui.run.gate = false;
     }, 0);
     $('#app').innerHTML = viewRun();
+    const waiting = document.querySelector('[data-wait]');
+    if (waiting) {
+      setTimeout(() => {
+        if (!waiting.isConnected) return;
+        waiting.disabled = false;
+        waiting.removeAttribute('data-wait');
+        waiting.focus({ preventScroll: true });
+      }, Number(waiting.dataset.wait));
+    }
     const primary = document.querySelector('[data-primary]');
     if (primary) primary.focus({ preventScroll: true });
     else {
@@ -17174,7 +17369,7 @@ ${t && H > W && W < 600 ? '<li>Tip: turn your phone sideways for a bigger view.<
     return { due, held, stuck };
   }
   // One clear thing for a parent to do tonight, picked from the same report.
-  function tonightJob(pack, prog, subjectBits) {
+  function tonightJob(pack, prog, subjectBits, flags) {
     const sp = spacingOf(pack, prog);
     const name = pack.name;
     const next = planExam(pack);
@@ -17196,6 +17391,8 @@ ${t && H > W && W < 600 ? '<li>Tip: turn your phone sideways for a bigger view.<
       const label = pack.subjects[ask[0]].label;
       return { title: `New ${label} work`, mins: 2, text: `${name} has 3 stars on every ${label} section and asked for new work. Send a photo of his next ${label} topic list or a test notice, and new sections get added.` };
     }
+    const missed = (flags && flags.proveMiss) || 0;
+    if (missed >= 2) return { title: 'Check his working on paper', mins: 10, text: `${missed} times lately a maths answer came very fast and ${name} couldn't show a step of the working. Sit with him for 10 minutes and watch him do three maths questions on paper.` };
     if (sp.due >= 8) return { title: 'A comeback lap', mins: 5, text: `${sp.due} kinds of question are due back for a check. Ask ${name} to ride the comeback lap on his Home screen. It takes about 5 minutes.` };
     if (next) {
       const b = subjectBits(next.subject);
@@ -17248,7 +17445,7 @@ ${t && H > W && W < 600 ? '<li>Tip: turn your phone sideways for a bigger view.<
     const topicOf = (sid, tid) => (pack.subjects[sid] ? pack.subjects[sid].topics.find((x) => x.id === tid) : null);
     const boyTiles = Object.values(RS.packs).filter((x) => v.data[x.id]).map((x) => {
       const dx = v.data[x.id];
-      const job = tonightJob(x, dx.progress || {}, bitsFor(x, dx).subjectBits);
+      const job = tonightJob(x, dx.progress || {}, bitsFor(x, dx).subjectBits, dx.flags);
       return `<button class="ph-boy boy-${x.id} ${v.who === x.id ? 'on' : ''}" data-act="parents-who" data-id="${x.id}" aria-pressed="${v.who === x.id}">${(dx.progress || {}).plate ? plate(dx.progress.plate) : `<span class="ph-av">${h(x.name[0])}</span>`}<span class="ph-boy-txt"><b>${h(x.name)}</b><small>Tonight: ${h(job.title)}</small></span></button>`;
     }).join('');
     const dayTabs = [7, 30].map((n) => `<button class="ph-segb ${v.days === n ? 'on' : ''}" data-act="parents-days" data-id="${n}" aria-pressed="${v.days === n}">${n} days</button>`).join('');
@@ -17303,7 +17500,7 @@ ${t && H > W && W < 600 ? '<li>Tip: turn your phone sideways for a bigger view.<
         <div class="ph-seg no-print" role="group" aria-label="Period">${dayTabs}</div></div>
       <div class="ph-ringbox"><svg viewBox="0 0 64 64" role="img" aria-label="Rode on ${t.days} of the last ${v.days} days"><circle cx="32" cy="32" r="${r}" class="ph-ring-bg"/><circle cx="32" cy="32" r="${r}" class="ph-ring-fg" stroke-dasharray="${((round * Math.min(t.days, v.days)) / v.days).toFixed(1)} ${round.toFixed(1)}" transform="rotate(-90 32 32)"/></svg><span><b class="num">${t.days}/${v.days}</b><small>days ridden</small></span></div>
     </div>`;
-    const job = tonightJob(pack, prog, subjectBits);
+    const job = tonightJob(pack, prog, subjectBits, d.flags);
     const nextLine = nextUp ? (() => {
       const [word, tone, icon] = readiness(subjectBits(nextUp.subject));
       return `<div class="ph-nextup"><span class="muted">Next up</span><b>${h(nextUp.label)} test, ${whenText(daysUntil(nextUp.date)).toLowerCase()}</b><span class="chip ${tone}">${ic(icon, 14)} ${word}</span></div>`;
@@ -17391,6 +17588,9 @@ ${t && H > W && W < 600 ? '<li>Tip: turn your phone sideways for a bigger view.<
       else if (quick.ok / quick.n >= 0.7) facts.push(['bolt', `${quick.n} quick answers (under 2 seconds), and most were right: that's fast recall, not rushing.`]);
       else facts.push(['bolt', `${quick.n} ${quick.n === 1 ? 'answer was' : 'answers were'} tapped in under 2 seconds${quick.exam === quick.n ? ', all in practice tests' : ''}, and ${quick.ok ? `only ${quick.ok}` : 'none'} right. Quick misses usually mean rushing. Ask: "Did the test feel long?"`]);
     }
+    const fl = d.flags || {};
+    if (fl.left) facts.push(['flag', `${fl.left} ${fl.left === 1 ? 'answer came' : 'answers came'} after leaving the game during the question (another app, the browser or a calculator). Those earn no points and go back on his fix list.`]);
+    if (fl.proveOk || fl.proveMiss) facts.push(['bolt', `${fl.proveOk + fl.proveMiss} very quick maths ${fl.proveOk + fl.proveMiss === 1 ? 'answer was' : 'answers were'} checked with "Prove it": he showed a step of the working ${fl.proveOk} ${fl.proveOk === 1 ? 'time' : 'times'} and couldn't ${fl.proveMiss} ${fl.proveMiss === 1 ? 'time' : 'times'}.${fl.proveMiss ? ' Ask to see his working on paper.' : ''}`]);
     if (d.late && d.late.n) facts.push(['flag', `${d.late.n} answers came after 9 pm, on ${d.late.days} ${d.late.days === 1 ? 'evening' : 'evenings'}. An earlier slot is better for remembering, and for sleep.`]);
     const easy = d.easy || {};
     if (easy.races) facts.push(['star', `${easy.races} of ${easy.of} section races were on sections he already had 3 stars in${easy.top && easy.top.length ? `, mostly ${easy.top.map((x) => `${x.label} (${x.n})`).join(', ')}` : ''}. Those now pay half once a day.`]);
@@ -17528,7 +17728,7 @@ ${t && H > W && W < 600 ? '<li>Tip: turn your phone sideways for a bigger view.<
         const m = prog.m || {};
         const rows = (sub ? sub.topics.filter((x) => !x.warmup) : []).map((x) => ({ t: x, m: Math.round((100 * x.skills.reduce((a, s) => a + (m[s] || 0), 0)) / x.skills.length) }));
         return { weakest: rows.sort((a, b) => a.m - b.m).slice(0, 3) };
-      }).text}`);
+      }, d.flags).text}`);
     }
     return lines.join('\n');
   }
@@ -17795,19 +17995,58 @@ ${t && H > W && W < 600 ? '<li>Tip: turn your phone sideways for a bigger view.<
         r.combo = 0;
         r.sheet = lesson(r, r.q, '');
         drawRun();
+        sayStep(`The right answer is ${r.q.correct}`);
         break;
       }
-      case 'lesson-next':
-        ui.run.sheet.step++;
+      case 'lesson-next': {
+        const sh = ui.run.sheet;
+        if (sh.ready && Date.now() < sh.ready) break;
+        sh.step++;
+        sh.at = Date.now();
         drawRun();
+        sayStep(ui.run.q.steps[sh.step]);
         break;
-      case 'next':
-        if (ui.run.mode === 'teach') teachGo(ui.run.after);
+      }
+      case 'next': {
+        const r = ui.run;
+        const sh = r.sheet;
+        if (sh && sh.ready && Date.now() < sh.ready) break;
+        // After the lesson card, the same question again: "your turn".
+        if (r.mode !== 'teach' && sh && sh.type === 'wrong' && !r.q.redone) {
+          startRedo();
+          break;
+        }
+        if (r.mode === 'teach') teachGo(r.after);
         else {
-          ui.run.i++;
+          r.i++;
           nextQuestion();
         }
         break;
+      }
+      case 'redo-again': {
+        const r = ui.run;
+        if (r.sheet && r.sheet.ready && Date.now() < r.sheet.ready) break;
+        r.sheet = null;
+        r.typed = '';
+        r.draft = '';
+        drawRun();
+        break;
+      }
+      case 'prove-check':
+      case 'prove-skip': {
+        const r = ui.run;
+        if (!r || !r.prove) break;
+        const box = $('#prove-in');
+        if (act === 'prove-check' && box && !box.value.trim()) {
+          box.classList.remove('shake');
+          void box.offsetWidth;
+          box.classList.add('shake');
+          break;
+        }
+        const v = act === 'prove-check' && box ? Number(box.value.trim().replace(/\s/g, '').replace(',', '.')) : NaN;
+        proveDone(Math.abs(v - r.prove.gap.want) < 1e-9);
+        break;
+      }
       case 'teach':
         if (el.dataset.subject && PK().subjects[el.dataset.subject]) ui.subject = el.dataset.subject;
         startTeach(id);
@@ -17982,7 +18221,7 @@ ${t && H > W && W < 600 ? '<li>Tip: turn your phone sideways for a bigger view.<
         const pk = RS.packs[v.who];
         const dx = v.data && v.data[v.who];
         if (!dx) break;
-        const job = tonightJob(pk, dx.progress || {}, bitsFor(pk, dx).subjectBits);
+        const job = tonightJob(pk, dx.progress || {}, bitsFor(pk, dx).subjectBits, dx.flags);
         shareText(`${pk.name}, tonight: ${job.text}`);
         break;
       }
@@ -18127,6 +18366,23 @@ ${t && H > W && W < 600 ? '<li>Tip: turn your phone sideways for a bigger view.<
       default:
     }
   });
+
+  // ---------- leaving the game during a question ----------
+  // Another app, a browser tab or a calculator: the page can tell it was put away or lost focus, not what for.
+  function awayStart() {
+    const r = ui.run;
+    if (r && r.q && r.mode !== 'teach' && !r.sheet && !r.listening && !r.leftAt) r.leftAt = Date.now();
+  }
+  function awayEnd() {
+    const r = ui.run;
+    if (r && r.leftAt) {
+      r.away = (r.away || 0) + (Date.now() - r.leftAt) / 1000;
+      r.leftAt = null;
+    }
+  }
+  document.addEventListener('visibilitychange', () => (document.visibilityState === 'hidden' ? awayStart() : awayEnd()));
+  window.addEventListener('blur', awayStart);
+  window.addEventListener('focus', awayEnd);
 
   // ---------- keyboard for laptops ----------
   document.addEventListener('keydown', (e) => {
