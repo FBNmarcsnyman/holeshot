@@ -826,6 +826,23 @@ body:has(.ph[data-boy="kash"]) { --ph-wash: #FFD2BD; }
 .redo-tag svg { display: inline; }
 .prove-in { width: 100%; height: 56px; border-radius: 16px; border: 3px solid var(--accent); background: var(--card); color: var(--ink); text-align: center; font: 800 26px/1 var(--display); }
 
+/* Race Day pit stop (4 November 2026): a move between the two heats, a clock running down, then one tap on focus. */
+.pit-body { display: grid; gap: 14px; padding: 8px 2px 24px; max-width: 560px; margin-inline: auto; width: 100%; }
+.pit-title { font-family: var(--display); font-weight: 800; font-size: 38px; line-height: 1; letter-spacing: -.03em; }
+.pit-move { display: grid; grid-template-columns: 84px minmax(0, 1fr); gap: 14px; align-items: center; }
+.pit-move b { font-family: var(--display); font-weight: 700; font-size: 22px; line-height: 1.2; }
+.pit-clock { position: relative; width: 84px; height: 84px; border-radius: 50%; display: grid; place-items: center; background: conic-gradient(var(--accent) 0 100%, var(--card-2) 0); animation: pit-down var(--secs) linear forwards; }
+.pit-clock::after { content: ""; position: absolute; inset: 8px; border-radius: 50%; background: var(--card); }
+.pit-clock span { position: relative; z-index: 1; font-family: var(--display); font-weight: 800; font-size: 24px; }
+@property --pit { syntax: '<percentage>'; inherits: false; initial-value: 100%; }
+.pit-clock { --pit: 100%; background: conic-gradient(var(--accent) 0 var(--pit), var(--card-2) 0); }
+@keyframes pit-down { from { --pit: 100%; } to { --pit: 0%; } }
+@media (prefers-reduced-motion: reduce) { .pit-clock { animation: none; } }
+.pit-ask { font-weight: 700; font-size: 17px; }
+.pit-btns { display: grid; gap: 8px; }
+.pit-focus { justify-content: center; }
+.pit .link-btn { justify-self: center; padding: 10px; }
+
 </style>
 <div id="app"></div>
 <div id="toast" class="toast" role="status" aria-live="polite" hidden></div>
@@ -2841,7 +2858,7 @@ body:has(.ph[data-boy="kash"]) { --ph-wash: #FFD2BD; }
 
   RS.packs.kash = {
     id: 'kash',
-    name: 'Kash',
+    name: 'KA$H',
     grade: 'Grade 4',
     term: 'Term 4',
     defaultPaint: 'blue',
@@ -10545,6 +10562,232 @@ Jordy's Science test, Tuesday 10 November: Planet Earth and Beyond. Written from
   ];
 })(typeof window !== 'undefined' ? window : globalThis);
 
+/* General knowledge: fun facts to grow what he knows, in eight sections from space to planet Earth.
+   Written for this app. Every fact is one that stays true: no current champions, records or population counts.
+   The subject opens on 14 November 2026 (opens), extra: true keeps it out of the bike and gear unlock counts,
+   and retire: true means a question answered right first time doesn't come back. See ADDING-QUESTIONS.md. */
+(function (root) {
+  'use strict';
+  const RS = root.RS;
+  const { bank } = RS;
+  const pack = RS.packs.jordy;
+  const S = pack.skills;
+
+  // ---------- Space beyond the Sun ----------
+  S.gk_space = bank([
+    { q: `What is the name of the galaxy our solar system is in?`, a: `The Milky Way`, w: [`Andromeda`, `The Southern Cross`, `The Orion Nebula`], why: `On a dark night in the Karoo, the Milky Way looks like a pale band of light across the sky. That band is our own galaxy, seen from the inside.` },
+    { q: `Which group of stars do people in South Africa use to find south at night?`, a: `The Southern Cross`, w: [`The Big Dipper`, `Orion's Belt`, `The Seven Sisters`], why: `Follow the long arm of the Southern Cross about four and a half times its length, then drop straight down to the horizon. That's roughly south.` },
+    { q: `Light from the Sun takes about how long to reach Earth?`, a: `About 8 minutes`, w: [`About 8 seconds`, `About 8 hours`, `About 8 days`], why: `Light is the fastest thing there is, but the Sun is 150 million km away. If the Sun switched off, we wouldn't know for about 8 minutes.` },
+    { q: `A light-year is a measure of…`, a: `distance`, w: [`time`, `brightness`, `speed`], why: `It is how far light travels in one year, about 9,5 million million km. The nearest star after the Sun is more than 4 light-years away.` },
+    { q: `Which way does a comet's glowing tail point?`, a: `Away from the Sun`, w: [`Towards the Sun`, `Always behind the comet`, `Always towards Earth`], h: `Think about what might be pushing on the tail.`, why: `Sunlight and a stream of tiny particles from the Sun push the tail away from it. So when a comet heads back out, its tail goes in front!` },
+    { q: `Halley's Comet can be seen from Earth about once every…`, a: `76 years`, w: [`7 years`, `760 years`, `7 600 years`], why: `It last came past in 1986 and is due back in 2061, so most people get only one chance to see it.` },
+    { q: `What was Sputnik 1, launched in 1957?`, a: `The first satellite sent into space`, w: [`The first rocket to land on the Moon`, `The first space station`, `The first telescope in space`], why: `The Soviet Union launched it. It was a shiny metal ball about the size of a beach ball that sent out beeps by radio.` },
+    { q: `In 2002, who became the first South African to travel into space?`, a: `Mark Shuttleworth`, w: [`Elon Musk`, `Christiaan Barnard`, `Gary Player`], why: `He paid for his own seat on a Russian Soyuz rocket and spent eight days on the International Space Station.` },
+    { q: `Astronauts on a space station, like the International Space Station, see about 16 sunrises a day. Why?`, a: `The station circles Earth about every 90 minutes`, w: [`The Sun goes around the station 16 times a day`, `The station spins round and round like a top`, `There is no night anywhere in space`], why: `It races along at about 28 000 km/h, so it passes from night into day roughly every 90 minutes.` },
+    { q: `Why do astronauts float inside a space station?`, a: `They and the station are falling around Earth together`, w: [`There is no gravity in space`, `Magnets in the walls lift them up`, `Their suits are filled with a light gas`], why: `Up there, Earth's gravity is still about 90% as strong as on the ground. The station is falling the whole time, but it moves sideways so fast that it keeps missing the Earth.` },
+    { q: `What is a black hole?`, a: `A place where gravity is so strong not even light escapes`, w: [`An empty patch of sky with no stars`, `A dark cloud of dust between stars`, `A tunnel that leads to another galaxy`], why: `Many black holes form when a giant star collapses. There's a huge one at the centre of the Milky Way.` },
+    { q: `Why was the Southern African Large Telescope (SALT) built near Sutherland in the Northern Cape?`, a: `The skies there are dark, dry and clear`, w: [`It is right beside the sea`, `It never gets cold there`, `It is next to a big city with bright lights`], why: `Far from city lights, the Karoo sky is very dark. Sutherland is also one of South Africa's coldest towns, so it wasn't chosen for the weather!` },
+    { q: `On the last three Apollo Moon landings, astronauts drove around in…`, a: `a battery-powered buggy`, w: [`a petrol dirt bike`, `a diesel 4x4 bakkie`, `a steam-powered tractor`], h: `Think about what an engine needs that the Moon doesn't have.`, why: `Petrol and diesel engines need oxygen from the air, and the Moon has no air. The three Moon buggies are still parked up there.` },
+    { tf: true, q: `True or false: some stars are so huge that, in the Sun's place, they would stretch out past Earth.`, why: `Betelgeuse, the reddish star in Orion, is a red supergiant. Put in the Sun's place, it would reach out beyond Mars.` },
+    { tf: true, q: `True or false: during the Apollo missions, twelve astronauts walked on the Moon.`, why: `Six Apollo missions landed between 1969 and 1972, each with two moonwalkers. A third astronaut stayed in orbit, waiting to take them home.` },
+    { tf: false, q: `True or false: stars twinkle because they flash on and off.`, why: `The twinkling doesn't come from the stars themselves. Moving air in our atmosphere bends their light this way and that, which makes them seem to twinkle.` },
+    { tf: false, q: `True or false: you would hear a loud bang if a spaceship exploded a few kilometres away from you in space.`, why: `Sound needs something to travel through, like air or water. Space is almost empty, so explosions there are silent.` },
+    { q: `The proper name for a "shooting star", a speck of space rock burning up in our air, is a ___.`, t: [`meteor`, `meteors`], h: `It starts with "m". Most of them are no bigger than a grain of sand.`, why: `Meteors heat up and glow as they rush into our air. A piece that survives and lands on the ground is called a meteorite.` },
+    { q: `Comets are often called dirty ___, because they are made of ice, dust and rock.`, t: [`snowballs`, `snowball`, `snow balls`], h: `Think of something cold you could throw at someone in winter.`, why: `When a comet comes near the Sun, some of its ice turns to gas, and dust streams off it to make the glowing tail.` },
+    { q: `In 1961, the first person to travel into space was Yuri ___.`, t: [`Gagarin`], h: `He was a pilot from the Soviet Union, and his surname starts with "G".`, why: `He went once around the Earth in about 108 minutes. Neil Armstrong walked on the Moon only eight years later.` },
+  ]);
+
+  // ---------- Animals of the world ----------
+  S.gk_animals = bank([
+    { q: `Which animal is the fastest of all, reaching over 300 km/h in a dive?`, a: `The peregrine falcon`, w: [`The cheetah`, `The ostrich`, `The hummingbird`], why: `A cheetah is the fastest runner on land, but a diving peregrine falcon is far faster. Peregrines live on every continent except Antarctica.` },
+    { q: `What is the biggest animal known to have ever lived, even bigger than the dinosaurs?`, a: `The blue whale`, w: [`Tyrannosaurus rex`, `The African elephant`, `The whale shark`], why: `A blue whale can grow to about 30 m long, longer than a basketball court. It feeds on tiny shrimp-like animals called krill.` },
+    { q: `Which mammal carries its baby for the longest, about 22 months?`, a: `The African elephant`, w: [`The blue whale`, `The giraffe`, `The rhino`], why: `That's almost two years! A newborn elephant calf weighs about 100 kg.` },
+    { q: `How many bones are in a giraffe's long neck?`, a: `7, the same as in your neck`, w: [`1 long bone`, `25`, `70`], why: `Almost all mammals have seven neck bones. A giraffe's are just enormous: the longest are about 25 cm each.` },
+    { q: `Which of these mammals lays eggs?`, a: `The platypus`, w: [`The bat`, `The kangaroo`, `The hedgehog`], why: `The platypus and the echidnas are the only mammals that lay eggs. Once the babies hatch, they drink their mother's milk.` },
+    { q: `Which animal is covered in hard scales and rolls into a tight ball when it's scared?`, a: `The pangolin`, w: [`The aardvark`, `The porcupine`, `The meerkat`], why: `Its scales are made of keratin, the same stuff as your fingernails. The kind that lives in South Africa is the ground pangolin.` },
+    { q: `Scientists working in Johannesburg found that some dung beetles roll their dung balls in a straight line at night by using…`, a: `the Milky Way`, w: [`the smell of the dung`, `sounds made by other beetles`, `echoes, like bats do`], why: `In tests in a planetarium in Johannesburg, the beetles rolled straight under a sky showing only the Milky Way. With the sky switched off, they got lost.` },
+    { q: `Why are flamingos pink?`, a: `Pink colours in the food they eat`, w: [`They get sunburnt standing in water`, `They are born bright pink`, `They roll in pink mud`], why: `Their food, like tiny shrimp and algae, contains pink and orange colours. Flamingo chicks hatch grey or white.` },
+    { q: `How many hearts does an octopus have?`, a: `Three`, w: [`One`, `Two`, `Eight`], why: `Two hearts pump blood through the gills, and one pumps it around the body. And its blood is blue!` },
+    { q: `Which animals are a hippo's closest living relatives?`, a: `Whales and dolphins`, w: [`Pigs`, `Elephants`, `Rhinos`], why: `DNA shows that hippos and whales share an ancestor that lived millions of years ago. Hippos spend most of the day in water too.` },
+    { q: `Which animal is linked to the most human deaths each year?`, a: `The mosquito`, w: [`The shark`, `The lion`, `The crocodile`], why: `Mosquitoes spread malaria and other diseases. Only the females bite, because they need blood to make their eggs.` },
+    { q: `In the dry Namib Desert, how does the fog-basking beetle get water?`, a: `It catches fog drops on its back`, w: [`It digs deep wells in the sand`, `It drinks salty seawater`, `It never needs any water`], why: `On foggy mornings it stands on its head, facing the wind. Fog drops collect on its back and run down to its mouth.` },
+    { q: `For many sea turtles, what decides whether a baby turtle is male or female?`, a: `How warm the sand around the egg is`, w: [`How big the mother turtle is`, `What time of day it hatches`, `How deep in the sea the egg was laid`], why: `Warmer nests hatch mostly females, and cooler nests mostly males. Loggerhead and leatherback turtles nest on beaches in northern KwaZulu-Natal.` },
+    { tf: true, q: `True or false: an elephant's trunk has no bones in it.`, why: `It's made of thousands of muscles, which is why it can bend any way, pick up a peanut or push over a tree.` },
+    { tf: false, q: `True or false: bats are blind.`, why: `All bats can see. Many also use echolocation: they make calls and listen for the echoes to find insects in the dark.` },
+    { tf: true, q: `True or false: some frogs can survive being frozen in winter and hop away when they thaw out in spring.`, why: `In the wood frog of North America, about two-thirds of the water in its body can turn to ice. Its heart stops and it stops breathing, but sugar from its liver protects its cells until it thaws.` },
+    { tf: false, q: `True or false: an ostrich buries its head in the sand when it's scared.`, why: `It's a myth. A scared ostrich runs off at up to about 70 km/h, or lies flat with its neck on the ground, which can look as if its head is buried.` },
+    { q: `A baby kangaroo is called a ___.`, t: [`joey`, `joeys`], h: `It's also a boy's name.`, why: `A newborn joey is about the size of a jelly bean. It crawls into its mother's pouch and stays there for months.` },
+    { q: `The only mammal that can truly fly, not just glide, is the ___.`, t: [`bat`, `bats`], h: `It hangs upside down to sleep.`, why: `Flying squirrels can only glide. A bat's wings are thin skin stretched between very long finger bones.` },
+    { q: `The big change from a caterpillar into a butterfly is called ___.`, t: [`metamorphosis`], h: `It's a long word that starts with "meta".`, why: `Inside its hard case, called a chrysalis, the caterpillar's body breaks down and rebuilds itself as a butterfly. Frogs go through a metamorphosis too.` },
+  ]);
+
+  // ---------- South Africa ----------
+  S.gk_sa = bank([
+    { q: `What is South Africa's national animal?`, a: `The springbok`, w: [`The lion`, `The elephant`, `The buffalo`], why: `Springbok can leap high into the air with stiff legs and an arched back. This bouncing is called pronking.` },
+    { q: `South Africa's national bird is the…`, a: `blue crane`, w: [`ostrich`, `secretary bird`, `fish eagle`], why: `The secretary bird is on the coat of arms, but the blue crane is the national bird. It lives almost only in South Africa.` },
+    { q: `Which tree is South Africa's national tree?`, a: `The real yellowwood`, w: [`The jacaranda`, `The baobab`, `The blue gum`], why: `Yellowwoods can live for hundreds of years. The jacarandas that turn Pretoria purple actually come from South America.` },
+    { q: `How many colours are on the South African flag?`, a: `Six`, w: [`Three`, `Four`, `Eight`], why: `Black, green, gold, white, red and blue. The flag was first flown in 1994.` },
+    { q: `How many official languages does South Africa have?`, a: `12`, w: [`9`, `11`, `15`], why: `For years there were 11. In 2023, South African Sign Language became the 12th.` },
+    { q: `Which machine did South African-born Allan Cormack help invent, winning a Nobel Prize?`, a: `The CT scanner`, w: [`The X-ray machine`, `The heart-lung machine`, `The stethoscope`], why: `A CT scanner, or CAT scan, takes X-rays from many angles, and a computer builds them into slices of the inside of the body. Cormack studied at the University of Cape Town and shared the prize in 1979.` },
+    { q: `The Three Rondavels, rock towers shaped like round huts, stand in which canyon?`, a: `The Blyde River Canyon`, w: [`The Fish River Canyon`, `The Grand Canyon`, `Oribi Gorge`], why: `It's in Mpumalanga, on the Panorama Route. Rondavels are traditional round houses with pointed roofs.` },
+    { q: `Nelson Mandela spent 18 of his 27 years in prison on which island?`, a: `Robben Island`, w: [`Seal Island`, `Dassen Island`, `Bird Island`], why: `Robben means "seals" in Dutch. The island is now a museum and a World Heritage Site.` },
+    { q: `The Cradle of Humankind, near Johannesburg, is famous for…`, a: `fossils of early human ancestors`, w: [`the first gold mine in Africa`, `the oldest trees on Earth`, `the biggest dinosaur ever found`], why: `A skull nicknamed Mrs Ples, more than 2 million years old, was found in the Sterkfontein Caves there in 1947.` },
+    { q: `Mapungubwe, an ancient kingdom in Limpopo, is famous for a small statue of a…`, a: `golden rhino`, w: [`golden lion`, `silver elephant`, `bronze leopard`], why: `The little gold rhino is about 800 years old. The kingdom grew rich trading gold and ivory across the Indian Ocean.` },
+    { q: `Which animal is NOT one of the Big Five?`, a: `The cheetah`, w: [`The leopard`, `The buffalo`, `The rhino`], why: `The Big Five are the lion, leopard, elephant, rhino and buffalo. You'll find them on the backs of our banknotes.` },
+    { q: `South Africa has three capital cities. In which one does Parliament make the laws?`, a: `Cape Town`, w: [`Pretoria`, `Bloemfontein`, `Johannesburg`], why: `Pretoria is where the President's offices are, and Bloemfontein is home to the Supreme Court of Appeal.` },
+    { q: `Which archbishop, who won the Nobel Peace Prize in 1984, is famous for calling South Africa the "Rainbow Nation"?`, a: `Desmond Tutu`, w: [`Albert Luthuli`, `Steve Biko`, `Thabo Mbeki`], why: `The name celebrates all the different people who make up South Africa. Desmond Tutu was known for his big laugh and his fight for fairness.` },
+    { tf: true, q: `True or false: the rocks of Table Mountain are far older than the Himalayas.`, why: `Table Mountain's sandstone is hundreds of millions of years old. The Himalayas only started rising about 50 million years ago.` },
+    { tf: true, q: `True or false: bunny chow, a hollowed-out loaf of bread filled with curry, comes from Durban.`, why: `It was first sold in Durban, and nobody is quite sure how it got its name. Don't worry: there's no rabbit in it!` },
+    { tf: false, q: `True or false: penguins only live in icy places, so there are none in South Africa.`, why: `African penguins live on our coast, at places like Boulders Beach near Simon's Town. They are in danger of dying out, so they need protecting.` },
+    { tf: false, q: `True or false: the rand is named after a river.`, why: `It is named after the Witwatersrand, the ridge around Johannesburg where gold was found in 1886.` },
+    { q: `South Africa's national flower is the king ___.`, t: [`protea`, `proteas`], h: `It's also the nickname of our national cricket team.`, why: `The king protea has the biggest flower head of all the proteas. It grows in the fynbos of the Western and Eastern Cape.` },
+    { q: `The flat white cloud that spills over the top of Table Mountain is called the ___.`, t: [`tablecloth`, `table cloth`], h: `The first half of the word is in the mountain's name.`, why: `It forms when the south-easter blows damp air up the mountain. The air cools into cloud, then pours down the other side.` },
+    { q: `Johannesburg's isiZulu nickname, eGoli, means "place of ___".`, t: [`gold`], h: `Think about why the city was built in the first place.`, why: `Johannesburg grew almost overnight after gold was found on the Witwatersrand in 1886.` },
+  ]);
+
+  // ---------- The world ----------
+  S.gk_world = bank([
+    { q: `Which ocean is so big that all the land on Earth could fit inside it?`, a: `The Pacific Ocean`, w: [`The Atlantic Ocean`, `The Indian Ocean`, `The Arctic Ocean`], why: `The Pacific covers about a third of the whole planet. Its name means "peaceful", even though it has some huge storms.` },
+    { q: `Officially, where do the Atlantic and Indian Oceans meet?`, a: `At Cape Agulhas`, w: [`At Cape Point`, `At Durban`, `At Robben Island`], why: `Many people think it's Cape Point, but the official line runs south from Cape Agulhas, the southernmost tip of Africa.` },
+    { q: `What is the capital city of Namibia?`, a: `Windhoek`, w: [`Gaborone`, `Maputo`, `Harare`], why: `Gaborone is the capital of Botswana, Maputo of Mozambique and Harare of Zimbabwe. All four countries are South Africa's neighbours.` },
+    { q: `Which country has a flag that is not a rectangle?`, a: `Nepal`, w: [`Japan`, `Brazil`, `Canada`], why: `Nepal's flag is shaped like two triangles, one on top of the other. It is the only national flag that isn't a rectangle or a square.` },
+    { q: `Which is the only one of the Seven Wonders of the Ancient World still standing?`, a: `The Great Pyramid of Giza`, w: [`The Colossus of Rhodes`, `The Hanging Gardens of Babylon`, `The Lighthouse of Alexandria`], why: `It was built in Egypt about 4 500 years ago. For almost 4 000 years it was the tallest thing people had ever built.` },
+    { q: `Which is the largest country in the world by area?`, a: `Russia`, w: [`China`, `Canada`, `The United States`], why: `Russia is so wide that it has 11 time zones. When it's breakfast time on one side, it's evening on the other.` },
+    { q: `Which is the smallest country in the world?`, a: `Vatican City`, w: [`Monaco`, `Lesotho`, `Luxembourg`], why: `It covers less than half a square kilometre and sits inside the city of Rome. The Pope lives there.` },
+    { q: `The Taj Mahal, a white marble tomb an emperor built for his wife, is in which country?`, a: `India`, w: [`Egypt`, `China`, `Turkey`], why: `It was built nearly 400 years ago and took about 20 years to finish. Millions of people visit it every year.` },
+    { q: `How many countries are there in Africa?`, a: `54`, w: [`14`, `34`, `94`], why: `Africa has 54 countries that belong to the United Nations, more than any other continent. South Sudan only became a country in 2011.` },
+    { q: `Which imaginary line around the Earth crosses Limpopo province?`, a: `The Tropic of Capricorn`, w: [`The equator`, `The Tropic of Cancer`, `The Arctic Circle`], why: `There's a marker for it on the N1 north of Polokwane. On about 21 December, the midday Sun is straight overhead all along this line.` },
+    { q: `Mount Kilimanjaro, the highest mountain in Africa, is in which country?`, a: `Tanzania`, w: [`Kenya`, `Ethiopia`, `Uganda`], why: `It's so tall that its top is icy cold and can be snowy, even though it's close to the equator. You can see it from Kenya, just over the border.` },
+    { q: `What is the biggest island in the world, not counting Australia?`, a: `Greenland`, w: [`Madagascar`, `Iceland`, `Great Britain`], why: `Despite its name, most of Greenland is covered by a thick sheet of ice. Madagascar, off Africa, is the fourth biggest.` },
+    { q: `Most of the Amazon rainforest is in which country?`, a: `Brazil`, w: [`Mexico`, `India`, `Kenya`], why: `The Amazon is the biggest rainforest on Earth. It stretches across several countries, but about 60% of it is in Brazil.` },
+    { tf: true, q: `True or false: Lesotho is a whole country surrounded on all sides by South Africa.`, why: `All of Lesotho is more than 1 000 m above sea level. Its lowest point is higher than the highest point of many countries!` },
+    { tf: true, q: `True or false: at the closest point, Russia and the USA are less than 4 km apart.`, why: `Two small islands in the Bering Strait, Big Diomede (Russia) and Little Diomede (USA), are about 3,8 km apart.` },
+    { tf: false, q: `True or false: you can see the Great Wall of China from the Moon with just your eyes.`, why: `It's very long, but only a few metres wide. From the Moon, the Earth looks like a ball, and no single building can be picked out.` },
+    { tf: false, q: `True or false: the Statue of Liberty in New York was a gift from England.`, why: `It was a gift from the people of France, in 1886. It's made of copper, which has turned green over time.` },
+    { q: `The capital of Australia is not Sydney but ___.`, t: [`Canberra`], h: `It starts with "C", and it was built specially to be the capital.`, why: `Sydney and Melbourne both wanted to be the capital, so a new city, Canberra, was built in between them.` },
+    { q: `The European country shaped like a boot kicking a ball is ___.`, t: [`Italy`], h: `It's famous for pizza and pasta.`, why: `The "ball" is the island of Sicily. Rome, Italy's capital, has the tiny Vatican City inside it.` },
+    { q: `Venice, in Italy, is built on islands and has ___ instead of many of its streets.`, t: [`canals`, `canal`, `waterways`], h: `Boats called gondolas use them.`, why: `Venice has over 100 islands joined by hundreds of bridges. People get around by boat and on foot.` },
+  ]);
+
+  // ---------- Sport and motorsport ----------
+  S.gk_sport = bank([
+    { q: `In motocross, what does it mean to get the holeshot?`, a: `To be first into the first corner`, w: [`To land a jump perfectly`, `To crash in a muddy hole`, `To overtake on the last lap`], why: `With the holeshot, you can pick your own line and nobody is roosting dirt in your face. It's a big advantage.` },
+    { q: `In a classic enduro race, how is the winner usually decided?`, a: `Fastest total time on the timed tests`, w: [`The highest jump of the day`, `The rider who uses the least fuel`, `The most laps in a 30-minute race`], why: `Riders follow a long route over rough ground and must reach each time check on time. The timed special tests along the way decide the winner.` },
+    { q: `The Dakar Rally is named after Dakar, the capital of which country?`, a: `Senegal`, w: [`Morocco`, `Egypt`, `Saudi Arabia`], why: `The first race, at the end of 1978, went from Paris to Dakar. It has moved to other continents since, but kept its name.` },
+    { q: `How do bike riders in the Dakar Rally find their way across the desert?`, a: `With a roadbook of route notes`, w: [`By following painted arrows`, `By following a pace car`, `With phone maps showing every turn`], why: `The roadbook shows distances and arrows for each turn, and riders scroll through it on their handlebars as they ride.` },
+    { q: `Which South African won three motocross world titles in the 1990s?`, a: `Greg Albertyn`, w: [`Siya Kolisi`, `Gary Player`, `Wayde van Niekerk`], why: `He won the 125cc world title in 1992 and the 250cc title in 1993 and 1994. He was South Africa's first motocross world champion.` },
+    { q: `What do the five Olympic rings stand for?`, a: `The continents of the world joined together`, w: [`The five oceans`, `The first five host cities`, `Five sports at the first Olympics`], why: `The five linked rings stand for the continents taking part, united by sport. They were first flown at the 1920 Games.` },
+    { q: `Where were the ancient Olympic Games held?`, a: `Olympia, in Greece`, w: [`Athens, in Greece`, `Rome, in Italy`, `Cairo, in Egypt`], why: `They were held at Olympia for over 1 000 years. Athens hosted the first modern Olympics, in 1896.` },
+    { q: `How many points is a try worth in rugby union?`, a: `5`, w: [`3`, `4`, `6`], why: `It has been worth 5 since 1992. A conversion kick afterwards can add 2 more, making 7.` },
+    { q: `Rugby's World Cup trophy is named after William Webb Ellis. What is he said to have done?`, a: `Picked up the ball and ran during a football game`, w: [`Invented the oval-shaped ball`, `Coached the first Springbok team`, `Scored the first World Cup try`], why: `The story says it happened at Rugby School in England in 1823, which gave the game its name. Historians aren't sure it's true!` },
+    { q: `In which year did the Springboks first win the Rugby World Cup?`, a: `1995`, w: [`1991`, `2007`, `2019`], why: `South Africa hosted it, and President Nelson Mandela, wearing a Springbok jersey, handed the trophy to captain Francois Pienaar.` },
+    { q: `In cricket, how many balls are bowled in one over?`, a: `6`, w: [`4`, `8`, `12`], why: `After six balls the umpire calls "over", and a different bowler bowls from the other end. Some countries once used 8-ball overs.` },
+    { q: `In cricket, what is a duck?`, a: `Getting out without scoring a run`, w: [`A ball that bounces twice`, `Six runs from one hit`, `A catch taken with one hand`], why: `The name comes from "duck's egg", because a 0 on the scoreboard looks like an egg.` },
+    { q: `Which stadium, shaped like a calabash (a traditional African pot), hosted the 2010 FIFA World Cup final?`, a: `FNB Stadium in Johannesburg`, w: [`Moses Mabhida Stadium in Durban`, `Cape Town Stadium`, `Loftus Versfeld in Pretoria`], why: `It's also known as Soccer City. Spain beat the Netherlands in that final.` },
+    { tf: false, q: `True or false: in rugby, you may throw a pass forward to a teammate.`, why: `Passes must go sideways or backwards. If you pass forward, the other team gets a scrum.` },
+    { tf: true, q: `True or false: a cricket Test match can last up to five days.`, why: `Tests are the longest form of cricket. Even after five days, a Test can still end in a draw.` },
+    { tf: false, q: `True or false: an Olympic gold medal is made of solid gold.`, why: `It's mostly silver, covered with at least 6 g of gold. The last solid gold medals were given out in 1912.` },
+    { tf: true, q: `True or false: supercross races are held on man-made dirt tracks, often inside stadiums.`, why: `Supercross tracks pack tight turns and lots of jumps into a small space. Motocross tracks are longer and run over natural ground outdoors.` },
+    { q: `On a motocross track, a row of small bumps built close together is called the ___.`, t: [`whoops`, `whoop`, `whoop-de-doos`, `whoopdedoos`], h: `It sounds like a shout of excitement.`, why: `Fast riders skim across the tops of the whoops instead of dropping into every dip.` },
+    { q: `In cricket, LBW stands for leg before ___.`, t: [`wicket`, `the wicket`], h: `It's the three stumps with the bails on top.`, why: `A batter can be out LBW if the ball hits their leg or pad when it would have gone on to hit the stumps.` },
+    { q: `In the ancient Olympic Games, winners got a crown made of ___ leaves.`, t: [`olive`, `olives`], h: `It's the tree whose small fruit is pressed to make cooking oil.`, why: `There were no gold medals. The olive branches were cut from a sacred tree at Olympia.` },
+  ]);
+
+  // ---------- Inventions and science ----------
+  S.gk_inventions = bank([
+    { q: `Who is famous for inventing the telephone, in 1876?`, a: `Alexander Graham Bell`, w: [`Thomas Edison`, `Isaac Newton`, `Henry Ford`], why: `Bell also taught deaf students, and both his mother and his wife were deaf.` },
+    { q: `The Wright brothers' first powered aeroplane flight, in 1903, lasted about…`, a: `12 seconds`, w: [`12 minutes`, `2 hours`, `2 days`], why: `It covered about 37 m, less than the wingspan of a jumbo jet. Only 66 years later, people walked on the Moon.` },
+    { q: `The first petrol-powered motorbike, built in Germany in 1885, was made mostly of…`, a: `wood`, w: [`carbon fibre`, `plastic`, `aluminium`], why: `Gottlieb Daimler and Wilhelm Maybach's Reitwagen ("riding car") had a wooden frame, wooden wheels and two small side wheels to stop it falling over.` },
+    { q: `Mechanics remember the four strokes of a four-stroke engine as suck, squeeze, bang and…`, a: `blow`, w: [`brake`, `spin`, `cool`], why: `Suck in fuel and air, squeeze them tight, a spark makes them bang, then blow the burnt gas out of the exhaust.` },
+    { q: `Why do many two-stroke dirt bikes have oil mixed into their petrol?`, a: `To keep the engine's moving parts oiled`, w: [`To make the fuel cheaper`, `To make the exhaust smoke blue on purpose`, `To stop the petrol from freezing`], why: `In a two-stroke, the fuel passes through the bottom of the engine on its way in, so the oil mixed into it coats the moving parts. Get the mix wrong and the engine can seize.` },
+    { q: `In Johannesburg, high above sea level, water boils at about…`, a: `94 °C`, w: [`100 °C`, `110 °C`, `120 °C`], h: `High up, the air presses down less.`, why: `Lower air pressure lets water boil at a lower temperature. At the coast in Durban, it boils at about 100 °C.` },
+    { q: `What are the bubbles in fizzy cooldrinks made of?`, a: `Carbon dioxide`, w: [`Oxygen`, `Helium`, `Steam`], why: `The gas is pushed into the drink under pressure. When you open the bottle, the pressure drops and the gas escapes as bubbles.` },
+    { q: `Table salt is made of sodium joined to which poisonous gas?`, a: `Chlorine`, w: [`Oxygen`, `Nitrogen`, `Helium`], why: `On its own, sodium fizzes and can burst into flame in water, and chlorine is poisonous. Joined together, they make the salt on your chips!` },
+    { q: `Who invented the World Wide Web, in 1989?`, a: `Tim Berners-Lee`, w: [`Bill Gates`, `Steve Jobs`, `Elon Musk`], why: `He gave it away for free so that anyone could use it, instead of making money from it.` },
+    { q: `Velcro was invented after a Swiss engineer noticed…`, a: `burrs sticking to his dog's fur`, w: [`how geckos climb up walls`, `how spiders spin their webs`, `octopus suckers stuck to a rock`], why: `Under a microscope, he saw that the burrs had tiny hooks that caught on loops of fur. Velcro copies that: hooks on one strip, loops on the other.` },
+    { q: `The microwave oven was invented after a scientist working with radar noticed that…`, a: `a snack bar in his pocket had melted`, w: [`his cup of tea had frozen`, `his radio played music by itself`, `his watch had stopped`], why: `Percy Spencer worked out that the radar's invisible waves were heating the food. Microwave ovens use the same kind of waves.` },
+    { q: `The Kreepy Krauly, invented in Springs in 1974, is a machine that…`, a: `cleans swimming pools by itself`, w: [`digs for gold underground`, `catches snakes in gardens`, `climbs walls to clean windows`], why: `It crawls around the floor and sides of a pool, sucking up dirt. Kreepy Kraulys are now used in pools all over the world.` },
+    { q: `The dolos, a giant concrete block that protects harbour walls from waves, was invented in which South African city?`, a: `East London`, w: [`Johannesburg`, `Bloemfontein`, `Kimberley`], why: `It was designed after a storm smashed East London's harbour wall in 1963. Its twisted shape now guards coasts all over the world.` },
+    { tf: false, q: `True or false: on the Moon, a hammer falls faster than a feather.`, why: `With no air to slow the feather down, they fall together. An Apollo 15 astronaut tried it on the Moon in 1971, and they landed at the same time.` },
+    { tf: true, q: `True or false: sound travels faster through water than through air.`, why: `Sound moves about four times faster in water than in air. Water carries sound a long way too: some whale calls can be heard hundreds of kilometres away.` },
+    { tf: true, q: `True or false: glass is made mostly from sand.`, why: `Sand, with a little soda ash and limestone mixed in, is heated in a furnace until it melts into a hot, runny liquid, which cools into clear glass.` },
+    { tf: false, q: `True or false: Thomas Edison invented electricity.`, why: `Nobody invented electricity: it's part of nature, like lightning. Inventors like Edison found new ways to use it.` },
+    { q: `When you brake, the force between your tyres and the dirt that slows you down is called ___.`, t: [`friction`], h: `Rub your hands together fast and feel them warm up.`, why: `Friction acts when two surfaces rub. Knobbly tyres give more friction on loose dirt, so you can brake and corner harder.` },
+    { q: `The tiny building blocks that everything is made of are called ___. Their name comes from a Greek word meaning "can't be cut".`, t: [`atoms`, `atom`], h: `Gold, iron and oxygen are each made of just one kind of these.`, why: `Atoms are so small that millions of them would fit across the full stop at the end of this sentence.` },
+    { q: `Before they built aeroplanes, the Wright brothers sold and repaired ___ in their shop.`, t: [`bicycles`, `bicycle`, `bikes`, `bike`, `cycles`], h: `They used skills from this trade, like building light, strong frames, on their first aeroplane.`, why: `Their shop paid for their flying experiments, and their shop mechanic helped build the aeroplane's engine.` },
+  ]);
+
+  // ---------- The human body ----------
+  S.gk_body = bank([
+    { q: `How many bones does an adult human skeleton have?`, a: `206`, w: [`106`, `306`, `1 006`], why: `Babies are born with around 300 bones. As they grow, some of them join together.` },
+    { q: `Where is the smallest bone in your body?`, a: `Inside your ear`, w: [`In your little toe`, `In the tip of your nose`, `In your little finger`], why: `It's called the stirrup and is about the size of a grain of rice. It helps pass sounds on to your inner ear.` },
+    { q: `What is the biggest organ of the human body?`, a: `The skin`, w: [`The liver`, `The brain`, `The lungs`], why: `Your skin is an organ too, and it covers your whole body. The liver is the biggest organ inside your body.` },
+    { q: `What do red blood cells carry around your body?`, a: `Oxygen`, w: [`Germs`, `Bone cells`, `Electricity`], why: `They pick up oxygen in your lungs and drop it off wherever your body needs it. The iron in them helps make your blood red.` },
+    { q: `Which organs clean your blood and make urine?`, a: `The kidneys`, w: [`The lungs`, `The heart`, `The stomach`], why: `You have two kidneys, each about the size of your fist. Your blood passes through them many times a day.` },
+    { q: `About how many times does your heart beat in one day?`, a: `About 100 000`, w: [`About 1 000`, `About 10 000`, `About 10 million`], why: `At about 70 beats a minute, that's 70 × 60 × 24, which is just over 100 000. It beats faster when you ride hard.` },
+    { q: `In an adult, the brain is only about 2% of the body's mass. About how much of the body's energy does it use?`, a: `About 20%`, w: [`About 1%`, `About 2%`, `About 80%`], why: `The brain works all the time, even during sleep, so it needs a big share of the body's energy. A child's growing brain uses an even bigger share.` },
+    { q: `Why does food taste of almost nothing when you have a blocked nose?`, a: `Much of what we call taste comes from smell`, w: [`Your tongue stops working when you're sick`, `Germs eat the flavour in your food`, `A cold makes your teeth numb`], why: `Your tongue picks up sweet, sour, salty, bitter and savoury. Your nose adds the rest, like the flavour of strawberry or chocolate.` },
+    { q: `What does the pupil of your eye do in bright sunlight?`, a: `It gets smaller`, w: [`It gets bigger`, `It changes colour`, `It closes completely`], why: `The coloured ring around it, the iris, tightens to let in less light. In the dark, your pupils open wide to catch more light.` },
+    { q: `How much sleep a night do doctors suggest for children aged 6 to 12?`, a: `9 to 12 hours`, w: [`4 to 5 hours`, `6 to 7 hours`, `14 to 16 hours`], why: `While you sleep, your body grows and repairs itself, and your brain stores what you learnt that day.` },
+    { q: `Why do you sweat when you ride hard on a hot day?`, a: `Sweat cools you as it dries on your skin`, w: [`It washes dirt out of your body`, `It makes your skin stronger`, `It gets rid of extra blood`], why: `As sweat evaporates, it takes heat away with it. That's also why you must drink plenty of water on a race day.` },
+    { q: `Hiccups happen when which muscle under your lungs suddenly jerks?`, a: `The diaphragm`, w: [`The heart`, `The biceps`, `The tongue`], why: `When it jerks, you suck in air and your vocal cords snap shut, which makes the "hic" sound.` },
+    { q: `Which kind of food gives your body what it needs to build and repair muscles?`, a: `Protein, like eggs, beans and meat`, w: [`Sugar, like sweets and cooldrink`, `Salt, like the salt on chips`, `Fat, like butter and oil`], why: `Proteins are your body's building blocks. Your muscles use them to grow back stronger after hard exercise.` },
+    { tf: false, q: `True or false: the blood inside your veins is blue until it touches the air.`, why: `Blood is always red: bright red with lots of oxygen, darker red with less. Veins only look blue because of the way light passes through your skin.` },
+    { tf: false, q: `True or false: each part of your tongue can only taste one flavour, like sweet at the tip.`, why: `This "tongue map" is a myth. Every part of your tongue that has taste buds can pick up all the basic tastes.` },
+    { tf: true, q: `True or false: your fingernails grow faster than your toenails.`, why: `Fingernails grow much faster. A lost toenail can take more than a year to grow back.` },
+    { tf: true, q: `True or false: you are a little bit taller in the morning than at bedtime.`, why: `During the day, the soft pads between the bones of your spine get squashed a little. They spring back while you sleep, so you can be about 1 cm taller in the morning.` },
+    { q: `The hard, shiny outer layer of your teeth, the hardest stuff in your body, is called ___.`, t: [`enamel`, `tooth enamel`], h: `It's also a word for a shiny kind of paint.`, why: `Enamel can't grow back once it's damaged, so brushing twice a day really matters.` },
+    { q: `The soft stuff inside some of your bones, which makes your blood cells, is called bone ___.`, t: [`marrow`], h: `It rhymes with "arrow".`, why: `Your bone marrow makes millions of new red blood cells every second.` },
+    { q: `Your thigh bone, the longest and strongest bone in your body, is called the ___.`, t: [`femur`], h: `It rhymes with "lemur".`, why: `It's about a quarter of your height. Your shin bone is the second longest.` },
+  ]);
+
+  // ---------- Planet Earth ----------
+  S.gk_earth = bank([
+    { q: `Mount Everest, the highest mountain above sea level, is on the border of Nepal and which country?`, a: `China`, w: [`India`, `Pakistan`, `Bhutan`], why: `Its top is about 8 849 m above sea level. It is still being pushed up by a few millimetres a year as two of Earth's plates press together.` },
+    { q: `Measured from its base on the sea floor, which mountain is taller than Everest?`, a: `Mauna Kea, in Hawaii`, w: [`Kilimanjaro, in Tanzania`, `Table Mountain, in Cape Town`, `Mont Blanc, in the Alps`], why: `Most of Mauna Kea is hidden under the Pacific Ocean. From its base to its top, it's over 10 000 m tall.` },
+    { q: `What is the largest desert in the world?`, a: `Antarctica`, w: [`The Sahara`, `The Kalahari`, `The Namib`], h: `A desert is any place with very little rain or snow.`, why: `Antarctica gets so little snow each year that it counts as a desert. The Sahara is the largest hot desert.` },
+    { q: `Where are most of the world's active volcanoes?`, a: `In a ring around the Pacific Ocean`, w: [`In the middle of Africa`, `Under the North Pole`, `Along the coast of South Africa`], why: `It's called the Ring of Fire, where plates of Earth's crust meet. Most big earthquakes happen there too.` },
+    { q: `What causes most earthquakes?`, a: `Huge plates of Earth's crust moving and slipping`, w: [`The Moon pulling on the ground`, `Very strong winds`, `Underground rivers flowing`], why: `The plates usually move only a few centimetres a year, about as fast as your fingernails grow. South Africa gets small tremors too, some caused by deep mines.` },
+    { q: `You see lightning before you hear the thunder because…`, a: `light travels much faster than sound`, w: [`thunder starts after the lightning ends`, `sound has to go around the clouds`, `your eyes work faster than your ears`], why: `Count the seconds between the flash and the bang, then divide by 3. That's roughly how many kilometres away the storm is.` },
+    { q: `In the water cycle, when water vapour cools and turns into tiny drops that make clouds, it's called…`, a: `condensation`, w: [`evaporation`, `precipitation`, `collection`], why: `You can see condensation on a cold cooldrink can, when water from the air turns into drops on the outside.` },
+    { q: `In which kind of rock are fossils usually found?`, a: `Sedimentary rock`, w: [`Igneous rock`, `Volcanic glass`, `Metamorphic rock`], why: `Sedimentary rock forms from layers of mud and sand that slowly harden, trapping plants and animals. The Karoo is famous for its fossils.` },
+    { q: `Which is South Africa's longest river?`, a: `The Orange River`, w: [`The Vaal River`, `The Limpopo River`, `The Thukela River`], why: `It starts in the mountains of Lesotho and flows west into the Atlantic Ocean. The Augrabies Falls are on it.` },
+    { q: `In Afrikaans, the name Drakensberg means…`, a: `Dragon Mountain`, w: [`Thunder Mountain`, `Snake River`, `Cloud Hill`], why: `It's South Africa's highest mountain range. Its isiZulu name, uKhahlamba, means "barrier of spears".` },
+    { q: `Huge spinning storms that form over warm seas and sometimes hit Mozambique are called…`, a: `tropical cyclones`, w: [`tornadoes`, `sandstorms`, `blizzards`], why: `They are the same kind of storm as hurricanes and typhoons. The name just changes with the ocean they form in.` },
+    { q: `Which gas makes up most of the air around us?`, a: `Nitrogen`, w: [`Oxygen`, `Carbon dioxide`, `Hydrogen`], why: `About 78% of the air is nitrogen. Only about 21% is the oxygen we need to breathe.` },
+    { q: `The deepest part of the ocean is in…`, a: `the Mariana Trench`, w: [`the Bermuda Triangle`, `the Dead Sea`, `the Great Barrier Reef`], why: `It's about 11 km deep. If Mount Everest were dropped into it, its peak would still be about 2 km under the water.` },
+    { tf: false, q: `True or false: lightning never strikes the same place twice.`, why: `Lightning often hits tall things again and again. Some tall buildings are struck many times a year.` },
+    { tf: false, q: `True or false: stalactites grow up from the floor of a cave.`, why: `Stalactites hang down from the roof, and stalagmites grow up from the floor. You can see both in the Cango Caves near Oudtshoorn.` },
+    { tf: true, q: `True or false: Africa is very slowly splitting apart along the East African Rift.`, why: `The ground there is pulling apart by a few millimetres a year. In millions of years, a new ocean may fill the gap.` },
+    { tf: true, q: `True or false: to see a rainbow, the Sun must be behind you.`, why: `Sunlight shines into raindrops in front of you and bounces back out, split into colours. Rainbows show up most in the morning or late afternoon, because when the Sun is high in the sky, the rainbow would be below the horizon.` },
+    { q: `Hot melted rock is called magma underground, and ___ once it comes out of a volcano.`, t: [`lava`], h: `It glows orange as it flows down the side of the volcano.`, why: `Lava can be hotter than 1 000 °C. When it cools and hardens, it becomes rock such as basalt.` },
+    { q: `In the water cycle, when the Sun heats water and it turns into a gas, it's called ___.`, t: [`evaporation`, `evaporating`], h: `It's the opposite of condensation.`, why: `Water evaporates from oceans, lakes and even wet washing on the line. Plants give off water vapour too.` },
+    { q: `The very hot centre of the Earth is called the ___.`, t: [`core`, `inner core`, `Earth's core`], h: `It's also the name for the middle of an apple.`, why: `The inner core is a solid ball of iron and nickel, about as hot as the surface of the Sun.` },
+  ]);
+
+  // ---------- The subject ----------
+  pack.subjects.general = {
+    label: 'General knowledge',
+    source: 'General knowledge for a Grade 6 learner',
+    scope: 'Fun facts about space, animals, South Africa, the world, sport, inventions, the body and planet Earth',
+    note: `General knowledge to grow what he knows. A question he gets right first time never comes back, and new ones arrive every week`,
+    examSize: 15,
+    extra: true,
+    retire: true,
+    opens: '2026-11-14',
+    topics: [
+      RS.section('gk_space', 0, 'Space beyond the Sun', 'Stars, galaxies, comets, astronauts and the Moon landings'),
+      RS.section('gk_animals', 1, 'Animals of the world', 'Record breakers, strange abilities, habitats and life cycles'),
+      RS.section('gk_sa', 2, 'South Africa', 'Symbols, landmarks, heritage and famous South Africans'),
+      RS.section('gk_world', 3, 'The world', 'Countries, capitals, flags, oceans and wonders'),
+      RS.section('gk_sport', 4, 'Sport and motorsport', 'Motocross, enduro, the Dakar, the Olympics, rugby and cricket'),
+      RS.section('gk_inventions', 5, 'Inventions and science', 'Who invented what, and how everyday things work'),
+      RS.section('gk_body', 6, 'The human body', 'Bones, organs, senses, blood and sleep'),
+      RS.section('gk_earth', 7, 'Planet Earth', 'Mountains, rivers, volcanoes, weather and rocks'),
+    ],
+  };
+})(typeof window !== 'undefined' ? window : globalThis);
+
 /* Grade 7 head start, for Jordy's first year of Grade 7 in 2027. Whole numbers, exponents, fractions and decimals,
    number patterns, input and output, algebra and integers, from the CAPS Grade 7 topics. Written for this app: every
    question is original and gets fresh numbers each time. Where the school's book does something differently, the book wins.
@@ -12109,6 +12352,232 @@ Jordy's Science test, Tuesday 10 November: Planet Earth and Beyond. Written from
           ['−5', 0, 'It is one step to the left of −4.'],
         ] },
       ]),
+    ],
+  };
+})(typeof window !== 'undefined' ? window : globalThis);
+
+/* General knowledge for Kash: fun facts at a Grade 4 level, to grow what he knows.
+   The subject opens on 11 November 2026 (opens), extra: true keeps it out of the bike and gear unlock counts,
+   and retire: true means a question he gets right first time doesn't come back.
+   Only facts that don't change: no current champions, records or population figures. See ADDING-QUESTIONS.md. */
+(function (root) {
+  'use strict';
+  const RS = root.RS;
+  const { bank } = RS;
+  const pack = RS.packs.kash;
+  const S = pack.skills;
+
+  // ---------- Amazing animals ----------
+  S.gk_animals = bank([
+    { q: `Which land animal is the fastest runner?`, a: `The cheetah`, w: [`The lion`, `The zebra`, `The ostrich`], why: `A cheetah can sprint faster than a car drives through town, but only for a short dash before it must rest.` },
+    { q: `Which is the heaviest animal that lives on land?`, a: `The African elephant`, w: [`The hippo`, `The white rhino`, `The giraffe`], why: `African elephants are heavier than any other land animal. Even a hippo or a rhino weighs much less.` },
+    { q: `Which is the biggest animal alive today?`, a: `The blue whale`, w: [`The African elephant`, `The great white shark`, `The giant squid`], why: `Scientists think the blue whale is the biggest animal that has ever lived, bigger even than the dinosaurs.` },
+    { q: `What is a baby elephant called?`, a: `A calf`, w: [`A cub`, `A foal`, `A kid`], why: `Baby whales and baby giraffes are called calves too.` },
+    { q: `What is a group of lions called?`, a: `A pride`, w: [`A herd`, `A flock`, `A swarm`], why: `A pride is a family of lions that live together. The lionesses do most of the hunting.` },
+    { q: `What do giant pandas eat most of the time?`, a: `Bamboo`, w: [`Fish`, `Meat`, `Honey`], why: `Giant pandas spend many hours every day munching bamboo shoots and leaves.` },
+    { q: `Which of these animals eats meat?`, a: `The leopard`, w: [`The zebra`, `The giraffe`, `The elephant`], why: `Leopards hunt other animals. Zebras, giraffes and elephants eat plants.` },
+    { q: `Where do polar bears live in the wild?`, a: `In the icy Arctic, near the North Pole`, w: [`In Antarctica, near the South Pole`, `In the hot Sahara Desert`, `In the Amazon rainforest`], why: `Polar bears live around the North Pole. Almost all wild penguins live in the southern half of the world, so the two never meet in the wild.` },
+    { q: `Which animal can change the colour of its skin?`, a: `The chameleon`, w: [`The tortoise`, `The warthog`, `The zebra`], why: `Chameleons mostly change colour to show their mood, and to warm up or cool down.` },
+    { q: `Which animal sleeps hanging upside down?`, a: `A bat`, w: [`An owl`, `A squirrel`, `A frog`], why: `Bats hang by their feet, so they can simply let go and swoop off into the air.` },
+    { q: `Which bird can hover in one spot and even fly backwards?`, a: `The hummingbird`, w: [`The ostrich`, `The penguin`, `The chicken`], why: `A hummingbird beats its wings so fast that they hum. Hummingbirds live in North and South America.` },
+    { q: `Which of these is a mammal, not a fish?`, a: `A whale`, w: [`A shark`, `A goldfish`, `A seahorse`], why: `Whales breathe air through a blowhole and feed their babies milk. Sharks and seahorses are fish.` },
+    { q: `How does a snake pick up smells?`, a: `By flicking its tongue in and out`, w: [`Through its ears`, `With the tip of its tail`, `By blinking its eyes`], why: `A snake's forked tongue catches smells in the air and carries them to a special spot in the roof of its mouth.` },
+    { tf: true, q: `True or false: no two zebras have exactly the same stripes.`, why: `Every zebra has its own pattern of stripes, so no two look exactly alike.` },
+    { tf: true, q: `True or false: a giraffe has the same number of neck bones as you.`, why: `Giraffes and people both have seven neck bones. A giraffe's are just much, much longer.` },
+    { tf: false, q: `True or false: a bat is a kind of bird.`, why: `Bats are mammals. They have fur, and the mothers feed their babies milk.` },
+    { tf: false, q: `True or false: an ostrich hides by burying its head in the sand.`, why: `That's a myth. A scared ostrich may lie flat with its neck along the ground, so from far away its head seems to disappear.` },
+    { q: `A baby kangaroo is called a ___.`, t: [`joey`, `joeys`], h: `It sounds like a boy's name.`, why: `A newborn joey is tiny. It lives in its mother's pouch for months while it grows.` },
+    { q: `Barn owls sleep in the day and hunt at night. Animals like this are ___.`, t: [`nocturnal`, `nocturnal animals`], h: `It starts with "n".`, why: `Bushbabies, bats and most owls are nocturnal. Many have big eyes or sharp ears to find their way in the dark.` },
+    { q: `An animal that eats only plants, like a zebra, is a ___.`, t: [`herbivore`, `herbivores`], h: `It starts with "h".`, why: `Herbivores eat grass, leaves and fruit. Meat-eaters, like lions, are called carnivores.` },
+  ]);
+
+  // ---------- Space ----------
+  S.gk_space = bank([
+    { q: `Who was the first person to walk on the Moon?`, a: `Neil Armstrong`, w: [`Yuri Gagarin`, `Mark Shuttleworth`, `Buzz Aldrin`], why: `Neil Armstrong stepped onto the Moon in 1969. Buzz Aldrin followed him soon after.` },
+    { q: `Who was the first person ever to travel into space?`, a: `Yuri Gagarin`, w: [`Neil Armstrong`, `Mark Shuttleworth`, `Buzz Aldrin`], why: `In 1961, Yuri Gagarin from Russia flew once around the Earth in a spaceship. The trip took less than two hours.` },
+    { q: `Who was the first South African to travel into space?`, a: `Mark Shuttleworth`, w: [`Neil Armstrong`, `Yuri Gagarin`, `Buzz Aldrin`], why: `In 2002, Mark Shuttleworth flew to the International Space Station. He spent more than a week in space.` },
+    { q: `Which planet is the hottest?`, a: `Venus`, w: [`Mercury`, `Mars`, `Jupiter`], why: `Mercury is closer to the Sun, but Venus has a thick layer of air that traps heat like a blanket.` },
+    { q: `What is a shooting star really?`, a: `A bit of space rock burning up in our air`, w: [`A star falling down to Earth`, `A plane flying with its lights on`, `A spark flying off the Moon`], why: `Tiny bits of rock and dust from space rush into our air so fast that they burn up in a bright streak.` },
+    { q: `What is the name of our galaxy, the huge group of stars that our Sun is part of?`, a: `The Milky Way`, w: [`Andromeda`, `The Solar Road`, `The Star Belt`], why: `On a dark night far from town lights, like in the Karoo, the Milky Way looks like a pale, cloudy band across the sky.` },
+    { q: `Which group of stars helps people in South Africa find south at night?`, a: `The Southern Cross`, w: [`The Milky Way`, `The North Star`, `The Morning Star`], why: `The Southern Cross is a small kite shape of bright stars. Its long arm points towards south.` },
+    { q: `How long does the Earth take to travel once around the Sun?`, a: `About 365 days, or one year`, w: [`One day`, `One week`, `One month`], why: `Each trip around the Sun is one year. On your birthday, you've been around the Sun one more time!` },
+    { q: `What causes day and night?`, a: `The Earth spinning like a top`, w: [`The Sun switching off at night`, `The Moon covering the Sun`, `Clouds hiding the Sun`], why: `The Earth spins once every 24 hours. When your side faces the Sun it is day, and when it faces away it is night.` },
+    { q: `The Moon pulls on things much less than the Earth does. What would happen if you jumped there?`, a: `You would jump much higher`, w: [`You couldn't jump at all`, `You would sink into the dust`, `You would fly off into space`], why: `The Moon's pull is only about a sixth of the Earth's, so you would feel very light and bounce high.` },
+    { q: `What do you call a scientist who studies the stars and planets?`, a: `An astronomer`, w: [`An astronaut`, `An archaeologist`, `A geologist`], why: `Astronomers study space, mostly from here on Earth. Astronauts are the people who travel into space.` },
+    { q: `What is a comet?`, a: `A ball of ice and dust that grows a tail near the Sun`, w: [`A star that has burnt out`, `A planet with rings around it`, `A deep hole on the Moon`], why: `As a comet nears the Sun, some of its ice turns to gas. That makes a glowing head and a long tail.` },
+    { q: `What was the first animal to travel around the Earth in space?`, a: `A dog`, w: [`A cat`, `A horse`, `A chicken`], why: `In 1957, a dog called Laika circled the Earth. That was more than three years before the first person went to space.` },
+    { tf: true, q: `True or false: sound can't travel through empty space.`, why: `Sound needs something like air or water to travel through. Space is almost empty, so it is silent out there.` },
+    { tf: true, q: `True or false: a rocket blasts hot gas downwards to push itself up.`, why: `The gas rushes out of the bottom very fast, and that pushes the rocket the other way, up into space.` },
+    { tf: false, q: `True or false: the stars are only in the sky at night.`, why: `The stars are there in the daytime too. The Sun is so bright that we just can't see them.` },
+    { tf: false, q: `True or false: Mars is bigger than the Earth.`, why: `Mars is only about half as wide as the Earth.` },
+    { q: `The planet people call the Red Planet is ___.`, t: [`Mars`], h: `It is the fourth planet from the Sun.`, why: `Mars looks red because its dust and rocks have rust in them.` },
+    { q: `A group of stars that makes a shape or picture in the sky is a ___.`, t: [`constellation`, `constellations`], h: `It is a long word that starts with "con".`, why: `Orion, the hunter, and Scorpius, the scorpion, are two constellations you can see from South Africa.` },
+    { q: `A long tube with lenses or mirrors inside, for looking at faraway planets and stars, is a ___.`, t: [`telescope`, `telescopes`], h: `It starts with "tele", which means "far".`, why: `A telescope collects lots of light, so faint and faraway things look brighter and bigger.` },
+  ]);
+
+  // ---------- South Africa ----------
+  S.gk_sa = bank([
+    { q: `How many capital cities does South Africa have?`, a: `Three`, w: [`One`, `Two`, `Nine`], why: `They are Pretoria, Cape Town and Bloemfontein. Each one is home to a different part of the government.` },
+    { q: `How many provinces does South Africa have?`, a: `Nine`, w: [`Seven`, `Eleven`, `Five`], why: `Gauteng, KwaZulu-Natal, Limpopo, Mpumalanga, North West, the Free State, and the Western, Eastern and Northern Cape.` },
+    { q: `Which is South Africa's smallest province by size?`, a: `Gauteng`, w: [`The Northern Cape`, `Limpopo`, `The Free State`], why: `Gauteng is the smallest by size, but lots of people live there. The Northern Cape is the biggest.` },
+    { q: `Which of these is NOT one of the Big Five?`, a: `The cheetah`, w: [`The leopard`, `The buffalo`, `The rhino`], why: `The Big Five are the lion, leopard, elephant, rhino and buffalo. A cheetah is a big cat, but it isn't one of them.` },
+    { q: `Kruger National Park is in which two provinces?`, a: `Limpopo and Mpumalanga`, w: [`Gauteng and North West`, `KwaZulu-Natal and the Free State`, `The Western and Northern Cape`], why: `Kruger is one of Africa's biggest game reserves. It runs along the border with Mozambique.` },
+    { q: `What is South Africa's national bird?`, a: `The blue crane`, w: [`The ostrich`, `The fish eagle`, `The hadeda`], why: `The blue crane is a tall, grey-blue bird. It is found almost only in South Africa.` },
+    { q: `How many colours are on the South African flag?`, a: `Six`, w: [`Three`, `Four`, `Eight`], why: `Red, white, blue, green, black and gold. The flag was first flown in 1994.` },
+    { q: `What does Freedom Day, on 27 April, remember?`, a: `South Africa's first election open to everyone`, w: [`The first Springbok rugby match`, `The day Kruger Park opened`, `The first day of winter`], why: `On 27 April 1994, South Africans of all races voted together for the first time.` },
+    { q: `Who became South Africa's president after the 1994 election?`, a: `Nelson Mandela`, w: [`Desmond Tutu`, `Paul Kruger`, `Miriam Makeba`], why: `Nelson Mandela spent 27 years in prison for fighting for equal rights, then became president in 1994.` },
+    { q: `How many languages are used in South Africa's national anthem?`, a: `Five`, w: [`One`, `Two`, `Twelve`], why: `The anthem uses isiXhosa, isiZulu, Sesotho, Afrikaans and English.` },
+    { q: `Which ocean washes onto Durban's beaches?`, a: `The Indian Ocean`, w: [`The Atlantic Ocean`, `The Pacific Ocean`, `The Arctic Ocean`], why: `The Indian Ocean is warm, so Durban's sea is great for swimming. Cape Town's Atlantic side is much colder.` },
+    { q: `The world's first heart transplant from one person to another was done in 1967. In which city?`, a: `Cape Town`, w: [`London`, `New York`, `Johannesburg`], why: `Dr Chris Barnard and his team gave a man a new heart at Groote Schuur Hospital in Cape Town.` },
+    { q: `Which is the longest river in South Africa?`, a: `The Orange River`, w: [`The Vaal River`, `The Limpopo River`, `The Tugela River`], why: `The Orange River starts in the mountains of Lesotho and flows west all the way to the Atlantic Ocean.` },
+    { tf: true, q: `True or false: South African Sign Language is one of our official languages.`, why: `It became South Africa's 12th official language in 2023. Deaf people use it to talk with their hands, face and body.` },
+    { tf: true, q: `True or false: the white cloud that spills over Table Mountain is called the tablecloth.`, why: `When the south-easter blows, cloud pours over the flat top like a cloth over a table.` },
+    { tf: false, q: `True or false: Table Mountain is the highest mountain in South Africa.`, why: `Table Mountain is just over 1 000 m high. The highest peaks are in the Drakensberg, more than three times as high.` },
+    { tf: false, q: `True or false: you'll never see a wild penguin in South Africa, because it's too warm.`, why: `African penguins live on our coast. You can see them waddling on Boulders Beach near Cape Town.` },
+    { q: `South Africa's national animal is a buck that leaps high into the air. It is the ___.`, t: [`springbok`, `springboks`], h: `It starts with "s", and its name is Afrikaans.`, why: `When a springbok is excited or alarmed, it jumps straight up with a stiff back. This is called pronking.` },
+    { q: `South Africa's national flower is the king ___.`, t: [`protea`, `proteas`], h: `It starts with "p".`, why: `The king protea has a huge flower head that can be as big as a dinner plate.` },
+    { q: `Johannesburg is also called eGoli, which means "the place of ___".`, t: [`gold`], h: `Miners dug it out of the ground there.`, why: `Gold was found there in 1886, and the city grew up around the gold mines.` },
+  ]);
+
+  // ---------- The world ----------
+  S.gk_world = bank([
+    { q: `In South Africa, we learn that the world has how many continents?`, a: `Seven`, w: [`Five`, `Six`, `Nine`], why: `Africa, Asia, Europe, North America, South America, Australia and Antarctica.` },
+    { q: `Which is the biggest continent?`, a: `Asia`, w: [`Africa`, `Europe`, `North America`], why: `Asia is the biggest continent, and Africa comes second.` },
+    { q: `Which continent is the coldest, and almost all covered in ice?`, a: `Antarctica`, w: [`Europe`, `Asia`, `Australia`], why: `Antarctica is around the South Pole. Nobody lives there for good, only scientists and helpers who stay for a while.` },
+    { q: `Which is the longest river in Africa?`, a: `The Nile`, w: [`The Orange`, `The Congo`, `The Limpopo`], why: `The Nile flows north through Egypt into the Mediterranean Sea.` },
+    { q: `Which is the biggest hot desert in the world?`, a: `The Sahara`, w: [`The Kalahari`, `The Namib`, `The Karoo`], why: `The Sahara covers much of North Africa. It is almost as big as the whole of the USA.` },
+    { q: `Which is the highest mountain in the world?`, a: `Mount Everest`, w: [`Kilimanjaro`, `Table Mountain`, `Mont Blanc`], why: `Mount Everest is in the Himalayas, between Nepal and China. It is nearly 9 km high.` },
+    { q: `Kilimanjaro, Africa's highest mountain, is in which country?`, a: `Tanzania`, w: [`Kenya`, `South Africa`, `Egypt`], why: `Kilimanjaro is in East Africa, close to the border with Kenya. It is an old volcano.` },
+    { q: `Which country is shaped a bit like a boot?`, a: `Italy`, w: [`France`, `Spain`, `Egypt`], why: `On a map of Europe, Italy looks like a boot kicking a ball. The ball is the island of Sicily.` },
+    { q: `Which country is completely surrounded by South Africa?`, a: `Lesotho`, w: [`Eswatini`, `Botswana`, `Namibia`], why: `Lesotho is a mountain kingdom inside South Africa. Eswatini also borders Mozambique.` },
+    { q: `The Victoria Falls are on the border of which two countries?`, a: `Zambia and Zimbabwe`, w: [`Kenya and Tanzania`, `Namibia and Botswana`, `South Africa and Lesotho`], why: `Local people call the falls "the smoke that thunders", because the spray rises like smoke.` },
+    { q: `Which country's flag is white with a red circle in the middle?`, a: `Japan`, w: [`China`, `Canada`, `Brazil`], why: `The red circle stands for the Sun. Japan is called the Land of the Rising Sun.` },
+    { q: `Most of the Amazon, the world's biggest rainforest, is in which country?`, a: `Brazil`, w: [`Egypt`, `Australia`, `India`], why: `The Amazon rainforest is home to jaguars, sloths, parrots and countless insects.` },
+    { q: `In which city is the Eiffel Tower?`, a: `Paris`, w: [`London`, `Rome`, `Cairo`], why: `The Eiffel Tower is in Paris, the capital of France. It was built in 1889.` },
+    { tf: false, q: `True or false: you can see the Great Wall of China from the Moon with just your eyes.`, why: `That's a myth. The wall is very long, but it's far too narrow to see from the Moon.` },
+    { tf: false, q: `True or false: there is a big piece of land under the ice at the North Pole.`, why: `The North Pole is on frozen sea. It's the South Pole that sits on land, in Antarctica.` },
+    { tf: true, q: `True or false: Africa has more than 50 countries.`, why: `Africa has 54 countries, more than any other continent.` },
+    { tf: true, q: `True or false: when it's summer in South Africa, it's winter in England.`, why: `South Africa is in the southern half of the Earth and England is in the northern half, so their seasons are opposite.` },
+    { q: `The imaginary line around the middle of the Earth is the ___.`, t: [`equator`, `the equator`], h: `It starts with "e".`, why: `Many places near the equator, like the Amazon rainforest, are hot all year round.` },
+    { q: `Canada's flag has a big red ___ leaf on it.`, t: [`maple`, `maple leaf`], h: `The sap of this tree makes a sweet syrup for pancakes.`, why: `Maple trees grow in many parts of Canada, and the maple leaf is the country's best-known symbol.` },
+    { q: `The biggest ocean on Earth is the ___ Ocean.`, t: [`Pacific`, `Pacific Ocean`], h: `Its name means "peaceful".`, why: `The Pacific is so big that all the land on Earth could fit into it.` },
+  ]);
+
+  // ---------- Sport ----------
+  S.gk_sport = bank([
+    { q: `In a motocross race, what does a waved chequered flag mean?`, a: `The race is over`, w: [`Danger ahead`, `One lap to go`, `The race has just started`], why: `The chequered flag has black and white squares. When you see it, you've finished.` },
+    { q: `A marshal waves a yellow flag. What should you do?`, a: `Slow down and take care: there's danger ahead`, w: [`Speed up, because the track is clear`, `Stop and get off your bike`, `Ride back to the start gate`], why: `A yellow flag warns of danger ahead, such as a fallen rider or a bike on the track.` },
+    { q: `What does a red flag mean in a motocross race?`, a: `The race has been stopped`, w: [`You are in the lead`, `Go faster`, `Last lap`], why: `A red flag means stop racing at once, usually because someone needs help on the track.` },
+    { q: `How does a motocross race start?`, a: `A start gate drops in front of the riders`, w: [`A traffic light turns green`, `The riders run to their bikes`, `A whistle blows at the finish line`], why: `Riders line up behind the gate. When it drops, they race to the first corner.` },
+    { q: `What does the "250" on a 250 motocross bike tell you?`, a: `The size of its engine`, w: [`Its top speed in km/h`, `Its mass in kilograms`, `The rider's race number`], why: `It means the engine is 250 cc, which is short for cubic centimetres. A 450 has a bigger engine.` },
+    { q: `On a motocross track, what is a berm?`, a: `A corner with a banked wall of dirt`, w: [`A row of small bumps`, `A big jump with a flat top`, `A muddy puddle`], why: `Riders lean into the berm and use it like a wall, so they can turn fast without sliding out.` },
+    { q: `How many Springbok players are on the field at once in a rugby test?`, a: `15`, w: [`11`, `13`, `9`], why: `A rugby union team has 15 players on the field: 8 forwards and 7 backs.` },
+    { q: `How many players does each soccer team have on the field?`, a: `11`, w: [`15`, `9`, `7`], why: `Each team has 10 outfield players and 1 goalkeeper.` },
+    { q: `What is the nickname of South Africa's men's soccer team?`, a: `Bafana Bafana`, w: [`The Proteas`, `The Springboks`, `Banyana Banyana`], why: `Bafana Bafana means "the boys, the boys" in isiZulu. The women's team is Banyana Banyana, "the girls, the girls".` },
+    { q: `In cricket, what do you score if you hit the ball over the boundary without it bouncing?`, a: `Six runs`, w: [`Four runs`, `One run`, `Ten runs`], why: `If the ball bounces before it crosses the boundary rope, it's four runs.` },
+    { q: `How many rings are on the Olympic flag?`, a: `Five`, w: [`Four`, `Six`, `Seven`], why: `The five linked rings stand for the parts of the world that take part, joined together by sport.` },
+    { q: `Where did the very first Olympic Games take place, long ago?`, a: `In ancient Greece`, w: [`In ancient Egypt`, `In China`, `In South Africa`], why: `The ancient Olympics were held at Olympia in Greece, nearly 3 000 years ago.` },
+    { q: `The Comrades Marathon is run between Durban and which city?`, a: `Pietermaritzburg`, w: [`Johannesburg`, `Bloemfontein`, `Cape Town`], why: `It is roughly 90 km long, more than twice as far as a normal marathon.` },
+    { tf: true, q: `True or false: in golf, the player who takes the fewest shots wins.`, why: `Golfers try to get the ball into each hole in as few hits as they can.` },
+    { tf: true, q: `True or false: in tennis, a score of "love" means zero.`, why: `"Love" is tennis talk for zero, so "15-love" means one player has won a point and the other hasn't.` },
+    { tf: false, q: `True or false: a soccer goalkeeper may pick up the ball anywhere on the field.`, why: `The goalkeeper may only handle the ball inside their own penalty area, the big box in front of the goal.` },
+    { tf: false, q: `True or false: in rugby, you may throw the ball forward to a teammate.`, why: `In rugby, a pass must never go forward. A forward pass gives the other team a scrum.` },
+    { q: `Being first into the first corner after the start gate drops is called getting the ___.`, t: [`holeshot`, `hole shot`], h: `It's a motocross word made of two short words joined together.`, why: `The rider who gets the holeshot has a clear track ahead. This game is named after it!` },
+    { q: `A row of small bumps close together on a motocross track is called the ___.`, t: [`whoops`, `whoop section`, `whoops section`], h: `It starts with "wh".`, why: `Good riders skim across the tops of the whoops instead of bouncing through every bump.` },
+    { q: `In cricket, a set of six balls bowled by one bowler is called an ___.`, t: [`over`, `overs`], h: `It's a short word that also means "finished".`, why: `After each over, a different bowler bowls from the other end.` },
+  ]);
+
+  // ---------- My body ----------
+  S.gk_body = bank([
+    { q: `About how many bones does a grown-up's body have?`, a: `206`, w: [`52`, `106`, `500`], why: `Babies are born with about 300 bones, but some of them join together as they grow.` },
+    { q: `Which is the longest bone in your body?`, a: `Your thigh bone`, w: [`Your shin bone`, `Your arm bone`, `Your collarbone`], why: `The thigh bone, called the femur, runs from your hip to your knee. It is also the strongest bone.` },
+    { q: `Where is the smallest bone in your body?`, a: `In your ear`, w: [`In your little toe`, `In your nose`, `In your little finger`], why: `It is the stirrup bone, deep inside your ear. It is smaller than a grain of rice.` },
+    { q: `Which two parts of your body do your ribs protect?`, a: `Your heart and lungs`, w: [`Your brain and eyes`, `Your knees and elbows`, `Your ears and nose`], why: `Your ribs make a strong cage around your chest. Your skull protects your brain.` },
+    { q: `How many milk teeth do children usually have?`, a: `20`, w: [`10`, `32`, `50`], why: `Milk teeth fall out one by one. A grown-up can have up to 32 adult teeth.` },
+    { q: `What is the hardest thing in your body?`, a: `The enamel on your teeth`, w: [`Your skull`, `Your thigh bone`, `Your fingernails`], why: `Enamel is the shiny white outer layer of your teeth. It's even harder than bone.` },
+    { q: `About how big is your heart?`, a: `About the size of your fist`, w: [`About the size of a pea`, `About the size of a rugby ball`, `About the size of your whole chest`], why: `Your heart is a strong pump. It pushes blood all around your body, day and night.` },
+    { q: `Which of these is NOT one of your five senses?`, a: `Speaking`, w: [`Hearing`, `Taste`, `Touch`], why: `The five senses are sight, hearing, smell, taste and touch. Speaking is something you do, not a sense.` },
+    { q: `How much sleep does a 10-year-old need each night?`, a: `About 9 to 12 hours`, w: [`About 4 hours`, `About 6 hours`, `About 16 hours`], why: `While you sleep, your body grows and repairs itself, and your brain sorts out what you learned.` },
+    { q: `Which foods help build strong muscles?`, a: `Eggs, beans, fish and meat`, w: [`Sweets and fizzy cooldrinks`, `Packets of chips`, `Butter and cooking oil`], why: `These foods have lots of protein, which your body uses to build and repair muscles.` },
+    { q: `What is the biggest organ of your body?`, a: `Your skin`, w: [`Your heart`, `Your brain`, `Your stomach`], why: `Your skin covers your whole body. It keeps germs out and helps keep you cool.` },
+    { q: `Why should you drink plenty of water on a hot race day?`, a: `To replace the water you lose when you sweat`, w: [`To make your bones grow longer`, `To keep your teeth white`, `To make your hair grow`], why: `Sweat cools you down, but it uses up water. Feeling thirsty, dizzy or headachy can mean you need a drink.` },
+    { q: `When you bump your "funny bone", what are you really hitting?`, a: `A nerve near your elbow`, w: [`A bone in your knee`, `A muscle in your neck`, `A joint in your wrist`], why: `It's not a bone at all. A nerve runs close to the skin there, so a bump makes your arm tingle.` },
+    { tf: false, q: `True or false: each part of your tongue can taste only one flavour.`, why: `That's a myth. You can taste every flavour on all parts of your tongue.` },
+    { tf: false, q: `True or false: the blood inside your veins is blue.`, why: `Blood is always red. Veins only look blue through your skin.` },
+    { tf: true, q: `True or false: no two people have the same fingerprints, not even twins.`, why: `Even identical twins have different fingerprints. That's why the police use them to tell people apart.` },
+    { tf: true, q: `True or false: your heart is a muscle.`, why: `Your heart is a muscle that never stops working. It beats faster when you ride hard.` },
+    { q: `When you breathe in, your lungs take a gas called ___ from the air.`, t: [`oxygen`], h: `It starts with "o".`, why: `Your blood carries oxygen to every part of your body. Your muscles need it to work.` },
+    { q: `The black circle in the middle of your eye, which gets bigger in the dark, is the ___.`, t: [`pupil`, `pupils`], h: `It has the same name as a learner at school.`, why: `In the dark, your pupil opens wide to let in more light, so you can see better.` },
+    { q: `The long row of bones down the middle of your back is your ___.`, t: [`spine`, `backbone`, `spinal column`], h: `It starts with "s".`, why: `Your spine is made of many small bones stacked up. It lets you bend and twist on the bike.` },
+  ]);
+
+  // ---------- How things work ----------
+  S.gk_how = bank([
+    { q: `Which of these will a magnet pull?`, a: `An iron nail`, w: [`A plastic spoon`, `A wooden pencil`, `A rubber band`], why: `Magnets pull things made of iron and steel. They don't pull plastic, wood or rubber.` },
+    { q: `What happens when you push the north ends of two magnets together?`, a: `They push each other away`, w: [`They snap together`, `They stop being magnets`, `They get very hot`], why: `Two north ends or two south ends push apart. A north end and a south end pull together.` },
+    { q: `Which way does a compass needle point?`, a: `North`, w: [`Always towards the Sun`, `Straight down`, `To the nearest town`], why: `A compass needle is a tiny magnet. The Earth acts like a giant magnet and turns it to point north.` },
+    { q: `You see a rainbow in the afternoon. Where is the Sun?`, a: `Behind you`, w: [`In front of you`, `Right above the rainbow`, `Hiding inside the rainbow`], why: `To see a rainbow, the Sun must shine from behind you onto raindrops in front of you.` },
+    { q: `Which colour is on the outer edge of a rainbow?`, a: `Red`, w: [`Violet`, `Green`, `Yellow`], why: `From the outside in, a rainbow goes red, orange, yellow, green, blue, indigo and violet.` },
+    { q: `When is your shadow shortest on a sunny day?`, a: `Around midday`, w: [`Early in the morning`, `Late in the afternoon`, `Just before sunset`], why: `At midday the Sun is high in the sky, so your shadow is short. When the Sun is low, shadows are long.` },
+    { q: `Why can a huge steel ship float?`, a: `Its hollow shape pushes aside lots of water`, w: [`Steel is lighter than water`, `Its engines hold it up`, `The fish push it up from below`], why: `The water pushes back up on the ship. Squash the same steel into a lump, and it would sink.` },
+    { q: `A see-saw is which kind of simple machine?`, a: `A lever`, w: [`A ramp`, `A screw`, `A wheel and axle`], why: `A lever is a bar that turns on a point called a pivot. Spanners and spades are levers too.` },
+    { q: `Why is it easier to push a dirt bike up a ramp onto a bakkie than to lift it?`, a: `You push it further, but with less force`, w: [`The bike gets lighter on a ramp`, `The ramp pulls the bike up for you`, `The ramp makes the bike roll by itself`], why: `A ramp is a simple machine. It spreads the work over a longer distance, so each push is easier.` },
+    { q: `Why do you see lightning before you hear the thunder?`, a: `Light travels much faster than sound`, w: [`Thunder starts after the lightning ends`, `Your eyes are closer to the storm`, `Sound gets stuck in the clouds`], why: `Light reaches you almost at once, but sound takes about 3 seconds to travel 1 km.` },
+    { q: `What pulls you back down to the ground after a big jump?`, a: `Gravity`, w: [`Magnetism`, `Electricity`, `The wind`], why: `Gravity pulls everything towards the Earth. That's why what goes up must come down.` },
+    { q: `The Kreepy Krauly was invented in South Africa. What does it do?`, a: `It cleans swimming pools`, w: [`It cleans dirt bikes`, `It keeps snakes out of houses`, `It digs holes for fence poles`], why: `It crawls around the bottom of a pool, sucking up leaves and dirt. It was invented in Springs, near Johannesburg.` },
+    { q: `Which of these lets electricity flow through it?`, a: `A copper wire`, w: [`A plastic ruler`, `A rubber glove`, `A wooden spoon`], why: `Metals like copper let electricity through. Plastic and rubber don't, so they cover wires to keep us safe.` },
+    { tf: false, q: `True or false: a magnet will pick up a piece of kitchen foil.`, why: `Kitchen foil is made of aluminium, and magnets don't pull aluminium.` },
+    { tf: true, q: `True or false: an egg that sinks in tap water can float in very salty water.`, why: `A cup of salty water is heavier than a cup of plain water, so it pushes up harder and holds the egg up.` },
+    { tf: false, q: `True or false: sunlight is just one colour.`, why: `White sunlight is really a mix of all the colours of the rainbow. Raindrops split them apart.` },
+    { tf: true, q: `True or false: a wheel and axle is a simple machine.`, why: `A wheel turning on a rod, called an axle, makes things easier to move. Each wheel on your bike is one.` },
+    { q: `A flag goes up a pole on a rope that runs over a wheel at the top. This simple machine is a ___.`, t: [`pulley`, `pulleys`], h: `You pull the rope down to make the flag go up.`, why: `A pulley changes the direction of a pull. Cranes use pulleys to lift heavy loads.` },
+    { q: `You shout near a cliff and hear your voice bounce back. This is an ___.`, t: [`echo`, `echoes`], h: `It starts with "e".`, why: `Sound bounces off hard surfaces, like cliffs and walls, and comes back to your ears.` },
+    { q: `The force that slows things down when they rub together, and helps tyres grip, is ___.`, t: [`friction`], h: `Rub your hands together fast. This force makes them warm.`, why: `Knobbly dirt-bike tyres give lots of friction, so they grip the dirt instead of sliding.` },
+  ]);
+
+  // ---------- Nature and weather ----------
+  S.gk_nature = bank([
+    { q: `How can you tell how old a tree is after it has been cut down?`, a: `Count the rings in its trunk`, w: [`Count its branches`, `Measure its leaves`, `Count its roots`], why: `Most trees grow one new ring each year, so each ring stands for about one year.` },
+    { q: `Which months are summer in South Africa?`, a: `December, January and February`, w: [`June, July and August`, `March, April and May`, `September, October and November`], why: `In South Africa, Christmas and the long summer holiday fall in the hot months.` },
+    { q: `Why do we have seasons?`, a: `The Earth is tilted as it goes around the Sun`, w: [`The Earth gets much closer to the Sun in summer`, `The Moon blocks the Sun in winter`, `The Sun gets hotter and colder`], why: `When our half of the Earth leans towards the Sun, we get summer. When it leans away, we get winter.` },
+    { q: `Which part of South Africa gets most of its rain in winter?`, a: `Cape Town and the Western Cape`, w: [`Johannesburg and Gauteng`, `Polokwane and Limpopo`, `Bloemfontein and the Free State`], why: `Most of the country gets its rain from summer thunderstorms. The Western Cape gets its rain in winter.` },
+    { q: `What is fog?`, a: `A cloud down at ground level`, w: [`Smoke from a fire`, `Dust blown by the wind`, `Snow that has melted`], why: `Fog is made of tiny water drops floating in the air, just like a cloud. That's why your goggles get wet in it.` },
+    { q: `Where is the safest place to be in a thunderstorm?`, a: `Inside a building or a car with a metal roof`, w: [`Under a tall tree`, `In the middle of an open field`, `In a swimming pool`], why: `Lightning often strikes tall things, like trees, and anyone out in the open. Get inside until the storm passes.` },
+    { q: `What is hail?`, a: `Balls of ice that fall from storm clouds`, w: [`Very big raindrops`, `Frozen dew on the grass`, `Snow that has turned to slush`], why: `Inside tall storm clouds, raindrops freeze and grow layer by layer, until they are heavy enough to fall.` },
+    { q: `How many main body parts does an insect have?`, a: `Three`, w: [`Two`, `Four`, `Six`], why: `An insect has a head, a middle part called the thorax, and a back part called the abdomen.` },
+    { q: `In a butterfly's life, what comes after the caterpillar?`, a: `The chrysalis`, w: [`The egg`, `The tadpole`, `The seed`], why: `Egg, caterpillar, chrysalis, butterfly. Inside the chrysalis, the caterpillar's body changes into a butterfly.` },
+    { q: `Why is the sea salty?`, a: `Rivers wash salt from rocks into the sea`, w: [`Fish make the water salty`, `People pour salt into it`, `Seaweed makes salt`], why: `Rain slowly washes tiny bits of salt out of rocks. Rivers carry it to the sea, and it stays there.` },
+    { q: `What mostly causes the tides, when the sea rises and falls each day?`, a: `The pull of the Moon`, w: [`The wind blowing`, `Big ships sailing past`, `Whales swimming`], why: `The Moon pulls on the sea, so the water rises and falls about twice a day.` },
+    { q: `Which is the biggest fish in the sea?`, a: `The whale shark`, w: [`The great white shark`, `The tuna`, `The swordfish`], why: `A whale shark can grow longer than a bus, but it mostly eats tiny sea creatures called plankton.` },
+    { q: `Why do blackjack seeds end up stuck on your socks after a ride?`, a: `They have tiny hooks that grab on`, w: [`They are covered in sticky glue`, `They jump onto you`, `The wind blows them onto wet socks`], why: `Blackjack seeds hook onto socks and animal fur. That's how the plant spreads its seeds to new places.` },
+    { tf: false, q: `True or false: a spider is an insect.`, why: `Spiders have eight legs, but insects have six, so a spider is not an insect.` },
+    { tf: false, q: `True or false: coral is a kind of rock.`, why: `Corals are tiny sea animals. They build hard skeletons around themselves, and these slowly grow into reefs.` },
+    { tf: true, q: `True or false: some dung beetles use the Milky Way to find their way at night.`, why: `Scientists working in South Africa found that dung beetles use the glow of the Milky Way to roll their dung balls in a straight line.` },
+    { tf: true, q: `True or false: some plants catch and eat insects.`, why: `The Venus flytrap snaps shut on insects. South Africa has insect-eating plants too, called sundews.` },
+    { q: `The huge African tree with a very fat trunk, sometimes called the upside-down tree, is the ___.`, t: [`baobab`, `baobabs`, `baobab tree`], h: `It starts with "b" and grows in Limpopo.`, why: `Its bare branches look like roots sticking up into the air. A baobab can live for over a thousand years.` },
+    { q: `Bees make honey from a sweet juice they collect from flowers, called ___.`, t: [`nectar`], h: `It starts with "n".`, why: `Bees carry nectar back to the hive, where it slowly thickens into honey.` },
+    { q: `The season when many trees lose their leaves is ___.`, t: [`autumn`, `fall`], h: `It comes between summer and winter.`, why: `In autumn, leaves turn yellow, orange and red, then drop. In South Africa, that's around March to May.` },
+  ]);
+
+  // ---------- The subject ----------
+  pack.subjects.general = {
+    label: 'General knowledge',
+    source: 'General knowledge for a Grade 4 learner',
+    scope: 'Fun facts about animals, space, South Africa, the world, sport, the body, how things work and nature',
+    note: `General knowledge to grow what he knows. A question he gets right first time never comes back, and new ones arrive every week`,
+    examSize: 15,
+    extra: true,
+    retire: true,
+    opens: '2026-11-11',
+    topics: [
+      RS.section('gk_animals', 0, 'Amazing animals', 'Fastest, biggest, babies, food and homes'),
+      RS.section('gk_space', 1, 'Space', 'Astronauts, rockets, stars and planets'),
+      RS.section('gk_sa', 2, 'South Africa', 'Places, symbols, history and famous firsts'),
+      RS.section('gk_world', 3, 'The world', 'Continents, oceans, countries and flags'),
+      RS.section('gk_sport', 4, 'Sport', 'Motocross, rugby, cricket, soccer and the Olympics'),
+      RS.section('gk_body', 5, 'My body', 'Bones, teeth, heart, senses and staying healthy'),
+      RS.section('gk_how', 6, 'How things work', 'Magnets, light, floating and simple machines'),
+      RS.section('gk_nature', 7, 'Nature and weather', 'Plants, seasons, weather, insects and the sea'),
     ],
   };
 })(typeof window !== 'undefined' ? window : globalThis);
@@ -14012,7 +14481,11 @@ ${t && H > W && W < 600 ? '<li>Tip: turn your phone sideways for a bigger view.<
   // A subject with an opens date (the Grade 7 head start) stays hidden until that day. The tests still check it.
   {
     const d = new Date();
-    const today = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+    // On the local preview only, holeshot.opensFrom in local storage lets a test see a subject before its day.
+    let today = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+    try {
+      if (location.hostname === 'localhost' && localStorage.getItem('holeshot.opensFrom')) today = localStorage.getItem('holeshot.opensFrom');
+    } catch (e) { /* no storage: the real date stands */ }
     for (const pack of Object.values(RS.packs)) {
       for (const [id, sub] of Object.entries(pack.subjects)) if (sub.opens && today < sub.opens) delete pack.subjects[id];
     }
@@ -14329,7 +14802,7 @@ ${t && H > W && W < 600 ? '<li>Tip: turn your phone sideways for a bigger view.<
   // ---------- staying up to date ----------
   // An open tab or a home screen app keeps running the page it first loaded, old prices and all. So it asks which version
   // is live when it comes back into view and every few minutes, and swaps over between races. build.mjs fills in BUILD.
-  const BUILD = 'e8ba1bd210';
+  const BUILD = 'e16108097a';
   const BACK_KEY = 'holeshot.back.v1';
   const TRIED_KEY = 'holeshot.tried.v1';
   let liveBuild = null;
@@ -15442,7 +15915,7 @@ ${t && H > W && W < 600 ? '<li>Tip: turn your phone sideways for a bigger view.<
       const done = isCleared(p, t);
       const here = next && next.id === t.id;
       const lists = t.skills.filter((id) => pack.skills[id].items);
-      const fresh = lists.reduce((n, id) => n + RS.unseenCount(pack.skills[id].items, (p.seen && p.seen[id]) || []), 0);
+      const fresh = sub.retire ? lists.reduce((n, id) => n + leftIn(p, id).length, 0) : lists.reduce((n, id) => n + RS.unseenCount(pack.skills[id].items, (p.seen && p.seen[id]) || []), 0);
       return `<article class="stop ${here ? 'here' : ''}">
         <div class="stop-photo">${photo(t.img, t.stop)}<span class="chip on-photo num">${t.warmup ? 'Extra practice' : done ? `${ic('check', 12)} Cleared` : here ? 'You are here' : `Section ${i + 1}`}</span></div>
         <div class="stop-body">
@@ -15452,8 +15925,8 @@ ${t && H > W && W < 600 ? '<li>Tip: turn your phone sideways for a bigger view.<
           </div>
           <div class="stop-row"><div class="meter" style="flex:1" role="img" aria-label="${m} percent"><i style="width:${m}%"></i></div><span class="small-t num muted">${m}%</span>${stars(tp.stars || 0, 14)}</div>
           ${heldTopic(p, t) ? `<div><span class="chip good">${ic('check', 12)} Still remembered</span></div>` : seenTopic(p, t) && dueTopic(p, t) ? '<div><span class="chip warn">Due back: ride the comeback lap</span></div>' : ''}
-          ${starsOf(p, t.id) >= 3 ? `<div class="small-t muted">${payFor(p, sub, 'topic', t.id) ? 'You know this one: it pays half points once today.' : 'Paid today. It pays half again tomorrow.'}</div>` : ''}
-          ${lists.length ? `<div class="small-t muted num">${fresh ? `${fresh} new question${fresh === 1 ? '' : 's'} to go` : 'All asked once. They come round again now.'}</div>` : ''}
+          ${starsOf(p, t.id) >= 3 && !sub.retire ? `<div class="small-t muted">${payFor(p, sub, 'topic', t.id) ? 'You know this one: it pays half points once today.' : 'Paid today. It pays half again tomorrow.'}</div>` : ''}
+          ${lists.length ? `<div class="small-t muted num">${fresh ? `${fresh} ${sub.retire ? 'still to discover' : `new question${fresh === 1 ? '' : 's'} to go`}` : sub.retire ? 'You know them all! New ones arrive every Wednesday and Sunday.' : 'All asked once. They come round again now.'}</div>` : ''}
           ${t.walk ? `<button class="btn small full walk-go" data-act="walk" data-id="${t.id}">${ic('route', 16)} Track walk: learn it first</button>` : ''}
           ${teachable(t) ? `<button class="btn small full walk-go" data-act="teach" data-id="${t.id}">${ic('spark', 16, true)} Maths lesson: see one done, then try</button>` : ''}
           ${ruleCard(t)}
@@ -16138,6 +16611,7 @@ ${t && H > W && W < 600 ? '<li>Tip: turn your phone sideways for a bigger view.<
   const subjectKnown = (p, sub) => racing(sub).length > 0 && racing(sub).every((t) => starsOf(p, t.id) >= 3);
   const payKey = (mode, topicId) => (mode === 'topic' ? topicId : `${ui.subject}:${mode}`);
   function payFor(p, sub, mode, topicId) {
+    if (sub.retire) return 1;
     const known = mode === 'topic' ? starsOf(p, topicId) >= 3 : ['daily', 'mixed', 'exam'].includes(mode) && subjectKnown(p, sub);
     if (!known) return 1;
     return (p.knownPaid || {})[payKey(mode, topicId)] === dayKey() ? 0 : 0.5;
@@ -16170,6 +16644,41 @@ ${t && H > W && W < 600 ? '<li>Tip: turn your phone sideways for a bigger view.<
       <div class="rows">${where ? pointsBtn(where) : ''}${recent ? '' : `<button class="btn full" data-act="ask-new">Ask for new ${h(sub.label)} work</button>`}</div></section>`;
   }
 
+  // Race Day: a race of 8 or more questions runs as two heats with a short pit stop between them: a quick move,
+  // then one tap on how focused the first heat felt. Moving between short bursts helps a busy brain settle.
+  const PIT_MOVES = {
+    older: [['15 squats', 'Feet apart, sit back like there is a chair behind you.'], ['20 star jumps', 'Arms and legs out together.'], ['Plank for 20 seconds', 'Straight like a board, on your elbows.'], ['10 push-ups against a wall', 'Hands on the wall, lean in and push back.'], ['Run on the spot for 30 seconds', 'Knees up, like riding the whoops.'], ['Stand on one leg, 15 seconds each side', 'Like balancing the bike at the start gate.']],
+    younger: [['10 star jumps', 'Arms and legs out together.'], ['Hop like a frog 8 times', 'Squat down low and jump forward.'], ['Touch your toes 10 times', 'Stand up tall in between.'], ['Run on the spot for 20 seconds', 'Knees up high!'], ['Be a motorbike: lean left and right 10 times', 'Hands on the bars, rev and lean into the berms.'], ['Stand on one leg for 10 seconds', 'Then swap legs.']],
+  };
+  const PIT_SECS = { older: 25, younger: 20 };
+  const ageOf = () => (parseInt(String(PK().grade || '').replace(/\D/g, ''), 10) >= 6 ? 'older' : 'younger');
+  function viewPit() {
+    const r = ui.run;
+    const heat = r.log.filter((l) => !l.bonus);
+    const right = heat.filter((l) => l.ok && l.firstTry).length;
+    const [move, how] = r.pit.move;
+    const wait = Math.max(0, Math.round(r.pit.at + r.pit.secs * 1000 - Date.now()));
+    const btn = (id, label) => `<button class="btn full pit-focus" data-act="pit-go" data-id="${id}"${wait ? ` disabled data-wait="${wait}" style="--wait:${wait}ms"` : ''}>${label}</button>`;
+    return `<section class="run pit" aria-label="Pit stop">
+      <header class="run-top"><button class="round" data-act="quit" aria-label="Pull off the track">${ic('x')}</button><div style="flex:1"></div><div class="run-score"><b>${RS.fmt(r.pts)}</b><small class="small-t muted">points</small></div></header>
+      <div class="pit-body">
+        <div class="eyebrow">Heat 1 done · ${right} of ${heat.length} right first time</div>
+        <h1 class="pit-title">Pit stop</h1>
+        <div class="pit-move card"><div class="pit-clock" style="--secs:${r.pit.secs}s" aria-hidden="true"><span class="num">${r.pit.secs}</span></div><div><b>${h(move)}</b><p class="small-t muted">${h(how)}</p></div></div>
+        <p class="pit-ask">How focused were you in heat 1?</p>
+        <div class="pit-btns">${btn('full', 'Full gas')}${btn('wobbly', 'A bit wobbly')}${btn('stalled', 'Stalled a lot')}</div>
+        <button class="link-btn small-t muted" data-act="pit-skip">Skip the pit stop</button>
+      </div>
+      ${sheetHTML()}
+    </section>`;
+  }
+  // General knowledge retires a question he gets right first time: it is never asked again, and new ones come weekly.
+  const retires = (skill) => Object.values(PK().subjects).some((x) => x.retire && x.topics.some((t) => t.skills.includes(skill)));
+  const knownOf = (p, skill) => (p.known && p.known[skill]) || [];
+  const leftIn = (p, skill) => {
+    const fn = PK().skills[skill];
+    return fn && fn.items ? fn.items.filter((it) => !knownOf(p, skill).includes(RS.itemKey(it))) : [];
+  };
   function startRun(mode, topicId) {
     const sub = SUB();
     // An old screen can still offer a lap after the list has emptied.
@@ -16179,8 +16688,13 @@ ${t && H > W && W < 600 ? '<li>Tip: turn your phone sideways for a bigger view.<
     const pay = payFor(P(), sub, mode, topicId);
     if (pay === 0.5) (P().knownPaid = P().knownPaid || {})[payKey(mode, topicId)] = dayKey();
     const n = mode === 'exam' ? sub.examSize : mode === 'review' ? Math.min(10, dueList(P(), sub).length) : mode === 'mixed' ? Math.min(10, racing(sub).length) : 10;
+    if (sub.retire && !sub.topics.some((t) => (!topicId || t.id === topicId) && t.skills.some((id) => leftIn(P(), id).length))) {
+      toast('You know every question here! New ones arrive every Wednesday and Sunday.');
+      return;
+    }
     ui.result = null;
-    ui.run = { id: uuid(), mode, topicId, queue: buildQueue(P(), sub, mode, topicId, n).map((slot) => (typeof slot === 'string' ? { skill: slot } : slot)), i: 0, total: n, q: null, typed: '', tries: 0, combo: 0, bestCombo: 0, pts: 0, score: 0, right: 0, log: [], extras: 0, asked: new Set(), sheet: null, heard: '', listening: false, started: Date.now(), pay, fixed: [], fixNote: '', firstGiven: null, qStart: Date.now(), penalty: 0, gate: true, trace: [], before: Object.fromEntries(sub.topics.map((t) => [t.id, mastery(P(), t)])) };
+    const pitAt = n >= 8 && mode !== 'lap' && mode !== 'fix' ? Math.ceil(n / 2) : 0;
+    ui.run = { pitAt, pitDone: false, id: uuid(), mode, topicId, queue: buildQueue(P(), sub, mode, topicId, n).map((slot) => (typeof slot === 'string' ? { skill: slot } : slot)), i: 0, total: n, q: null, typed: '', tries: 0, combo: 0, bestCombo: 0, pts: 0, score: 0, right: 0, log: [], extras: 0, asked: new Set(), sheet: null, heard: '', listening: false, started: Date.now(), pay, fixed: [], fixNote: '', firstGiven: null, qStart: Date.now(), penalty: 0, gate: true, trace: [], before: Object.fromEntries(sub.topics.map((t) => [t.id, mastery(P(), t)])) };
     audio();
     nextQuestion();
     if (mode === 'lap') {
@@ -16194,6 +16708,13 @@ ${t && H > W && W < 600 ? '<li>Tip: turn your phone sideways for a bigger view.<
     stopSpeaking();
     // A fix-it lap ends as soon as the list is clear.
     if (r.i >= r.queue.length || (r.mode === 'fix' && !fixList(P(), SUB()).length)) return finishRun();
+    if (r.pitAt && !r.pitDone && !r.pit && r.log.filter((l) => !l.bonus).length >= r.pitAt && !r.queue[r.i].bonus) {
+      const age = ageOf();
+      r.pit = { at: Date.now(), secs: PIT_SECS[age], move: RS.pick(PIT_MOVES[age]) };
+      keepRun();
+      drawRun();
+      return;
+    }
     const slot = r.queue[r.i];
     const fn = PK().skills[slot.skill];
     const lvl = levelFor(P(), slot.skill, r.mode);
@@ -16212,10 +16733,23 @@ ${t && H > W && W < 600 ? '<li>Tip: turn your phone sideways for a bigger view.<
       do {
         if (fn.items) {
           const seen = p.seen[slot.skill] || [];
-          const kin = slot.like ? fn.items.filter((it) => kindOf(it.q) === slot.like && !seen.includes(RS.itemKey(it))) : [];
-          const got = kin.length ? { item: RS.pick(kin) } : RS.pickUnseen(fn.items, seen);
+          let pool = fn.items;
+          if (retires(slot.skill)) {
+            r.usedItems = r.usedItems || [];
+            pool = leftIn(p, slot.skill).filter((it) => !r.usedItems.includes(RS.itemKey(it)));
+            // Nothing new left in this list for this race: skip the slot rather than ask a known one.
+            if (!pool.length) {
+              r.queue.splice(r.i, 1);
+              if (!slot.bonus) r.total = Math.max(1, r.total - 1);
+              return nextQuestion();
+            }
+          }
+          const kin = slot.like ? pool.filter((it) => kindOf(it.q) === slot.like && !seen.includes(RS.itemKey(it))) : [];
+          const got = kin.length ? { item: RS.pick(kin) } : RS.pickUnseen(pool, seen);
           p.seen[slot.skill] = got.seen || [...seen, RS.itemKey(got.item)];
           q = fn.ask(got.item);
+          q.itemKey = RS.itemKey(got.item);
+          if (r.usedItems) r.usedItems.push(q.itemKey);
         } else q = fn(lvl);
         // The answers get shuffled, so they can't be part of what makes a question the same one.
         key = `${q.q}|${q.correct}`;
@@ -16286,6 +16820,11 @@ ${t && H > W && W < 600 ? '<li>Tip: turn your phone sideways for a bigger view.<
     const d = dayLog(p);
     d.q++;
     if (ok && firstTry) d.ok++;
+    if (ok && firstTry && q.itemKey && retires(q.skill)) {
+      p.known = p.known || {};
+      const k = p.known[q.skill] || (p.known[q.skill] = []);
+      if (!k.includes(q.itemKey)) k.push(q.itemKey);
+    }
     if (!q.bonus) {
       r.score += credit;
       if (ok) r.right++;
@@ -16832,6 +17371,7 @@ ${t && H > W && W < 600 ? '<li>Tip: turn your phone sideways for a bigger view.<
   function viewRun() {
     const r = ui.run;
     if (r.mode === 'teach') return viewTeach();
+    if (r.pit) return viewPit();
     const q = r.q;
     const t = topicOf(q.skill);
     const pct = (r.i + (r.sheet && r.sheet.type !== 'retry' && r.sheet.type !== 'quit' ? 1 : 0)) / r.queue.length;
@@ -16844,7 +17384,7 @@ ${t && H > W && W < 600 ? '<li>Tip: turn your phone sideways for a bigger view.<
           ? `<div class="run-score"><b id="lap-clock" class="lap-clock">${lapText(Date.now() - r.started + r.penalty * 1000)}</b><small class="small-t muted">${r.penalty ? `+${r.penalty} s penalty` : 'clean so far'}</small></div>`
           : `<div class="run-score"><b>${RS.fmt(r.pts)}</b>${mult > 1 ? `<span class="combo">${ic('bolt', 11, true)} ×${mult}</span>` : `<small class="small-t muted">points</small>`}${ghostChip(r)}</div>`}
       </header>
-      ${r.gate && r.i === 0 ? '<div class="gate-drop" aria-hidden="true"><span>Gate drop!</span></div>' : ''}
+      ${r.gate && r.i === 0 ? '<div class="gate-drop" aria-hidden="true"><span>Gate drop!</span></div>' : r.heat2 ? '<div class="gate-drop" aria-hidden="true"><span>Heat 2!</span></div>' : ''}
       <div class="run-body">
         <article class="q-card ${!q.visual && RS.plain(q.q).length <= 30 ? 'bare' : ''}">
           <div class="q-meta">
@@ -16865,18 +17405,20 @@ ${t && H > W && W < 600 ? '<li>Tip: turn your phone sideways for a bigger view.<
   function drawRun() {
     // The gate drops once, on the first question.
     setTimeout(() => {
-      if (ui.run) ui.run.gate = false;
+      if (ui.run) {
+        ui.run.gate = false;
+        ui.run.heat2 = false;
+      }
     }, 0);
     $('#app').innerHTML = viewRun();
-    const waiting = document.querySelector('[data-wait]');
-    if (waiting) {
+    document.querySelectorAll('[data-wait]').forEach((waiting, i) => {
       setTimeout(() => {
         if (!waiting.isConnected) return;
         waiting.disabled = false;
         waiting.removeAttribute('data-wait');
-        waiting.focus({ preventScroll: true });
+        if (i === 0) waiting.focus({ preventScroll: true });
       }, Number(waiting.dataset.wait));
-    }
+    });
     const primary = document.querySelector('[data-primary]');
     if (primary) primary.focus({ preventScroll: true });
     else {
@@ -18021,6 +18563,22 @@ ${t && H > W && W < 600 ? '<li>Tip: turn your phone sideways for a bigger view.<
           r.i++;
           nextQuestion();
         }
+        break;
+      }
+      case 'pit-go':
+      case 'pit-skip': {
+        const r = ui.run;
+        if (!r || !r.pit) break;
+        if (act === 'pit-go' && Date.now() < r.pit.at + r.pit.secs * 1000) break;
+        if (act === 'pit-go') {
+          const p = P();
+          p.focus = [...(p.focus || []), { day: dayKey(), subject: ui.subject, said: id }].slice(-60);
+          save();
+        }
+        r.pit = null;
+        r.pitDone = true;
+        r.heat2 = true;
+        nextQuestion();
         break;
       }
       case 'redo-again': {
