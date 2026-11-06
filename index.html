@@ -2704,7 +2704,7 @@ body:has(.ph[data-boy="kash"]) { --ph-wash: #FFD2BD; }
       maths: {
         label: 'Maths',
         source: 'Number Sense',
-        scope: 'Pages 1 to 24 and page 37',
+        scope: 'Term 4 book work',
         note: 'Built from the topics on the school’s test list',
         examSize: 20,
         topics: [
@@ -14822,7 +14822,7 @@ ${t && H > W && W < 600 ? '<li>Tip: turn your phone sideways for a bigger view.<
   // ---------- staying up to date ----------
   // An open tab or a home screen app keeps running the page it first loaded, old prices and all. So it asks which version
   // is live when it comes back into view and every few minutes, and swaps over between races. build.mjs fills in BUILD.
-  const BUILD = '7a30109766';
+  const BUILD = '3c7cbae975';
   const BACK_KEY = 'holeshot.back.v1';
   const TRIED_KEY = 'holeshot.tried.v1';
   let liveBuild = null;
@@ -15458,11 +15458,12 @@ ${t && H > W && W < 600 ? '<li>Tip: turn your phone sideways for a bigger view.<
   function subjectStrip(pack) {
     const chip = (id, label, sub, cls, locked) => `<button class="sub-chip ${cls}" ${locked ? 'disabled' : `data-act="subject" data-id="${id}"`}>${locked ? ic('lock', 13) : ''}<b>${label}</b><small class="num">${sub}</small></button>`;
     if (pack.exams) {
-      return pack.exams.map((e) => {
-        const n = daysUntil(e.date);
+      // Tests still to come first, then the ones already written, which say Done.
+      const done = (e) => daysUntil(e.date) < 0;
+      return [...pack.exams.filter((e) => !done(e)), ...pack.exams.filter(done)].map((e) => {
         const has = !!pack.subjects[e.subject];
-        const cls = `${e.subject === ui.subject ? 'on' : ''} ${n < 0 ? 'past' : ''}`;
-        return chip(e.subject, e.label, has ? shortDay(e.date) : 'Coming soon', cls, !has);
+        const cls = `${e.subject === ui.subject ? 'on' : ''} ${done(e) ? 'past' : ''}`;
+        return chip(e.subject, e.label, !has ? 'Coming soon' : done(e) ? 'Done' : shortDay(e.date), cls, !has);
       }).join('') + Object.entries(pack.subjects).filter(([id]) => !pack.exams.some((e) => e.subject === id)).map(([id, s]) => chip(id, s.label, 'Open', id === ui.subject ? 'on' : '', false)).join('');
     }
     return Object.entries(pack.subjects).map(([id, s]) => chip(id, s.label, 'Open', id === ui.subject ? 'on' : '', false)).join('') + (pack.locked || []).map((l) => chip('', l, 'Needs its books', '', true)).join('');
