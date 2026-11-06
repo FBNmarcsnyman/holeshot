@@ -95,6 +95,7 @@ svg { display: block; }
 .btn.dark { background: var(--ink); color: var(--card); }
 .btn.small { min-height: 42px; padding: 8px 16px; font-size: 14px; }
 .btn.full { width: 100%; }
+.row-btns { display: flex; gap: 8px; flex-wrap: wrap; }
 .btn[disabled] { opacity: .55; cursor: default; }
 .chip {
   display: inline-flex; align-items: center; gap: 4px; padding: 3px 9px; border-radius: 999px;
@@ -14473,6 +14474,732 @@ ${t && H > W && W < 600 ? '<li>Tip: turn your phone sideways for a bigger view.<
   };
 })(typeof window !== 'undefined' ? window : globalThis);
 
+/* Daily Holeshot: one short puzzle a day, built only from work he has already met.
+   A mini crossword whose clues are his own written questions, or a target number made from a handful of numbers.
+   Both boys get the same kind on the same day, each at his own grade, and every device builds the same puzzle.
+   Hints are free and climb one step at a time. It never pays points: src/app.js decides what happens when it ends.
+   Research: C:\Dev\Kids\Holeshot research\reports\Holeshot puzzle games and similar apps.md */
+(function (root) {
+  'use strict';
+  const RS = (root.RS = root.RS || {});
+
+  // ---------- the same puzzle on every device ----------
+  const seedOf = (text) => {
+    let n = 2166136261;
+    for (let i = 0; i < text.length; i++) n = Math.imul(n ^ text.charCodeAt(i), 16777619);
+    return n >>> 0;
+  };
+  function rng(text) {
+    let s = seedOf(text);
+    return () => {
+      s = (s + 0x6d2b79f5) >>> 0;
+      let t = Math.imul(s ^ (s >>> 15), s | 1);
+      t ^= t + Math.imul(t ^ (t >>> 7), t | 61);
+      return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+    };
+  }
+  const roll = (rand, a, b) => a + Math.floor(rand() * (b - a + 1));
+  const shuffled = (rand, arr) => {
+    const a = arr.slice();
+    for (let i = a.length - 1; i > 0; i--) {
+      const j = Math.floor(rand() * (i + 1));
+      [a[i], a[j]] = [a[j], a[i]];
+    }
+    return a;
+  };
+
+  // Monday to Saturday take turns; Sunday is off.
+  const WEEK = [null, 'crossword', 'countdown', 'crossword', 'countdown', 'crossword', 'countdown'];
+  const kindFor = (day) => {
+    const [y, m, d] = day.split('-').map(Number);
+    return WEEK[new Date(y, m - 1, d).getDay()];
+  };
+  // Kash's grid is smaller with fewer, shorter words; Jordy's is bigger.
+  const SIZE = { young: { want: 7, min: 5, side: 9, longest: 8 }, older: { want: 9, min: 6, side: 11, longest: 10 } };
+
+  // ---------- crossword words ----------
+  // Only written questions with a one-word answer in plain letters, from kinds of question he has already answered.
+  // A clue that points at options, a picture or a table makes no sense on its own, and a clue mustn't hold its answer.
+  // Words with ê, ë or ô wait until Marc says how accents should count.
+  const NEEDS_MORE = /\b(these|those|following|below|above|underlined|in bold|options?|picture|table|diagram|graph|map|sentence)\b/i;
+  function wordsFor(pack, p, today, older) {
+    const longest = SIZE[older ? 'older' : 'young'].longest;
+    const found = new Map();
+    for (const [subject, sub] of Object.entries(pack.subjects)) {
+      for (const t of sub.topics) {
+        for (const skill of t.skills) {
+          const s = p.skills[skill];
+          const list = pack.skills[skill];
+          if (!s || !(s.seen > 0) || !list || !list.items) continue;
+          const due = !s.due || s.due <= today;
+          for (const it of list.items) {
+            const answer = it.t ? it.t[0] : it.tf === undefined ? it.a : null;
+            if (typeof answer !== 'string') continue;
+            const word = answer.trim();
+            if (!/^[A-Za-z]+$/.test(word) || word.length < 3 || word.length > longest) continue;
+            // Another accepted answer the same length (practise, practice, rehearse) would be marked wrong in the grid.
+            if (it.t && it.t.some((x) => x.trim().length === word.length && x.trim().toLowerCase() !== word.toLowerCase())) continue;
+            // "Choose the word that fits best: as cold as ___" needs no options once it just asks for the gap.
+            const clue = RS.plain(String(it.q)).replace(/\*\*/g, '').replace(/\s+/g, ' ').trim()
+              .replace(/^(?:choose|pick|tap) the (?:word|words|answer) that ([^:]*):\s*/i, (m, what) => (/simile/i.test(what) ? 'Finish the simile: ' : 'Fill the gap: '));
+            if (clue.length > 120 || NEEDS_MORE.test(clue) || clue.toLowerCase().includes(word.toLowerCase())) continue;
+            const key = word.toUpperCase();
+            const had = found.get(key);
+            if (!had || (due && !had.due)) found.set(key, { answer: key, clue, skill, subject, topic: t.id, due });
+          }
+        }
+      }
+    }
+    return [...found.values()];
+  }
+
+  // ---------- crossword layout ----------
+  // Words go in one at a time, each crossing one already placed, with no letters touching except where words cross.
+  // Many layouts are tried and the fullest, most compact one is kept.
+  function tryLayout(order, want, side, rand) {
+    const cells = new Map();
+    const get = (r, c) => cells.get(`${r},${c}`);
+    const placed = [];
+    let box = null;
+    const fits = (word, r, c, down) => {
+      const dr = down ? 1 : 0;
+      const dc = down ? 0 : 1;
+      const n = word.length;
+      if (get(r - dr, c - dc) || get(r + dr * n, c + dc * n)) return -1;
+      if (box) {
+        const rows = Math.max(box.r1, r + dr * (n - 1)) - Math.min(box.r0, r) + 1;
+        const cols = Math.max(box.c1, c + dc * (n - 1)) - Math.min(box.c0, c) + 1;
+        if (rows > side || cols > side) return -1;
+      }
+      let cross = 0;
+      for (let i = 0; i < n; i++) {
+        const rr = r + dr * i;
+        const cc = c + dc * i;
+        const cell = get(rr, cc);
+        if (cell) {
+          if (cell.ch !== word[i] || cell[down ? 'down' : 'across']) return -1;
+          cross++;
+        } else if (get(rr + dc, cc + dr) || get(rr - dc, cc - dr)) return -1;
+      }
+      return placed.length && !cross ? -1 : cross;
+    };
+    const put = (w, r, c, down) => {
+      for (let i = 0; i < w.answer.length; i++) {
+        const k = `${r + (down ? i : 0)},${c + (down ? 0 : i)}`;
+        const cell = cells.get(k) || { ch: w.answer[i] };
+        cell[down ? 'down' : 'across'] = true;
+        cells.set(k, cell);
+      }
+      const r1 = r + (down ? w.answer.length - 1 : 0);
+      const c1 = c + (down ? 0 : w.answer.length - 1);
+      box = box ? { r0: Math.min(box.r0, r), r1: Math.max(box.r1, r1), c0: Math.min(box.c0, c), c1: Math.max(box.c1, c1) } : { r0: r, r1, c0: c, c1 };
+      placed.push(Object.assign({}, w, { r, c, down }));
+    };
+    let crossings = 0;
+    for (const w of order) {
+      if (placed.length >= want) break;
+      if (!placed.length) {
+        if (w.answer.length <= side) put(w, 0, 0, false);
+        continue;
+      }
+      let best = [];
+      let most = 0;
+      for (const [k, cell] of cells) {
+        if (cell.across && cell.down) continue;
+        const [rr, cc] = k.split(',').map(Number);
+        const down = !!cell.across;
+        for (let i = 0; i < w.answer.length; i++) {
+          if (w.answer[i] !== cell.ch) continue;
+          const r = down ? rr - i : rr;
+          const c = down ? cc : cc - i;
+          const x = fits(w.answer, r, c, down);
+          if (x < 1) continue;
+          if (x > most) {
+            most = x;
+            best = [];
+          }
+          if (x === most) best.push([r, c, down]);
+        }
+      }
+      if (!best.length) continue;
+      const [r, c, down] = best[Math.floor(rand() * best.length)];
+      put(w, r, c, down);
+      crossings += most;
+    }
+    if (!box) return null;
+    const rows = box.r1 - box.r0 + 1;
+    const cols = box.c1 - box.c0 + 1;
+    const words = placed.map((w) => Object.assign(w, { r: w.r - box.r0, c: w.c - box.c0 }));
+    return { words, rows, cols, score: words.length * 1000 + crossings * 20 - rows * cols - Math.abs(rows - cols) * 4 };
+  }
+  function crossword(all, { older, prefer, seed }) {
+    const size = SIZE[older ? 'older' : 'young'];
+    const rand = rng(`crossword|${seed}`);
+    // One subject a day when it has plenty of words: the one with a test coming up, or else a different one each day.
+    const bySub = {};
+    for (const w of all) (bySub[w.subject] = bySub[w.subject] || []).push(w);
+    const plenty = Object.keys(bySub).filter((k) => bySub[k].length >= size.want * 3).sort();
+    const subject = prefer && plenty.includes(prefer) ? prefer : plenty.length ? plenty[Math.floor(rand() * plenty.length)] : null;
+    const pool = subject ? bySub[subject] : all;
+    if (pool.length < size.min) return null;
+    let best = null;
+    for (let go = 0; go < 80; go++) {
+      // Words due back go first, so the puzzle does the comeback lap's job too. A longer word starts the grid.
+      const order = [...shuffled(rand, pool.filter((w) => w.due)), ...shuffled(rand, pool.filter((w) => !w.due))].slice(0, 60);
+      const at = order.findIndex((w) => w.answer.length >= 5 && w.answer.length <= size.side);
+      if (at > 0) order.unshift(order.splice(at, 1)[0]);
+      const g = tryLayout(order, size.want, size.side, rand);
+      if (g && (!best || g.score > best.score)) best = g;
+      if (best && best.words.length >= size.want && go >= 20) break;
+    }
+    if (!best || best.words.length < size.min) return null;
+    // Numbered in reading order, as in any crossword. An across and a down that start together share a number.
+    const starts = [...new Set(best.words.map((w) => w.r * 100 + w.c))].sort((a, b) => a - b);
+    const words = best.words
+      .map((w) => ({ n: starts.indexOf(w.r * 100 + w.c) + 1, answer: w.answer, clue: w.clue, r: w.r, c: w.c, down: w.down, skill: w.skill, subject: w.subject, topic: w.topic }))
+      .sort((a, b) => a.down - b.down || a.n - b.n);
+    return { kind: 'crossword', subject, rows: best.rows, cols: best.cols, words };
+  }
+
+  // ---------- target number ----------
+  // The answer is built first from some of the numbers, so the puzzle can always be done and has a neat way to show.
+  // Kash adds and takes away with small numbers. Jordy uses all four signs and three-digit targets.
+  // Every step stays a whole number above zero.
+  const SIGN = { '+': (a, b) => a + b, '−': (a, b) => a - b, '×': (a, b) => a * b, '÷': (a, b) => a / b };
+  function countdown({ older, seed }) {
+    const rand = rng(`countdown|${seed}`);
+    for (let go = 0; go < 2000; go++) {
+      const small = Array.from({ length: older ? 6 : 5 }, () => roll(rand, 1, 10));
+      const nums = older
+        ? [...shuffled(rand, [25, 50, 75, 100]).slice(0, roll(rand, 1, 2)), ...small].slice(0, 6)
+        : [...small.slice(0, 4), [10, 15, 20, 25][roll(rand, 0, 3)]];
+      const use = shuffled(rand, nums).slice(0, older ? roll(rand, 4, 5) : roll(rand, 3, 4));
+      let cur = use[0];
+      const steps = [];
+      let ok = true;
+      for (const next of use.slice(1)) {
+        const signs = older ? ['×', '+', '−', '÷', '×', '+'] : ['+', '+', '−'];
+        let made = false;
+        for (const s of shuffled(rand, signs)) {
+          const [a, b] = s === '−' || s === '÷' ? [Math.max(cur, next), Math.min(cur, next)] : [cur, next];
+          if (s === '×' && (a === 1 || b === 1)) continue;
+          if (s === '÷' && (b === 1 || a % b)) continue;
+          const v = SIGN[s](a, b);
+          if (v <= 0 || v > (older ? 999 : 99) || v === a || v === b) continue;
+          steps.push({ a, s, b, v });
+          cur = v;
+          made = true;
+          break;
+        }
+        if (!made) {
+          ok = false;
+          break;
+        }
+      }
+      const [lo, hi] = older ? [101, 999] : [21, 99];
+      // Jordy's always needs a times or a share, so it's never just adding up.
+      if (!ok || cur < lo || cur > hi || nums.includes(cur) || (older && !steps.some((x) => x.s === '×' || x.s === '÷'))) continue;
+      return { kind: 'countdown', nums: shuffled(rand, nums), target: cur, signs: older ? ['+', '−', '×', '÷'] : ['+', '−'], steps, close: older ? 5 : 3 };
+    }
+    return null;
+  }
+
+  // ---------- drawing ----------
+  const esc = (s) => String(s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+  const clock = (secs) => `${Math.floor(secs / 60)}:${String(secs % 60).padStart(2, '0')}`;
+  // Green: done on his own. Yellow: done with a hint. The chequered flag ends every row.
+  function flag(kind, size = 24) {
+    const cloth = kind === 'c'
+      ? [0, 1, 2, 3].flatMap((x) => [0, 1].map((y) => `<rect x="${6 + x * 3.5}" y="${3 + y * 4}" width="3.5" height="4" fill="${(x + y) % 2 ? '#fff' : '#15161B'}"/>`)).join('') + '<rect x="6" y="3" width="14" height="8" fill="none" stroke="#15161B" stroke-width=".8"/>'
+      : `<path d="M6 3h14l-3 4 3 4H6z" fill="${kind === 'g' ? '#19A84F' : '#F2C200'}" stroke="rgba(0,0,0,.25)" stroke-width=".6"/>`;
+    return `<svg class="pz-flag" width="${size}" height="${size}" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 2v20" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>${cloth}</svg>`;
+  }
+  const flagRow = (flags, size) => `<span class="pz-flags" role="img" aria-label="${flags.filter((f) => f === 'g').length} of ${flags.length} on his own">${flags.map((f) => flag(f, size)).join('')}${flag('c', size)}</span>`;
+  const shareRow = (flags) => `${flags.map((f) => (f === 'g' ? '🟩' : '🟨')).join('')} 🏁`;
+
+  const CSS = `
+.pz{max-width:560px;margin:0 auto;padding:12px 16px 28px;display:grid;gap:12px;color:var(--ink)}
+.pz-head{display:flex;align-items:center;gap:10px}
+.pz-head>div{flex:1;min-width:0}
+.pz-flags{display:inline-flex;gap:2px;align-items:center;color:var(--ink-2);flex-wrap:wrap}
+.pz-grid{--cell:min(44px,calc((min(100vw,560px) - 34px - (var(--cols) - 1) * 3px) / var(--cols)));display:grid;grid-template-columns:repeat(var(--cols),var(--cell));gap:3px;justify-content:center;padding:4px 0}
+.pz-cell,.pz-void{width:var(--cell);height:var(--cell);border-radius:7px;box-sizing:border-box}
+.pz-cell{position:relative;border:2px solid var(--line);background:var(--card);color:var(--ink);font:700 calc(var(--cell) * .5)/1 var(--display);display:grid;place-items:center;padding:0;cursor:pointer;-webkit-tap-highlight-color:transparent}
+.pz-cell i{position:absolute;top:2px;left:3px;font:600 calc(var(--cell) * .24)/1 system-ui,sans-serif;font-style:normal;color:var(--ink-3)}
+.pz-cell.word{background:var(--card-2);border-color:var(--ink-3)}
+.pz-cell.sel{border-color:var(--accent);box-shadow:0 0 0 2px var(--accent) inset}
+.pz-cell.ok{background:var(--good-soft);border-color:var(--good);color:var(--good)}
+.pz-cell.shown{color:var(--warn)}
+.pz-cell.bad{background:var(--bad-soft);border-color:var(--bad);color:var(--bad)}
+.pz-clue{display:flex;align-items:center;gap:8px;background:var(--card);border-radius:16px;padding:8px;box-shadow:var(--shadow);min-height:64px}
+.pz-clue p{flex:1;margin:0;font-size:15px;line-height:1.35}
+.pz-clue b{display:block;font-size:12px;letter-spacing:.04em;text-transform:uppercase;color:var(--accent)}
+.pz-arrow{flex:none;width:44px;height:44px;border-radius:12px;border:0;background:var(--card-2);color:var(--ink);font-size:22px;cursor:pointer}
+.pz-tools{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.pz-say{margin:0;font-size:14px;color:var(--ink-2);flex:1;min-width:150px}
+.pz-hint.nudge{animation:pz-pulse 1.4s ease-in-out infinite}
+@keyframes pz-pulse{50%{box-shadow:0 0 0 6px color-mix(in srgb,var(--accent) 30%,transparent)}}
+.pz-learnt{background:var(--warn-soft);color:var(--ink);border-radius:14px;padding:10px 12px;font-size:14px;line-height:1.4}
+.pz-learnt .eyebrow{color:var(--warn)}
+.pz-keys{display:grid;gap:6px}
+.pz-row{display:flex;gap:4px;justify-content:center}
+.pz-key{flex:1;max-width:46px;min-width:0;height:48px;border:0;border-radius:10px;background:var(--card);color:var(--ink);font:600 18px/1 var(--display);box-shadow:var(--shadow);cursor:pointer;padding:0;-webkit-tap-highlight-color:transparent}
+.pz-key.wide{max-width:72px;flex:1.6;font-size:15px}
+.pz-key:active,.pz-tile:active,.pz-sign:active{transform:scale(.96)}
+.pz-all{background:var(--card);border-radius:16px;padding:10px 14px;box-shadow:var(--shadow)}
+.pz-all summary{cursor:pointer;font-weight:600;min-height:28px}
+.pz-all h4{margin:10px 0 4px;font-size:12px;letter-spacing:.04em;text-transform:uppercase;color:var(--ink-3)}
+.pz-all button{display:block;width:100%;text-align:left;border:0;background:none;color:var(--ink);font:inherit;font-size:14px;padding:6px 4px;border-radius:8px;cursor:pointer}
+.pz-all button.done{color:var(--good);text-decoration:line-through}
+.pz-target{text-align:center;background:var(--ink);color:var(--card);border-radius:20px;padding:14px}
+.pz-target small{display:block;font-size:12px;letter-spacing:.06em;text-transform:uppercase;opacity:.7}
+.pz-target b{font:700 52px/1.05 var(--display)}
+.pz-tiles{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.pz-tile{height:58px;border:0;border-radius:14px;background:var(--card);color:var(--ink);font:700 24px/1 var(--display);box-shadow:var(--shadow);cursor:pointer}
+.pz-tile.made{background:var(--card-2)}
+.pz-tile.on{background:var(--accent);color:var(--accent-ink)}
+.pz-signs{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+.pz-sign{height:52px;border:0;border-radius:14px;background:var(--card-2);color:var(--ink);font:700 26px/1 var(--display);cursor:pointer}
+.pz-sign.on{background:var(--ink);color:var(--card)}
+.pz-lines{margin:0;padding:0;list-style:none;display:grid;gap:4px;font:600 16px/1.3 var(--display)}
+.pz-lines li{background:var(--card);border-radius:10px;padding:8px 12px}
+.pz-done h2{margin:4px 0 8px;font-family:var(--display);font-size:28px}
+.pz-done .pz-flags{margin:6px 0 10px}
+.pz-done .pz-lines li{background:var(--card-2);padding:6px 12px}
+.pz-review{list-style:none;margin:8px 0 12px;padding:0;display:grid;gap:6px}
+.pz-review li{display:flex;gap:8px;align-items:flex-start;font-size:14px;line-height:1.35}
+.pz-review b{font-family:var(--display)}
+.pz-btns{display:grid;gap:8px}
+@media (prefers-reduced-motion:reduce){.pz-hint.nudge{animation:none;outline:3px solid var(--accent)}}
+`;
+  function addCss() {
+    if (document.getElementById('pz-css')) return;
+    const s = document.createElement('style');
+    s.id = 'pz-css';
+    s.textContent = CSS;
+    document.head.appendChild(s);
+  }
+
+  // The end card is the same for both kinds: flags, what he did, a share with no answers in it.
+  function endCard(o, title, flags, lines, body) {
+    const own = flags.filter((f) => f === 'g').length;
+    return `<section class="card pz-done" aria-label="Puzzle done">
+      <div class="eyebrow">Daily Holeshot · ${esc(o.dayLabel)}</div>
+      <h2>${title}</h2>
+      ${flagRow(flags, 30)}
+      <p class="small-t muted">${lines}</p>
+      ${body}
+      <div class="pz-btns">
+        <button class="btn primary full" data-do="share">Share the flags</button>
+        <button class="btn full" data-do="close">Back to Home</button>
+      </div>
+      <p class="small-t muted" style="margin-top:10px">${own === flags.length ? 'All on your own. ' : ''}A new puzzle comes tomorrow${o.sunday ? ' (Monday: Sunday is a day off)' : ''}.</p>
+    </section>`;
+  }
+  // Hints offer themselves after this long with nothing typed.
+  const NUDGE = 20;
+
+  // ---------- the crossword ----------
+  function crosswordGame(host, o) {
+    const d = o.data;
+    const pr = o.prog || {};
+    const fill = Object.assign({}, pr.fill);
+    const shown = new Set(pr.shown || []);
+    const hints = Object.assign({}, pr.hints);
+    const revealed = new Set(pr.revealed || []);
+    let secs = pr.secs || 0;
+    const cellsOf = (w) => Array.from(w.answer, (_, i) => `${w.r + (w.down ? i : 0)},${w.c + (w.down ? 0 : i)}`);
+    const right = {};
+    const wordsAt = {};
+    d.words.forEach((w, wi) => cellsOf(w).forEach((k, i) => {
+      right[k] = w.answer[i];
+      (wordsAt[k] = wordsAt[k] || []).push(wi);
+    }));
+    const solved = (wi) => cellsOf(d.words[wi]).every((k) => fill[k] === right[k]);
+    const done = new Set(d.words.map((_, i) => i).filter(solved));
+    const fixed = (k) => shown.has(k) || wordsAt[k].some((wi) => done.has(wi));
+    const nextWord = (from, step) => {
+      for (let j = 1; j <= d.words.length; j++) {
+        const wi = (from + step * j + d.words.length * 2) % d.words.length;
+        if (!done.has(wi)) return wi;
+      }
+      return from;
+    };
+    let sel = { w: done.size < d.words.length ? nextWord(-1, 1) : 0, i: 0 };
+    let bad = new Set();
+    let say = '';
+    let learnt = null;
+    let idle = 0;
+    let over = done.size === d.words.length;
+    let result = null;
+
+    const keep = () => o.onSave({ fill, shown: [...shown], hints, revealed: [...revealed], secs });
+    const HINTS = ['Check this word', 'Show a letter', 'Where did I learn this?', 'Show the word'];
+
+    function draw() {
+      if (result) {
+        const order = d.words.slice().sort((a, b) => a.n - b.n || a.down - b.down);
+        const review = `<ul class="pz-review">${order.map((w) => {
+          const wi = d.words.indexOf(w);
+          return `<li>${flag(hints[wi] ? 'y' : 'g', 20)}<span><b>${w.answer}</b> · ${esc(w.clue)}</span></li>`;
+        }).join('')}</ul>`;
+        const own = result.flags.filter((f) => f === 'g').length;
+        host.innerHTML = `<div class="pz">${endCard(o, own === result.flags.length ? 'Crossword cleaned!' : 'Crossword done!', result.flags, `${own} of ${result.flags.length} words on your own · ${clock(secs)}${revealed.size ? `. ${revealed.size === 1 ? 'The word you were shown comes' : 'The words you were shown come'} back in tomorrow's comeback lap.` : ''}`, review)}</div>`;
+        return;
+      }
+      const w = d.words[sel.w];
+      const mine = cellsOf(w);
+      const selKey = mine[sel.i];
+      const nums = {};
+      for (const x of d.words) nums[`${x.r},${x.c}`] = x.n;
+      let grid = '';
+      for (let r = 0; r < d.rows; r++) {
+        for (let c = 0; c < d.cols; c++) {
+          const k = `${r},${c}`;
+          if (!right[k]) {
+            grid += '<span class="pz-void"></span>';
+            continue;
+          }
+          const ok = wordsAt[k].some((wi) => done.has(wi));
+          const cls = [mine.includes(k) ? 'word' : '', k === selKey ? 'sel' : '', ok ? 'ok' : '', shown.has(k) && !ok ? 'shown' : '', bad.has(k) ? 'bad' : ''].join(' ');
+          grid += `<button class="pz-cell ${cls}" data-cell="${k}" aria-label="Square ${r + 1}, ${c + 1}${fill[k] ? `, ${fill[k]}` : ', empty'}">${nums[k] ? `<i>${nums[k]}</i>` : ''}${fill[k] || ''}</button>`;
+        }
+      }
+      const lvl = hints[sel.w] || 0;
+      const canHint = !done.has(sel.w) && lvl < HINTS.length;
+      const list = (down) => d.words.map((x, wi) => [x, wi]).filter(([x]) => x.down === down).map(([x, wi]) => `<button class="${done.has(wi) ? 'done' : ''}" data-word="${wi}"><b>${x.n}</b> ${esc(x.clue)} (${x.answer.length})</button>`).join('');
+      const keys = ['QWERTYUIOP', 'ASDFGHJKL', 'ZXCVBNM'].map((row, i) => `<div class="pz-row">${[...row].map((ch) => `<button class="pz-key" data-key="${ch}">${ch}</button>`).join('')}${i === 2 ? '<button class="pz-key wide" data-key="back" aria-label="Delete">Del</button>' : ''}</div>`).join('');
+      host.innerHTML = `<div class="pz">
+        <div class="pz-head"><div><div class="eyebrow">Daily Holeshot · Mini crossword</div><div class="h-sec">${esc(o.subjectLabel ? `${o.subjectLabel} words` : 'Words you know')}</div></div><span class="chip num">${done.size} of ${d.words.length}</span><button class="btn small" data-do="close">Close</button></div>
+        <div class="pz-grid" style="--cols:${d.cols}" role="grid" aria-label="Crossword">${grid}</div>
+        <div class="pz-clue"><button class="pz-arrow" data-do="prev" aria-label="Previous clue">‹</button><p aria-live="polite"><b>${w.n} ${w.down ? 'down' : 'across'} · ${w.answer.length} letters</b>${esc(w.clue)}</p><button class="pz-arrow" data-do="next" aria-label="Next clue">›</button></div>
+        <div class="pz-tools">${canHint ? `<button class="btn small dark pz-hint ${idle >= NUDGE ? 'nudge' : ''}" data-do="hint">${HINTS[lvl]}</button>` : ''}<p class="pz-say" role="status">${esc(say || (idle >= NUDGE && canHint ? 'Stuck? Hints are free.' : ''))}</p></div>
+        ${learnt && learnt.w === sel.w ? `<div class="pz-learnt"><div class="eyebrow">Where you learnt it</div>${learnt.html}</div>` : ''}
+        <div class="pz-keys">${keys}</div>
+        <details class="pz-all"><summary>All the clues</summary><h4>Across</h4>${list(false)}<h4>Down</h4>${list(true)}</details>
+      </div>`;
+    }
+
+    function finish() {
+      over = true;
+      const flags = d.words.map((w, wi) => [w, wi]).sort(([a], [b]) => a.n - b.n || a.down - b.down).map(([, wi]) => (hints[wi] ? 'y' : 'g'));
+      result = { flags };
+      keep();
+      o.sfx('fanfare');
+      o.onDone({
+        kind: 'crossword',
+        flags,
+        secs,
+        words: d.words.map((w, wi) => ({ answer: w.answer, clue: w.clue, skill: w.skill, topic: w.topic, subject: w.subject, own: !hints[wi], hints: hints[wi] || 0 })),
+        revealed: [...revealed].map((wi) => d.words[wi].skill),
+      });
+      draw();
+      window.scrollTo(0, 0);
+    }
+    function settle(typed) {
+      idle = 0;
+      const fresh = d.words.map((_, wi) => wi).filter((wi) => !done.has(wi) && solved(wi));
+      fresh.forEach((wi) => done.add(wi));
+      if (done.size === d.words.length) return finish();
+      if (fresh.length) {
+        o.sfx(fresh.length > 1 ? 'combo' : 'right');
+        if (!say) say = fresh.includes(sel.w) ? `${d.words[sel.w].answer}. Nice!` : '';
+        if (done.has(sel.w)) sel = { w: nextWord(sel.w, 1), i: 0 };
+      } else if (typed && cellsOf(d.words[sel.w]).every((k) => fill[k])) {
+        o.sfx('wrong');
+        say = 'Not quite. Fix a letter, or try a hint.';
+      }
+      keep();
+      draw();
+    }
+    // Typing the letter already fixed in a square just moves him on, and any other letter skips to the next gap,
+    // so typing the whole word and typing only the gaps both work.
+    function type(ch) {
+      const ks = cellsOf(d.words[sel.w]);
+      let i = Math.min(sel.i, ks.length - 1);
+      idle = 0;
+      if (fixed(ks[i]) && right[ks[i]] === ch) {
+        sel.i = Math.min(i + 1, ks.length - 1);
+        return draw();
+      }
+      while (i < ks.length && fixed(ks[i])) i++;
+      if (i >= ks.length) i = ks.findIndex((k) => !fixed(k));
+      if (i < 0) return;
+      fill[ks[i]] = ch;
+      bad.delete(ks[i]);
+      sel.i = Math.min(i + 1, ks.length - 1);
+      say = '';
+      settle(true);
+    }
+    function back() {
+      const ks = cellsOf(d.words[sel.w]);
+      let i = sel.i;
+      if (!fill[ks[i]] || fixed(ks[i])) {
+        i--;
+        while (i >= 0 && fixed(ks[i])) i--;
+        if (i < 0) return;
+      }
+      delete fill[ks[i]];
+      bad.delete(ks[i]);
+      sel.i = i;
+      say = '';
+      settle(false);
+    }
+    function hint() {
+      const wi = sel.w;
+      const w = d.words[wi];
+      const ks = cellsOf(w);
+      const lvl = hints[wi] || 0;
+      if (done.has(wi) || lvl >= HINTS.length) return;
+      hints[wi] = lvl + 1;
+      if (lvl === 0) {
+        bad = new Set(ks.filter((k) => fill[k] && fill[k] !== right[k]));
+        say = bad.size ? `${bad.size === 1 ? 'One letter is' : `${bad.size} letters are`} wrong. They're in red.` : ks.every((k) => fill[k]) ? '' : 'Every letter so far is right.';
+      } else if (lvl === 1) {
+        const k = ks.find((x) => fill[x] !== right[x]);
+        fill[k] = right[k];
+        shown.add(k);
+        bad.delete(k);
+        say = 'One letter is in.';
+      } else if (lvl === 2) {
+        learnt = { w: wi, html: o.learnt(w) };
+        say = '';
+      } else {
+        ks.forEach((k) => {
+          if (fill[k] !== right[k]) {
+            fill[k] = right[k];
+            shown.add(k);
+          }
+        });
+        revealed.add(wi);
+        say = `It's ${w.answer}. It comes back in tomorrow's comeback lap.`;
+      }
+      o.sfx('tap');
+      settle(false);
+    }
+    function pickCell(k) {
+      const here = wordsAt[k];
+      const now = here.includes(sel.w) && cellsOf(d.words[sel.w])[sel.i] === k;
+      // Tapping the square that's already picked swaps between across and down.
+      const wi = now && here.length > 1 ? here.find((x) => x !== sel.w) : here.includes(sel.w) ? sel.w : here[0];
+      sel = { w: wi, i: cellsOf(d.words[wi]).indexOf(k) };
+      say = '';
+      idle = 0;
+      draw();
+    }
+    function pickWord(wi) {
+      sel = { w: wi, i: 0 };
+      say = '';
+      idle = 0;
+      draw();
+    }
+
+    const onClick = (e) => {
+      const b = e.target.closest('button');
+      if (!b || !host.contains(b)) return;
+      if (b.dataset.cell) return pickCell(b.dataset.cell);
+      if (b.dataset.word) {
+        const det = b.closest('details');
+        if (det) det.open = false;
+        return pickWord(Number(b.dataset.word));
+      }
+      if (b.dataset.key) return b.dataset.key === 'back' ? back() : over ? null : type(b.dataset.key);
+      const act = b.dataset.do;
+      if (act === 'close') return o.onClose();
+      if (act === 'share') return o.share(`Holeshot daily puzzle · ${o.dayLabel}\n${o.name}'s mini crossword: ${shareRow(result.flags)}\n${result.flags.filter((f) => f === 'g').length} of ${result.flags.length} on my own`);
+      if (act === 'prev' || act === 'next') return pickWord(nextWord(sel.w, act === 'prev' ? -1 : 1));
+      if (act === 'hint') return hint();
+    };
+    const onKey = (e) => {
+      if (over || e.ctrlKey || e.metaKey || e.altKey) return;
+      if (/^[a-z]$/i.test(e.key)) type(e.key.toUpperCase());
+      else if (e.key === 'Backspace') back();
+      else if (e.key === 'Tab' || e.key === 'Enter') pickWord(nextWord(sel.w, e.shiftKey ? -1 : 1));
+      else return;
+      e.preventDefault();
+    };
+    // His time counts only while the page is in front of him.
+    const tick = setInterval(() => {
+      if (over || document.visibilityState !== 'visible') return;
+      secs++;
+      idle++;
+      if (idle === NUDGE && !done.has(sel.w) && (hints[sel.w] || 0) < HINTS.length) draw();
+      if (secs % 10 === 0) keep();
+    }, 1000);
+    host.addEventListener('click', onClick);
+    document.addEventListener('keydown', onKey);
+    if (over) {
+      result = { flags: d.words.map((w, wi) => [w, wi]).sort(([a], [b]) => a.n - b.n || a.down - b.down).map(([, wi]) => (hints[wi] ? 'y' : 'g')) };
+    }
+    draw();
+    return {
+      stop() {
+        clearInterval(tick);
+        host.removeEventListener('click', onClick);
+        document.removeEventListener('keydown', onKey);
+        if (!over) keep();
+      },
+    };
+  }
+
+  // ---------- the target number ----------
+  function countdownGame(host, o) {
+    const d = o.data;
+    const pr = o.prog || {};
+    const start = () => d.nums.map((v, id) => ({ id, v }));
+    let tiles = pr.tiles || start();
+    let lines = pr.lines || [];
+    let back = pr.back || [];
+    let hints = pr.hints || 0;
+    let secs = pr.secs || 0;
+    let made = pr.made || d.nums.length;
+    let first = null;
+    let sign = null;
+    let say = '';
+    let idle = 0;
+    let result = pr.result || null;
+
+    const keep = () => o.onSave({ tiles, lines, back, hints, secs, made, result });
+    const closest = () => tiles.reduce((best, t) => (Math.abs(t.v - d.target) < Math.abs(best.v - d.target) ? t : best), tiles[0]);
+    const stepText = (x) => `${x.a} ${x.s} ${x.b} = ${x.v}`;
+
+    function draw() {
+      if (result) {
+        const flags = [result.exact && !hints ? 'g' : 'y'];
+        const body = `${lines.length ? `<div class="eyebrow">Your way</div><ul class="pz-lines" style="margin:6px 0 12px">${lines.map((l) => `<li>${esc(l)}</li>`).join('')}</ul>` : ''}<div class="eyebrow">One neat way</div><ul class="pz-lines" style="margin:6px 0 12px">${d.steps.map((x) => `<li>${stepText(x)}</li>`).join('')}</ul>`;
+        host.innerHTML = `<div class="pz">${endCard(o, result.exact ? `${d.target}, spot on!` : `${result.got}: only ${Math.abs(result.got - d.target)} away`, flags, `${result.exact ? 'Exactly right' : 'Close enough to count'}${hints ? ', with a hint' : ', all on your own'} · ${clock(secs)}`, body)}</div>`;
+        return;
+      }
+      const near = closest();
+      const gap = Math.abs(near.v - d.target);
+      const shownSteps = d.steps.slice(0, hints);
+      host.innerHTML = `<div class="pz">
+        <div class="pz-head"><div><div class="eyebrow">Daily Holeshot · Target number</div><div class="h-sec">Make the number</div></div><button class="btn small" data-do="close">Close</button></div>
+        <div class="pz-target"><small>Target</small><b class="num">${d.target}</b></div>
+        <p class="small-t muted" style="margin:0">Tap a number, a sign, then another number. Each number can be used once. ${d.signs.length === 2 ? 'Use + and −.' : 'Use + − × ÷.'}</p>
+        <div class="pz-tiles">${tiles.map((t) => `<button class="pz-tile num ${t.id >= d.nums.length ? 'made' : ''} ${first === t.id ? 'on' : ''}" data-tile="${t.id}">${t.v}</button>`).join('')}</div>
+        <div class="pz-signs" style="grid-template-columns:repeat(${d.signs.length},1fr)">${d.signs.map((s) => `<button class="pz-sign ${sign === s ? 'on' : ''}" data-sign="${s}" aria-label="${{ '+': 'plus', '−': 'minus', '×': 'times', '÷': 'divided by' }[s]}">${s}</button>`).join('')}</div>
+        ${lines.length ? `<ul class="pz-lines">${lines.map((l) => `<li>${esc(l)}</li>`).join('')}</ul>` : ''}
+        <p class="pz-say" role="status">${esc(say || (idle >= NUDGE && hints < d.steps.length ? 'Stuck? Hints are free.' : ''))}</p>
+        ${shownSteps.length ? `<div class="pz-learnt"><div class="eyebrow">Hint</div>${shownSteps.map((x, i) => `${i + 1}. ${stepText(x)}`).join('<br>')}${hints >= d.steps.length ? '<br>Start again and follow these.' : ''}</div>` : ''}
+        <div class="pz-tools">
+          ${lines.length ? '<button class="btn small" data-do="undo">Undo</button><button class="btn small" data-do="again">Start again</button>' : ''}
+          ${hints < d.steps.length ? `<button class="btn small dark pz-hint ${idle >= NUDGE ? 'nudge' : ''}" data-do="hint">${hints ? 'Show the next move' : 'Show a move'}</button>` : ''}
+        </div>
+        ${gap && gap <= d.close ? `<button class="btn primary full" data-do="close-enough">Finish: ${near.v} is only ${gap} away</button>` : ''}
+      </div>`;
+    }
+    function finish(exact, got) {
+      result = { exact, got };
+      keep();
+      o.sfx(exact ? 'fanfare' : 'right');
+      o.onDone({ kind: 'countdown', flags: [exact && !hints ? 'g' : 'y'], secs, exact, got, target: d.target, hints, revealed: [] });
+      draw();
+      window.scrollTo(0, 0);
+    }
+    function join(id) {
+      const a = tiles.find((t) => t.id === first);
+      const b = tiles.find((t) => t.id === id);
+      let v = SIGN[sign](a.v, b.v);
+      if (sign === '−' && v <= 0) say = a.v === b.v ? 'That makes 0, which can\'t help. Try another.' : `Tap the bigger number first: ${b.v} − ${a.v}.`;
+      else if (sign === '÷' && !Number.isInteger(v)) say = `${a.v} doesn't share into ${b.v} equal parts. Try another.`;
+      else if (v > 99999) say = 'That number is far too big. Try another.';
+      if (say) {
+        o.sfx('wrong');
+        sign = null;
+        first = null;
+        return draw();
+      }
+      back = [...back, { tiles, lines }].slice(-8);
+      tiles = [...tiles.filter((t) => t.id !== a.id && t.id !== b.id), { id: made++, v }];
+      lines = [...lines, `${a.v} ${sign} ${b.v} = ${v}`];
+      first = null;
+      sign = null;
+      o.sfx('tap');
+      if (v === d.target) return finish(true, v);
+      keep();
+      draw();
+    }
+    const onClick = (e) => {
+      const b = e.target.closest('button');
+      if (!b || !host.contains(b)) return;
+      idle = 0;
+      say = '';
+      const act = b.dataset.do;
+      if (act === 'close') return o.onClose();
+      if (act === 'share') {
+        const how = result.exact ? 'spot on' : `${Math.abs(result.got - d.target)} away`;
+        return o.share(`Holeshot daily puzzle · ${o.dayLabel}\n${o.name}'s target number: ${shareRow([result.exact && !hints ? 'g' : 'y'])} ${how}`);
+      }
+      if (result) return;
+      if (b.dataset.tile) {
+        const id = Number(b.dataset.tile);
+        if (first === null || (sign === null && first !== id)) first = id;
+        else if (first === id) {
+          first = null;
+          sign = null;
+        } else if (sign) return join(id);
+        return draw();
+      }
+      if (b.dataset.sign) {
+        if (first === null) say = 'Tap a number first.';
+        else sign = sign === b.dataset.sign ? null : b.dataset.sign;
+        return draw();
+      }
+      if (act === 'undo' && back.length) {
+        ({ tiles, lines } = back[back.length - 1]);
+        back = back.slice(0, -1);
+      } else if (act === 'again') {
+        tiles = start();
+        lines = [];
+        back = [];
+      } else if (act === 'hint') {
+        hints = Math.min(d.steps.length, hints + 1);
+        o.sfx('tap');
+      } else if (act === 'close-enough') {
+        const near = closest();
+        return finish(false, near.v);
+      }
+      first = null;
+      sign = null;
+      keep();
+      draw();
+    };
+    const onKey = (e) => {
+      if (e.key === 'Escape' && !result) {
+        first = null;
+        sign = null;
+        draw();
+      }
+    };
+    const tick = setInterval(() => {
+      if (result || document.visibilityState !== 'visible') return;
+      secs++;
+      idle++;
+      if (idle === NUDGE && hints < d.steps.length) draw();
+      if (secs % 10 === 0) keep();
+    }, 1000);
+    host.addEventListener('click', onClick);
+    document.addEventListener('keydown', onKey);
+    draw();
+    return {
+      stop() {
+        clearInterval(tick);
+        host.removeEventListener('click', onClick);
+        document.removeEventListener('keydown', onKey);
+        if (!result) keep();
+      },
+    };
+  }
+
+  function start(host, o) {
+    addCss();
+    return (o.data.kind === 'countdown' ? countdownGame : crosswordGame)(host, o);
+  }
+
+  RS.puzzle = { kindFor, wordsFor, crossword, countdown, start, flagRow, shareRow, SIZE };
+})(typeof window !== 'undefined' ? window : globalThis);
+
 /* Holeshot: the game screens. Progress saves on this device. */
 (function () {
   'use strict';
@@ -14822,7 +15549,7 @@ ${t && H > W && W < 600 ? '<li>Tip: turn your phone sideways for a bigger view.<
   // ---------- staying up to date ----------
   // An open tab or a home screen app keeps running the page it first loaded, old prices and all. So it asks which version
   // is live when it comes back into view and every few minutes, and swaps over between races. build.mjs fills in BUILD.
-  const BUILD = '3c7cbae975';
+  const BUILD = 'c73775deee';
   const BACK_KEY = 'holeshot.back.v1';
   const TRIED_KEY = 'holeshot.tried.v1';
   let liveBuild = null;
@@ -15506,6 +16233,7 @@ ${t && H > W && W < 600 ? '<li>Tip: turn your phone sideways for a bigger view.<
       ${guideCard(p)}
       ${examCard(pack)}
       ${planCard(p, pack)}
+      ${puzzleCard(p)}
       ${knownCard(p, sub)}
       <div class="home-grid">
         <section class="hero" aria-label="Today's moto">
@@ -15714,6 +16442,150 @@ ${t && H > W && W < 600 ? '<li>Tip: turn your phone sideways for a bigger view.<
     save();
     render();
     window.scrollTo(0, 0);
+  }
+
+  // ---------- Daily Holeshot ----------
+  // One short puzzle a day from work he has already met (src/puzzle-daily.js): a mini crossword or a target number,
+  // with Sunday off. It opens on 14 November 2026, after Jordy's last test. Until Marc decides what it pays, it pays no
+  // points and doesn't count for the streak. A word he was shown comes back in tomorrow's comeback lap.
+  const PUZZLE_FROM = '2026-11-14';
+  function puzzleOpen() {
+    let today = dayKey();
+    try {
+      // The local preview can open it early with holeshot.opensFrom, like the Grade 7 head start.
+      if (location.hostname === 'localhost' && localStorage.getItem('holeshot.opensFrom')) today = localStorage.getItem('holeshot.opensFrom');
+    } catch (e) { /* no storage: the real date stands */ }
+    return today >= PUZZLE_FROM;
+  }
+  const olderRider = () => parseInt((/\d+/.exec(PK().grade) || ['0'])[0], 10) >= 6;
+  // Made once a day and kept, so every device shows the same puzzle and a half-done one carries on.
+  function puzzleFor(p) {
+    const today = dayKey();
+    if (p.puzzle && p.puzzle.day === today) return p.puzzle;
+    if (!RS.puzzle.kindFor(today)) return null;
+    const older = olderRider();
+    const seed = `${today}|${ui.who}`;
+    let data = null;
+    if (RS.puzzle.kindFor(today) === 'crossword') {
+      const e = nextExam(PK());
+      data = RS.puzzle.crossword(RS.puzzle.wordsFor(PK(), p, today, older), { older, prefer: e && daysUntil(e.date) <= 7 ? e.subject : null, seed });
+    }
+    // Too few words met yet for a crossword: a target number instead.
+    if (!data) data = RS.puzzle.countdown({ older, seed });
+    p.puzzle = { day: today, kind: data.kind, data, prog: null, done: false };
+    keepState();
+    return p.puzzle;
+  }
+  const puzzleName = (z) => (z.kind === 'crossword' ? 'Mini crossword' : 'Target number');
+  // A count with nothing to lose, never a second streak.
+  function puzzleWeek(p) {
+    const monday = dayKey(mondayOf(new Date()));
+    const n = (p.puzzleLog || []).filter((x) => x.day >= monday).length;
+    return `Puzzles this week: ${n} of ${Math.min(6, ((new Date().getDay() + 6) % 7) + 1)}`;
+  }
+  function puzzleCard(p) {
+    if (!puzzleOpen()) return '';
+    const z = puzzleFor(p);
+    const head = (title, chip) => `<div class="hero-head"><div><div class="eyebrow">Daily Holeshot</div><div class="h-sec">${title}</div></div>${chip}</div>`;
+    if (!z) return `<section class="card" aria-label="Daily Holeshot">${head('Sunday: no puzzle', '')}<p class="small-t muted">Rest day. A new one comes tomorrow.</p></section>`;
+    if (z.done) {
+      return `<section class="card" aria-label="Daily Holeshot">${head(puzzleName(z), '<span class="chip good">Done today</span>')}
+        <div style="margin-block:8px 4px">${RS.puzzle.flagRow(z.flags, 26)}</div>
+        <p class="small-t muted num" style="margin-bottom:10px">${puzzleWeek(p)}</p>
+        <div class="row-btns"><button class="btn dark small" data-act="puzzle-share">Share the flags</button><button class="btn small" data-act="puzzle" data-id="again">Play again for fun</button></div>
+      </section>`;
+    }
+    const sub = z.data.subject && PK().subjects[z.data.subject];
+    const about = z.kind === 'crossword' ? `${z.data.words.length} words from ${sub ? `your ${sub.label}` : 'what you have learnt'}` : `Make ${z.data.target} from ${z.data.nums.length} numbers`;
+    return `<section class="card" aria-label="Daily Holeshot">${head(puzzleName(z), '<span class="chip lime">Today</span>')}
+      <p class="small-t muted" style="margin-block:4px 12px">${about}. About 3 minutes, and hints are free.</p>
+      <button class="btn primary full" data-act="puzzle">${z.prog ? 'Carry on' : "Play today's puzzle"} ${ic('arrow')}</button>
+    </section>`;
+  }
+  // The card from the walk or section that taught the word, for the third hint.
+  function learntFor(w) {
+    const sub = PK().subjects[w.subject];
+    const t = sub && sub.topics.find((x) => x.id === w.topic);
+    if (!t) return 'You met it in your races.';
+    const at = RS.walkPoint(t.walk, { q: w.clue, correct: w.answer });
+    return at ? `<b>${h(t.title)}</b><br>${RS.html(at.text)}` : `You met it in <b>${h(t.title)}</b> (${h(sub.label)}): ${h(t.blurb)}.`;
+  }
+  function startPuzzle(again) {
+    const p = P();
+    const z = puzzleOpen() && puzzleFor(p);
+    if (!z || ui.run) return render();
+    stopSpeaking();
+    audio();
+    const sub = z.data.subject && PK().subjects[z.data.subject];
+    $('#app').innerHTML = '<div id="pz-host"></div>';
+    window.scrollTo(0, 0);
+    ui.side = {
+      id: 'puzzle',
+      handle: RS.puzzle.start($('#pz-host'), {
+        data: z.data,
+        prog: again ? null : z.prog,
+        name: PK().name,
+        dayLabel: shortDay(z.day),
+        sunday: !RS.puzzle.kindFor(laterDay(z.day, 1)),
+        subjectLabel: sub ? sub.label : '',
+        sfx: (kind) => sfx(kind),
+        learnt: learntFor,
+        share: (text) => shareText(text),
+        // A replay for fun is never saved over the day's own result.
+        onSave: (prog) => {
+          if (again) return;
+          z.prog = prog;
+          keepState();
+        },
+        onDone: (res) => {
+          if (!again) endPuzzle(z, res);
+        },
+        onClose: closePuzzle,
+      }),
+    };
+  }
+  function endPuzzle(z, res) {
+    const p = P();
+    Object.assign(z, { done: true, flags: res.flags, secs: res.secs });
+    p.puzzleLog = [...(p.puzzleLog || []).filter((x) => x.day !== z.day), { day: z.day, kind: z.kind, flags: res.flags, secs: res.secs }].slice(-60);
+    // Only the date moves: a word he had to be shown is due again tomorrow. Nothing he has already proved is undone.
+    const tomorrow = laterDay(dayKey(), 1);
+    for (const skill of res.revealed || []) {
+      const s = p.skills[skill];
+      if (s && (!s.due || s.due > tomorrow)) s.due = tomorrow;
+    }
+    // One line in the results log. The words don't go in as answers, so the parents' page totals stay about races.
+    const own = res.flags.filter((f) => f === 'g').length;
+    logRow('run', {
+      id: uuid(),
+      finished_at: new Date().toISOString(),
+      mode: 'puzzle',
+      subject: z.data.subject || ui.subject,
+      topic: z.kind,
+      label: `Daily Holeshot: ${puzzleName(z)}`,
+      pct: Math.round((100 * own) / res.flags.length),
+      right_count: own,
+      total: res.flags.length,
+      pts: 0,
+      best_combo: 0,
+      secs: res.secs,
+      fix_left: 0,
+      installed: !!navigator.standalone || matchMedia('(display-mode: standalone)').matches,
+    });
+    save();
+  }
+  function closePuzzle() {
+    if (ui.side && ui.side.handle && ui.side.handle.stop) ui.side.handle.stop();
+    ui.side = null;
+    ui.tab = 'home';
+    save();
+    render();
+    window.scrollTo(0, 0);
+  }
+  function sharePuzzle() {
+    const z = P().puzzle;
+    if (!z || !z.done) return;
+    shareText(`Holeshot daily puzzle · ${shortDay(z.day)}\n${PK().name}'s ${puzzleName(z).toLowerCase()}: ${RS.puzzle.shareRow(z.flags)}`);
   }
   function guideCard(p) {
     if (p.guided || p.runsDone > 3) return '';
@@ -18831,6 +19703,12 @@ ${t && H > W && W < 600 ? '<li>Tip: turn your phone sideways for a bigger view.<
       }
       case 'side':
         startSide(id);
+        break;
+      case 'puzzle':
+        startPuzzle(id === 'again');
+        break;
+      case 'puzzle-share':
+        sharePuzzle();
         break;
       case 'resume': {
         const x = savedRun();
