@@ -15576,7 +15576,7 @@ ${t && H > W && W < 600 ? '<li>Tip: turn your phone sideways for a bigger view.<
   // ---------- staying up to date ----------
   // An open tab or a home screen app keeps running the page it first loaded, old prices and all. So it asks which version
   // is live when it comes back into view and every few minutes, and swaps over between races. build.mjs fills in BUILD.
-  const BUILD = '33e6aa7792';
+  const BUILD = 'c325d964e7';
   const BACK_KEY = 'holeshot.back.v1';
   const TRIED_KEY = 'holeshot.tried.v1';
   let liveBuild = null;
@@ -16255,10 +16255,9 @@ ${t && H > W && W < 600 ? '<li>Tip: turn your phone sideways for a bigger view.<
       : weak.length
       ? weak.map((x, i) => `<div class="coach-item"><div class="coach-row"><span class="rank">${i + 1}</span><h3>${x.t.title}</h3><button class="btn dark small" data-act="start" data-mode="topic" data-topic="${x.t.id}">Practise</button></div><div class="meter" role="img" aria-label="${Math.round(x.m * 100)} percent"><i style="width:${Math.round(x.m * 100)}%"></i></div></div>`).join('')
       : `<div class="coach-item"><p class="small-t">${seenTopic(p, main[0]) ? 'Nothing needs fixing right now. Try the main event.' : 'Finish one moto and your coach will find what to practise next.'}</p></div>`;
-    const todayOn = openFrom(TODAY_FROM);
-    const todayHtml = todayOn ? todayCard(p, pack) : planCard(p, pack);
+    const todayHtml = todayCard(p, pack);
     // A lap already on the Today list doesn't get its own card as well.
-    const listed = (kind) => todayOn && todayHtml && p.plan.free && p.plan.jobs.some((j) => j.kind === kind);
+    const listed = (kind) => todayHtml && p.plan.free && p.plan.jobs.some((j) => j.kind === kind);
     return shell(`
       ${resumeCard()}
       ${guideCard(p)}
@@ -16676,10 +16675,7 @@ ${t && H > W && W < 600 ? '<li>Tip: turn your phone sideways for a bigger view.<
       p.plan = { day: today, subject: e.subject, jobs };
       keepState();
     }
-    return p.plan.jobs.map((j) => {
-      const v = jobView(p, sub, e.subject, j);
-      return v && { ...v, kind: j.kind };
-    }).filter(Boolean);
+    return p.plan.jobs.map((j) => jobView(p, sub, e.subject, j)).filter(Boolean);
   }
   // On a day with no test in the next week: any comeback lap first, then today's moto, then any fix-it lap,
   // in the subject he's on. Picked once a day like the test plan.
@@ -16713,9 +16709,7 @@ ${t && H > W && W < 600 ? '<li>Tip: turn your phone sideways for a bigger view.<
     return { text: 'Main event', meta: `${sub.examSize} mixed questions, no hints`, done: ran((r) => r.mode === 'exam'), go };
   }
   // The week before a test this is the test plan. Other days it's the day's laps, and it only shows when there's more
-  // than today's moto to do, since the moto has its own big card just below. It takes over from the plan card on
-  // 14 November 2026, the day after Jordy's last test, so Home doesn't change under him in test week.
-  const TODAY_FROM = '2026-11-14';
+  // than today's moto to do, since the moto has its own big card just below.
   function todayCard(p, pack) {
     const e = planExam(pack);
     const n = e ? daysUntil(e.date) : null;
@@ -16741,25 +16735,6 @@ ${t && H > W && W < 600 ? '<li>Tip: turn your phone sideways for a bigger view.<
         ? `<li class="done"><div class="today-row"><span class="today-dot">${ic('check', 14)}</span><span class="today-txt"><b>${j.text}</b><small>Done</small></span></div></li>`
         : `<li class="${j === next ? 'next' : ''}"><button class="today-row" ${j.go}><span class="today-dot"></span><span class="today-txt"><b>${j.text}</b><small>${j.meta}</small></span>${ic('arrow', 18)}</button></li>`)).join('')}</ol>
       ${test && n === 0 ? '<p class="small-t muted">One quick lap to warm up, then put the screen away. You know this. Good luck!</p>' : ''}
-    </section>`;
-  }
-  // The plan card as it was, until the Today card takes over. It can go after 14 November.
-  function planCard(p, pack) {
-    const e = planExam(pack);
-    if (!e) return '';
-    const n = daysUntil(e.date);
-    if (n > 7) return '';
-    const jobs = planJobs(p, pack, e);
-    const left = jobs.filter((j) => !j.done).length;
-    const word = pack.testWord || 'exam';
-    const head = n === 0 ? `${e.label} ${word} today` : `${n === 1 ? 'Tomorrow' : `${n} days to go`}: do ${jobs.length === 1 ? 'this' : `these ${jobs.length}`} today`;
-    const foot = n === 0 ? 'One quick lap to warm up, then put the screen away. You know this. Good luck!' : left ? `${left} to go. They're picked from your own answers.` : `All done for today. That's how you get ready for a ${word}.`;
-    const said = { review: 'Comeback lap: check what you learnt before', exam: 'Main event practice test' };
-    return `<section class="card plan" aria-label="Plan for your ${word}">
-      <div class="eyebrow">${e.label} ${word} · ${shortDay(e.date)}</div>
-      <div class="h-sec">${head}</div>
-      <ol class="plan-list">${jobs.map((j, i) => `<li class="${j.done ? 'done' : ''}"><span class="plan-tick">${j.done ? ic('check', 16) : i + 1}</span><span class="plan-text">${said[j.kind] || j.text}</span>${j.done ? '<span class="chip good">Done</span>' : `<button class="btn small dark" ${j.go}>Go</button>`}</li>`).join('')}</ol>
-      <p class="small-t muted">${foot}</p>
     </section>`;
   }
   // A goal he picks in the pits. It only shows how close he is: prices and points don't change.
