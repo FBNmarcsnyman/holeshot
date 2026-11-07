@@ -524,6 +524,33 @@ details ol { margin: 6px 0 0; padding-left: 20px; }
 .plan-tick { flex: none; width: 28px; height: 28px; border-radius: 50%; display: grid; place-items: center; background: var(--ink); color: var(--card); font-weight: 800; font-size: 14px; }
 .plan-list li.done .plan-tick { background: var(--good); }
 .plan-text { flex: 1; min-width: 0; font-weight: 700; }
+/* Today on Home: a ring for how much is done, then one short row per job, the whole row a button */
+.today { display: grid; gap: 12px; }
+.today-head { display: flex; align-items: center; gap: 14px; }
+.today-ring { position: relative; flex: none; width: 64px; height: 64px; }
+.today-ring svg { width: 100%; height: 100%; transform: rotate(-90deg); }
+.today-ring circle { fill: none; stroke-width: 7; }
+.today-ring .bg { stroke: var(--card-2); }
+.today-ring .fg { stroke: var(--accent); stroke-linecap: round; transition: stroke-dasharray .5s ease; }
+.today.all .today-ring .fg { stroke: var(--good); }
+.today-ring > span { position: absolute; inset: 0; display: grid; place-items: center; font: 800 17px/1 var(--display); }
+.today.all .today-ring > span { color: var(--good); }
+.today-sum { min-width: 0; display: grid; gap: 2px; }
+.today-sum b { font-family: var(--display); font-weight: 700; font-size: 20px; letter-spacing: -.01em; }
+.today-sum small { font-size: 13px; color: var(--ink-2); }
+.today-list { list-style: none; margin: 0; padding: 0; background: var(--card-2); border-radius: 18px; overflow: hidden; }
+.today-list li + li { border-top: 1px solid var(--line); }
+.today-row { width: 100%; min-height: 60px; padding: 11px 14px; display: flex; align-items: center; gap: 12px; text-align: left; color: var(--ink); }
+button.today-row:active { background: color-mix(in srgb, var(--ink) 7%, transparent); }
+.today-dot { flex: none; width: 24px; height: 24px; border-radius: 50%; display: grid; place-items: center; box-shadow: inset 0 0 0 2px var(--ink-3); }
+.today-list li.next .today-dot { box-shadow: inset 0 0 0 3px var(--accent); }
+.today-list li.done .today-dot { background: var(--good); color: var(--card); box-shadow: none; }
+.today-txt { flex: 1; min-width: 0; display: grid; gap: 2px; }
+.today-txt b { font-size: 15px; font-weight: 700; line-height: 1.25; }
+.today-txt small { font-size: 12.5px; color: var(--ink-3); }
+.today-list li.done .today-txt b { color: var(--ink-3); text-decoration: line-through; }
+.today-row > svg { flex: none; color: var(--ink-3); }
+.today-list li.next .today-row > svg { color: var(--accent); }
 .stop-cue { border: 2px solid var(--good); }
 
 /* His own rider on Home and on the results */
@@ -15549,7 +15576,7 @@ ${t && H > W && W < 600 ? '<li>Tip: turn your phone sideways for a bigger view.<
   // ---------- staying up to date ----------
   // An open tab or a home screen app keeps running the page it first loaded, old prices and all. So it asks which version
   // is live when it comes back into view and every few minutes, and swaps over between races. build.mjs fills in BUILD.
-  const BUILD = 'c73775deee';
+  const BUILD = '33e6aa7792';
   const BACK_KEY = 'holeshot.back.v1';
   const TRIED_KEY = 'holeshot.tried.v1';
   let liveBuild = null;
@@ -16228,11 +16255,15 @@ ${t && H > W && W < 600 ? '<li>Tip: turn your phone sideways for a bigger view.<
       : weak.length
       ? weak.map((x, i) => `<div class="coach-item"><div class="coach-row"><span class="rank">${i + 1}</span><h3>${x.t.title}</h3><button class="btn dark small" data-act="start" data-mode="topic" data-topic="${x.t.id}">Practise</button></div><div class="meter" role="img" aria-label="${Math.round(x.m * 100)} percent"><i style="width:${Math.round(x.m * 100)}%"></i></div></div>`).join('')
       : `<div class="coach-item"><p class="small-t">${seenTopic(p, main[0]) ? 'Nothing needs fixing right now. Try the main event.' : 'Finish one moto and your coach will find what to practise next.'}</p></div>`;
+    const todayOn = openFrom(TODAY_FROM);
+    const todayHtml = todayOn ? todayCard(p, pack) : planCard(p, pack);
+    // A lap already on the Today list doesn't get its own card as well.
+    const listed = (kind) => todayOn && todayHtml && p.plan.free && p.plan.jobs.some((j) => j.kind === kind);
     return shell(`
       ${resumeCard()}
       ${guideCard(p)}
       ${examCard(pack)}
-      ${planCard(p, pack)}
+      ${todayHtml}
       ${puzzleCard(p)}
       ${knownCard(p, sub)}
       <div class="home-grid">
@@ -16255,8 +16286,8 @@ ${t && H > W && W < 600 ? '<li>Tip: turn your phone sideways for a bigger view.<
         </section>
         <div class="home-side">
           ${goalCard(p)}
-          ${comebackCard(p, sub)}
-          ${fixCard(p, sub)}
+          ${listed('review') ? '' : comebackCard(p, sub)}
+          ${listed('fix') ? '' : fixCard(p, sub)}
           ${stuckCard(p, sub)}
           <section class="tiles" aria-label="Your numbers">
             ${tile('star', 'Points', RS.fmt(p.points), today.pts ? `<span class="chip lime num">+${today.pts} today</span>` : '<span class="chip">Ride to earn</span>')}
@@ -16449,14 +16480,15 @@ ${t && H > W && W < 600 ? '<li>Tip: turn your phone sideways for a bigger view.<
   // with Sunday off. It opens on 14 November 2026, after Jordy's last test. Until Marc decides what it pays, it pays no
   // points and doesn't count for the streak. A word he was shown comes back in tomorrow's comeback lap.
   const PUZZLE_FROM = '2026-11-14';
-  function puzzleOpen() {
+  function openFrom(day) {
     let today = dayKey();
     try {
-      // The local preview can open it early with holeshot.opensFrom, like the Grade 7 head start.
+      // The local preview can open dated things early with holeshot.opensFrom, like the Grade 7 head start.
       if (location.hostname === 'localhost' && localStorage.getItem('holeshot.opensFrom')) today = localStorage.getItem('holeshot.opensFrom');
     } catch (e) { /* no storage: the real date stands */ }
-    return today >= PUZZLE_FROM;
+    return today >= day;
   }
+  const puzzleOpen = () => openFrom(PUZZLE_FROM);
   const olderRider = () => parseInt((/\d+/.exec(PK().grade) || ['0'])[0], 10) >= 6;
   // Made once a day and kept, so every device shows the same puzzle and a half-done one carries on.
   function puzzleFor(p) {
@@ -16633,7 +16665,7 @@ ${t && H > W && W < 600 ? '<li>Tip: turn your phone sideways for a bigger view.<
     const sub = pack.subjects[e.subject];
     const today = dayKey();
     const n = daysUntil(e.date);
-    if (!p.plan || p.plan.day !== today || p.plan.subject !== e.subject) {
+    if (!p.plan || p.plan.day !== today || p.plan.subject !== e.subject || p.plan.free) {
       const jobs = [dueList(p, sub).length ? { kind: 'review' } : { kind: 'daily' }];
       if (n > 0) {
         const weak = racing(sub).filter((t) => !isCleared(p, t)).sort((a, b) => mastery(p, a) - mastery(p, b));
@@ -16644,17 +16676,74 @@ ${t && H > W && W < 600 ? '<li>Tip: turn your phone sideways for a bigger view.<
       p.plan = { day: today, subject: e.subject, jobs };
       keepState();
     }
-    const ran = (fn) => p.runs.some((r) => r.when === today && r.label.startsWith(`${sub.label}: `) && fn(r));
     return p.plan.jobs.map((j) => {
-      const t = j.topic && sub.topics.find((x) => x.id === j.topic);
-      const go = `data-subject="${e.subject}" ${j.kind === 'walk' ? `data-act="walk" data-id="${j.topic}"` : `data-act="start" data-mode="${j.kind}" ${j.topic ? `data-topic="${j.topic}"` : ''}`}`;
-      if (j.kind === 'review') return { text: 'Comeback lap: check what you learnt before', done: ran((r) => r.mode === 'review') || !dueList(p, sub).length, go };
-      if (j.kind === 'daily') return { text: "Today's moto", done: p.dailyBy[e.subject] === today, go };
-      if (j.kind === 'walk') return { text: `${t.walk ? 'Track walk' : 'Maths lesson'}: ${t.title}`, done: (p.walked || {})[j.topic] === today, go };
-      if (j.kind === 'topic') return { text: `Practise: ${t.title}`, done: ran((r) => r.mode === 'topic' && r.label === `${sub.label}: ${t.title}`), go };
-      return { text: 'Main event practice test', done: ran((r) => r.mode === 'exam'), go };
-    });
+      const v = jobView(p, sub, e.subject, j);
+      return v && { ...v, kind: j.kind };
+    }).filter(Boolean);
   }
+  // On a day with no test in the next week: any comeback lap first, then today's moto, then any fix-it lap,
+  // in the subject he's on. Picked once a day like the test plan.
+  function dayJobs(p, sub) {
+    const today = dayKey();
+    if (!p.plan || p.plan.day !== today || p.plan.subject !== ui.subject || !p.plan.free) {
+      const jobs = [...(dueList(p, sub).length ? [{ kind: 'review' }] : []), { kind: 'daily' }, ...(fixList(p, sub).length ? [{ kind: 'fix' }] : [])];
+      p.plan = { day: today, subject: ui.subject, jobs, free: true };
+      keepState();
+    }
+    return p.plan.jobs.map((j) => jobView(p, sub, ui.subject, j)).filter(Boolean);
+  }
+  // One row on the Today card: a name, one short line under it, and whether it's done today.
+  function jobView(p, sub, id, j) {
+    const today = dayKey();
+    const ran = (fn) => p.runs.some((r) => r.when === today && r.label.startsWith(`${sub.label}: `) && fn(r));
+    const t = j.topic && sub.topics.find((x) => x.id === j.topic);
+    if (j.topic && !t) return null;
+    const go = `data-subject="${id}" ${j.kind === 'walk' ? `data-act="walk" data-id="${j.topic}"` : `data-act="start" data-mode="${j.kind}" ${j.topic ? `data-topic="${j.topic}"` : ''}`}`;
+    if (j.kind === 'review') {
+      const n = dueList(p, sub).length;
+      return { text: 'Comeback lap', meta: `${n} due back, to check they stuck`, done: ran((r) => r.mode === 'review') || !n, go };
+    }
+    if (j.kind === 'daily') return { text: "Today's moto", meta: '10 questions, about 6 minutes', done: p.dailyBy[id] === today, go };
+    if (j.kind === 'fix') {
+      const n = fixList(p, sub).length;
+      return { text: 'Fix-it lap', meta: `${n} to fix, from what caught you out`, done: ran((r) => r.mode === 'fix') || !n, go };
+    }
+    if (j.kind === 'walk') return { text: `${t.walk ? 'Track walk' : 'Maths lesson'}: ${t.title}`, meta: 'Learn it, then a few quick questions', done: (p.walked || {})[j.topic] === today, go };
+    if (j.kind === 'topic') return { text: `Practise: ${t.title}`, meta: 'Picked from your own answers', done: ran((r) => r.mode === 'topic' && r.label === `${sub.label}: ${t.title}`), go };
+    return { text: 'Main event', meta: `${sub.examSize} mixed questions, no hints`, done: ran((r) => r.mode === 'exam'), go };
+  }
+  // The week before a test this is the test plan. Other days it's the day's laps, and it only shows when there's more
+  // than today's moto to do, since the moto has its own big card just below. It takes over from the plan card on
+  // 14 November 2026, the day after Jordy's last test, so Home doesn't change under him in test week.
+  const TODAY_FROM = '2026-11-14';
+  function todayCard(p, pack) {
+    const e = planExam(pack);
+    const n = e ? daysUntil(e.date) : null;
+    const test = e && n <= 7;
+    const jobs = test ? planJobs(p, pack, e) : dayJobs(p, SUB());
+    if (!jobs.length || (!test && jobs.length < 2)) return '';
+    const word = pack.testWord || 'exam';
+    const left = jobs.filter((j) => !j.done);
+    const next = left[0];
+    const r = 26;
+    const round = 2 * Math.PI * r;
+    const done = jobs.length - left.length;
+    const sum = left.length
+      ? `<b class="num">${left.length} left today</b><small>Next: ${next.text}</small>`
+      : `<b>All done today</b><small>${test ? `That's how you get ready for a ${word}.` : 'Come back tomorrow for the next lot.'}</small>`;
+    return `<section class="card today ${left.length ? '' : 'all'}" aria-label="${test ? `Plan for your ${word}` : 'Today'}">
+      <div class="eyebrow">${test ? `${e.label} ${word} · ${shortDay(e.date)}` : `Today · ${SUB().label}`}</div>
+      <div class="today-head">
+        <div class="today-ring"><svg viewBox="0 0 64 64" role="img" aria-label="${done} of ${jobs.length} done"><circle cx="32" cy="32" r="${r}" class="bg"/>${done ? `<circle cx="32" cy="32" r="${r}" class="fg" stroke-dasharray="${((round * done) / jobs.length).toFixed(1)} ${round.toFixed(1)}"/>` : ''}</svg><span class="num">${left.length ? `${done}/${jobs.length}` : ic('check', 26)}</span></div>
+        <div class="today-sum">${sum}</div>
+      </div>
+      <ol class="today-list">${jobs.map((j) => (j.done
+        ? `<li class="done"><div class="today-row"><span class="today-dot">${ic('check', 14)}</span><span class="today-txt"><b>${j.text}</b><small>Done</small></span></div></li>`
+        : `<li class="${j === next ? 'next' : ''}"><button class="today-row" ${j.go}><span class="today-dot"></span><span class="today-txt"><b>${j.text}</b><small>${j.meta}</small></span>${ic('arrow', 18)}</button></li>`)).join('')}</ol>
+      ${test && n === 0 ? '<p class="small-t muted">One quick lap to warm up, then put the screen away. You know this. Good luck!</p>' : ''}
+    </section>`;
+  }
+  // The plan card as it was, until the Today card takes over. It can go after 14 November.
   function planCard(p, pack) {
     const e = planExam(pack);
     if (!e) return '';
@@ -16665,10 +16754,11 @@ ${t && H > W && W < 600 ? '<li>Tip: turn your phone sideways for a bigger view.<
     const word = pack.testWord || 'exam';
     const head = n === 0 ? `${e.label} ${word} today` : `${n === 1 ? 'Tomorrow' : `${n} days to go`}: do ${jobs.length === 1 ? 'this' : `these ${jobs.length}`} today`;
     const foot = n === 0 ? 'One quick lap to warm up, then put the screen away. You know this. Good luck!' : left ? `${left} to go. They're picked from your own answers.` : `All done for today. That's how you get ready for a ${word}.`;
+    const said = { review: 'Comeback lap: check what you learnt before', exam: 'Main event practice test' };
     return `<section class="card plan" aria-label="Plan for your ${word}">
       <div class="eyebrow">${e.label} ${word} · ${shortDay(e.date)}</div>
       <div class="h-sec">${head}</div>
-      <ol class="plan-list">${jobs.map((j, i) => `<li class="${j.done ? 'done' : ''}"><span class="plan-tick">${j.done ? ic('check', 16) : i + 1}</span><span class="plan-text">${j.text}</span>${j.done ? '<span class="chip good">Done</span>' : `<button class="btn small dark" ${j.go}>Go</button>`}</li>`).join('')}</ol>
+      <ol class="plan-list">${jobs.map((j, i) => `<li class="${j.done ? 'done' : ''}"><span class="plan-tick">${j.done ? ic('check', 16) : i + 1}</span><span class="plan-text">${said[j.kind] || j.text}</span>${j.done ? '<span class="chip good">Done</span>' : `<button class="btn small dark" ${j.go}>Go</button>`}</li>`).join('')}</ol>
       <p class="small-t muted">${foot}</p>
     </section>`;
   }
