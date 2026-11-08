@@ -15576,7 +15576,7 @@ ${t && H > W && W < 600 ? '<li>Tip: turn your phone sideways for a bigger view.<
   // ---------- staying up to date ----------
   // An open tab or a home screen app keeps running the page it first loaded, old prices and all. So it asks which version
   // is live when it comes back into view and every few minutes, and swaps over between races. build.mjs fills in BUILD.
-  const BUILD = 'c325d964e7';
+  const BUILD = 'e79917b68a';
   const BACK_KEY = 'holeshot.back.v1';
   const TRIED_KEY = 'holeshot.tried.v1';
   let liveBuild = null;
@@ -16812,10 +16812,12 @@ ${t && H > W && W < 600 ? '<li>Tip: turn your phone sideways for a bigger view.<
     const words = RS.plain(text).split(/\s+/).filter(Boolean).length;
     return Math.min(6000, Math.max(1500, 900 + 280 * words));
   }
-  // Reads a line of the lesson card after whatever is already being said.
+  // Reads a line of the lesson card after whatever is already being said, in the same character voice.
   function sayStep(text) {
-    if (!text || !state.sound || !window.speechSynthesis || !ui.run || !ui.run.q) return;
-    window.speechSynthesis.speak(dress(new SpeechSynthesisUtterance(RS.speakable(String(text))), voiceOf(P()), ui.run.q.lang || 'en-ZA'));
+    if (!text || !state.sound || !ui.run || !ui.run.q) return;
+    const q = ui.run.q;
+    const line = RS.speakable(String(text));
+    voiceTurn(sayLang(q) ? fetchSay(P().gear.voice || 'vStock', line) : null, () => deviceSay(voiceOf(P()), line, q.lang), true, () => ui.run && ui.run.q === q);
   }
   // "Your turn": after the lesson, the same question again, which he must get right before the race goes on.
   function startRedo() {
@@ -18663,14 +18665,19 @@ ${t && H > W && W < 600 ? '<li>Tip: turn your phone sideways for a bigger view.<
   // people, not robots. Clip 0 is the sample, then the right lines, then the wrong lines. If a clip can't load, the
   // device's voice says the line instead.
   const clipBank = {};
-  let clipNow = null;
+  const clipsOn = new Set();
+  let clipEnds = 0;
+  // Each thing said waits for the one asked before it, so a lesson step comes after the character's line, never over it.
+  let sayChain = Promise.resolve();
   function stopClip() {
-    if (clipNow) {
+    for (const node of clipsOn) {
       try {
-        clipNow.stop();
+        node.stop();
       } catch (e) { /* already ended */ }
-      clipNow = null;
     }
+    clipsOn.clear();
+    clipEnds = 0;
+    sayChain = Promise.resolve();
   }
   // Called from a tap, so an iPad lets the sound start.
   function wakeAudio() {
@@ -18685,27 +18692,53 @@ ${t && H > W && W < 600 ? '<li>Tip: turn your phone sideways for a bigger view.<
     return ac;
   }
   const decode = (b) => new Promise((ok, no) => ac.decodeAudioData(b, ok, no));
-  function startBuffer(buf) {
-    stopSpeaking();
+  // Plays a sound once anything already playing has finished.
+  function playBuffer(buf) {
     const node = ac.createBufferSource();
     node.buffer = buf;
     node.connect(ac.destination);
-    node.start();
-    clipNow = node;
+    const at = Math.max(ac.currentTime, clipEnds);
+    node.start(at);
+    clipEnds = at + buf.duration;
+    clipsOn.add(node);
+    node.onended = () => clipsOn.delete(node);
   }
-  async function playClip(src) {
-    if (!wakeAudio()) return false;
-    try {
-      const buf = await (clipBank[src] || (clipBank[src] = fetch(src).then((res) => {
+  function loadClip(src) {
+    if (!wakeAudio()) return Promise.resolve(null);
+    if (!clipBank[src]) {
+      clipBank[src] = fetch(src).then((res) => {
         if (!res.ok) throw new Error('no clip');
         return res.arrayBuffer();
-      }).then(decode)));
-      startBuffer(buf);
-      return true;
-    } catch (e) {
-      delete clipBank[src];
-      return false;
+      }).then(decode).catch(() => {
+        delete clipBank[src];
+        return null;
+      });
     }
+    return clipBank[src];
+  }
+  // Says one thing in the rider's character voice: a recorded or fetched sound, or the device's voice when there isn't
+  // one. Something new stops whatever is being said; "after" waits for it instead. still() is asked once the sound is
+  // ready, so a reading that arrives after he has moved on stays quiet.
+  function voiceTurn(sound, device, after, still) {
+    if (!after) stopSpeaking();
+    const asked = readNo;
+    const ok = () => asked === readNo && (!still || still());
+    if (!sound && !after) return device();
+    sayChain = Promise.all([sayChain, sound]).then(([, buf]) => {
+      if (!ok()) return;
+      if (buf) return playBuffer(buf);
+      // The device's voice waits for a sound still playing, so the two never talk over each other.
+      const wait = ac ? clipEnds - ac.currentTime : 0;
+      if (wait > 0.05) {
+        setTimeout(() => {
+          if (ok()) device();
+        }, wait * 1000);
+      } else device();
+    }).catch(() => {});
+  }
+  // The device's own voice, cast for the character.
+  function deviceSay(who, text, lang) {
+    if (window.speechSynthesis) window.speechSynthesis.speak(dress(new SpeechSynthesisUtterance(text), who, lang || 'en-ZA'));
   }
   function clipFor(id, line) {
     const who = GEAR.voice.items[id];
@@ -18719,15 +18752,20 @@ ${t && H > W && W < 600 ? '<li>Tip: turn your phone sideways for a bigger view.<
   function sayAs(id, line) {
     const who = GEAR.voice.items[id] || GEAR.voice.items.vStock;
     const src = clipFor(id, line);
-    if (!src) return speakAs(who, line);
-    playClip(src).then((played) => {
-      if (!played) speakAs(who, line);
-    });
+    voiceTurn(src ? loadClip(src) : fetchSay(id, line), () => deviceSay(who, line));
   }
-  function speakAs(who, text) {
-    if (!window.speechSynthesis) return;
-    stopSpeaking();
-    window.speechSynthesis.speak(dress(new SpeechSynthesisUtterance(text), who, 'en-ZA'));
+  // Reads a card in the rider's character voice a few sentences at a time, since holeshot-say takes 700 characters at
+  // most. Afrikaans cards stay with the device, as Kokoro only speaks English.
+  function sayCard(text, english) {
+    const id = P().gear.voice || 'vStock';
+    const who = voiceOf(P());
+    const parts = [];
+    for (const s of text.match(/[^.!?]+[.!?]*\s*/g) || []) {
+      const last = parts.length - 1;
+      if (last >= 0 && parts[last].length + s.length <= 600) parts[last] += s;
+      else parts.push(s);
+    }
+    parts.map((s) => s.trim()).filter(Boolean).forEach((part, i) => voiceTurn(english ? fetchSay(id, part) : null, () => deviceSay(who, part), i > 0));
   }
   // What the rider's character says about an answer, or nothing for the standard voice.
   function charLine(ok) {
@@ -18776,21 +18814,11 @@ ${t && H > W && W < 600 ? '<li>Tip: turn your phone sideways for a bigger view.<
   function readAloud() {
     const r = ui.run;
     if (!r) return;
-    stopSpeaking();
     r.readOn = true;
     const q = r.q;
     const text = readText(q);
-    const device = () => {
-      if (window.speechSynthesis && ui.run && ui.run.q === q) window.speechSynthesis.speak(dress(new SpeechSynthesisUtterance(text), voiceOf(P()), q.lang || 'en-ZA'));
-    };
-    if (!sayLang(q)) return device();
-    const asked = readNo;
-    fetchSay(P().gear.voice || 'vStock', text).then((buf) => {
-      // Moved on, tapped again or stopped while it was on its way: say nothing.
-      if (asked !== readNo || !ui.run || ui.run.q !== q) return;
-      if (buf) startBuffer(buf);
-      else device();
-    });
+    // Moved on, tapped again or stopped while it was on its way: say nothing.
+    voiceTurn(sayLang(q) ? fetchSay(P().gear.voice || 'vStock', text) : null, () => deviceSay(voiceOf(P()), text, q.lang), false, () => ui.run && ui.run.q === q);
   }
   // Once he has used Read in a race, the next question's reading is fetched as it appears, so his tap plays at once.
   function readNext() {
@@ -19819,7 +19847,8 @@ ${t && H > W && W < 600 ? '<li>Tip: turn your phone sideways for a bigger view.<
         const copy = box.cloneNode(true);
         copy.querySelectorAll('button, .walk-word, .walk-tile').forEach((b) => b.remove());
         const words = box.querySelectorAll('.walk-word').length ? [...box.querySelectorAll('.walk-word')].map((b) => b.textContent).join(' ') : '';
-        speakAs(voiceOf(P()), `${copy.innerText.replace(/\s+/g, ' ').trim()} ${words}`.trim());
+        const q = ui.run && ui.run.q;
+        sayCard(`${copy.innerText.replace(/\s+/g, ' ').trim()} ${words}`.trim(), q ? sayLang(q) : ui.subject !== 'afrikaans');
         break;
       }
       case 'parents-share':
