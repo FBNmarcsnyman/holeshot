@@ -16184,7 +16184,9 @@ ${t && H > W && W < 600 ? '<li>Tip: turn your phone sideways for a bigger view.<
         sample: 'Hi! I am Rookie Rik! I am going to beat you to the first corner!',
         right: ['Yes! Even I did not know that one!', 'Whoa! Can you do my homework too?', 'Braaap! You are so good it is annoying!', 'Nice one! I am telling everyone it was me.'],
         wrong: ['Whoa, I nearly picked that one too!', 'Oops! Even the pros stall it sometimes.', 'Wrong turn, champ! Back on the track, you have got this.'] },
-      vSpanner: { label: 'Uncle Spanner', cost: 0, c: '#4A5568', c2: '#F2C200', prefer: ['Connor', 'Malcolm', 'Ryan', 'Gordon', 'Rishi', 'Daniel', 'Google UK English Male', 'George'], pitch: 0.85, rate: 0.9,
+      // His recordings are a British man, so British voices come first. Rishi (Indian English) was taken out on 10 November:
+      // Jordy's iPad gave it to him and it read Afrikaans badly.
+      vSpanner: { label: 'Uncle Spanner', cost: 0, c: '#4A5568', c2: '#F2C200', prefer: ['Ryan', 'Daniel', 'Arthur', 'Malcolm', 'Connor', 'Gordon', 'Google UK English Male', 'George'], pitch: 0.85, rate: 0.9,
         sample: 'Uncle Spanner here. I have seen your riding. We need to talk.',
         right: ['Finally! I can put my spanner down.', 'Hmm. Not bad. Do not tell anyone I said so.', 'Correct. I almost smiled. Almost.', 'Good. That is the first thing today that has worked properly.'],
         wrong: ['Not that one. Every engine needs a second kick.', 'Hmm. Let us take that apart and see how it works.', 'Close. Even a good mechanic checks the manual.', 'Put the spanner down a sec. Have a look at your rule card.'] },
@@ -16364,7 +16366,7 @@ ${t && H > W && W < 600 ? '<li>Tip: turn your phone sideways for a bigger view.<
   // ---------- staying up to date ----------
   // An open tab or a home screen app keeps running the page it first loaded, old prices and all. So it asks which version
   // is live when it comes back into view and every few minutes, and swaps over between races. build.mjs fills in BUILD.
-  const BUILD = 'f9e9738124';
+  const BUILD = '183a58f225';
   const BACK_KEY = 'holeshot.back.v1';
   const TRIED_KEY = 'holeshot.tried.v1';
   let liveBuild = null;
@@ -19572,18 +19574,22 @@ ${t && H > W && W < 600 ? '<li>Tip: turn your phone sideways for a bigger view.<
   let voicePicks = {};
   if (window.speechSynthesis && window.speechSynthesis.addEventListener) window.speechSynthesis.addEventListener('voiceschanged', () => { voicePicks = {}; });
   // Characters choose in this order, and each one avoids a voice an earlier one took, so they sound different.
+  // The rider's own character always chooses first, so he gets his best voice and never one left over by the others.
   const CAST_ORDER = ['vStock', 'vPiet', 'vDave', 'vSpanner', 'vDad', 'vRik', 'vTurbo'];
   const named = (v, n) => new RegExp(`\\b${n}\\b`, 'i').test(v.name);
-  function castVoices(lang) {
-    if (voicePicks[lang] !== undefined) return voicePicks[lang];
+  // Indian English voices (Rishi, Lekha, Veena on an iPad) read Afrikaans and South African names badly, so they are a last resort.
+  const VOICE_FAR = (v) => /^en-in/i.test((v.lang || '').replace('_', '-')) || /\b(rishi|lekha|veena)\b/i.test(v.name);
+  function castVoices(lang, first) {
+    const key = `${lang}|${first || ''}`;
+    if (voicePicks[key] !== undefined) return voicePicks[key];
     const voices = window.speechSynthesis.getVoices();
     const want = lang.replace('_', '-').toLowerCase();
     const mine = voices.filter((v) => (v.lang || '').replace('_', '-').toLowerCase().slice(0, 2) === want.slice(0, 2));
     // No voice for this language (often Afrikaans on an iPad): the English voices read it, as before.
-    if (!mine.length && !want.startsWith('en')) return castVoices('en-ZA');
+    if (!mine.length && !want.startsWith('en')) return castVoices('en-ZA', first);
     const taken = new Set();
     const cast = {};
-    for (const id of CAST_ORDER) {
+    for (const id of first ? [first, ...CAST_ORDER.filter((x) => x !== first)] : CAST_ORDER) {
       const who = GEAR.voice.items[id];
       if (!who) continue;
       let best = null;
@@ -19593,6 +19599,7 @@ ${t && H > W && W < 600 ? '<li>Tip: turn your phone sideways for a bigger view.<
         const key = `${v.name} ${v.voiceURI || ''}`;
         let score = VOICE_GOOD.test(key) ? 40 : VOICE_OK.test(key) ? 20 : 0;
         if (VOICE_BAD.test(v.name) && !who.robot) score -= 60;
+        if (VOICE_FAR(v)) score -= 80;
         if (vl === want) score += 6;
         const at = (who.prefer || []).findIndex((n) => named(v, n));
         if (at >= 0) score += 30 - at * 2;
@@ -19607,12 +19614,12 @@ ${t && H > W && W < 600 ? '<li>Tip: turn your phone sideways for a bigger view.<
       if (best) taken.add(best);
       cast[id] = best;
     }
-    if (voices.length) voicePicks[lang] = cast;
+    if (voices.length) voicePicks[key] = cast;
     return cast;
   }
   function pickVoice(lang, who) {
     const id = Object.keys(GEAR.voice.items).find((k) => GEAR.voice.items[k] === who) || 'vStock';
-    return castVoices(lang)[id] || null;
+    return castVoices(lang, id)[id] || null;
   }
   // Safari on an iPad never lets a website use downloaded voices, and downloading a better copy can even hide the basic one,
   // so an iPad gets no download tip. An iPad can call itself a Mac, so a touch screen gives it away.
@@ -21065,6 +21072,8 @@ ${t && H > W && W < 600 ? '<li>Tip: turn your phone sideways for a bigger view.<
   // Lets test scripts see the game's state. Nothing in the game uses these.
   RS._ui = ui;
   RS._render = render;
+  // For test/voices: the device voice a character would read with.
+  RS._voiceFor = (lang, id) => pickVoice(lang, GEAR.voice.items[id]);
   logSend();
   syncNow();
   RS._applySpeech = applySpeech;
