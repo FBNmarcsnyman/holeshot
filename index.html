@@ -9713,6 +9713,236 @@ Jordy's Science test, Tuesday 10 November: Planet Earth and Beyond. Written from
   });
 })(typeof window !== 'undefined' ? window : globalThis);
 
+/* Afrikaans, die strand: a revision section for his Afrikaans taaltoets on Friday 13 November 2026.
+   It follows the parts of a beach-themed practice sheet: STOMPI, bywoorde and byvoeglike naamwoorde, verlede en
+   toekomende tyd, ontkenning, trappe van vergelyking, voegwoorde, besitlike voornaamwoorde, die intensiewe vorm and
+   strand words. Original sentences, nothing copied from the sheet. See ADDING-QUESTIONS.md. */
+(function (root) {
+  'use strict';
+  const RS = root.RS;
+  const pack = RS.packs.kash;
+  const noted = (section, notes, more) => Object.assign(section, { notes }, more);
+
+  RS.addSection('kash', '2026-11-12-kash-strand', 'afrikaans', {
+    id: 'kaf_strand',
+    photo: 9,
+    title: 'Die strand: extra laps',
+    blurb: 'Tye, ontkenning, voegwoorde, voornaamwoorde and more',
+    opts: { lang: 'af-ZA', strict: true },
+    items: [
+      // ---------- A. STOMPI: woordorde ----------
+      { q: `Rangskik die woorde: vanoggend / die seuntjie / stadig / op die sand / loop`, a: `Die seuntjie loop vanoggend stadig op die sand.`, w: [`Die seuntjie loop stadig vanoggend op die sand.`, `Die seuntjie loop op die sand vanoggend stadig.`, `Vanoggend die seuntjie loop stadig op die sand.`], why: `S V1 T M P: die seuntjie (S), loop (V1), vanoggend (T), stadig (M), op die sand (P).`, h: `STOMPI: tyd (wanneer) first, then wyse (hoe), then plek (waar).`, nope: { [`Vanoggend die seuntjie loop stadig op die sand.`]: `If a sentence starts with a time word, the verb must come straight after it: Vanoggend loop die seuntjie ...` } },
+      { q: `Rangskik die woorde: my pa / elke oggend / in die see / swem / vinnig`, a: `My pa swem elke oggend vinnig in die see.`, w: [`My pa swem vinnig elke oggend in die see.`, `My pa swem in die see elke oggend vinnig.`, `My pa elke oggend swem vinnig in die see.`], why: `S V1 T M P: my pa, swem, elke oggend (wanneer), vinnig (hoe), in die see (waar).`, h: `Tyd comes before wyse, and wyse before plek.` },
+      { q: `Rangskik die woorde: die kinders / vanmiddag / wil / in die rotspoel / swem`, a: `Die kinders wil vanmiddag in die rotspoel swem.`, w: [`Die kinders wil swem vanmiddag in die rotspoel.`, `Die kinders wil in die rotspoel vanmiddag swem.`, `Die kinders vanmiddag wil in die rotspoel swem.`], why: `Wil is V1, so it comes second. Swem is V2, so it goes right at the end.`, h: `With two verbs, the second verb (V2) goes to the end.` },
+      { q: `Rangskik die woorde: Ma / vandag / 'n sonhoed / by die winkel / koop`, a: `Ma koop vandag 'n sonhoed by die winkel.`, w: [`Ma koop by die winkel vandag 'n sonhoed.`, `Ma vandag koop 'n sonhoed by die winkel.`, `Ma koop 'n sonhoed by die winkel vandag.`], why: `S V1 T O P: Ma, koop, vandag, 'n sonhoed (die objek), by die winkel.`, h: `S V1 T O M P: the object comes after the time word.` },
+      { tf: true, q: `True or false: in STOMPI, the time word (wanneer?) comes before the place (waar?).`, why: `T comes before P in S V1 T O M P V2 I. Tyd kom voor wyse en plek.` },
+
+      // ---------- B. Bywoorde en byvoeglike naamwoorde ----------
+      { q: `"Die bruin hond hardloop vanoggend vinnig langs die nat sand." Wat is die bywoord van tyd?`, a: `vanoggend`, w: [`vinnig`, `bruin`, `nat`], why: `A bywoord van tyd answers "wanneer?". When does the dog run? Vanoggend.`, h: `Ask: wanneer?`, nope: { [`vinnig`]: `Vinnig tells you how the dog runs, so it is a bywoord van wyse.` } },
+      { q: `"Die bruin hond hardloop vanoggend vinnig langs die nat sand." Wat is die bywoord van wyse?`, a: `vinnig`, w: [`vanoggend`, `bruin`, `nat`], why: `A bywoord van wyse answers "hoe?". How does the dog run? Vinnig.`, h: `Ask: hoe?`, nope: { [`bruin`]: `Bruin describes the dog, a noun, so it is a byvoeglike naamwoord.` } },
+      { q: `"Die bruin hond hardloop vanoggend vinnig langs die nat sand." Watter byvoeglike naamwoord beskryf die hond?`, a: `bruin`, w: [`nat`, `vinnig`, `vanoggend`], why: `Bruin describes the hond. A byvoeglike naamwoord describes a noun.`, nope: { [`nat`]: `Nat describes the sand, not the dog.` } },
+      { q: `"Die bruin hond hardloop vanoggend vinnig langs die nat sand." Watter byvoeglike naamwoord beskryf die sand?`, a: `nat`, w: [`bruin`, `vinnig`, `vanoggend`], why: `Nat sits just before sand and describes it.`, nope: { [`bruin`]: `Bruin describes the dog, not the sand.` } },
+      { q: `Skryf die bywoord van tyd neer: "Die moeë visser het gister stil op die lang pier gesit."`, t: [`gister`], why: `Gister answers "wanneer?".`, h: `Which word tells you when?` },
+      { q: `Skryf die bywoord van wyse neer: "Die moeë visser het gister stil op die lang pier gesit."`, t: [`stil`], why: `Stil answers "hoe?": how did he sit? Stil.`, h: `Which word tells you how he sat?` },
+      { q: `Skryf die byvoeglike naamwoord neer wat die pier beskryf: "Die moeë visser het gister stil op die lang pier gesit."`, t: [`lang`], why: `Lang comes just before pier and describes it.`, h: `Look at the word just before "pier".` },
+
+      // ---------- C. Verlede tyd ----------
+      { q: `Verlede tyd: "Die seun bou 'n sandkasteel."`, a: `Die seun het 'n sandkasteel gebou.`, w: [`Die seun het 'n sandkasteel bou.`, `Die seun het 'n sandkasteel gebouw.`, `Die seun sal 'n sandkasteel bou.`], why: `Verlede tyd: het + ge- + the verb at the end. Bou becomes het ... gebou.`, h: `Remember: het + ge-.`, nope: { [`Die seun het 'n sandkasteel gebouw.`]: `A gebouw is a building. The verb is bou, so it is gebou.`, [`Die seun sal 'n sandkasteel bou.`]: `Sal is for the future, not the past.` } },
+      { q: `Verlede tyd: "Die son is baie warm."`, a: `Die son was baie warm.`, w: [`Die son het baie warm gewees.`, `Die son sal baie warm wees.`, `Die son het baie warm.`], why: `In the past tense, is becomes was.`, h: `What does "is" become in the past?` },
+      { q: `Verlede tyd: "Ons het 'n groot strandsambreel."`, a: `Ons het 'n groot strandsambreel gehad.`, w: [`Ons het 'n groot strandsambreel gehet.`, `Ons was 'n groot strandsambreel.`, `Ons het 'n groot strandsambreel.`], why: `Het (have) becomes het ... gehad in the past.`, h: `What does het change to in the past?`, nope: { [`Ons het 'n groot strandsambreel.`]: `That is still the present. The past needs gehad at the end.` } },
+      { q: `Verlede tyd: "Die kinders moet hul hoede dra."`, a: `Die kinders moes hul hoede dra.`, w: [`Die kinders moet hul hoede gedra.`, `Die kinders het hul hoede gemoet.`, `Die kinders sal hul hoede moet dra.`], why: `Moet becomes moes, and dra stays at the end as it is.`, h: `Moet becomes ...?` },
+      { q: `Verlede tyd, begin met "Gister": "Pa vang 'n groot vis."`, a: `Gister het Pa 'n groot vis gevang.`, w: [`Gister Pa het 'n groot vis gevang.`, `Gister het Pa 'n groot vis vang.`, `Gister vang Pa 'n groot vis gevang.`], why: `After Gister comes het, then Pa, and gevang goes to the end.`, h: `When a sentence starts with a time word, the verb (het) comes next.`, nope: { [`Gister Pa het 'n groot vis gevang.`]: `After Gister the verb must come straight away: Gister het Pa ...` } },
+      { q: `Verlede tyd: "Die meisie ontdek 'n klein krap."`, a: `Die meisie het 'n klein krap ontdek.`, w: [`Die meisie het 'n klein krap geontdek.`, `Die meisie ontdek 'n klein krap gehad.`, `Die meisie sal 'n klein krap ontdek.`], why: `Verbs that start with be-, ge-, her-, ont- or ver- don't get ge-. So ontdek stays ontdek: het ... ontdek.`, h: `Some verbs never take ge-. Listen to how ontdek starts.`, nope: { [`Die meisie het 'n klein krap geontdek.`]: `Ontdek starts with ont-, and those verbs don't take ge-.` } },
+      { q: `Verlede tyd: "Die golwe word groot."`, a: `Die golwe het groot geword.`, w: [`Die golwe het groot word.`, `Die golwe word groot gehad.`, `Die golwe sal groot word.`], why: `Word becomes het ... geword, and geword goes to the end.`, h: `het + ge-.` },
+      { q: `Vul in, verlede tyd: "Ek het 'n blou emmer." → "Ek het 'n blou emmer ___."`, t: [`gehad`], why: `Het becomes het ... gehad.`, h: `It starts with ge-.` },
+      { q: `Vul in, verlede tyd: "Die water is koud." → "Die water ___ koud."`, t: [`was`], why: `Is becomes was.`, h: `Three letters.` },
+
+      // ---------- D. Toekomende tyd ----------
+      { q: `Toekomende tyd: "Ons speel vlugbal op die strand."`, a: `Ons sal vlugbal op die strand speel.`, w: [`Ons sal speel vlugbal op die strand.`, `Ons het vlugbal op die strand gespeel.`, `Ons sal vlugbal op die strand gespeel.`], why: `Toekomende tyd: sal + the verb at the end. Speel moves to the end.`, h: `sal + werkwoord, and the verb goes to the end.`, nope: { [`Ons het vlugbal op die strand gespeel.`]: `Het ... gespeel is the past tense.` } },
+      { q: `Toekomende tyd, begin met "Môre": "Die see is kalm."`, a: `Môre sal die see kalm wees.`, w: [`Môre sal die see kalm is.`, `Môre die see sal kalm wees.`, `Môre was die see kalm.`], why: `In the future, is becomes sal ... wees. After Môre comes sal straight away.`, h: `What does is change to after sal?` },
+      { q: `Toekomende tyd: "Ek het 'n nuwe swembroek."`, a: `Ek sal 'n nuwe swembroek hê.`, w: [`Ek sal 'n nuwe swembroek het.`, `Ek het 'n nuwe swembroek gehad.`, `Ek sal 'n nuwe swembroek gehad.`], why: `Het becomes sal ... hê in the future.`, h: `What does het change to after sal?`, nope: { [`Ek sal 'n nuwe swembroek het.`]: `After sal, het changes to hê.` } },
+      { q: `Toekomende tyd, begin met "Volgende week": "Die meisies kan op die strand draf."`, a: `Volgende week sal die meisies op die strand kan draf.`, w: [`Volgende week die meisies sal op die strand kan draf.`, `Volgende week sal die meisies op die strand draf kan.`, `Volgende week kan die meisies op die strand gedraf.`], why: `After Volgende week comes sal. Kan draf moves to the end.`, h: `After the time words, sal comes next.` },
+      { q: `Toekomende tyd: "Die kinders eet toebroodjies."`, a: `Die kinders sal toebroodjies eet.`, w: [`Die kinders sal eet toebroodjies.`, `Die kinders sal toebroodjies geëet.`, `Die kinders het toebroodjies geëet.`], why: `Sal comes after the subject, and eet goes to the end with no ge-.`, h: `sal + werkwoord at the end.` },
+      { q: `Vul in, toekomende tyd: "Die water is koud." → "Môre sal die water koud ___."`, t: [`wees`], why: `Is becomes sal ... wees.`, h: `Is changes when you use sal.` },
+      { q: `Vul in, toekomende tyd: "Hy het 'n branderplank." → "Hy sal 'n branderplank ___."`, t: [`hê`, `he`], why: `Het becomes sal ... hê.`, h: `Het changes after sal.` },
+
+      // ---------- E. Ontkenning ----------
+      { q: `Ontkenning: "Die seun swem in die see."`, a: `Die seun swem nie in die see nie.`, w: [`Die seun swem nie in die see.`, `Die seun nie swem in die see nie.`, `Die seun swem in die see nie.`], why: `Use nie ... nie: the first nie after the verb, the second at the end.`, h: `Nie ... nie.`, nope: { [`Die seun swem nie in die see.`]: `The second nie is missing at the end.` } },
+      { q: `Ontkenning, begin met "Nee,": "Is daar iets in jou emmer?"`, a: `Nee, daar is niks in my emmer nie.`, w: [`Nee, daar is niks in my emmer.`, `Nee, daar is iemand in my emmer nie.`, `Nee, daar is iets in my emmer nie.`], why: `Iets becomes niks, and the sentence ends with nie. Jou becomes my, because you are answering.`, h: `Iets becomes niks.` },
+      { q: `Ontkenning: "Iemand bou 'n sandkasteel."`, a: `Niemand bou 'n sandkasteel nie.`, w: [`Niemand bou 'n sandkasteel.`, `Nooit bou 'n sandkasteel nie.`, `Niks bou 'n sandkasteel nie.`], why: `Iemand becomes niemand, and nie goes at the end.`, h: `Iemand becomes niemand.`, nope: { [`Niemand bou 'n sandkasteel.`]: `The nie at the end is missing.` } },
+      { q: `Ontkenning: "Ons gaan altyd strand toe."`, a: `Ons gaan nooit strand toe nie.`, w: [`Ons gaan nooit strand toe.`, `Ons nooit gaan strand toe nie.`, `Ons gaan altyd nie strand toe nie.`], why: `Altyd becomes nooit, and nie goes at the end.`, h: `Altyd becomes nooit.` },
+      { q: `Vul in: "Ek eet iets." → "Ek eet ___ nie."`, t: [`niks`], why: `Iets becomes niks.`, h: `The opposite of iets.` },
+      { q: `Vul in: "Daar is iemand in die water." → "Nee, daar is ___ in die water nie."`, t: [`niemand`], why: `Iemand becomes niemand.`, h: `Add one letter to the front of iemand.` },
+
+      // ---------- F. Trappe van vergelyking ----------
+      { q: `Die water is vandag ___ as gister. (koud)`, t: [`kouer`], why: `Koud loses its d: koud, kouer, koudste. The clue "as" means vergrotende trap.`, h: `"as" means vergrotende trap. Koud drops a letter.` },
+      { q: `Die blou boot is die ___ boot in die hawe. (vinnig)`, t: [`vinnigste`], why: `"die" ... means the most of all, so it's the oortreffende trap: vinnigste.`, h: `"die" means oortreffende trap: -ste.` },
+      { q: `Hierdie duin is ___ as daardie een. (hoog)`, a: `hoër`, w: [`hoeër`, `hoger`, `hoogste`], why: `Hoog, hoër, hoogste. One o and the g fall away, and the e gets a deelteken.`, nope: { [`hoogste`]: `"as" means only two are compared, so it's the vergrotende trap, not -ste.` } },
+      { q: `Jou toebroodjie is ___ as myne. (lekker)`, t: [`lekkerder`], why: `Words that end in -r add -der: lekker, lekkerder, lekkerste.`, h: `Words ending in r add -der.` },
+      { q: `My skulp is die ___ skulp op die strand. (mooi)`, t: [`mooiste`], why: `"die" ... means the most of all: mooi, mooier, mooiste.`, h: `Oortreffende trap ends in -ste.` },
+      { q: `Die skilpad is ___ as die krap. (stadig)`, t: [`stadiger`], why: `"as" means vergrotende trap: stadig, stadiger, stadigste.`, h: `Vergrotende trap ends in -er.` },
+      { q: `Wat is die vergrotende trap van "lank"?`, a: `langer`, w: [`lanker`, `langste`, `lankerder`], why: `Lank, langer, langste. The k becomes g.`, nope: { [`langste`]: `Langste is the oortreffende trap.` } },
+      { tf: true, q: `True or false: "die grootste" is die oortreffende trap.`, why: `Groot, groter, grootste. Die ... -ste is the oortreffende trap.` },
+
+      // ---------- G. Voegwoorde ----------
+      { q: `Verbind met "omdat": Ons gaan huis toe. Dit reën.`, a: `Ons gaan huis toe omdat dit reën.`, w: [`Ons gaan huis toe omdat reën dit.`, `Omdat ons gaan huis toe dit reën.`, `Ons gaan huis toe en omdat dit reën.`], why: `Omdat sends the verb to the end: omdat dit reën.`, h: `After omdat, the verb moves to the end.` },
+      { q: `Verbind met "nadat": Ons eet roomys. Ons speel in die branders.`, a: `Ons eet roomys nadat ons in die branders speel.`, w: [`Ons eet roomys nadat ons speel in die branders.`, `Ons eet roomys nadat speel ons in die branders.`, `Nadat ons eet roomys ons speel in die branders.`], why: `Nadat sends the verb to the end: nadat ons in die branders speel.`, h: `After nadat, the verb moves to the end.`, nope: { [`Ons eet roomys nadat ons speel in die branders.`]: `After nadat, speel must go to the very end.` } },
+      { q: `Verbind met "maar": Die strand is mooi. Die wind waai sterk.`, a: `Die strand is mooi, maar die wind waai sterk.`, w: [`Die strand is mooi, maar die wind sterk waai.`, `Die strand is mooi, maar waai die wind sterk.`, `Die strand is mooi maar sterk die wind waai.`], why: `Maar keeps the normal order: die wind waai sterk.`, h: `En and maar keep the normal word order.`, nope: { [`Die strand is mooi, maar die wind sterk waai.`]: `Maar doesn't move the verb. Only words like omdat and nadat do.` } },
+      { q: `Verbind met "en": Ma pak die mandjie. Pa dra die stoele.`, a: `Ma pak die mandjie en Pa dra die stoele.`, w: [`Ma pak die mandjie en Pa die stoele dra.`, `Ma pak die mandjie en dra Pa die stoele.`, `Ma pak en die mandjie Pa dra die stoele.`], why: `En just joins the two sentences. Nothing moves.`, h: `En keeps the normal order.` },
+      { q: `Verbind met "omdat": Die meisie dra 'n hoed. Die son brand.`, a: `Die meisie dra 'n hoed omdat die son brand.`, w: [`Die meisie dra 'n hoed omdat brand die son.`, `Die meisie dra 'n hoed omdat die son is brand.`, `Die meisie dra omdat 'n hoed die son brand.`], why: `Omdat sends the verb brand to the end.`, h: `After omdat, the verb moves to the end.` },
+      { tf: true, q: `True or false: after "nadat", the verb moves to the end of the sentence.`, why: `Omdat and nadat send the verb to the end. En and maar don't.` },
+      { tf: false, q: `True or false: after "maar", the verb moves to the end of the sentence.`, why: `Maar keeps the normal order, just like en.`, not: `Only voegwoorde like omdat and nadat move the verb.` },
+
+      // ---------- H. Besitlike voornaamwoorde ----------
+      { q: `Ek het 'n emmer. Die emmer is ___.`, t: [`myne`], why: `Ek → my emmer → die emmer is myne.`, h: `The word at the end of the sentence ends in -ne.` },
+      { q: `Jy het 'n sonbril. Die sonbril is ___.`, t: [`joune`], why: `Jy → jou sonbril → die sonbril is joune.`, h: `The word at the end of the sentence ends in -ne.` },
+      { q: `Die seun het 'n visstok. ___ visstok is lank.`, t: [`Sy`], why: `A boy's thing is sy ... : sy visstok.`, h: `His, before the noun.` },
+      { q: `Die seun het 'n visstok. Die visstok is ___.`, t: [`syne`], why: `Sy visstok → die visstok is syne.`, h: `The word at the end of the sentence ends in -ne.` },
+      { q: `Die meisie het 'n handdoek. ___ handdoek is pienk.`, t: [`Haar`], why: `A girl's thing is haar ... : haar handdoek.`, h: `Her, before the noun.` },
+      { q: `Die meisie het 'n handdoek. Die handdoek is ___.`, a: `hare`, w: [`haar`, `syne`, `sy`], why: `Haar handdoek → die handdoek is hare.`, nope: { [`haar`]: `Haar goes before the noun. At the end of the sentence it's hare.`, [`syne`]: `Syne is for a boy.` } },
+
+      // ---------- I. Intensiewe vorm ----------
+      { q: `Skryf die intensiewe vorm: koud`, t: [`yskoud`, `bitterkoud`, `vrieskoud`], why: `Yskoud: as cold as ice. Bitterkoud and vrieskoud are right too.`, h: `Add a word in front that makes it extra strong.` },
+      { q: `Skryf die intensiewe vorm: stil`, t: [`doodstil`, `muisstil`, `tjoepstil`], why: `Doodstil, muisstil or tjoepstil: very, very quiet.`, h: `Add a word in front that makes it extra strong.` },
+      { q: `Skryf die intensiewe vorm: maklik`, t: [`doodmaklik`], why: `Doodmaklik: very easy.`, h: `Add a word in front that makes it extra strong.` },
+      { q: `Skryf die intensiewe vorm: swaar`, t: [`loodswaar`], why: `Loodswaar: as heavy as lead.`, h: `Add a word in front that makes it extra strong.` },
+
+      // ---------- J. Woordeskat: die strand ----------
+      { q: `Wat is "lighthouse" in Afrikaans?`, t: [`vuurtoring`], why: `'n Vuurtoring: a tower with a fire (light) on top.`, h: `A tall tower with a light on top, near the sea.` },
+    ],
+  });
+
+  // ---------- The rule card, and putting it first ----------
+  const topics = pack.subjects.afrikaans.topics;
+  const section = topics.find((t) => t.id === 'kaf_strand');
+  noted(section, [
+    `STOMPI: S V1 T O M P V2 I. Tyd (wanneer) kom voor wyse (hoe) en plek (waar).`,
+    `Verlede tyd: het + ge-. Is word was. Het word het ... gehad. Moet word moes. Ont-, be-, ver-, her- en ge- kry nie ge- nie.`,
+    `Toekomende tyd: sal + werkwoord aan die einde. Is word sal ... wees. Het word sal ... hê.`,
+    `Ontkenning: nie ... nie. Iets word niks. Iemand word niemand. Altyd word nooit.`,
+    `Trappe: "as" = vergrotende trap (groter). "die" = oortreffende trap (grootste).`,
+    `En en maar hou die gewone volgorde. Omdat en nadat skuif die werkwoord na die einde.`,
+    `my, myne. jou, joune. sy, syne. haar, hare.`,
+  ]);
+  // His newest test comes first on the track, and comes up more often until it is strong.
+  topics.splice(topics.indexOf(section), 1);
+  topics.unshift(section);
+  const subject = pack.subjects.afrikaans;
+  subject.source = 'Taaltoets, Friday 13 November';
+  subject.scope = 'Die strand: tye, ontkenning, voegwoorde and the earlier mind maps';
+  subject.focus = ['kaf_strand', ...(subject.focus || [])];
+  subject.startWith = ['kaf_strand', ...(subject.startWith || [])];
+
+  pack.exams.push({ date: '2026-11-13', subject: 'afrikaans', label: 'Afrikaans' });
+})(typeof window !== 'undefined' ? window : globalThis);
+
+/* Afrikaans revision test, die strand: the questions of the practice sheet for his taaltoets on Friday
+   13 November 2026, in the sheet's order of parts (A to H). It is his job for today on the Home screen until
+   every question has been answered (must, on the test in pack.exams). */
+(function (root) {
+  'use strict';
+  const RS = root.RS;
+  const pack = RS.packs.kash;
+  const noted = (section, notes, more) => Object.assign(section, { notes }, more);
+  const ends = `The word at the end of the sentence ends in -ne.`;
+  const strong = `Add a word in front that makes it extra strong.`;
+
+  RS.addSection('kash', '2026-11-12-kash-toets', 'afrikaans', {
+    id: 'kaf_toets',
+    photo: 8,
+    title: 'Oefentoets: die strand',
+    blurb: 'Revision test for Friday: do every question',
+    opts: { lang: 'af-ZA', strict: true },
+    items: [
+      // ---------- Afdeling A: woordorde en woordsoorte ----------
+      { q: `1.1 Rangskik die woorde: môre / die seun / vinnig / op die strand / hardloop`, a: `Die seun hardloop môre vinnig op die strand.`, w: [`Die seun hardloop vinnig môre op die strand.`, `Die seun hardloop op die strand môre vinnig.`, `Môre die seun hardloop vinnig op die strand.`], why: `S V1 T M P: die seun, hardloop, môre (wanneer), vinnig (hoe), op die strand (waar).`, h: `STOMPI: tyd comes before wyse and plek.` },
+      { q: `1.2 Rangskik die woorde: die meisies / vanmiddag / rustig / in die see / speel`, a: `Die meisies speel vanmiddag rustig in die see.`, w: [`Die meisies speel rustig vanmiddag in die see.`, `Die meisies speel in die see vanmiddag rustig.`, `Vanmiddag die meisies speel rustig in die see.`], why: `S V1 T M P: die meisies, speel, vanmiddag (wanneer), rustig (hoe), in die see (waar).`, h: `STOMPI: tyd comes before wyse and plek.` },
+      { q: `2.1 "Die vrolike kinders speel vandag rustig op die warm sand." Skryf die bywoord van tyd neer.`, t: [`vandag`], why: `Vandag answers "wanneer?".`, h: `Bywoord van tyd = wanneer?` },
+      { q: `2.2 "Die vrolike kinders speel vandag rustig op die warm sand." Skryf die bywoord van wyse neer.`, t: [`rustig`], why: `Rustig answers "hoe?": how do they play? Rustig.`, h: `Bywoord van wyse = hoe?` },
+      { q: `2.3 "Die vrolike kinders speel vandag rustig op die warm sand." Skryf die byvoeglike naamwoord wat die kinders beskryf neer.`, t: [`vrolike`, `vrolik`], why: `Vrolike comes just before kinders and describes them.`, h: `Look at the word just before "kinders".` },
+      { q: `2.4 "Die vrolike kinders speel vandag rustig op die warm sand." Skryf die byvoeglike naamwoord wat die sand beskryf neer.`, t: [`warm`], why: `Warm comes just before sand and describes it.`, h: `Look at the word just before "sand".` },
+
+      // ---------- Afdeling B: tye ----------
+      { q: `3.1 Verlede tyd: "Die meisie speel met 'n bal."`, a: `Die meisie het met 'n bal gespeel.`, w: [`Die meisie het met 'n bal speel.`, `Die meisie het gespeel met 'n bal.`, `Die meisie sal met 'n bal speel.`], why: `Het + ge-: speel becomes het ... gespeel, at the end.`, h: `Het + ge-, and the verb goes to the end.` },
+      { q: `3.2 Verlede tyd: "Die water is warm."`, a: `Die water was warm.`, w: [`Die water het warm gewees.`, `Die water sal warm wees.`, `Die water het warm.`], why: `Is becomes was.`, h: `What does is change to in the past?` },
+      { q: `3.3 Verlede tyd, begin met "Gister": "Ek het 'n sonbril."`, a: `Gister het ek 'n sonbril gehad.`, w: [`Gister ek het 'n sonbril gehad.`, `Gister het ek 'n sonbril.`, `Gister het ek 'n sonbril gehet.`], why: `Het becomes het ... gehad. After Gister, het comes straight away.`, h: `After a time word at the start, the verb comes next.`, nope: { [`Gister ek het 'n sonbril gehad.`]: `After Gister the verb must come next: Gister het ek ...` } },
+      { q: `3.4 Verlede tyd: "Die seun ontdek 'n mooi seester."`, a: `Die seun het 'n mooi seester ontdek.`, w: [`Die seun het 'n mooi seester geontdek.`, `Die seun ontdek 'n mooi seester gehad.`, `Die seun het ontdek 'n mooi seester.`], why: `Ontdek starts with ont-, so it gets no ge-: het ... ontdek.`, h: `Verbs starting with be-, ge-, her-, ont- or ver- get no ge-.`, nope: { [`Die seun het 'n mooi seester geontdek.`]: `Ontdek starts with ont-, and those verbs don't take ge-.` } },
+      { q: `3.5 Verlede tyd, begin met "Verlede week": "Die kinders moet vroeg huis toe gaan."`, a: `Verlede week moes die kinders vroeg huis toe gaan.`, w: [`Verlede week die kinders moes vroeg huis toe gaan.`, `Verlede week moet die kinders vroeg huis toe gegaan.`, `Verlede week het die kinders vroeg huis toe moes gaan.`], why: `Moet becomes moes. After Verlede week, moes comes straight away.`, h: `What does moet change to in the past?` },
+      { q: `4.1 Toekomende tyd: "Ons eet roomys op die strand."`, a: `Ons sal roomys op die strand eet.`, w: [`Ons sal eet roomys op die strand.`, `Ons het roomys op die strand geëet.`, `Ons sal roomys op die strand geëet.`], why: `Sal + werkwoord: eet goes to the end.`, h: `sal + werkwoord at the end.` },
+      { q: `4.2 Toekomende tyd, begin met "Môre": "Die wind is sterk."`, a: `Môre sal die wind sterk wees.`, w: [`Môre sal die wind sterk is.`, `Môre die wind sal sterk wees.`, `Môre was die wind sterk.`], why: `Is becomes sal ... wees. After Môre, sal comes straight away.`, h: `What does is change to after sal?` },
+      { q: `4.3 Toekomende tyd: "Ek het 'n hoed."`, a: `Ek sal 'n hoed hê.`, w: [`Ek sal 'n hoed het.`, `Ek het 'n hoed gehad.`, `Ek sal hê 'n hoed.`], why: `Het becomes sal ... hê.`, h: `What does het change to after sal?`, nope: { [`Ek sal 'n hoed het.`]: `After sal, het changes to hê.` } },
+      { q: `4.4 Toekomende tyd: "Die kinders bou 'n groot sandkasteel."`, a: `Die kinders sal 'n groot sandkasteel bou.`, w: [`Die kinders sal bou 'n groot sandkasteel.`, `Die kinders het 'n groot sandkasteel gebou.`, `Die kinders sal 'n groot sandkasteel gebou.`], why: `Sal + werkwoord: bou goes to the end.`, h: `sal + werkwoord at the end.` },
+      { q: `4.5 Toekomende tyd, begin met "Volgende jaar": "Die seun kan vinnig swem."`, a: `Volgende jaar sal die seun vinnig kan swem.`, w: [`Volgende jaar die seun sal vinnig kan swem.`, `Volgende jaar sal die seun vinnig swem kan.`, `Volgende jaar het die seun vinnig kan swem.`], why: `After Volgende jaar comes sal. Kan swem goes to the end.`, h: `After the time words, sal comes next.` },
+
+      // ---------- Afdeling C: ontkenning ----------
+      { q: `5.1 Ontkenning: "Die meisie lees op die handdoek."`, a: `Die meisie lees nie op die handdoek nie.`, w: [`Die meisie lees nie op die handdoek.`, `Die meisie nie lees op die handdoek nie.`, `Die meisie lees op die handdoek nie.`], why: `Nie ... nie: the first nie after the verb, the second at the end.`, h: `Nie ... nie.`, nope: { [`Die meisie lees nie op die handdoek.`]: `The second nie is missing at the end.` } },
+      { q: `5.2 Ontkenning, begin met "Nee,": "Is daar iemand in die water?"`, a: `Nee, daar is niemand in die water nie.`, w: [`Nee, daar is niemand in die water.`, `Nee, daar is nie iemand in die water.`, `Nee, daar is iemand in die water nie.`], why: `Iemand becomes niemand, and nie goes at the end.`, h: `Iemand word niemand.` },
+      { q: `5.3 Ontkenning: "Ek eet iets op die strand."`, a: `Ek eet niks op die strand nie.`, w: [`Ek eet niks op die strand.`, `Ek eet nie iets op die strand.`, `Ek eet iets op die strand nie.`], why: `Iets becomes niks, and nie goes at the end.`, h: `Iets word niks.` },
+      { q: `5.4 Ontkenning, begin met "Nee,": "Die kinders speel altyd met die bal."`, a: `Nee, die kinders speel nooit met die bal nie.`, w: [`Nee, die kinders speel nooit met die bal.`, `Nee, die kinders nooit speel met die bal nie.`, `Nee, die kinders speel altyd nie met die bal nie.`], why: `Altyd becomes nooit, and nie goes at the end.`, h: `Altyd word nooit.` },
+
+      // ---------- Afdeling D: trappe van vergelyking ----------
+      { q: `6.1 Skryf die vergrotende trap van "klein".`, t: [`kleiner`], why: `Klein, kleiner, kleinste. Vergrotende trap ends in -er.`, h: `Vergrotende trap: groter.` },
+      { q: `6.1 Skryf die oortreffende trap van "klein".`, t: [`kleinste`], why: `Klein, kleiner, kleinste. Oortreffende trap ends in -ste.`, h: `Oortreffende trap: grootste.` },
+      { q: `6.1 Skryf die vergrotende trap van "warm".`, t: [`warmer`], why: `Warm, warmer, warmste.`, h: `Vergrotende trap ends in -er.` },
+      { q: `6.1 Skryf die oortreffende trap van "warm".`, t: [`warmste`], why: `Warm, warmer, warmste.`, h: `Oortreffende trap ends in -ste.` },
+      { q: `6.2 Die branders is vandag ___ as gister. (hoog)`, a: `hoër`, w: [`hoeër`, `hoger`, `hoogste`], why: `"as" means vergrotende trap: hoog, hoër, hoogste.`, nope: { [`hoogste`]: `"as" compares two, so it is the vergrotende trap, not -ste.` } },
+      { q: `6.2 Dit is die ___ sandkasteel op die strand. (groot)`, t: [`grootste`], why: `"die" ... means the most of all: groot, groter, grootste.`, h: `"die" means oortreffende trap.` },
+      { q: `6.2 My roomys is ___ as joune. (lekker)`, t: [`lekkerder`], why: `Words ending in -r add -der: lekker, lekkerder, lekkerste.`, h: `"as" means vergrotende trap. Words ending in r add -der.` },
+      { q: `6.2 Die skilpad is die ___ dier in die prent. (stadig)`, t: [`stadigste`], why: `"die" ... means the most of all: stadig, stadiger, stadigste.`, h: `"die" means oortreffende trap.` },
+
+      // ---------- Afdeling E: voegwoorde ----------
+      { q: `7.1 Verbind met "en": Ons dra ons strandsakke. Ons loop strand toe.`, a: `Ons dra ons strandsakke en ons loop strand toe.`, w: [`Ons dra ons strandsakke en ons strand toe loop.`, `Ons dra ons strandsakke en loop ons strand toe.`, `Ons dra en ons strandsakke loop strand toe.`], why: `En keeps the normal order: ons loop strand toe.`, h: `En and maar keep the normal order.` },
+      { q: `7.2 Verbind met "nadat": Ons droog af. Ons swem in die see.`, a: `Ons droog af nadat ons in die see swem.`, w: [`Ons droog af nadat ons swem in die see.`, `Ons droog af nadat swem ons in die see.`, `Ons droog nadat ons in die see swem af.`], why: `Nadat sends the verb to the end: nadat ons in die see swem.`, h: `Omdat and nadat send the verb to the end.` },
+      { q: `7.3 Verbind met "omdat": Ek dra 'n hoed. Die son is warm.`, a: `Ek dra 'n hoed omdat die son warm is.`, w: [`Ek dra 'n hoed omdat die son is warm.`, `Ek dra 'n hoed omdat is die son warm.`, `Omdat ek dra 'n hoed die son is warm.`], why: `Omdat sends the verb to the end: omdat die son warm is.`, h: `Omdat and nadat send the verb to the end.`, nope: { [`Ek dra 'n hoed omdat die son is warm.`]: `After omdat, is must go to the very end.` } },
+      { q: `7.4 Verbind met "maar": Die sand is warm. Die water is koud.`, a: `Die sand is warm, maar die water is koud.`, w: [`Die sand is warm, maar die water koud is.`, `Die sand is warm, maar is die water koud.`, `Die sand is warm maar koud die water is.`], why: `Maar keeps the normal order: die water is koud.`, h: `En and maar keep the normal order.` },
+
+      // ---------- Afdeling F: voornaamwoorde ----------
+      { q: `8.1 Ek het 'n handdoek. ___ handdoek is blou.`, t: [`My`], why: `Ek → my handdoek.`, h: `It goes before the noun.` },
+      { q: `8.1 Ek het 'n handdoek. My handdoek is blou. Die handdoek is ___.`, t: [`myne`], why: `My handdoek → die handdoek is myne.`, h: ends },
+      { q: `8.2 Jy het 'n emmer. ___ emmer is geel.`, t: [`Jou`], why: `Jy → jou emmer.`, h: `It goes before the noun.` },
+      { q: `8.2 Jy het 'n emmer. Jou emmer is geel. Die emmer is ___.`, t: [`joune`], why: `Jou emmer → die emmer is joune.`, h: ends },
+      { q: `8.3 Die seun het 'n branderplank. ___ branderplank is lank.`, t: [`Sy`], why: `A boy's thing: sy branderplank.`, h: `It goes before the noun. The boy is a hy.` },
+      { q: `8.3 Die seun het 'n branderplank. Sy branderplank is lank. Die branderplank is ___.`, t: [`syne`], why: `Sy branderplank → die branderplank is syne.`, h: ends },
+      { q: `8.4 Die meisie het 'n pet. ___ pet is rooi.`, t: [`Haar`], why: `A girl's thing: haar pet.`, h: `It goes before the noun. The girl is a sy.` },
+      { q: `8.4 Die meisie het 'n pet. Haar pet is rooi. Die pet is ___.`, t: [`hare`], why: `Haar pet → die pet is hare.`, h: ends },
+
+      // ---------- Afdeling G: intensiewe vorm ----------
+      { q: `9.1 Skryf die intensiewe vorm: vinnig`, t: [`blitsvinnig`], why: `Blitsvinnig: as fast as lightning (blits).`, h: strong },
+      { q: `9.2 Skryf die intensiewe vorm: warm`, t: [`snikwarm`, `kokendwarm`, `kokend warm`, `kookwarm`], why: `Snikwarm or kokend warm: very, very hot.`, h: strong },
+      { q: `9.3 Skryf die intensiewe vorm: nuwe`, t: [`splinternuwe`, `splinternuut`, `vlagnuwe`, `vlagnuut`], why: `Splinternuwe: brand new.`, h: strong },
+
+      // ---------- Afdeling H: woordeskat, die strand (the sheet's pictures) ----------
+      { q: `10.1 Prent: a shell. Skryf die Afrikaanse woord.`, t: [`skulp`, `seeskulp`, `skulpie`], why: `'n Skulp. Many of them are skulpe.`, h: `You find them on the sand. It starts with sk-.` },
+      { q: `10.2 Prent: a starfish. Skryf die Afrikaanse woord.`, t: [`seester`], why: `'n Seester: a star of the sea.`, h: `A star that lives in the sea.` },
+      { q: `10.3 Prent: a bucket. Skryf die Afrikaanse woord.`, t: [`emmer`, `sandemmer`, `emmertjie`], why: `'n Emmer: you carry sand or water in it.`, h: `It starts with e.` },
+      { q: `10.4 Prent: a beach umbrella. Skryf die Afrikaanse woord.`, t: [`strandsambreel`, `sambreel`, `sonsambreel`], why: `'n Strandsambreel keeps the sun off you.`, h: `Strand + ...` },
+      { q: `10.5 Prent: a sailboat. Skryf die Afrikaanse woord.`, t: [`seilboot`, `seiljag`, `seilskuit`, `boot`], why: `'n Seilboot: a boat with a seil (sail).`, h: `A sail is a seil.` },
+      { q: `10.6 Prent: a beach towel. Skryf die Afrikaanse woord.`, t: [`handdoek`, `strandhanddoek`], why: `'n Handdoek: you dry yourself with it.`, h: `Hand + ...` },
+    ],
+  });
+
+  const subject = pack.subjects.afrikaans;
+  const topics = subject.topics;
+  const section = topics.find((t) => t.id === 'kaf_toets');
+  noted(section, [
+    `STOMPI: tyd kom voor wyse en plek.`,
+    `Bywoord van tyd = wanneer? Bywoord van wyse = hoe?`,
+    `Verlede tyd: het + ge-. Is word was. Het word het ... gehad. Moet word moes.`,
+    `Toekomende tyd: sal + werkwoord aan die einde.`,
+    `Ontkenning: nie ... nie. Iets word niks. Iemand word niemand. Altyd word nooit.`,
+    `groter = vergrotende trap (as). grootste = oortreffende trap (die).`,
+    `En en maar hou die gewone volgorde. Omdat en nadat skuif die werkwoord na die einde.`,
+    `my, myne. jou, joune. sy, syne. haar, hare.`,
+  ]);
+  // First on the track, and the must-do job on Home until every question is answered.
+  topics.splice(topics.indexOf(section), 1);
+  topics.unshift(section);
+  subject.focus = ['kaf_toets', ...subject.focus];
+  subject.startWith = ['kaf_toets', ...subject.startWith];
+  const test = pack.exams.find((e) => e.date === '2026-11-13' && e.subject === 'afrikaans');
+  test.must = ['kaf_toets'];
+})(typeof window !== 'undefined' ? window : globalThis);
+
 /* November 2026: rule cards, Track walks and wrong-answer tips for Jordy's nine Afrikaans racing sections,
    following the book's rules as the questions in bank-afrikaans.js state them. */
 (function (root) {
@@ -18276,6 +18506,166 @@ ${t && H > W && W < 600 ? '<li>Tip: turn your phone sideways for a bigger view.<
   };
 })(typeof window !== 'undefined' ? window : globalThis);
 
+/* The English for tap-for-English on the strand revision section (src/bank-zz-2026-11-12-kash-afrikaans-strand.js),
+   added to RS.glossAf from src/gloss-af-data.js. Checked by test/gloss.mjs. */
+(function (root) {
+  'use strict';
+  const data = root.RS.glossAf;
+  Object.assign(data.words, {
+    seuntjie: 'little boy',
+    rotspoel: 'rock pool',
+    sonhoed: 'sun hat',
+    bruin: 'brown',
+    neer: 'down',
+    pier: 'pier',
+    strandsambreel: 'beach umbrella',
+    hul: 'their',
+    hoede: 'hats',
+    ontdek: 'discover / discovers',
+    vlugbal: 'volleyball',
+    kalm: 'calm',
+    swembroek: 'swimming costume',
+    draf: 'jog',
+    toebroodjies: 'sandwiches',
+    branderplank: 'surfboard',
+    mandjie: 'basket',
+    stoele: 'chairs',
+    sonbril: 'sunglasses',
+    visstok: 'fishing rod',
+    pienk: 'pink',
+  });
+  Object.assign(data.says, {
+    // A. STOMPI
+    [`Rangskik die woorde: vanoggend / die seuntjie / stadig / op die sand / loop`]: `Put the words in order: this morning / the little boy / slowly / on the sand / walks`,
+    [`Rangskik die woorde: my pa / elke oggend / in die see / swem / vinnig`]: `Put the words in order: my dad / every morning / in the sea / swims / fast`,
+    [`Rangskik die woorde: die kinders / vanmiddag / wil / in die rotspoel / swem`]: `Put the words in order: the children / this afternoon / want to / in the rock pool / swim`,
+    [`Rangskik die woorde: Ma / vandag / 'n sonhoed / by die winkel / koop`]: `Put the words in order: Mom / today / a sun hat / at the shop / buys`,
+    // B. Bywoorde en byvoeglike naamwoorde
+    [`"Die bruin hond hardloop vanoggend vinnig langs die nat sand." Wat is die bywoord van tyd?`]: `"The brown dog runs fast along the wet sand this morning." Which is the bywoord van tyd (adverb of time)?`,
+    [`"Die bruin hond hardloop vanoggend vinnig langs die nat sand." Wat is die bywoord van wyse?`]: `"The brown dog runs fast along the wet sand this morning." Which is the bywoord van wyse (adverb of manner)?`,
+    [`"Die bruin hond hardloop vanoggend vinnig langs die nat sand." Watter byvoeglike naamwoord beskryf die hond?`]: `"The brown dog runs fast along the wet sand this morning." Which byvoeglike naamwoord (adjective) describes the dog?`,
+    [`"Die bruin hond hardloop vanoggend vinnig langs die nat sand." Watter byvoeglike naamwoord beskryf die sand?`]: `"The brown dog runs fast along the wet sand this morning." Which byvoeglike naamwoord (adjective) describes the sand?`,
+    [`Skryf die bywoord van tyd neer: "Die moeë visser het gister stil op die lang pier gesit."`]: `Write down the bywoord van tyd (adverb of time): "The tired fisherman sat quietly on the long pier yesterday."`,
+    [`Skryf die bywoord van wyse neer: "Die moeë visser het gister stil op die lang pier gesit."`]: `Write down the bywoord van wyse (adverb of manner): "The tired fisherman sat quietly on the long pier yesterday."`,
+    [`Skryf die byvoeglike naamwoord neer wat die pier beskryf: "Die moeë visser het gister stil op die lang pier gesit."`]: `Write down the byvoeglike naamwoord (adjective) that describes the pier: "The tired fisherman sat quietly on the long pier yesterday."`,
+    // C. Verlede tyd
+    [`Verlede tyd: "Die seun bou 'n sandkasteel."`]: `Past tense: "The boy builds a sandcastle."`,
+    [`Verlede tyd: "Die son is baie warm."`]: `Past tense: "The sun is very hot."`,
+    [`Verlede tyd: "Ons het 'n groot strandsambreel."`]: `Past tense: "We have a big beach umbrella."`,
+    [`Verlede tyd: "Die kinders moet hul hoede dra."`]: `Past tense: "The children must wear their hats."`,
+    [`Verlede tyd, begin met "Gister": "Pa vang 'n groot vis."`]: `Past tense, start with "Gister" (yesterday): "Dad catches a big fish."`,
+    [`Verlede tyd: "Die meisie ontdek 'n klein krap."`]: `Past tense: "The girl discovers a small crab."`,
+    [`Verlede tyd: "Die golwe word groot."`]: `Past tense: "The waves become big."`,
+    [`Vul in, verlede tyd: "Ek het 'n blou emmer." → "Ek het 'n blou emmer ___."`]: `Fill in, past tense: "I have a blue bucket." → "Ek het 'n blou emmer ___." (I had a blue bucket.)`,
+    [`Vul in, verlede tyd: "Die water is koud." → "Die water ___ koud."`]: `Fill in, past tense: "The water is cold." → "Die water ___ koud."`,
+    // D. Toekomende tyd
+    [`Toekomende tyd: "Ons speel vlugbal op die strand."`]: `Future tense: "We play volleyball on the beach."`,
+    [`Toekomende tyd, begin met "Môre": "Die see is kalm."`]: `Future tense, start with "Môre" (tomorrow): "The sea is calm."`,
+    [`Toekomende tyd: "Ek het 'n nuwe swembroek."`]: `Future tense: "I have a new swimming costume."`,
+    [`Toekomende tyd, begin met "Volgende week": "Die meisies kan op die strand draf."`]: `Future tense, start with "Volgende week" (next week): "The girls can jog on the beach."`,
+    [`Toekomende tyd: "Die kinders eet toebroodjies."`]: `Future tense: "The children eat sandwiches."`,
+    [`Vul in, toekomende tyd: "Die water is koud." → "Môre sal die water koud ___."`]: `Fill in, future tense: "The water is cold." → "Môre sal die water koud ___." (Tomorrow the water will be cold.)`,
+    [`Vul in, toekomende tyd: "Hy het 'n branderplank." → "Hy sal 'n branderplank ___."`]: `Fill in, future tense: "He has a surfboard." → "Hy sal 'n branderplank ___." (He will have a surfboard.)`,
+    // E. Ontkenning
+    [`Ontkenning: "Die seun swem in die see."`]: `Make it negative: "The boy swims in the sea."`,
+    [`Ontkenning, begin met "Nee,": "Is daar iets in jou emmer?"`]: `Make it negative, start with "Nee," (No,): "Is there something in your bucket?"`,
+    [`Ontkenning: "Iemand bou 'n sandkasteel."`]: `Make it negative: "Someone is building a sandcastle."`,
+    [`Ontkenning: "Ons gaan altyd strand toe."`]: `Make it negative: "We always go to the beach."`,
+    [`Vul in: "Ek eet iets." → "Ek eet ___ nie."`]: `Fill in: "I eat something." → "Ek eet ___ nie." (I eat nothing.)`,
+    [`Vul in: "Daar is iemand in die water." → "Nee, daar is ___ in die water nie."`]: `Fill in: "There is someone in the water." → "Nee, daar is ___ in die water nie." (No, there is nobody in the water.)`,
+    // F. Trappe van vergelyking
+    [`Die water is vandag ___ as gister. (koud)`]: `The water is ___ today than yesterday. (cold)`,
+    [`Die blou boot is die ___ boot in die hawe. (vinnig)`]: `The blue boat is the ___ boat in the harbour. (fast)`,
+    [`Hierdie duin is ___ as daardie een. (hoog)`]: `This dune is ___ than that one. (high)`,
+    [`Jou toebroodjie is ___ as myne. (lekker)`]: `Your sandwich is ___ than mine. (tasty)`,
+    [`My skulp is die ___ skulp op die strand. (mooi)`]: `My shell is the ___ shell on the beach. (pretty)`,
+    [`Die skilpad is ___ as die krap. (stadig)`]: `The tortoise is ___ than the crab. (slow)`,
+    [`Wat is die vergrotende trap van "lank"?`]: `What is the vergrotende trap (comparative) of "lank" (long)?`,
+    [`True or false: "die grootste" is die oortreffende trap.`]: `True or false: "die grootste" (the biggest) is the oortreffende trap (superlative).`,
+    // G. Voegwoorde
+    [`Verbind met "omdat": Ons gaan huis toe. Dit reën.`]: `Join with "omdat" (because): We go home. It is raining.`,
+    [`Verbind met "nadat": Ons eet roomys. Ons speel in die branders.`]: `Join with "nadat" (after): We eat ice cream. We play in the waves.`,
+    [`Verbind met "maar": Die strand is mooi. Die wind waai sterk.`]: `Join with "maar" (but): The beach is pretty. The wind blows strongly.`,
+    [`Verbind met "en": Ma pak die mandjie. Pa dra die stoele.`]: `Join with "en" (and): Mom packs the basket. Dad carries the chairs.`,
+    [`Verbind met "omdat": Die meisie dra 'n hoed. Die son brand.`]: `Join with "omdat" (because): The girl wears a hat. The sun is burning.`,
+    // H. Besitlike voornaamwoorde
+    [`Ek het 'n emmer. Die emmer is ___.`]: `I have a bucket. The bucket is ___. (mine)`,
+    [`Jy het 'n sonbril. Die sonbril is ___.`]: `You have sunglasses. The sunglasses are ___. (yours)`,
+    [`Die seun het 'n visstok. ___ visstok is lank.`]: `The boy has a fishing rod. ___ fishing rod is long. (His)`,
+    [`Die seun het 'n visstok. Die visstok is ___.`]: `The boy has a fishing rod. The fishing rod is ___. (his)`,
+    [`Die meisie het 'n handdoek. ___ handdoek is pienk.`]: `The girl has a towel. ___ towel is pink. (Her)`,
+    [`Die meisie het 'n handdoek. Die handdoek is ___.`]: `The girl has a towel. The towel is ___. (hers)`,
+    // I. Intensiewe vorm
+    [`Skryf die intensiewe vorm: koud`]: `Write the intensiewe vorm (the extra-strong form): koud (cold)`,
+    [`Skryf die intensiewe vorm: stil`]: `Write the intensiewe vorm (the extra-strong form): stil (quiet)`,
+    [`Skryf die intensiewe vorm: maklik`]: `Write the intensiewe vorm (the extra-strong form): maklik (easy)`,
+    [`Skryf die intensiewe vorm: swaar`]: `Write the intensiewe vorm (the extra-strong form): swaar (heavy)`,
+  });
+})(typeof window !== 'undefined' ? window : globalThis);
+
+/* The English for tap-for-English on the strand revision test (src/bank-zz-2026-11-12-kash-afrikaans-toets.js),
+   added to RS.glossAf from src/gloss-af-data.js. Checked by test/gloss.mjs. */
+(function (root) {
+  'use strict';
+  const data = root.RS.glossAf;
+  Object.assign(data.words, {
+    vrolike: 'happy / cheerful',
+    strandsakke: 'beach bags',
+    droog: 'dry',
+    pet: 'cap',
+    prent: 'picture',
+    skulp: 'shell',
+  });
+  const s = `"The happy children play quietly on the warm sand today."`;
+  Object.assign(data.says, {
+    [`1.1 Rangskik die woorde: môre / die seun / vinnig / op die strand / hardloop`]: `1.1 Put the words in order: tomorrow / the boy / fast / on the beach / runs`,
+    [`1.2 Rangskik die woorde: die meisies / vanmiddag / rustig / in die see / speel`]: `1.2 Put the words in order: the girls / this afternoon / calmly / in the sea / play`,
+    [`2.1 "Die vrolike kinders speel vandag rustig op die warm sand." Skryf die bywoord van tyd neer.`]: `2.1 ${s} Write down the bywoord van tyd (adverb of time).`,
+    [`2.2 "Die vrolike kinders speel vandag rustig op die warm sand." Skryf die bywoord van wyse neer.`]: `2.2 ${s} Write down the bywoord van wyse (adverb of manner).`,
+    [`2.3 "Die vrolike kinders speel vandag rustig op die warm sand." Skryf die byvoeglike naamwoord wat die kinders beskryf neer.`]: `2.3 ${s} Write down the byvoeglike naamwoord (adjective) that describes the children.`,
+    [`2.4 "Die vrolike kinders speel vandag rustig op die warm sand." Skryf die byvoeglike naamwoord wat die sand beskryf neer.`]: `2.4 ${s} Write down the byvoeglike naamwoord (adjective) that describes the sand.`,
+    [`3.1 Verlede tyd: "Die meisie speel met 'n bal."`]: `3.1 Past tense: "The girl plays with a ball."`,
+    [`3.2 Verlede tyd: "Die water is warm."`]: `3.2 Past tense: "The water is warm."`,
+    [`3.3 Verlede tyd, begin met "Gister": "Ek het 'n sonbril."`]: `3.3 Past tense, start with "Gister" (yesterday): "I have sunglasses."`,
+    [`3.4 Verlede tyd: "Die seun ontdek 'n mooi seester."`]: `3.4 Past tense: "The boy discovers a pretty starfish."`,
+    [`3.5 Verlede tyd, begin met "Verlede week": "Die kinders moet vroeg huis toe gaan."`]: `3.5 Past tense, start with "Verlede week" (last week): "The children must go home early."`,
+    [`4.1 Toekomende tyd: "Ons eet roomys op die strand."`]: `4.1 Future tense: "We eat ice cream on the beach."`,
+    [`4.2 Toekomende tyd, begin met "Môre": "Die wind is sterk."`]: `4.2 Future tense, start with "Môre" (tomorrow): "The wind is strong."`,
+    [`4.3 Toekomende tyd: "Ek het 'n hoed."`]: `4.3 Future tense: "I have a hat."`,
+    [`4.4 Toekomende tyd: "Die kinders bou 'n groot sandkasteel."`]: `4.4 Future tense: "The children build a big sandcastle."`,
+    [`4.5 Toekomende tyd, begin met "Volgende jaar": "Die seun kan vinnig swem."`]: `4.5 Future tense, start with "Volgende jaar" (next year): "The boy can swim fast."`,
+    [`5.1 Ontkenning: "Die meisie lees op die handdoek."`]: `5.1 Make it negative: "The girl reads on the towel."`,
+    [`5.2 Ontkenning, begin met "Nee,": "Is daar iemand in die water?"`]: `5.2 Make it negative, start with "Nee," (No,): "Is there someone in the water?"`,
+    [`5.3 Ontkenning: "Ek eet iets op die strand."`]: `5.3 Make it negative: "I eat something on the beach."`,
+    [`5.4 Ontkenning, begin met "Nee,": "Die kinders speel altyd met die bal."`]: `5.4 Make it negative, start with "Nee," (No,): "The children always play with the ball."`,
+    [`6.1 Skryf die vergrotende trap van "klein".`]: `6.1 Write the vergrotende trap (comparative) of "klein" (small).`,
+    [`6.1 Skryf die oortreffende trap van "klein".`]: `6.1 Write the oortreffende trap (superlative) of "klein" (small).`,
+    [`6.1 Skryf die vergrotende trap van "warm".`]: `6.1 Write the vergrotende trap (comparative) of "warm".`,
+    [`6.1 Skryf die oortreffende trap van "warm".`]: `6.1 Write the oortreffende trap (superlative) of "warm".`,
+    [`6.2 Die branders is vandag ___ as gister. (hoog)`]: `6.2 The waves are ___ today than yesterday. (high)`,
+    [`6.2 Dit is die ___ sandkasteel op die strand. (groot)`]: `6.2 It is the ___ sandcastle on the beach. (big)`,
+    [`6.2 My roomys is ___ as joune. (lekker)`]: `6.2 My ice cream is ___ than yours. (tasty)`,
+    [`6.2 Die skilpad is die ___ dier in die prent. (stadig)`]: `6.2 The tortoise is the ___ animal in the picture. (slow)`,
+    [`7.1 Verbind met "en": Ons dra ons strandsakke. Ons loop strand toe.`]: `7.1 Join with "en" (and): We carry our beach bags. We walk to the beach.`,
+    [`7.2 Verbind met "nadat": Ons droog af. Ons swem in die see.`]: `7.2 Join with "nadat" (after): We dry off. We swim in the sea.`,
+    [`7.3 Verbind met "omdat": Ek dra 'n hoed. Die son is warm.`]: `7.3 Join with "omdat" (because): I wear a hat. The sun is hot.`,
+    [`7.4 Verbind met "maar": Die sand is warm. Die water is koud.`]: `7.4 Join with "maar" (but): The sand is warm. The water is cold.`,
+    [`8.1 Ek het 'n handdoek. ___ handdoek is blou.`]: `8.1 I have a towel. ___ towel is blue.`,
+    [`8.1 Ek het 'n handdoek. My handdoek is blou. Die handdoek is ___.`]: `8.1 I have a towel. My towel is blue. The towel is ___.`,
+    [`8.2 Jy het 'n emmer. ___ emmer is geel.`]: `8.2 You have a bucket. ___ bucket is yellow.`,
+    [`8.2 Jy het 'n emmer. Jou emmer is geel. Die emmer is ___.`]: `8.2 You have a bucket. Your bucket is yellow. The bucket is ___.`,
+    [`8.3 Die seun het 'n branderplank. ___ branderplank is lank.`]: `8.3 The boy has a surfboard. ___ surfboard is long.`,
+    [`8.3 Die seun het 'n branderplank. Sy branderplank is lank. Die branderplank is ___.`]: `8.3 The boy has a surfboard. His surfboard is long. The surfboard is ___.`,
+    [`8.4 Die meisie het 'n pet. ___ pet is rooi.`]: `8.4 The girl has a cap. ___ cap is red.`,
+    [`8.4 Die meisie het 'n pet. Haar pet is rooi. Die pet is ___.`]: `8.4 The girl has a cap. Her cap is red. The cap is ___.`,
+    [`9.1 Skryf die intensiewe vorm: vinnig`]: `9.1 Write the intensiewe vorm (the extra-strong form): vinnig (fast)`,
+    [`9.2 Skryf die intensiewe vorm: warm`]: `9.2 Write the intensiewe vorm (the extra-strong form): warm (hot)`,
+    [`9.3 Skryf die intensiewe vorm: nuwe`]: `9.3 Write the intensiewe vorm (the extra-strong form): nuwe (new)`,
+  });
+  // The picture words: the question is the English already, so the English would only give the answer away.
+  data.off.push(...['shell', 'starfish', 'bucket', 'beach umbrella', 'sailboat', 'beach towel'].map((w, i) => `10.${i + 1} Prent: a ${w}. Skryf die Afrikaanse woord.`));
+})(typeof window !== 'undefined' ? window : globalThis);
+
 /* Tap for English on Afrikaans questions (Marc, 10 November 2026).
    On an Afrikaans question he can tap a word he doesn't know to see what it means, or tap "In English" for the whole
    question. The English is written ahead in gloss-af-data.js (RS.glossAf), so nothing goes to a translation service:
@@ -18703,7 +19093,7 @@ ${t && H > W && W < 600 ? '<li>Tip: turn your phone sideways for a bigger view.<
   // ---------- staying up to date ----------
   // An open tab or a home screen app keeps running the page it first loaded, old prices and all. So it asks which version
   // is live when it comes back into view and every few minutes, and swaps over between races. build.mjs fills in BUILD.
-  const BUILD = 'd404fb9893';
+  const BUILD = '32ecde94e7';
   const BACK_KEY = 'holeshot.back.v1';
   const TRIED_KEY = 'holeshot.tried.v1';
   let liveBuild = null;
@@ -19869,7 +20259,9 @@ ${t && H > W && W < 600 ? '<li>Tip: turn your phone sideways for a bigger view.<
       p.plan = { day: today, subject: e.subject, jobs };
       keepState();
     }
-    return p.plan.jobs.map((j) => jobView(p, sub, e.subject, j)).filter(Boolean);
+    // A test can name sections that must be done first (a revision sheet): they lead the list until every question is answered.
+    const must = (e.must || []).map((topic) => ({ kind: 'topic', topic, must: true }));
+    return [...must, ...p.plan.jobs].map((j) => jobView(p, sub, e.subject, j)).filter(Boolean);
   }
   // On a day with no test in the next week: any comeback lap first, then today's moto, then any fix-it lap,
   // in the subject he's on. Picked once a day like the test plan.
@@ -19904,6 +20296,12 @@ ${t && H > W && W < 600 ? '<li>Tip: turn your phone sideways for a bigger view.<
       return { ...row, text: `${sub.label} fix-it lap`, meta: `${n} to fix, from what caught you out`, done: ran((r) => r.mode === 'fix') || !n };
     }
     if (j.kind === 'walk') return { ...row, lesson: !t.walk, text: `${t.walk ? 'Track walk' : 'Maths lesson'}: ${t.title}`, meta: `${sub.label}. Learn it, then a few quick questions`, done: (p.walked || {})[j.topic] === today };
+    if (j.kind === 'topic' && j.must) {
+      const lists = t.skills.map((s) => [s, (PK().skills[s] || {}).items || []]);
+      const all = lists.reduce((n, [, items]) => n + items.length, 0);
+      const left = lists.reduce((n, [s, items]) => n + RS.unseenCount(items, (p.seen && p.seen[s]) || []), 0);
+      return { ...row, text: `Revision test: ${t.title}`, meta: left ? `${left} of ${all} questions still to do` : `All ${all} questions done`, done: !left };
+    }
     if (j.kind === 'topic') return { ...row, text: `Practise: ${t.title}`, meta: `${sub.label}. Picked from your own answers`, done: ran((r) => r.mode === 'topic' && r.label === `${sub.label}: ${t.title}`) };
     return { ...row, text: `${sub.label} main event`, meta: `${sub.examSize} mixed questions, no hints`, done: ran((r) => r.mode === 'exam') };
   }
