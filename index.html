@@ -16477,6 +16477,143 @@ Jordy's Science test, Tuesday 10 November: Planet Earth and Beyond. Written from
   });
 })(typeof window !== 'undefined' ? window : globalThis);
 
+/* Batch of 18 November 2026: six new questions for every general knowledge list. */
+(function (root) {
+  'use strict';
+  root.RS.addQuestions('jordy', '2026-11-18', {
+    gk_space: [
+      { q: `Which planet has a giant storm, the Great Red Spot, that is bigger than the whole Earth?`, a: `Jupiter`, w: [`Mars`, `Venus`, `Uranus`], why: `Jupiter's Great Red Spot is a storm that has raged for hundreds of years, and it is wider than Earth.` },
+      { q: `Which planet takes the shortest time to go once around the Sun?`, a: `Mercury`, w: [`Venus`, `Earth`, `Neptune`], why: `Mercury is closest to the Sun and moves fastest, so its year lasts only about 88 Earth days.`, h: `Planets nearer the Sun have a shorter path and move faster.` },
+      { q: `Which star is the closest to our Sun?`, a: `Proxima Centauri`, w: [`Sirius`, `Polaris`, `Betelgeuse`], why: `Proxima Centauri is about 4,2 light-years away. Sirius is the brightest star in our night sky, but it is farther off.` },
+      { tf: true, q: `True or false: Neptune is the planet farthest from the Sun.`, why: `Pluto used to be counted as the farthest planet, but it is now called a dwarf planet. That makes Neptune the eighth and farthest planet.` },
+      { q: `The Hubble Space ___ has taken photos of faraway galaxies from its orbit around Earth since 1990.`, t: [`telescope`, `Telescope`], why: `Hubble is a telescope in orbit above our air, so it sees space more clearly than telescopes on the ground.`, h: `Astronomers also use big ones on mountaintops.` },
+      { q: `Which planet spins on its side, tilted over so far that it seems to roll around the Sun?`, a: `Uranus`, w: [`Saturn`, `Jupiter`, `Mercury`], why: `Uranus is tilted by about 98 degrees, so it spins almost on its side.` },
+    ],
+    gk_animals: [
+      { q: `Which is the biggest bird alive today?`, a: `The ostrich`, w: [`The albatross`, `The eagle`, `The flamingo`], why: `An ostrich can be 2,5 metres tall and weigh over 100 kilograms. It cannot fly, but it can run very fast.` },
+      { q: `Which of these animals carries its baby in a pouch?`, a: `The wombat`, w: [`The lion`, `The warthog`, `The meerkat`], why: `Wombats are marsupials, like kangaroos. A marsupial mother carries her tiny baby in a pouch.` },
+      { tf: false, q: `True or false: a goldfish has a memory of only three seconds.`, why: `Goldfish can remember things for months. Scientists have taught them to find food and to learn tricks.` },
+      { q: `What do the huge ears of an African elephant help it to do?`, a: `Cool down`, w: [`Smell better`, `Dig for water`, `Swim faster`], why: `Blood flows through the thin ears, and flapping them cools the blood in the heat.` },
+      { q: `A big group of fish swimming together is called a ___ of fish.`, t: [`school`, `shoal`], why: `Fish swim in a school or a shoal. It helps protect them from hunters.`, h: `Dolphins and whales use a different word, pod.` },
+      { q: `Which animal can change its colour and has a tongue that shoots out to catch insects?`, a: `The chameleon`, w: [`The gecko`, `The tortoise`, `The crocodile`], why: `A chameleon changes colour to show its mood and to control its heat, and its sticky tongue shoots out very fast.` },
+    ],
+    gk_sa: [
+      { q: `Which is the smallest province in South Africa by area?`, a: `Gauteng`, w: [`Free State`, `Limpopo`, `North West`], why: `Gauteng is the smallest province, yet it has the most people, because Johannesburg and Pretoria are there.` },
+      { q: `Which animal is on the South African Krugerrand gold coin?`, a: `A springbok`, w: [`A lion`, `An elephant`, `A rhino`], why: `The Krugerrand shows a leaping springbok, the national animal, on the back of the coin.` },
+      { tf: true, q: `True or false: the name Soweto comes from the words South Western Townships.`, why: `Soweto is short for South Western Townships. It lies south-west of Johannesburg.` },
+      { q: `Mandela Day is held every year on 18 ___.`, t: [`July`], why: `Nelson Mandela was born on 18 July 1918. People spend 67 minutes helping others on his birthday.`, h: `It is a winter month.` },
+      { q: `The Cango Caves, with huge dripstone halls, are near which Western Cape town?`, a: `Oudtshoorn`, w: [`Knysna`, `Paarl`, `Worcester`], why: `The Cango Caves are in the Swartberg mountains near Oudtshoorn, which is also famous for its ostrich farms.` },
+      { q: `Who did the world's first human heart transplant, in Cape Town in 1967?`, a: `Dr Christiaan Barnard`, w: [`Dr Max Theiler`, `Dr Allan Cormack`, `Dr Sydney Brenner`], why: `Dr Christiaan Barnard and his team did the operation at Groote Schuur Hospital in December 1967.` },
+    ],
+    gk_world: [
+      { q: `The Nile, the great river of Egypt, flows into which sea?`, a: `The Mediterranean Sea`, w: [`The Red Sea`, `The Black Sea`, `The Caspian Sea`], why: `The Nile flows north through Egypt and spreads out into a delta where it meets the Mediterranean Sea.` },
+      { q: `What is the capital city of Canada?`, a: `Ottawa`, w: [`Toronto`, `Vancouver`, `Montreal`], why: `Ottawa is Canada's capital. Toronto is the biggest city, but it is not the capital.` },
+      { tf: true, q: `True or false: more people live in Asia than on any other continent.`, why: `More than half of all the people in the world live in Asia.` },
+      { q: `The Panama Canal is a shortcut for ships that joins the Atlantic Ocean to the ___ Ocean.`, t: [`Pacific`], why: `The canal lets ships cross Central America instead of sailing all the way around South America.`, h: `It is the biggest ocean.` },
+      { q: `Which language has the most people who speak it as their first language?`, a: `Mandarin Chinese`, w: [`English`, `Spanish`, `Hindi`], why: `Mandarin has more than 900 million first-language speakers. English is used in more places, but fewer people learn it first.` },
+      { q: `Mount Fuji, a famous volcano with a snowy top, is in which country?`, a: `Japan`, w: [`China`, `Peru`, `Italy`], why: `Mount Fuji is the highest mountain in Japan, and it is about 3 776 metres high.` },
+    ],
+    gk_sport: [
+      { q: `How many players from one team are on the field at once in rugby union?`, a: `15`, w: [`11`, `13`, `9`], why: `A rugby union team has 15 on the field: eight forwards and seven backs. Rugby league uses 13.` },
+      { q: `Which Springbok captain received the Rugby World Cup from Nelson Mandela in 1995?`, a: `Francois Pienaar`, w: [`Siya Kolisi`, `John Smit`, `Joost van der Westhuizen`], why: `Francois Pienaar led the Springboks to win the 1995 final on home soil. Mandela wore a Springbok jersey to hand over the trophy.` },
+      { tf: true, q: `True or false: in a Formula 1 car, the driver sits in front of the engine.`, why: `The engine sits behind the driver, in the middle or back of the car.` },
+      { q: `In tennis, when both players have 40 points, the score is called ___.`, t: [`deuce`], why: `At deuce, a player must win two points in a row to win the game.`, h: `It sounds like the word for the number two, in French.` },
+      { q: `How often are the Summer Olympic Games held?`, a: `Every four years`, w: [`Every year`, `Every two years`, `Every six years`], why: `The Olympics come around every four years, which is also called an Olympiad.` },
+      { q: `In freestyle motocross, what does a rider do when he "whips" a jump?`, a: `Lays the bike sideways in the air`, w: [`Turns off the engine`, `Jumps off the bike`, `Spins the front wheel by hand`], why: `A whip is when the rider kicks the back of the bike out sideways in the air, then straightens it before landing.` },
+    ],
+    gk_inventions: [
+      { q: `Your phone's GPS finds where you are by using signals from what?`, a: `Satellites in space`, w: [`Cell phone towers only`, `The Moon`, `Underground cables`], why: `GPS satellites circling the Earth send signals, and your phone uses the timing of several of them to work out where it is.` },
+      { q: `Which scientist, in the 1600s, worked out the three laws of motion and the law of gravity?`, a: `Isaac Newton`, w: [`Charles Darwin`, `Albert Einstein`, `Galileo Galilei`], why: `Isaac Newton explained how gravity pulls things and how forces make things move.` },
+      { tf: true, q: `True or false: penicillin, the first widely used antibiotic, was discovered by accident from a mould.`, why: `Alexander Fleming noticed in 1928 that a mould had killed the germs around it on a dish.` },
+      { q: `On a motorbike, ABS stands for anti-lock ___ system.`, t: [`braking`, `brake`], why: `ABS stops the wheels from locking up when you brake hard, so the bike stays steady.`, h: `Think about what the levers and pedal on the bike do.` },
+      { q: `What does a motorbike's clutch do?`, a: `Joins or separates the engine and gearbox`, w: [`Cools the engine`, `Makes the exhaust quieter`, `Pumps petrol to the engine`], why: `Pulling in the clutch lever cuts the engine's power to the wheel, so you can change gear smoothly.` },
+      { q: `Which metal is a liquid at normal room temperature?`, a: `Mercury`, w: [`Iron`, `Copper`, `Aluminium`], why: `Mercury melts at about minus 39 degrees Celsius, so it is liquid at room temperature.` },
+    ],
+    gk_body: [
+      { q: `About how long is an adult's small intestine, if it is stretched out?`, a: `About 6 metres`, w: [`About 60 centimetres`, `About 1 metre`, `About 60 metres`], why: `The small intestine is coiled up inside you, and it is around 6 metres long.` },
+      { q: `Your skin makes which vitamin when sunlight shines on it?`, a: `Vitamin D`, w: [`Vitamin C`, `Vitamin A`, `Vitamin K`], why: `Vitamin D helps your body use calcium to keep your bones strong.` },
+      { tf: false, q: `True or false: people only use about 10 per cent of their brain.`, why: `Scans show that we use all parts of the brain, though not all at the same moment.` },
+      { q: `The tiniest blood vessels in your body are called ___.`, t: [`capillaries`, `capillary`], why: `Capillaries are so thin that blood cells pass through in single file, and oxygen passes through their walls to your cells.`, h: `They join the tiny arteries to the tiny veins.` },
+      { q: `What is the clear front part of your eye, which covers the pupil, called?`, a: `The cornea`, w: [`The retina`, `The lens`, `The eyelid`], why: `The cornea is a clear dome that protects the eye and helps to focus light.` },
+      { q: `Which blood group can be given to almost anyone in an emergency, as a "universal donor"?`, a: `O negative`, w: [`AB positive`, `A positive`, `B positive`], why: `O negative red blood cells do not carry the markers that cause most reactions, so they suit almost every patient.` },
+    ],
+    gk_earth: [
+      { q: `What is the solid outer layer of the Earth, the one we live on, called?`, a: `The crust`, w: [`The mantle`, `The outer core`, `The inner core`], why: `The crust is the thin, rocky outside layer. Under it lies the thick mantle.` },
+      { q: `Which continent is the driest on Earth?`, a: `Antarctica`, w: [`Africa`, `Australia`, `Asia`], why: `Antarctica gets very little snow and rain, so it is a cold desert, the driest continent.` },
+      { tf: false, q: `True or false: the Earth is a perfectly round ball.`, why: `The Earth spins, so it bulges a little at the equator. It is very slightly squashed.` },
+      { q: `The huge sheets of the Earth's crust that slowly move are called tectonic ___.`, t: [`plates`, `plate`], why: `Earthquakes and volcanoes often happen where the plates push, pull or slide past each other.`, h: `They fit together a bit like jigsaw pieces.` },
+      { q: `In which direction does the Earth spin?`, a: `From west to east`, w: [`From east to west`, `From north to south`, `From south to north`], why: `The Earth spins towards the east, which is why the Sun appears to rise in the east.` },
+      { q: `Angel Falls, the highest waterfall in the world, is in which country?`, a: `Venezuela`, w: [`Brazil`, `Zambia`, `Canada`], why: `Angel Falls in Venezuela drops almost one kilometre, more than 15 times higher than Niagara Falls' main drop.` },
+    ],
+  });
+  root.RS.addQuestions('kash', '2026-11-18', {
+    gk_animals: [
+      { q: `Which animal has the longest neck?`, a: `The giraffe`, w: [`The elephant`, `The ostrich`, `The zebra`], why: `A giraffe's neck can be about 2 metres long, so it can reach leaves high up in the trees.` },
+      { q: `How many legs does a spider have?`, a: `8`, w: [`6`, `4`, `10`], why: `A spider has eight legs. An insect has six.`, h: `More than an insect has.` },
+      { tf: false, q: `True or false: a whale is a kind of fish.`, why: `A whale is a mammal. It breathes air, is warm-blooded and feeds its babies milk.` },
+      { q: `A baby cow is called a ___.`, t: [`calf`], why: `A baby cow is a calf. Baby elephants and whales are called calves too.`, h: `It rhymes with half.` },
+      { q: `Which bird lays the biggest egg?`, a: `The ostrich`, w: [`The eagle`, `The chicken`, `The owl`], why: `An ostrich egg is about as big as 20 chicken eggs.` },
+      { q: `Which sea animal has eight arms?`, a: `The octopus`, w: [`The shark`, `The dolphin`, `The crab`], why: `Octo means eight. An octopus has eight arms with suckers.` },
+    ],
+    gk_space: [
+      { q: `How many planets are there in our solar system?`, a: `8`, w: [`7`, `9`, `10`], why: `There are eight planets: Mercury, Venus, Earth, Mars, Jupiter, Saturn, Uranus and Neptune.` },
+      { q: `What do we call the Moon's changing shapes, from a thin crescent to a full circle?`, a: `Phases`, w: [`Seasons`, `Tides`, `Eclipses`], why: `The Moon makes no light of its own. We see the part the Sun lights up, and that part changes as the Moon circles Earth.` },
+      { tf: false, q: `True or false: the Sun is the biggest planet in our solar system.`, why: `The Sun is not a planet but a star, a huge ball of hot, glowing gas.` },
+      { q: `The planet with the beautiful rings around it is ___.`, t: [`Saturn`], why: `Saturn has the biggest and brightest rings, made of ice and rock.`, h: `It is the sixth planet from the Sun.` },
+      { q: `What must astronauts wear when they go outside their spacecraft?`, a: `A spacesuit`, w: [`A raincoat`, `A wetsuit`, `A race jersey`], why: `A spacesuit gives astronauts air to breathe, keeps them at the right temperature and protects them.` },
+      { q: `Which is the biggest planet in our solar system?`, a: `Jupiter`, w: [`Saturn`, `Earth`, `Neptune`], why: `Jupiter is so big that all the other planets could fit inside it.` },
+    ],
+    gk_sa: [
+      { q: `Which city is called the Mother City?`, a: `Cape Town`, w: [`Durban`, `Bloemfontein`, `Pretoria`], why: `Cape Town is the oldest city in South Africa, so it got the name Mother City.` },
+      { q: `What is the money used in South Africa called?`, a: `The rand`, w: [`The dollar`, `The pound`, `The euro`], why: `We use rand and cents. The rand is named after the Witwatersrand, the ridge where gold was found.` },
+      { tf: true, q: `True or false: Pretoria is nicknamed the Jacaranda City.`, why: `Thousands of jacaranda trees fill Pretoria's streets with purple flowers every October.` },
+      { q: `South Africa is at the southern tip of the continent of ___.`, t: [`Africa`], why: `South Africa is the country at the very south of Africa.`, h: `It is the continent where we live.` },
+      { q: `Which of these is a traditional South African food made from maize meal?`, a: `Pap`, w: [`Biltong`, `Boerewors`, `Koeksister`], why: `Pap is a stiff porridge made from ground maize. People eat it with a braai or with stew.` },
+      { q: `Which penguins live at Boulders Beach near Simon's Town?`, a: `African penguins`, w: [`Emperor penguins`, `King penguins`, `Rockhopper penguins`], why: `African penguins live on our coast. They are noisy and make loud braying calls.` },
+    ],
+    gk_world: [
+      { q: `Which ocean lies between Africa and Australia?`, a: `The Indian Ocean`, w: [`The Atlantic Ocean`, `The Arctic Ocean`, `The Pacific Ocean`], why: `The Indian Ocean washes the east coast of Africa and the west coast of Australia.` },
+      { q: `In which country are the famous pyramids at Giza?`, a: `Egypt`, w: [`Kenya`, `Mexico`, `Namibia`], why: `The great pyramids of Giza were built in Egypt more than 4 000 years ago as tombs for kings.` },
+      { tf: false, q: `True or false: polar bears live in Antarctica, with the penguins.`, why: `Polar bears live near the North Pole, in the Arctic. Penguins live in the south. They never meet in the wild.` },
+      { q: `Kangaroos live wild in the country of ___.`, t: [`Australia`], why: `Kangaroos are found in the wild only in Australia and nearby New Guinea.`, h: `It is also a continent.` },
+      { q: `The Great Wall, a very long wall made of stone and brick, is in which country?`, a: `China`, w: [`India`, `Brazil`, `Egypt`], why: `The Great Wall of China was built over many hundreds of years to protect China from attacks.` },
+      { q: `If you travel from South Africa to Egypt, which way do you go?`, a: `North`, w: [`South`, `East`, `West`], why: `Egypt is at the north of Africa, and South Africa is at the south.` },
+    ],
+    gk_sport: [
+      { q: `How many points does a try score in rugby?`, a: `5`, w: [`3`, `2`, `7`], why: `A try is worth 5 points. A conversion kick after it adds 2 more.` },
+      { q: `What must a motocross rider always wear on his head?`, a: `A helmet`, w: [`A cap`, `A beanie`, `A headband`], why: `A helmet protects the head if the rider falls.` },
+      { tf: true, q: `True or false: a marathon is about 42 kilometres long.`, why: `A marathon is 42,195 kilometres.` },
+      { q: `In cricket, the bowler tries to hit the three wooden ___ behind the batter.`, t: [`stumps`, `stump`], why: `The three stumps and the bails on top are called the wicket. If the ball hits them, the batter is out.`, h: `They stand up in the ground.` },
+      { q: `In which sport do players hit a ball over a net at Wimbledon?`, a: `Tennis`, w: [`Rugby`, `Hockey`, `Cricket`], why: `Wimbledon is the most famous tennis tournament in the world.` },
+      { q: `Why do motocross riders often stand on the footpegs over bumps?`, a: `Their legs soak up the bumps like springs`, w: [`It makes the bike go faster`, `It keeps their boots clean`, `It stops the engine from stalling`], why: `Standing lets the knees and legs bend and take the knocks, so the rider stays in control.` },
+    ],
+    gk_body: [
+      { q: `What is the tube that carries food from your mouth to your stomach called?`, a: `The oesophagus (gullet)`, w: [`The windpipe`, `The spine`, `The artery`], why: `The oesophagus squeezes the food down to your stomach. The windpipe is for air.` },
+      { q: `What is a joint?`, a: `A place where two bones meet`, w: [`A kind of muscle`, `A part of the brain`, `A tube for blood`], why: `Joints such as your knee and elbow let your bones bend and move.` },
+      { tf: true, q: `True or false: you breathe out a gas called carbon dioxide.`, why: `Your body makes carbon dioxide as it uses oxygen, and you breathe it out.` },
+      { q: `The strong bone that protects your brain is your ___.`, t: [`skull`], why: `Your skull is a hard shell of bone around the brain.`, h: `It is on top of your neck.` },
+      { q: `What is the watery liquid in your mouth that helps to break down food called?`, a: `Saliva`, w: [`Sweat`, `Blood`, `Tears`], why: `Saliva makes food wet and starts to break it down when you chew.` },
+      { q: `What carries messages between your brain and the rest of your body?`, a: `Nerves`, w: [`Bones`, `Veins`, `Teeth`], why: `Nerves are like thin wires that send messages, such as "that is hot", very fast.` },
+    ],
+    gk_how: [
+      { q: `Why does a balloon rubbed on your hair stick to a wall?`, a: `Static electricity`, w: [`Magnetism`, `Gravity`, `Glue from the rubber`], why: `Rubbing builds up a tiny electric charge on the balloon, and it makes the balloon cling to the wall.` },
+      { tf: true, q: `True or false: ice floats on water.`, why: `When water freezes it takes up more space, so ice is lighter than water and floats.` },
+      { q: `What colour is made when all the colours of the rainbow are mixed together as light?`, a: `White`, w: [`Black`, `Brown`, `Grey`], why: `Sunlight looks white but is made of all the rainbow colours mixed.` },
+      { q: `Water freezes at 0 degrees ___.`, t: [`Celsius`, `C`, `centigrade`, `degrees Celsius`], why: `Water turns into ice at 0 degrees Celsius and boils at 100.`, h: `It is the scale on a thermometer in South Africa.` },
+      { q: `Solar panels turn sunlight into what?`, a: `Electricity`, w: [`Petrol`, `Water`, `Wind`], why: `Solar panels use the energy in sunlight to make electricity.` },
+      { q: `What is moving back and forth very fast when a guitar string makes a sound?`, a: `Vibrations`, w: [`Magnets`, `Shadows`, `Heat`], why: `Sound is made when something moves back and forth very fast. That is called vibrating.` },
+    ],
+    gk_nature: [
+      { q: `What do the roots of a plant do?`, a: `Take in water and hold the plant in the ground`, w: [`Make the flowers`, `Catch insects`, `Make the leaves green`], why: `Roots drink water from the soil and also act like an anchor.` },
+      { q: `What are clouds made of?`, a: `Tiny drops of water or ice`, w: [`Smoke`, `Cotton`, `Air only`], why: `Clouds are made of millions of tiny water drops or ice crystals floating high up.` },
+      { tf: true, q: `True or false: plants make their own food in their leaves.`, why: `Leaves use sunlight, water and air to make food. This is called photosynthesis.` },
+      { q: `A very strong, spinning storm that forms over warm seas is called a ___.`, t: [`cyclone`, `tropical cyclone`, `hurricane`, `typhoon`], why: `Cyclones bring heavy rain and strong winds. They sometimes hit Mozambique. Near America they are called hurricanes.`, h: `Its eye is a calm spot in the middle of the storm.` },
+      { q: `Which gas do plants take in from the air?`, a: `Carbon dioxide`, w: [`Nitrogen`, `Smoke`, `Helium`], why: `Plants take in carbon dioxide and give out oxygen, which we need to breathe.` },
+      { q: `What do we call an animal that hunts other animals for food?`, a: `A predator`, w: [`A herbivore`, `A parasite`, `A scavenger`], why: `A predator hunts and kills its prey, like a lion hunting a zebra.` },
+    ],
+  });
+})(typeof window !== 'undefined' ? window : globalThis);
+
 /* Big Air: a short ramp-and-tricks side game, opened by the day's pit pass.
    Hold to rev, launch off the kicker, trick in the air, lean to match the landing slope.
    Scores are style points for his own records only. It never earns shop points. */
@@ -21736,7 +21873,7 @@ ${t && H > W && W < 600 ? '<li>Tip: turn your phone sideways for a bigger view.<
   // ---------- staying up to date ----------
   // An open tab or a home screen app keeps running the page it first loaded, old prices and all. So it asks which version
   // is live when it comes back into view and every few minutes, and swaps over between races. build.mjs fills in BUILD.
-  const BUILD = '14bf6f79ef';
+  const BUILD = '9aa916494f';
   const BACK_KEY = 'holeshot.back.v1';
   const TRIED_KEY = 'holeshot.tried.v1';
   let liveBuild = null;
