@@ -16614,6 +16614,493 @@ Jordy's Science test, Tuesday 10 November: Planet Earth and Beyond. Written from
   });
 })(typeof window !== 'undefined' ? window : globalThis);
 
+/* Batch of 22 November 2026: three new questions for every written list under 60, six for every general knowledge list. */
+(function (root) {
+  'use strict';
+  root.RS.addQuestions('jordy', '2026-11-22', {
+dv_tf: [
+  { tf: true, q: `True or false: every number that divides by 12 also divides by 6.`, why: `12 is 2 × 6, so any number made of whole 12s is also made of whole 6s.` },
+  { tf: true, q: `True or false: a number that divides by both 3 and 5 also divides by 15.`, why: `3 and 5 share no factor, so a number in both times tables is in the 15 times table.` },
+  { tf: true, q: `True or false: a number that divides by both 5 and 6 also divides by 30.`, why: `5 and 6 share no factor except 1, so a number that divides by both divides by 5 × 6 = 30.` },
+],
+eng_punct: [
+  { q: `Which sentence needs a question mark at the end?`, a: `Do you know where the start line is`, w: [`I wonder where the start line is`, `Tell me where the start line is`, `He asked where the start line was`], why: `Only the first is a direct question. The others are statements or commands, so they end in a full stop.`, h: `Look for the sentence that asks you something directly.` },
+  { q: `Type the name of the mark that shows ownership or a missing letter: the ___.`, t: [`apostrophe`], why: `The apostrophe shows that something belongs to someone, or that letters have been left out, as in don't.`, h: `It looks like a tiny floating comma and starts with "a".` },
+  { q: `Which sentence uses brackets correctly to add extra information?`, a: `My cousin (who lives in Gqeberha) rides enduro.`, w: [`My cousin (who lives in Gqeberha rides enduro).`, `My cousin who lives in Gqeberha) rides enduro.`, `My cousin (who lives in Gqeberha, rides) enduro.`], why: `Brackets come in pairs and wrap only the extra information. Here the extra information is "who lives in Gqeberha".`, h: `Check that every opening bracket has a closing one in the right place.` },
+],
+eng_parts: [
+  { q: `What part of speech is **and**? Boots and gloves were drying on the line.`, a: `Conjunction`, w: [`Preposition`, `Adverb`, `Pronoun`], why: `"And" joins the words "boots" and "gloves", so it is a conjunction.`, h: `What job does the word do between the two things?` },
+  { q: `Which word in this sentence is a possessive pronoun? The red bike is mine.`, a: `mine`, w: [`red`, `bike`, `is`], why: `A possessive pronoun takes the place of a noun and shows ownership. "Mine" stands for "my bike".`, h: `Which word shows who owns the bike?` },
+  { q: `A word that joins words or sentences, like "and" or "but", is called a ___.`, t: [`conjunction`], why: `Conjunctions join words, phrases or sentences.`, h: `It starts with "c" and ends in "-junction".` },
+],
+eng_figures: [
+  { q: `What figure of speech is this? The wet grass was a slippery slide under our tyres.`, a: `Metaphor`, w: [`Simile`, `Hyperbole`, `Personification`], why: `The grass is said to be a slide, with no "like" or "as", so it is a metaphor.`, h: `Is there a "like" or "as" in the sentence?` },
+  { q: `What figure of speech is this? I'm so hungry I could eat an elephant.`, a: `Hyperbole`, w: [`Simile`, `Metaphor`, `Alliteration`], why: `Nobody could really eat an elephant. It is a huge exaggeration, which is hyperbole.`, h: `Could this really happen?` },
+  { q: `The figure of speech that repeats the same starting sound in nearby words is ___.`, t: [`alliteration`], why: `In "Ten tired tyres tumbled", the repeated t sound is alliteration.`, h: `It starts with the same letter as "apple".` },
+],
+eng_speech: [
+  { q: `Change to indirect speech: Kyle said, "We are leaving."`, a: `Kyle said that they were leaving.`, w: [`Kyle said that we were leaving.`, `Kyle said that they are leaving.`, `Kyle said, that they were leaving?`], why: `In indirect speech "we" becomes "they" and "are" moves back to "were".`, h: `Change the pronoun and the tense.` },
+  { q: `Change to indirect speech: She asked, "Can you help me?"`, a: `She asked if I could help her.`, w: [`She asked if I can help her.`, `She asked can you help me.`, `She asked that could I help her.`], why: `A yes/no question becomes "asked if", "can" becomes "could" and "you" and "me" change to match who is speaking.`, h: `Use "if" and move the tense back.` },
+  { q: `In indirect speech, "tonight" usually becomes…`, a: `that night`, w: [`this night`, `last night`, `tomorrow night`], why: `Time words move back in indirect speech: "tonight" becomes "that night".`, h: `Think of "today" becoming "that day".` },
+],
+eng_syn: [
+  { q: `Which is a synonym for **silent**?`, a: `quiet`, w: [`loud`, `busy`, `lively`], why: `Silent and quiet both mean making little or no noise.`, h: `Which word means almost the same?` },
+  { q: `Which is an antonym of **include**?`, a: `exclude`, w: [`contain`, `invite`, `collect`], why: `To include is to put in. To exclude is to leave out, which is the opposite.`, h: `Think "put in" and its opposite.` },
+  { tf: true, q: `True or false: **scarce** and **plentiful** are antonyms.`, why: `Scarce means hard to find and plentiful means there is lots, so they are opposites.` },
+],
+eng_affix: [
+  { q: `What does the prefix **anti-** mean, as in **antifreeze**?`, a: `Against`, w: [`Before`, `Half`, `Many`], why: `Antifreeze works against freezing. Anti- means against.`, h: `What does antifreeze do to freezing?` },
+  { q: `What does the suffix **-able** mean in **washable**?`, a: `Able to be done`, w: [`Without`, `Full of`, `Not`], why: `Washable means able to be washed.`, h: `Say "able to be ..." with the word wash.` },
+  { q: `Add the prefix **re-** to **build** to mean "build again". Type the whole word.`, t: [`rebuild`, `re-build`], why: `Re- means again, so build again is rebuild.`, h: `Stick the prefix on the front, with no space.` },
+],
+eng_subject: [
+  { q: `Find the subject: My cousin from Gqeberha is visiting.`, a: `My cousin from Gqeberha`, w: [`is visiting`, `Gqeberha`, `My cousin`], why: `The subject is who the sentence is about, with the words that go with it: "My cousin from Gqeberha".`, h: `Who is visiting?` },
+  { q: `Find the predicate: The tired marshals drank water.`, a: `drank water`, w: [`The tired marshals`, `tired marshals drank`, `water`], why: `The predicate says what the subject did: "drank water".`, h: `What did the marshals do?` },
+  { tf: false, q: `True or false: in "The riders cheered and clapped.", the subject is "cheered and clapped".`, why: `"Cheered and clapped" is the predicate. The subject is "The riders".` },
+],
+eng_abstract: [
+  { q: `Form an abstract noun from **curious**: Her ___ made her open the engine cover.`, t: [`curiosity`], why: `Curious becomes curiosity, a quality you cannot touch.`, h: `The ending is -ity, and the spelling changes a little.` },
+  { q: `Complete with the abstract noun from **popular**: The rider's ___ grew with every win.`, a: `popularity`, w: [`popularly`, `popularise`, `populous`], why: `Popular becomes popularity. The other words are an adverb, a verb and a different adjective.`, h: `You need a noun, a name for a quality.` },
+  { tf: false, q: `True or false: you can touch an abstract noun, like **courage**.`, why: `An abstract noun names an idea or feeling. You cannot see or touch it.` },
+],
+geo_u1: [
+  { q: `A population density map uses darker shading for places with more people per km². What does the darkest shading show?`, a: `The most densely populated areas`, w: [`The biggest provinces`, `The driest areas`, `The areas with no people`], why: `Darker shading stands for a higher density: many people in each square kilometre.`, h: `Think of what dark shading is used to stand for.` },
+  { tf: false, q: `True or false: Gauteng is the largest province by area.`, why: `Gauteng is the smallest province by area. The Northern Cape is the largest.` },
+  { q: `Population density is measured in…`, a: `people per km²`, w: [`km² per person`, `kilometres`, `litres per person`], why: `Density is people divided by area, so it is shown as people per square kilometre.`, h: `Density is people divided by area.` },
+],
+geo_prov: [
+  { q: `Which province has Polokwane as its capital?`, a: `Limpopo`, w: [`Mpumalanga`, `North West`, `Free State`], why: `Polokwane is the capital of Limpopo, in the north of the country.` },
+  { q: `Which province has Mahikeng as its capital?`, a: `North West`, w: [`Northern Cape`, `Limpopo`, `Gauteng`], why: `Mahikeng is the capital of the North West province.` },
+  { q: `Which province has Bhisho as its capital?`, a: `Eastern Cape`, w: [`Western Cape`, `KwaZulu-Natal`, `Northern Cape`], why: `Bhisho, near Qonce, is the capital of the Eastern Cape.` },
+],
+geo_urban: [
+  { q: `Why do rural areas often have fewer shops and clinics?`, a: `Fewer people live there to use them`, w: [`Rural people never need clinics`, `Shops are not allowed on farms`, `Clinics only work in cities`], why: `Services go where many people can use them, so sparsely populated areas get fewer.`, h: `Think about how many customers or patients there are.` },
+  { tf: true, q: `True or false: a suburb with houses and shops close together is part of an urban area.`, why: `Suburbs are built-up areas with many people close together, so they are urban.` },
+  { q: `Which is a common challenge of living on a remote farm?`, a: `Long distances to shops, schools and clinics`, w: [`Too many neighbours`, `Heavy traffic every morning`, `No open space`], why: `Rural homes are spread out, so reaching services can take a long time.`, h: `Think about how far apart homes are.` },
+],
+geo_places: [
+  { q: `Which mineral brought many people to Johannesburg in its early days?`, a: `Gold`, w: [`Salt`, `Coal`, `Silver`], why: `Gold was found on the Witwatersrand, and people rushed there to find work and fortune.` },
+  { q: `What is a port?`, a: `A place where ships load and unload goods`, w: [`A road for lorries`, `A mountain pass`, `A farm near the sea`], why: `Ports have docks and cranes for ships, so many towns grew up around them.`, h: `Think of the Durban docks.` },
+  { tf: true, q: `True or false: people long ago often settled near fresh water so they could drink, wash and grow food.`, why: `Water is essential for life and farming, so it has always drawn people.` },
+],
+geo_move: [
+  { q: `What can happen to a village when many young people move away to the city?`, a: `Fewer people are left to work the land and run services`, w: [`The village gets more shops`, `More schools open`, `The population density goes up`], why: `When younger adults leave, there are fewer workers and customers left.`, h: `Think about who stays behind.` },
+  { q: `Which of these might people living in an informal settlement lack?`, a: `Proper water, toilets and electricity`, w: [`Neighbours`, `Fresh air`, `Daylight`], why: `Informal settlements are built without planning, so services are often missing.`, h: `Think of basic services.` },
+  { tf: true, q: `True or false: cities usually offer more kinds of jobs than most rural areas.`, why: `Cities have many businesses, offices and factories, which is a big reason people move there.` },
+],
+geo_globe: [
+  { q: `Which of these big cities is in China?`, a: `Shanghai`, w: [`Mumbai`, `Tokyo`, `Sydney`], why: `Shanghai is a large port city in eastern China.` },
+  { q: `Which ocean lies between Africa and South America?`, a: `The Atlantic Ocean`, w: [`The Indian Ocean`, `The Pacific Ocean`, `The Arctic Ocean`], why: `The Atlantic Ocean separates Africa from the Americas.`, h: `It is the ocean off the west coast of South Africa.` },
+  { tf: true, q: `True or false: more than half of the world's people live in Asia.`, why: `Asia is the most populated continent and holds well over half of all people.` },
+],
+geo_climate: [
+  { q: `Which South African city has a climate with most of its rain in winter?`, a: `Cape Town`, w: [`Durban`, `Johannesburg`, `Polokwane`], why: `Cape Town has a winter rainfall climate. Johannesburg and Durban get most rain in summer.`, h: `Think of the south-western corner of the country.` },
+  { q: `In which place is it hardest to grow crops?`, a: `A very dry place with little rain`, w: [`A river valley`, `A mild coastal plain`, `Land with fertile soil and regular rain`], why: `Crops need water, so very dry places are the hardest to farm.`, h: `What do plants need to grow?` },
+  { tf: true, q: `True or false: the eastern parts of South Africa generally get more rain than the western parts.`, why: `Moist air from the Indian Ocean brings more rain to the east, while the west is much drier.` },
+],
+geo_pop: [
+  { q: `400 people live on 20 km² of land. What is the population density?`, a: `20 people per km²`, w: [`8 000 people per km²`, `2 people per km²`, `380 people per km²`], why: `400 ÷ 20 = 20 people for each square kilometre.`, h: `Divide the people by the area.` },
+  { q: `A density of about 1 person per km² would most likely be found in…`, a: `a remote, dry region`, w: [`a big city centre`, `a crowded suburb`, `a busy taxi rank`], why: `Very low density means people are few and far apart, as in remote desert areas.`, h: `Few people, lots of space.` },
+  { tf: false, q: `True or false: a census is only taken in cities.`, why: `A census counts everyone in the whole country, in cities, towns and rural areas.` },
+],
+geo_live: [
+  { q: `Why do people in hot countries often paint their houses white?`, a: `White reflects the sun's heat`, w: [`White paint is the cheapest`, `White keeps rain out`, `White makes houses warmer`], why: `Light colours reflect sunlight, so the house stays cooler.`, h: `Think about wearing a white or a black shirt in the sun.` },
+  { tf: true, q: `True or false: a good standard of living means people can afford housing, food and healthcare.`, why: `Standard of living is about how well people live, including their basic needs and services.` },
+  { q: `Which is an example of subsistence farming?`, a: `A family growing mealies on a small plot to eat`, w: [`A big farm growing wheat for the export market`, `A cattle ranch selling to a supermarket chain`, `A sugar farm selling to a mill`], why: `Subsistence farmers grow food mainly for their own household.`, h: `Who eats the food that is grown?` },
+],
+geo_rural: [
+  { q: `A farm closes and the workers move to the city for jobs. This is an example of a…`, a: `push factor`, w: [`pull factor`, `census`, `population density`], why: `A push factor drives people away from a place. Losing work on the farm pushes people out.`, h: `Are they being driven out or drawn in?` },
+  { tf: false, q: `True or false: an informal settlement is usually well planned and has all services.`, why: `Informal settlements are built without planning and often lack services like water and electricity.` },
+  { q: `Which has the lower population density?`, a: `A cattle farm`, w: [`A city suburb`, `A city centre`, `A busy township`], why: `A farm covers a large area with only a few people, so its density is low.`, h: `Think of people in each square kilometre.` },
+],
+geo_world: [
+  { q: `The Aboriginal people are the first peoples of which country?`, a: `Australia`, w: [`Canada`, `Brazil`, `Kenya`], why: `Aboriginal Australians lived in Australia for tens of thousands of years before Europeans arrived.` },
+  { q: `The Amazon rainforest is mostly in which country?`, a: `Brazil`, w: [`India`, `Egypt`, `Japan`], why: `Most of the Amazon rainforest is in Brazil, in South America.` },
+  { q: `Which desert lies along the coast of Namibia?`, a: `The Namib`, w: [`The Sahara`, `The Gobi`, `The Arabian Desert`], why: `The Namib Desert runs along the Atlantic coast of Namibia.`, h: `The desert shares its name with the country.` },
+],
+ems_wants: [
+  { q: `A teacher teaching your class is providing a…`, a: `service`, w: [`good`, `scarcity`, `tax`], why: `Teaching is work done for you, which is a service.`, h: `Can you pick it up and carry it?` },
+  { q: `You have R100. You can buy a movie ticket or a book, not both. You buy the book. What is the opportunity cost?`, a: `The movie ticket`, w: [`The book`, `R100`, `Nothing`], why: `Opportunity cost is the next best thing you give up. Here it is the movie ticket.`, h: `What did you give up?` },
+  { tf: true, q: `True or false: a bag of mealie meal is a good.`, why: `A good is something you can see and touch, such as a bag of mealie meal.` },
+],
+ems_economy: [
+  { q: `A supermarket sells groceries to customers. Which sector is it in?`, a: `Tertiary`, w: [`Primary`, `Secondary`, `None of them`], why: `Shops provide a service by selling goods to people, so they are in the tertiary sector.`, h: `Does it take raw materials or make things?` },
+  { q: `A sawmill turns logs into planks. Which sector is it in?`, a: `Secondary`, w: [`Primary`, `Tertiary`, `Government`], why: `It turns raw materials into a product, which is the secondary sector.`, h: `Logs are changed into something else.` },
+  { tf: true, q: `True or false: one person in a household can be both a worker and a consumer.`, why: `A person works to earn income and then spends it on goods and services.` },
+],
+ems_entre: [
+  { q: `You sell 40 koeksisters at R5 each. Your costs were R120. What is your profit?`, a: `R80`, w: [`R200`, `R120`, `R160`], why: `Income is 40 × R5 = R200. Profit is R200 − R120 = R80.`, h: `Work out income first, then take away costs.` },
+  { q: `A bright poster and a good business name are part of…`, a: `marketing`, w: [`capital`, `tax`, `scarcity`], why: `Marketing tells people about your business and what you sell.`, h: `It helps customers find you.` },
+  { tf: false, q: `True or false: income and profit mean the same thing.`, why: `Income is all the money coming in. Profit is what is left after costs are taken away.` },
+],
+ems_budget: [
+  { q: `Your income is R800 a month. You plan R500 for needs and R150 for wants, and save the rest. How much do you save?`, a: `R150`, w: [`R650`, `R300`, `R100`], why: `R500 + R150 = R650 spent. R800 − R650 = R150 saved.`, h: `Add up what you spend first.` },
+  { q: `Your budget shows a deficit. What is a sensible first step?`, a: `Cut back on wants`, w: [`Spend more on wants`, `Ignore the budget`, `Cut back on food`], why: `A deficit means you spend more than you earn. Needs come first, so cut wants.`, h: `Which spending can you live without?` },
+  { tf: true, q: `True or false: an emergency fund is money saved for unexpected costs.`, why: `An emergency fund covers surprises, like a repair bill or a hospital visit.` },
+],
+    his_vote: [
+      { q: `What is a polling station?`, a: `A place where people go to cast their votes`, w: [`A place where parties print their posters`, `A building where the votes are counted in secret`, `The office where the president works`], why: `On election day, voters go to a polling station, such as a school hall, to mark their ballot papers and put them in a box.`, h: `Think about where you would go on election day.` },
+      { tf: true, q: `True or false: in South Africa's elections, a party that wins only a small share of the votes can still win some seats in Parliament.`, why: `Seats are shared out according to each party's share of the votes, so smaller parties can win a few seats too.` },
+      { q: `Which of these must a voter show at the polling station to prove who they are?`, a: `An identity document (ID)`, w: [`A library card`, `A school report`, `A bus ticket`], why: `Voters show their ID so that officials know the person is a citizen who is registered to vote.`, h: `It is the document that proves who you are.` },
+    ],
+    his_1994: [
+      { q: `In which month of 1994 were South Africa's first democratic elections held?`, a: `April`, w: [`January`, `June`, `December`], why: `Voting took place at the end of April 1994. This is why Freedom Day is on 27 April.`, h: `It is the month with Freedom Day in it.` },
+      { q: `Who was the last president of South Africa under apartheid, who worked with Nelson Mandela to bring in the elections?`, a: `F.W. de Klerk`, w: [`P.W. Botha`, `Oliver Tambo`, `Desmond Tutu`], why: `F.W. de Klerk was president when he and Nelson Mandela negotiated the end of apartheid. After the 1994 election he became a deputy president.`, h: `He led the National Party.` },
+      { tf: true, q: `True or false: after the 1994 election South Africa first used an interim (temporary) Constitution, until the final Constitution was passed in 1996.`, why: `An interim Constitution guided the country while the new government wrote the final Constitution, which became law in 1996.` },
+    ],
+    his_equal: [
+      { q: `Which of these is an example of discrimination?`, a: `Refusing someone a job because of their race`, w: [`Giving the job to the best person for it`, `Asking every applicant the same questions`, `Telling applicants when the interviews are`], why: `Discrimination is unfair treatment because of who a person is, such as their race. The Constitution says nobody may be treated this way.`, h: `Look for the one that is unfair to someone because of who they are.` },
+      { tf: true, q: `True or false: a person accused of a crime has the right to have a lawyer.`, why: `Everyone accused of a crime is entitled to a lawyer, so that they can put their side fairly in court.` },
+      { q: `What is a court?`, a: `A place where legal cases are heard and decided`, w: [`A place where new laws are voted on`, `A place where prisoners are trained`, `A place where the police keep their records`], why: `Courts hear both sides of a case and a judge or magistrate decides it according to the law.`, h: `Think of where a judge works.` },
+    ],
+    his_song: [
+      { q: `The tune of Nkosi Sikelel' iAfrika was also used for the national anthem of which of these countries?`, a: `Tanzania`, w: [`Kenya`, `Egypt`, `Nigeria`], why: `The hymn spread across Africa, and Tanzania's anthem, Mungu ibariki Afrika, uses its tune. Zambia's anthem did too.`, h: `It is a country in East Africa that has Mount Kilimanjaro.` },
+      { q: `Which of these is a national symbol, like the national anthem?`, a: `The national flag`, w: [`A school badge`, `A shop's logo`, `A provincial map`], why: `A country's symbols, such as its flag and its anthem, stand for the whole nation.`, h: `It flies on poles at government buildings.` },
+      { q: `What is a hymn?`, a: `A song of praise, usually to God`, w: [`A marching song for soldiers`, `A song that tells a funny story`, `A song played only on drums`], why: `Nkosi Sikelel' iAfrika began as a hymn, a song of praise and prayer, before it became an anthem.`, h: `You often sing one in church.` },
+    ],
+    his_healers: [
+      { q: `The word "muti", used in South Africa, comes from the isiZulu word for…`, a: `Medicine, or a tree`, w: [`Ancestor`, `Healer`, `Blessing`], why: `The isiZulu word umuthi means a tree and also the medicine made from plants. That is how the word muti came to mean medicine.`, h: `Many healing remedies come from this part of nature.` },
+      { tf: true, q: `True or false: Western doctors often use tests such as blood tests and X-rays to find out what is wrong.`, why: `Western medicine is based on science, so doctors use tests and scans to diagnose the problem.` },
+      { q: `Which of these is part of Western medicine, rather than indigenous medicine?`, a: `A vaccine made in a laboratory`, w: [`A tea made from leaves picked in the veld`, `A herbal remedy from a nyanga`, `Advice from a sangoma after speaking to the ancestors`], why: `Vaccines are made and tested in laboratories using science, which is the mark of Western medicine.`, h: `Look for the one that comes out of science laboratories.` },
+    ],
+    his_plants: [
+      { q: `Which South African plant is used to make a tea that has no caffeine?`, a: `Rooibos`, w: [`Marula`, `Protea`, `Baobab`], why: `Rooibos tea is made from a shrub that grows in the Cederberg area of the Western Cape. It is naturally free of caffeine.`, h: `It is a red-brown tea from the Western Cape.` },
+      { tf: true, q: `True or false: picking too many wild medicinal plants can make them very rare.`, why: `If wild plants are taken faster than they grow back, they can almost disappear. That is why a licence is needed to pick wild Buchu.` },
+      { q: `Plants that can be used to make medicine are called ___ plants.`, t: [`medicinal`], why: `Medicinal plants are plants used to heal people. South Africa has hundreds of them.`, h: `It is the describing word that comes from the word "medicine".` },
+    ],
+    his_sangoma: [
+      { q: `What do many sangomas throw and read to help them find out what is wrong with a patient?`, a: `Bones`, w: [`Coins`, `Playing cards`, `Tea leaves`], why: `Many sangomas use a set of divining bones. They throw them and read how they fall, to ask the ancestors for guidance.`, h: `Think of the name "divining ___".` },
+      { tf: true, q: `True or false: a sangoma can be either a man or a woman.`, why: `Both men and women are called to become sangomas.` },
+      { tf: false, q: `True or false: sangomas learn their work by studying at a university, like Western doctors.`, why: `A sangoma learns through a long apprenticeship under an experienced sangoma, not at a university.` },
+    ],
+    his_germs: [
+      { q: `Which vaccine, given to babies in South Africa, helps protect against serious TB?`, a: `The BCG vaccine`, w: [`The MMR vaccine`, `The flu jab`, `The polio drops`], why: `BCG is given to babies to protect them against the most serious kinds of TB.`, h: `It is named with three letters.` },
+      { tf: true, q: `True or false: covering your mouth when you cough helps stop germs from spreading.`, why: `Coughs spray out tiny droplets that can carry germs, so covering your mouth helps protect other people.` },
+      { q: `Where do germs multiply fastest?`, a: `In warm, damp places`, w: [`In cold, dry places`, `In hot, dry places`, `In bright, windy places`], why: `Bacteria grow quickly when it is warm and wet. That is why food goes off faster when it is left out in the heat.`, h: `Think of why food goes off quickly on a hot, humid day.` },
+    ],
+    his_jenner: [
+      { q: `In which year was smallpox declared wiped out across the world?`, a: `1980`, w: [`1950`, `1996`, `2005`], why: `Worldwide vaccination worked so well that the World Health Organization declared smallpox gone in 1980. It is the only human disease wiped out so far.`, h: `It was nearly two hundred years after Jenner's experiment.` },
+      { tf: true, q: `True or false: Edward Jenner was a country doctor in a village in England.`, why: `Jenner lived and worked as a doctor in the countryside of Gloucestershire, where he heard what milkmaids said about cowpox.` },
+      { q: `A person who has had a jab to protect them from a disease has been ___.`, t: [`vaccinated`, `immunised`, `immunized`, `inoculated`], why: `Being vaccinated means being given a vaccine so the body can beat the disease later.`, h: `It is the word from the vaccine.` },
+    ],
+    his_fleming: [
+      { q: `In 1945, Fleming shared which famous prize with Howard Florey and Ernst Chain, who made penicillin usable?`, a: `The Nobel Prize`, w: [`The Olympic gold medal`, `The Booker Prize`, `The Victoria Cross`], why: `Fleming noticed it, and Florey and Chain's team turned it into a medicine. All three shared the Nobel Prize for medicine.`, h: `It is the most famous science prize in the world.` },
+      { q: `What is the name of the mould that makes penicillin?`, a: `Penicillium`, w: [`Bacillus`, `Lactobacillus`, `Aspergillus`], why: `The mould is called Penicillium, and penicillin is named after it.`, h: `The medicine is named after it.` },
+      { tf: false, q: `True or false: antibiotics such as penicillin work against viruses like the flu.`, why: `Antibiotics only kill bacteria. They do not work against viruses.` },
+    ],
+    his_surgery: [
+      { q: `Which member of the operating team gives the anaesthetic?`, a: `The anaesthetist`, w: [`The surgeon`, `The radiographer`, `The pharmacist`], why: `The anaesthetist is a doctor who puts the patient to sleep and watches over them during the operation.`, h: `It is in the name: an___.` },
+      { q: `Why are a surgeon's tools sterilised before an operation?`, a: `To kill any germs on them`, w: [`To make them shine`, `To make them cooler`, `To make them sharper`], why: `Sterilising, usually with very hot steam, kills germs so they cannot get into the patient's body.`, h: `Think about what must be kept out of the wound.` },
+      { q: `A small, very sharp knife used by surgeons is called a ___.`, t: [`scalpel`], why: `A scalpel is the small, very sharp knife surgeons use to make cuts during an operation.`, h: `It begins with the letters "sc".` },
+    ],
+    his_aids: [
+      { q: `Which person in a hospital takes X-ray pictures?`, a: `A radiographer`, w: [`A pharmacist`, `A porter`, `A dietitian`], why: `A radiographer is trained to take X-rays and scans for the doctors.`, h: `Part of the word reminds you of radiation.` },
+      { q: `How can a healthy adult help patients who lose blood in operations?`, a: `By donating blood`, w: [`By having an X-ray`, `By taking antibiotics`, `By washing their hands`], why: `Blood for transfusions comes from donors, who give blood at a clinic or blood service.`, h: `Where does the blood for a transfusion come from?` },
+      { tf: true, q: `True or false: radiographers protect parts of the patient's body that are not being X-rayed with a lead apron.`, why: `X-rays are used only where needed. A lead apron blocks the rays from other parts of the body.` },
+    ],
+    his_heart: [
+      { q: `How old was Denise Darvall, whose heart was used in the first heart transplant?`, a: `25`, w: [`18`, `32`, `41`], why: `Denise Darvall was 25 when she died after the accident. Her heart gave Louis Washkansky his chance.`, h: `She was a young woman.` },
+      { q: `Which member of Christiaan Barnard's family was also on the team that did the first heart transplant?`, a: `His brother Marius`, w: [`His father Adam`, `His brother Philip`, `His son Johan`], why: `Dr Marius Barnard, Christiaan's younger brother, was a surgeon on the team.`, h: `He was also a surgeon.` },
+      { tf: true, q: `True or false: "Groote Schuur" means "great barn" in old Dutch and Afrikaans.`, why: `Groote Schuur means great barn. The name goes back to the old farm on which the hospital's grounds were built.` },
+    ],
+    his_views: [
+      { q: `Which of these headlines is the most neutral, giving only the facts?`, a: `Heart operation done at Cape Town hospital`, w: [`Miracle heart operation amazes the world`, `Shocking heart operation outrages city`, `Doctors waste money on risky heart stunt`], why: `A neutral headline tells what happened without words that show approval or disapproval.`, h: `Look for the one with no feeling words.` },
+      { q: `Why is it a good idea to read more than one newspaper story about an event?`, a: `To compare different points of view`, w: [`Because they are all exactly the same`, `Because one is always wrong`, `Because the headlines are always facts`], why: `Different writers have different points of view, so comparing them helps you decide what is fact and what is opinion.`, h: `Different writers may not think alike.` },
+      { q: `A statement that can be checked and shown to be true is a ___.`, t: [`fact`], why: `A fact can be checked, such as the date or the hospital. An opinion shows what someone thinks or feels.`, h: `It is the opposite of an opinion.` },
+    ],
+    his_democracy: [
+      { q: `Which city is the administrative capital of South Africa, where the Union Buildings stand?`, a: `Pretoria`, w: [`Cape Town`, `Bloemfontein`, `Durban`], why: `South Africa has three capitals. Pretoria is where the government's executive works, Cape Town is where Parliament meets and Bloemfontein is the judicial capital.`, h: `The president's offices are in this city.` },
+      { q: `Who is the head of the executive part of government in South Africa?`, a: `The president`, w: [`The Chief Justice`, `The Speaker of Parliament`, `The mayor of Cape Town`], why: `The executive carries out the laws, and the president leads it. Parliament makes the laws and the courts judge them.`, h: `Parliament makes laws, so the executive does what with them?` },
+      { tf: false, q: `True or false: every adult in South Africa is forced by law to vote.`, why: `Voting is a right and a choice. South Africans may vote, but the law does not force them to.` },
+    ],
+    his_justice: [
+      { q: `What is a verdict in a court case?`, a: `The court's decision on whether the accused is guilty`, w: [`The punishment the accused is given`, `The speech made by the lawyer`, `The list of witnesses`], why: `The verdict is guilty or not guilty. If it is guilty, the court then decides the sentence.`, h: `It comes before the sentence.` },
+      { q: `What does a prosecutor do?`, a: `Argues the case against the accused for the state`, w: [`Decides the sentence`, `Speaks on behalf of the accused`, `Guards the court building`], why: `The prosecutor presents the evidence to try to prove that the accused did the crime. The judge or magistrate decides.`, h: `The person defending the accused is a different person.` },
+      { tf: true, q: `True or false: in a South African court, an accused person has the right to remain silent.`, why: `Nobody can be forced to confess, and the court must prove guilt, which is part of a fair trial.` },
+    ],
+    his_anthem: [
+      { q: `In which language was the poem "Die Stem van Suid-Afrika" first written?`, a: `Afrikaans`, w: [`English`, `isiZulu`, `Sesotho`], why: `C.J. Langenhoven wrote the poem in Afrikaans in 1918.`, h: `It is one of South Africa's official languages.` },
+      { q: `Which president made both Nkosi Sikelel' iAfrika and Die Stem national anthems in 1994?`, a: `Nelson Mandela`, w: [`F.W. de Klerk`, `Thabo Mbeki`, `P.W. Botha`], why: `President Mandela announced that both songs would be national anthems. They were joined into one a few years later.`, h: `He was the first president of the new democracy.` },
+      { tf: true, q: `True or false: singing the anthem is one way people show respect for their country.`, why: `The anthem stands for the whole country, which is why we stand and sing or listen quietly.` },
+    ],
+    his_medicine: [
+      { q: `What does a doctor use a stethoscope for?`, a: `To listen to the heart and lungs`, w: [`To take a patient's temperature`, `To see inside bones`, `To measure how tall someone is`], why: `The stethoscope was invented in France in 1816 so that doctors could hear the sounds inside the chest.`, h: `The doctor holds it against your chest.` },
+      { tf: true, q: `True or false: doctors in the past sometimes used leeches to take blood from patients.`, why: `Leeches were used for hundreds of years. They are still used in a few special cases today.` },
+      { q: `Quinine, a medicine used for malaria, was first made from…`, a: `The bark of a tree`, w: [`Sea water`, `Volcanic rock`, `Animal bones`], why: `Quinine came from the bark of the cinchona tree in South America and was used to treat malaria for centuries.`, h: `Many old medicines came from plants.` },
+    ],
+    his_modern: [
+      { q: `Which South African-born scientist won the 1951 Nobel Prize for work on a yellow fever vaccine?`, a: `Max Theiler`, w: [`Christiaan Barnard`, `Hamilton Naki`, `Edward Jenner`], why: `Max Theiler was born in Pretoria and developed the yellow fever vaccine, for which he won the Nobel Prize.`, h: `He was born in Pretoria.` },
+      { tf: true, q: `True or false: Joseph Lister's use of antiseptic cut the number of patients who died after operations.`, why: `Lister used carbolic acid to kill germs, and far fewer patients died of infections after their operations.` },
+      { q: `Which kind of scan uses sound waves to look at an unborn baby?`, a: `An ultrasound scan`, w: [`An X-ray`, `A blood test`, `A heart-lung machine`], why: `Ultrasound bounces sound waves off the body to make a picture, which is safe for the baby.`, h: `The name starts with "ultra", meaning beyond, and the waves are sound.` },
+    ],
+    his_heart_more: [
+      { q: `In which Karoo town was Christiaan Barnard born?`, a: `Beaufort West`, w: [`Graaff-Reinet`, `Oudtshoorn`, `Colesberg`], why: `Barnard was born in Beaufort West in the Karoo in 1922 and became famous around the world.`, h: `It is a town in the Karoo.` },
+      { q: `Which organ was the first to be transplanted successfully, in 1954?`, a: `A kidney`, w: [`A heart`, `A liver`, `A lung`], why: `The first successful transplant was a kidney, between identical twins in 1954. The heart followed 13 years later.`, h: `It came well before the first heart.` },
+      { tf: true, q: `True or false: Philip Blaiberg lived much longer after his transplant than Louis Washkansky did.`, why: `Washkansky lived 18 days, but Blaiberg lived for about 19 months.` },
+    ],
+    sci_sun: [
+      { q: `About how long does light from the Sun take to reach the Earth?`, a: `About 8 minutes`, w: [`About 8 seconds`, `About 80 minutes`, `About 8 hours`], why: `The Sun is about 150 million km away. Its light takes about 8 minutes to cover that distance.`, h: `It is longer than a few seconds but much shorter than an hour.` },
+      { q: `The Sun's centre is much hotter than its surface. About how hot is it?`, a: `About 15 million °C`, w: [`About 6 000 °C`, `About 15 000 °C`, `About 150 000 °C`], why: `The surface is about 6 000 °C, but the core is about 15 million °C.`, h: `The centre is thousands of times hotter than the surface.` },
+      { tf: true, q: `True or false: the Sun is much bigger than all eight planets added together.`, why: `The Sun is so big that more than a million Earths could fit inside it. All the planets together are tiny beside it.` },
+    ],
+    sci_each: [
+      { q: `Which planet spins in the opposite direction to most of the others?`, a: `Venus`, w: [`Mars`, `Jupiter`, `Mercury`], why: `Venus spins backwards, so the Sun would rise in the west there.`, h: `It is also the hottest planet.` },
+      { q: `Which planet has the shortest day, only about 10 hours long?`, a: `Jupiter`, w: [`Mercury`, `Earth`, `Neptune`], why: `Jupiter is the biggest planet but spins the fastest, so one rotation takes only about 10 hours.`, h: `It is the biggest planet.` },
+      { tf: false, q: `True or false: Mars is bigger than the Earth.`, why: `Mars is about half as wide as the Earth. It is one of the smaller planets.` },
+    ],
+    sci_years: [
+      { q: `About how many Earth years does Jupiter take to go once around the Sun?`, a: `About 12`, w: [`About 1`, `About 29`, `About 84`], why: `Jupiter is far from the Sun, so its orbit is long. One Jupiter year is about 12 Earth years.`, h: `It is further than Mars but closer than Saturn, which takes about 29 years.` },
+      { q: `About how long is a year on Mercury?`, a: `About 88 Earth days`, w: [`About 365 Earth days`, `About 24 Earth hours`, `About 88 Earth years`], why: `Mercury is close to the Sun and moves fast, so it goes around in about 88 Earth days.`, h: `It has the shortest year of all the planets.` },
+      { tf: true, q: `True or false: the further a planet is from the Sun, the longer its year.`, why: `A far planet has a longer path to travel and moves more slowly, so its year is longer.` },
+    ],
+    sci_moons2: [
+      { q: `Europa is a moon of Jupiter. What do scientists think lies under its icy crust?`, a: `A hidden ocean of liquid water`, w: [`A core of solid gold`, `A thick atmosphere of air`, `Nothing but rock dust`], why: `Europa is covered in ice, but scientists think there is a salty ocean of liquid water below it.`, h: `The moon's surface is ice, and ice is frozen water.` },
+      { q: `Which is bigger across: the planet Mercury or Earth's Moon?`, a: `Mercury`, w: [`Earth's Moon`, `They are the same size`, `It depends on the day`], why: `Mercury is about 4 900 km wide and the Moon is about 3 500 km wide.`, h: `Mercury is the smallest planet, but the Moon is smaller still.` },
+      { tf: false, q: `True or false: Mars has the same number of moons as the Earth.`, why: `Earth has 1 moon and Mars has 2: Phobos and Deimos.` },
+    ],
+    sci_spin: [
+      { q: `The Earth rotates once in 24 hours. In how many hours does it turn half way round?`, a: `12`, w: [`6`, `24`, `48`], why: `Half a turn takes half of 24 hours: 24 ÷ 2 = 12 hours.`, h: `Halve the time for one full turn.` },
+      { q: `In a model with a globe and a torch, how can you show one full day and night?`, a: `Turn the globe once all the way round`, w: [`Move the torch away`, `Switch the torch off and on`, `Move the globe around the torch`], why: `One full turn of the globe is one rotation, and in that time each place goes through day and night.`, h: `Which movement is rotation?` },
+      { tf: false, q: `True or false: every planet takes 24 hours to rotate once.`, why: `Only the Earth takes about 24 hours. Jupiter takes about 10 hours, and Venus takes more than 200 Earth days.` },
+    ],
+    sci_moonmove: [
+      { q: `Imagine the Moon travelled around the Earth without rotating at all. What would we see?`, a: `All sides of the Moon in turn`, w: [`Only one side, as we do now`, `Nothing, because it would be dark`, `A bigger Moon each night`], why: `We see one side now because it rotates once in the time it takes to go around the Earth. With no rotation, every side would turn towards us in turn.`, h: `Why do we only see one face now?` },
+      { q: `Which force keeps the Moon travelling in its orbit around the Earth?`, a: `The Earth's gravity`, w: [`The Sun's light`, `The ocean tides`, `The Moon's own engine`], why: `The Earth's gravity pulls on the Moon and keeps it going around us.`, h: `The same kind of pull that keeps things on the ground.` },
+      { tf: false, q: `True or false: the Moon takes longer to go around the Earth than the Earth takes to go around the Sun.`, why: `The Moon takes about 28 days. The Earth takes about 365 days.` },
+    ],
+    sci_compare: [
+      { q: `About how many times wider than the Earth is the Sun?`, a: `About 110 times`, w: [`About 11 times`, `About 10 times`, `About 1 100 times`], why: `The Sun is about 1,4 million km wide. The Earth is about 12 750 km wide, which is about 110 times narrower.`, h: `The Sun is more than a hundred times wider.` },
+      { q: `About how far is the Moon from the Earth?`, a: `About 384 000 km`, w: [`About 38 000 km`, `About 3 840 000 km`, `About 150 million km`], why: `The Moon is about 384 000 km away. The Sun is about 150 million km away.`, h: `It is far less than the distance to the Sun.` },
+      { tf: true, q: `True or false: the Sun's gravity keeps the Earth in its orbit.`, why: `The Sun's strong gravity pulls on the Earth and keeps it moving around the Sun.` },
+    ],
+    sci_units: [
+      { q: `Which unit would you use for the speed of a car?`, a: `Kilometres per hour (km/h)`, w: [`Kilometres (km)`, `Kilograms (kg)`, `Degrees Celsius (°C)`], why: `Speed tells us how far something goes in an hour, so it is measured in km/h.`, h: `Speed is distance in a certain time.` },
+      { q: `How many grams are in 1 kilogram?`, a: `1 000`, w: [`100`, `10`, `10 000`], why: `Kilo means a thousand, so 1 kg = 1 000 g.`, h: `Think about what kilo means.` },
+      { tf: true, q: `True or false: water freezes at 0 °C.`, why: `Water turns to ice at 0 °C on the Celsius scale.` },
+    ],
+    sci_planets: [
+      { q: `Which planet is the second largest in our solar system?`, a: `Saturn`, w: [`Neptune`, `Earth`, `Uranus`], why: `Jupiter is the largest and Saturn is second, about nine times wider than the Earth.`, h: `It is the planet with the bright rings.` },
+      { q: `How many planets are closer to the Sun than the Earth is?`, a: `2`, w: [`1`, `3`, `4`], why: `Mercury and Venus are closer to the Sun. Earth is the third planet.`, h: `Earth is the third planet from the Sun.` },
+      { tf: true, q: `True or false: Jupiter is more than ten times wider than the Earth.`, why: `Jupiter is about 140 000 km across, and the Earth is about 12 750 km, so Jupiter is about 11 times wider.` },
+    ],
+    sci_moons: [
+      { q: `Who walked on the Moon with Neil Armstrong in 1969?`, a: `Buzz Aldrin`, w: [`Yuri Gagarin`, `John Glenn`, `Michael Collins`], why: `Buzz Aldrin walked on the Moon with Armstrong. Michael Collins stayed in orbit.`, h: `Apollo 11 landed two men on the Moon.` },
+      { q: `Why is gravity on the Moon weaker than on the Earth?`, a: `The Moon has much less matter in it`, w: [`The Moon has no air`, `The Moon is further from the Sun`, `The Moon is made of ice`], why: `Gravity depends on how much matter an object has. The Moon has much less than the Earth, so its pull is weaker.`, h: `Think about mass.` },
+      { tf: false, q: `True or false: the Earth's Moon is the only moon in the solar system.`, why: `Many planets have moons. Jupiter and Saturn have dozens.` },
+    ],
+    sci_earth: [
+      { q: `About how many degrees is the Earth's axis tilted?`, a: `About 23 degrees`, w: [`About 90 degrees`, `About 45 degrees`, `It is not tilted`], why: `The axis is tilted by about 23½ degrees, and this tilt causes the seasons.`, h: `It leans only a little, a lot less than a right angle.` },
+      { q: `What would happen if the Earth's axis were not tilted?`, a: `We would not have seasons`, w: [`We would not have night`, `The year would be shorter`, `The Moon would disappear`], why: `The tilt makes the Sun's light fall differently through the year, which causes the seasons.`, h: `What does the tilt cause?` },
+      { tf: false, q: `True or false: the midday Sun is directly overhead in Durban all year round.`, why: `Durban is south of the tropics. The midday Sun is never straight overhead there, and in winter it is low in the north.` },
+    ],
+    sci_moonspin: [
+      { q: `Which phase comes just before a full moon?`, a: `Waxing gibbous`, w: [`Waning gibbous`, `Waxing crescent`, `New moon`], why: `As the lit part grows: new, crescent, quarter, gibbous, then full. Growing is called waxing.`, h: `The lit part is still getting bigger.` },
+      { q: `At new moon, where is the Moon?`, a: `Between the Earth and the Sun`, w: [`On the far side of the Earth from the Sun`, `Behind the Sun`, `Inside the Earth's shadow`], why: `The lit half of the Moon faces the Sun, which is away from us, so we see almost none of it.`, h: `The side facing us is not the lit side.` },
+      { tf: false, q: `True or false: the far side of the Moon is always dark.`, why: `The far side gets sunlight too as the Moon rotates. We just never see it from the Earth.` },
+    ],
+    sci_spacesys: [
+      { q: `What did the little helicopter Ingenuity show on Mars?`, a: `A helicopter can fly in Mars's thin air`, w: [`Mars has thick clouds`, `Mars has no gravity`, `Rovers can swim`], why: `Ingenuity made the first powered flights on another planet, even though Mars's air is very thin.`, h: `It was taken to Mars with the rover Perseverance.` },
+      { q: `Why is a telescope's mirror made very smooth and carefully curved?`, a: `So it focuses light into a sharp image`, w: [`So it looks good`, `So it makes its own light`, `So it keeps the stars cold`], why: `A smooth curve brings all the light to one point, which gives a clear, sharp picture.`, h: `Think about what a mirror does to light.` },
+      { tf: true, q: `True or false: the International Space Station travels around the Earth.`, why: `The station orbits the Earth about every 90 minutes with astronauts on board.` },
+    ],
+gk_space: [
+  { q: `Why will the footprints left on the Moon by Apollo astronauts last for millions of years?`, a: `There is no wind or rain to wipe them away`, w: [`The soil is baked as hard as concrete`, `They are sealed under a glass dome`, `Earth's gravity presses them in more each year`], why: `The Moon has almost no air, so no wind or rain, and almost nothing moves the dust. Footprints stay until something like a tiny meteorite hits them.`, h: `Think about what makes footprints vanish on a beach.` },
+  { q: `Which planet spins the fastest, so that one day on it is just under 10 hours long?`, a: `Jupiter`, w: [`Mars`, `Earth`, `Neptune`], why: `Jupiter is a giant, yet it spins once in about 10 hours. That fast spin stretches its clouds into stripes.` },
+  { tf: true, q: `True or false: Saturn's rings are made mostly of pieces of ice, from tiny grains to chunks as big as houses.`, why: `The rings are billions of bits of water ice and some rock, all circling Saturn.` },
+  { q: `Roughly how many Earths could fit inside the Sun?`, a: `More than a million`, w: [`About 100`, `About 10 000`, `About 100 000`], why: `The Sun is so wide that more than a million Earths could fit inside it.`, h: `The Sun is much, much bigger than you think.` },
+  { q: `Which planet is the hottest, even hotter than Mercury, which is closer to the Sun?`, a: `Venus`, w: [`Mercury`, `Mars`, `Jupiter`], why: `Venus has a thick blanket of carbon dioxide that traps heat. Its surface is about 465 °C, hot enough to melt lead.` },
+  { q: `A giant star that blows itself apart at the end of its life is called a ___.`, t: [`supernova`, `a supernova`], why: `A supernova is a huge explosion that can briefly outshine a whole galaxy.`, h: `It starts with "super".` },
+],
+gk_animals: [
+  { q: `Which tiny animal, nicknamed the water bear, can survive freezing, boiling and even the empty vacuum of space?`, a: `The tardigrade`, w: [`The springtail`, `The water flea`, `The mite`], why: `Tardigrades are less than a millimetre long. They dry out and curl up, and can then survive terrible conditions for years.` },
+  { q: `A group of owls is called a...`, a: `Parliament`, w: [`Choir`, `Circus`, `Gang`], why: `A group of owls is called a parliament, probably because owls look wise and serious.` },
+  { tf: true, q: `True or false: an octopus has blue blood.`, why: `Octopus blood uses copper, not iron, to carry oxygen, and copper makes it blue.` },
+  { q: `Which of these animals has the biggest eyes?`, a: `The giant squid`, w: [`The blue whale`, `The elephant`, `The tiger shark`], why: `A giant squid's eye can be as wide as a dinner plate, which helps it see in the dark deep sea.` },
+  { q: `Fish, birds, reptiles and mammals all have a backbone, so they are called ___.`, t: [`vertebrates`, `vertebrate`], why: `Animals with a backbone are vertebrates. Animals without one, like insects and worms, are invertebrates.`, h: `It sounds like vertebrae, the bones of your spine.` },
+  { q: `Which animal can regrow lost legs, and even parts of its heart and brain?`, a: `The axolotl`, w: [`The tortoise`, `The crocodile`, `The kangaroo`], why: `The axolotl, a kind of salamander from Mexico, is famous for regrowing body parts.` },
+],
+gk_sa: [
+  { q: `The Hippo roller, invented in South Africa, helps people who live far from water to...`, a: `roll a drum of water home instead of carrying it`, w: [`pump water out of the ground`, `clean muddy water`, `plough dry fields`], why: `The Hippo roller is a barrel with a handle. It holds about 90 litres of water and rolls along the ground, so it is much easier than carrying buckets on your head.` },
+  { q: `What is it called when a springbok bounces up into the air with stiff legs and its back arched?`, a: `Pronking`, w: [`Trotting`, `Tiptoeing`, `Galloping`], why: `Pronking comes from the Afrikaans word for showing off. The springbok springs straight up again and again.` },
+  { q: `Every spring, the dry Namaqualand region in the Northern Cape is covered in carpets of...`, a: `wildflowers`, w: [`wild mushrooms`, `snow`, `green grass`], why: `After winter rain, millions of daisies and other flowers bloom, and tourists come from all over to see them.` },
+  { tf: true, q: `True or false: Hermanus, in the Western Cape, is famous for watching whales from the shore.`, why: `Southern right whales come close to the shore at Hermanus to have their calves, so you can watch them from the cliffs.` },
+  { q: `The word ubuntu, from the Nguni languages, is often explained as...`, a: `I am because we are`, w: [`strong like a mountain`, `the land of our fathers`, `every person for himself`], why: `Ubuntu is the idea that people become who they are through other people, so we should look after each other.` },
+  { q: `The Kgalagadi Transfrontier Park, with its red dunes and lions, is shared with ___.`, t: [`Botswana`], why: `The park lies across the border in the Kalahari, and the part in Botswana and the part in South Africa are one park.`, h: `A neighbour to our north with the Okavango Delta.` },
+],
+gk_world: [
+  { q: `The ancient Inca city of Machu Picchu, high in the Andes mountains, is in which country?`, a: `Peru`, w: [`Mexico`, `Chile`, `Colombia`], why: `Machu Picchu was built about 600 years ago, high on a mountain ridge in Peru.` },
+  { q: `Which is the longest mountain range on land?`, a: `The Andes`, w: [`The Himalayas`, `The Alps`, `The Rocky Mountains`], why: `The Andes run for about 7 000 km down the west side of South America.` },
+  { tf: true, q: `True or false: Australia is both a country and a continent.`, why: `Australia is the only country that covers a whole continent by itself.` },
+  { q: `Which two countries share the world's longest border?`, a: `Canada and the USA`, w: [`Russia and China`, `India and Pakistan`, `Argentina and Chile`], why: `The border between Canada and the USA is about 8 900 km long.` },
+  { q: `The money used in Japan is the ___.`, t: [`yen`, `Yen`, `the yen`], why: `One rand buys many yen, which is why Japanese prices have big numbers.`, h: `Three letters, starting with y.` },
+  { q: `The ancient city of Petra, carved into rose-coloured rock, is in which country?`, a: `Jordan`, w: [`Egypt`, `Greece`, `Turkey`], why: `Petra was carved into the cliffs by a people called the Nabataeans about 2 000 years ago.` },
+],
+gk_sport: [
+  { q: `The word motocross is a mix of "motorcycle" and which word?`, a: `cross-country`, w: [`crossroads`, `crosswind`, `crossing`], why: `The sport began in Europe as cross-country races on motorbikes across fields and hills.` },
+  { q: `In an enduro, what happens to a rider who arrives at a checkpoint later than he should?`, a: `He gets a time penalty`, w: [`He gets bonus points`, `His race number is changed`, `Nothing, it doesn't matter`], why: `Enduro riders must reach each checkpoint at a set time, and being late costs penalty time.` },
+  { tf: true, q: `True or false: in rugby union, a conversion kick is taken in line with where the try was grounded.`, why: `The kicker can go back as far as he likes, but must stay in line with the spot where the ball was grounded.` },
+  { q: `In the Tour de France, the overall leader wears which colour jersey?`, a: `Yellow`, w: [`Green`, `Red`, `Blue`], why: `The yellow jersey goes to the rider with the lowest total time so far.` },
+  { q: `How many events are in an Olympic decathlon?`, a: `10`, w: [`5`, `7`, `12`], why: `Deca means ten. Decathletes compete in ten events over two days, including running, jumping and throwing.` },
+  { q: `In tennis, a serve that the other player cannot even touch is called an ___.`, t: [`ace`, `an ace`], why: `An ace wins the point straight away.`, h: `It is also the name of the best card in a pack.` },
+],
+gk_inventions: [
+  { q: `In 1895, Wilhelm Röntgen found rays that let doctors see bones inside a body. What are they called?`, a: `X-rays`, w: [`Radio waves`, `Laser beams`, `Sound rays`], why: `He called them X-rays because he didn't know what they were. Bones block them, so they show up on the picture.` },
+  { q: `Louis Braille, who was blind, invented a way for blind people to read using...`, a: `patterns of raised dots`, w: [`pictures that glow`, `special sounds`, `tiny knots in string`], why: `Braille is read with the fingertips, using patterns of raised dots for each letter.` },
+  { tf: true, q: `True or false: sticky notes were invented by accident, from a glue that was not very sticky.`, why: `A scientist made a weak glue, and years later a colleague used it to keep a bookmark in place. Sticky notes were born.` },
+  { q: `Inside an old-style light bulb, a thin wire glows white-hot when electricity flows through it. What is the wire called?`, a: `The filament`, w: [`The fuse`, `The magnet`, `The battery`], why: `The filament gets so hot it glows. The bulb is filled with gas so that it doesn't burn up.` },
+  { q: `Glass lenses in spectacles and telescopes work because they bend light. This bending is called ___.`, t: [`refraction`], why: `Light changes direction when it passes from air into glass or water.`, h: `Think of a straw looking bent in a glass of water.` },
+  { q: `Why does a helium balloon float up?`, a: `Helium is lighter than the air around it`, w: [`Helium is hot`, `Helium is magnetic`, `Helium is sticky`], why: `A thing that weighs less than the air it pushes aside is pushed upwards.` },
+],
+gk_body: [
+  { q: `Which part of your brain mostly controls balance and coordination, which is handy on a bike?`, a: `The cerebellum`, w: [`The pituitary gland`, `The optic nerve`, `The tonsils`], why: `The cerebellum sits at the back of your brain and keeps your movements smooth and balanced.` },
+  { q: `About how much blood is in an adult's body?`, a: `About 5 litres`, w: [`About 1 litre`, `About 2 litres`, `About 12 litres`], why: `An adult has about 5 litres of blood, which your heart pumps around your whole body again and again.` },
+  { tf: true, q: `True or false: your left lung is a little smaller than your right lung, to make room for your heart.`, why: `Your heart sits slightly to the left, so the left lung is smaller.` },
+  { q: `A muscle can only pull, never push. So how does your arm straighten again after you bend it?`, a: `Another muscle pulls the other way`, w: [`The same muscle pushes it back`, `The bone pushes it`, `Your blood pumps it straight`], why: `Muscles work in pairs. The biceps bends the arm and the triceps pulls it straight again.` },
+  { q: `The coloured part of your eye is called the ___.`, t: [`iris`, `the iris`], why: `The iris is a ring of muscle that makes the pupil bigger or smaller.`, h: `It is also the name of a flower.` },
+  { q: `Which chemical gives you a rush of energy and a pounding heart when you are scared or excited, like at a start gate?`, a: `Adrenaline`, w: [`Insulin`, `Melatonin`, `Keratin`], why: `Adrenaline is made by glands above your kidneys. It speeds up your heart and gets your body ready for action.` },
+],
+gk_earth: [
+  { q: `Which instrument records the shaking of the ground in an earthquake?`, a: `A seismograph`, w: [`A barometer`, `A thermometer`, `A telescope`], why: `A seismograph draws wiggly lines. The bigger the wiggles, the stronger the shaking.` },
+  { q: `Which is the thickest layer of the Earth?`, a: `The mantle`, w: [`The crust`, `The inner core`, `The atmosphere`], why: `The mantle is about 2 900 km thick, and is hot, slow-flowing rock.` },
+  { tf: true, q: `True or false: the Earth's outer core is made of liquid metal.`, why: `The outer core is mostly molten iron and nickel. Its movement helps to make Earth's magnetic field.` },
+  { q: `About how much of the Earth's surface is covered by water?`, a: `About 70%`, w: [`About 30%`, `About 50%`, `About 90%`], why: `Roughly seven tenths of Earth is ocean, which is why it is called the blue planet.` },
+  { q: `The thin layer high in the air that blocks most of the Sun's harmful ultraviolet rays is the ___ layer.`, t: [`ozone`, `Ozone`], why: `Ozone is a gas high in the air that acts like sunscreen for the whole planet.`, h: `It is a form of oxygen with three atoms. It starts with "o".` },
+  { q: `The islands of Hawaii were built by volcanoes with gentle slopes and runny lava. What are they called?`, a: `Shield volcanoes`, w: [`Steep-sided ice volcanoes`, `Mud-dome volcanoes`, `Flat-top volcanoes`], why: `Shield volcanoes have lava that flows a long way before it cools, so they build wide, gently rising mountains.` },
+],
+  });
+  root.RS.addQuestions('kash', '2026-11-22', {
+    km_len_words: [
+      { q: `The pit lane is 8 m long. Each bike is 2 m long. How many bikes fit end to end along it?`, a: `4`, w: [`6`, `10`, `16`], why: `Divide the length of the lane by the length of one bike: 8 ÷ 2 = 4.`, h: `How many 2s fit into 8?` },
+      { q: `Jordy's bike is 185 cm long. Kash's bike is 150 cm long. How much longer is Jordy's bike?`, a: `35 cm`, w: [`45 cm`, `25 cm`, `335 cm`], why: `Take away: 185 − 150 = 35 cm.`, h: `Find the difference between the two lengths.` },
+      { tf: true, q: `True or false: 500 cm is longer than 4 m.`, why: `500 cm = 5 m, and 5 m is longer than 4 m.` },
+    ],
+    km_mc_words: [
+      { q: `A tin holds 400 g of beans. Mom opens 3 tins. How many grams of beans is that?`, a: `1 200 g`, w: [`1 000 g`, `1 300 g`, `120 g`], why: `3 × 400 = 1 200 g.`, h: `Multiply the mass of one tin by 3.` },
+      { q: `A bottle holds 2 L of juice. How many 250 mL cups can you fill from it?`, a: `8`, w: [`4`, `6`, `10`], why: `4 cups make 1 L, so 2 L fills 2 × 4 = 8 cups.`, h: `How many 250 mL cups make 1 L?` },
+      { tf: true, q: `True or false: 1 kg is heavier than 900 g.`, why: `1 kg = 1 000 g, and 1 000 g is more than 900 g.` },
+    ],
+    km_ap_words: [
+      { q: `A rectangular garden is 10 m long and 4 m wide. What is its perimeter?`, a: `28 m`, w: [`40 m`, `14 m`, `24 m`], why: `Add all four sides: 10 + 4 + 10 + 4 = 28 m.`, h: `Perimeter is the distance all the way around.` },
+      { q: `A square tile has sides of 5 cm. What is its area?`, a: `25 cm²`, w: [`20 cm²`, `10 cm²`, `25 cm`], why: `Area of a square = side × side = 5 × 5 = 25 cm².`, h: `Multiply the side by itself.` },
+      { tf: true, q: `True or false: a rectangle that is 7 cm long and 3 cm wide has an area of 21 cm².`, why: `Area = length × width = 7 × 3 = 21 cm².` },
+    ],
+    ns_sun: [
+      { q: `There are stars in the sky in the daytime too. Why can't we see them?`, a: `The Sun's bright light hides them`, w: [`They switch off in the day`, `They move to the other side of space`, `The Moon covers them`], why: `The Sun is so bright that it lights up our sky and hides the faint light of the other stars.`, h: `Think about which star is closest and brightest.` },
+      { q: `Some homes use sunshine to warm their water. Which type of the Sun's energy is used?`, a: `Heat`, w: [`Sound`, `Wind`, `Rain`], why: `The Sun's heat warms the water. Heat and light are the two types of energy it gives out.`, h: `Think of how a hot day warms a bucket of water.` },
+      { q: `The Sun's heat and light travel through ___ to reach the Earth.`, t: [`space`, `outer space`], why: `Space lies between the Sun and the Earth, and its energy crosses it to reach us.`, h: `What is the huge empty place between the Sun and Earth called?` },
+    ],
+    ns_planets: [
+      { q: `Which planet is known as the Red Planet?`, a: `Mars`, w: [`Venus`, `Jupiter`, `Mercury`], why: `Mars looks red because of the red dust that covers its rocks.`, h: `It is the planet next to Earth, further from the Sun.` },
+      { q: `Which is the smallest planet in the solar system?`, a: `Mercury`, w: [`Mars`, `Earth`, `Neptune`], why: `Mercury is the smallest planet, and it is also the closest to the Sun.`, h: `It is also the planet closest to the Sun.` },
+      { tf: true, q: `True or false: Saturn is bigger than the Earth.`, why: `Saturn is a giant planet. It is much bigger than the Earth.` },
+    ],
+    ns_life: [
+      { q: `Which part of a plant catches sunlight to help it make food?`, a: `Its leaves`, w: [`Its roots`, `Its seeds`, `Its soil`], why: `The leaves catch the Sun's light, and the plant uses it to make food.`, h: `It is the green, flat part.` },
+      { tf: false, q: `True or false: a plant kept in a dark cupboard for weeks will stay healthy.`, why: `Without light a plant cannot make its food, so it becomes weak and may die.` },
+      { q: `Why do house plants often grow bending towards a window?`, a: `They need light to make food`, w: [`They want to see outside`, `They are cold`, `They are thirsty`], why: `Plants need the Sun's light to make food, so they grow towards it.`, h: `What does a plant need from the Sun?` },
+    ],
+    ns_water: [
+      { q: `Which of these is water in its solid form?`, a: `Ice`, w: [`Water vapour`, `Rain`, `Dew`], why: `Ice is frozen water, so it is a solid. Rain and dew are liquid, and vapour is a gas.`, h: `It is what water becomes in a freezer.` },
+      { q: `Which of these will dry a wet towel fastest?`, a: `A hot, sunny, windy day`, w: [`A cold, cloudy night`, `A still, damp morning`, `A rainy afternoon`], why: `Heat makes water evaporate, and wind carries the vapour away, so the towel dries fastest.`, h: `Think about what makes water evaporate.` },
+      { tf: true, q: `True or false: when ice melts, it turns into liquid water.`, why: `Heat changes ice into liquid water. We call this melting.` },
+    ],
+    ns_share: [
+      { q: `You must tell the whole school about the planets at assembly. What should you do?`, a: `Speak loudly and clearly`, w: [`Whisper so it is a surprise`, `Talk very fast`, `Face the wall`], why: `Everyone must be able to hear and understand you, so speak up and go slowly.`, h: `Think about your audience at the back.` },
+      { q: `Why should the labels on your drawing be neat?`, a: `So other people can read them`, w: [`So the drawing is smaller`, `So it takes longer`, `So the colours match`], why: `A label is only useful if your audience can read it.`, h: `What are labels for?` },
+      { tf: false, q: `True or false: a poster is good when it has lots of tiny writing on it.`, why: `Tiny writing is hard to read. A good poster has big, clear words and pictures.` },
+    ],
+    ns_moon: [
+      { q: `Astronauts' footprints on the Moon stay there for a very long time. Why?`, a: `There is no wind or water to wipe them away`, w: [`The Moon's ground is made of glue`, `The footprints turn to rock at once`, `The astronauts come back to fix them`], why: `The Moon has no air or running water, so nothing blows or washes the footprints away.`, h: `Think about what spoils footprints on Earth.` },
+      { tf: true, q: `True or false: the Moon has mountains as well as craters.`, why: `The Moon's surface has mountains, flat dark plains and many craters.` },
+      { q: `Which of these is bigger than the Moon?`, a: `The Earth`, w: [`A crater`, `A Moon rock`, `An astronaut`], why: `About four Moons fit across the Earth, so the Earth is much bigger.`, h: `Think of the sizes: about four Moons fit across it.` },
+    ],
+    ns_phases: [
+      { q: `A Gibbous Moon comes between which two phases as the lit part grows?`, a: `Quarter and Full Moon`, w: [`New Moon and Crescent`, `Crescent and Quarter`, `Full Moon and New Moon`], why: `As the lit part grows the order is New, Crescent, Quarter, Gibbous, Full.`, h: `Say the order of the phases as the lit part grows.` },
+      { tf: true, q: `True or false: you can sometimes see the Moon in the daytime.`, why: `The Moon is in the sky for part of the day too. We can see it when the Sun's light is not too strong.` },
+      { tf: true, q: `True or false: a Full Moon comes about once every month.`, why: `The pattern of phases takes about a month, so there is about one Full Moon each month.` },
+    ],
+    ns_stories: [
+      { q: `In a Moon story, the Moon grows from a thin sliver until it is whole again. Which phase is the whole Moon?`, a: `Full Moon`, w: [`New Moon`, `Crescent`, `Quarter`], why: `A whole Moon is a Full Moon, the phase when all the side we see is lit.`, h: `All of the side we see is lit.` },
+      { q: `Why did some people see a bowl in the crescent Moon?`, a: `A crescent is curved like a bowl`, w: [`It was full of water`, `It was made of clay`, `It was bright orange`], why: `A thin curved crescent looks like the shape of a bowl.`, h: `Think about the shape.` },
+      { tf: true, q: `True or false: telling Moon stories is one way a culture passes its beliefs on to children.`, why: `Stories are told again and again, so the next group of children learns them.` },
+    ],
+    ns_rockets: [
+      { q: `What do we call the path a satellite follows around the Earth?`, a: `Its orbit`, w: [`Its payload`, `Its nose cone`, `Its launch`], why: `A satellite travels around the Earth along a path called its orbit.`, h: `It is the same word used for planets going around the Sun.` },
+      { q: `Big rockets drop their empty fuel tanks on the way up. Why?`, a: `The rocket gets lighter and goes faster`, w: [`To make more noise`, `To keep the fins clean`, `To give the nose cone more room`], why: `An empty tank is only extra weight. Dropping it makes the rocket lighter, so it climbs more easily.`, h: `Think about carrying a heavy bag.` },
+      { tf: true, q: `True or false: a satellite in space can take pictures of the Earth.`, why: `Satellites take pictures of clouds and the land from above, and send them back to Earth.` },
+    ],
+    en_terms: [
+      { q: `Which sentence is a simile?`, a: `The dust was like a thick brown cloud.`, w: [`The wind sang a sad song.`, `The track was long.`, `The bike is fast.`], why: `A simile compares two different things using "like" or "as". Here dust is compared to a cloud.`, h: `Look for "like" or "as" comparing two things.` },
+      { q: `Which sentence uses personification?`, a: `The engine coughed and gave up.`, w: [`The engine was loud.`, `The engine sounded like thunder.`, `The engine is red.`], why: `Only a person can cough. The engine is given a human action, so it is personification.`, h: `Which sentence gives a machine a human action?` },
+      { q: `What does an adjective do?`, a: `It tells us more about a noun`, w: [`It shows an action`, `It joins two sentences`, `It takes the place of a noun`], why: `An adjective describes a noun. In "the muddy track", muddy is the adjective.`, h: `Think of the word "muddy" in "the muddy track".` },
+    ],
+gk_animals: [
+  { q: `How many hearts does an octopus have?`, a: `Three`, w: [`One`, `Two`, `Eight`], why: `An octopus has three hearts. Two pump blood to its gills and one pumps blood to the rest of its body.` },
+  { q: `What is a baby goat called?`, a: `A kid`, w: [`A lamb`, `A calf`, `A foal`], why: `A baby goat is a kid. A baby sheep is a lamb.` },
+  { q: `Which animal has a very long dark purple tongue that helps it grab leaves?`, a: `The giraffe`, w: [`The zebra`, `The elephant`, `The hippo`], why: `A giraffe's tongue can be about 45 cm long. The dark colour helps to protect it from the sun.` },
+  { tf: true, q: `True or false: a snail has thousands of tiny teeth.`, why: `A snail's tongue is like a rough strip covered in thousands of tiny teeth that scrape up its food.` },
+  { q: `Which animal builds dams across rivers using sticks and mud?`, a: `The beaver`, w: [`The otter`, `The hedgehog`, `The mongoose`], why: `Beavers cut down trees with their strong teeth and build dams to make a pond for their home.` },
+  { q: `A fish breathes underwater through its ___.`, t: [`gills`, `gill`], why: `Gills take oxygen out of the water.`, h: `They are on the sides of its head.` },
+],
+gk_space: [
+  { q: `Which space rock, with a glowing tail, is made of ice and dust?`, a: `A comet`, w: [`An asteroid`, `A meteorite`, `A moon`], why: `When a comet nears the Sun, its ice warms up and streams out as a long glowing tail.` },
+  { q: `What do we call a piece of space rock that lands on the ground?`, a: `A meteorite`, w: [`A comet`, `A satellite`, `A planet`], why: `A rock that burns up in the sky is a meteor. If a piece reaches the ground, it is a meteorite.` },
+  { tf: false, q: `True or false: the Moon makes its own light.`, why: `The Moon does not make light. It shines because it reflects light from the Sun.` },
+  { q: `What is a satellite?`, a: `Something that circles around a planet`, w: [`A kind of star`, `A rocket engine`, `A very small planet`], why: `The Moon is a natural satellite of Earth. People also send machine satellites into space for TV, phones and maps.` },
+  { q: `The Sun is a ___, just like the ones we see in the sky at night.`, t: [`star`, `a star`], why: `The Sun looks big and bright because it is so close. Other stars are much farther away.`, h: `It twinkles at night.` },
+  { q: `How many moons does the Earth have?`, a: `One`, w: [`Two`, `Four`, `None`], why: `Earth has one Moon. Some other planets, like Jupiter and Saturn, have dozens.` },
+],
+gk_sa: [
+  { q: `In Afrikaans, rooibos means "red bush". What is rooibos?`, a: `A tea that comes from a plant`, w: [`A kind of red antelope`, `A tall tree in Kruger`, `A spicy sauce`], why: `Rooibos tea comes from a plant that grows in the Western Cape. It has no caffeine.` },
+  { q: `Oudtshoorn is famous for farming which very big bird?`, a: `The ostrich`, w: [`The eagle`, `The flamingo`, `The penguin`], why: `Ostriches are farmed there for meat, leather and feathers.` },
+  { q: `What is a rondavel?`, a: `A round house, often with a grass roof`, w: [`A kind of boat`, `A big drum`, `A square tent`], why: `Rondavel comes from the Afrikaans word rondawel. It is a round hut, usually with a thatched roof.` },
+  { tf: false, q: `True or false: Cape Town is on the east coast of South Africa.`, why: `Cape Town is in the south-west, on the Atlantic Ocean side. Durban is on the east coast.` },
+  { q: `The Big Five animal with a horn on its nose is the ___.`, t: [`rhino`, `rhinoceros`, `white rhino`, `black rhino`, `a rhino`], why: `The rhino is one of the Big Five, with the lion, leopard, elephant and buffalo.`, h: `Its name is short for rhinoceros.` },
+  { q: `Which public holiday, on 24 September, celebrates South Africa's many cultures?`, a: `Heritage Day`, w: [`Freedom Day`, `Youth Day`, `Human Rights Day`], why: `Heritage Day is when South Africans celebrate their different cultures. It is also called National Braai Day.` },
+],
+gk_world: [
+  { q: `Which country is famous for its windmills and fields of tulips?`, a: `The Netherlands`, w: [`Switzerland`, `Egypt`, `Peru`], why: `The Netherlands, also called Holland, is known for tulips, windmills and bicycles.` },
+  { q: `Which is the biggest country in the world?`, a: `Russia`, w: [`China`, `Canada`, `Brazil`], why: `Russia is so big that it covers more than one tenth of all the land on Earth.` },
+  { q: `The Taj Mahal, a beautiful white building, is in which country?`, a: `India`, w: [`Egypt`, `Japan`, `Brazil`], why: `A ruler built the Taj Mahal in India long ago, as a tomb for his wife.` },
+  { q: `The very cold area around the North Pole is called the ___.`, t: [`Arctic`, `the Arctic`], why: `The Arctic is a frozen ocean with ice on top, and polar bears live there.`, h: `Polar bears live there.` },
+  { tf: true, q: `True or false: Australia is both a country and a continent.`, why: `Australia is the only country that is also a whole continent.` },
+  { q: `The Statue of Liberty stands in the harbour of which big city?`, a: `New York`, w: [`London`, `Paris`, `Sydney`], why: `The statue stands in New York harbour in the USA. France gave it as a gift.` },
+],
+gk_sport: [
+  { q: `In which sport do players try to slam dunk the ball into a hoop?`, a: `Basketball`, w: [`Netball`, `Soccer`, `Hockey`], why: `A slam dunk is when a player jumps up and pushes the ball down through the hoop with his hands.` },
+  { q: `In which sport do players hit a shuttlecock, a little cone of feathers, over a net?`, a: `Badminton`, w: [`Tennis`, `Squash`, `Cricket`], why: `Badminton is played with light rackets and a shuttlecock.` },
+  { q: `In motocross, where do riders and mechanics work on the bikes between races?`, a: `In the pits`, w: [`In the start gate`, `On the podium`, `In the whoops`], why: `The pits are the area where bikes are fixed, fuelled and washed.` },
+  { tf: true, q: `True or false: a hat-trick in soccer means scoring three goals in one game.`, why: `When one player scores three goals in a match, it is a hat-trick.` },
+  { q: `In cricket, when a batter scores 100 runs, it is called a ___.`, t: [`century`, `a century`, `ton`], why: `A century is 100 runs by one batter.`, h: `It sounds like 100 years.` },
+  { q: `In rugby, what is it called when the players push against each other in a tight group to restart the game?`, a: `A scrum`, w: [`A huddle`, `A sprint`, `A kick-off`], why: `In a scrum, the forwards bind together and push while the ball is fed in between them.` },
+],
+gk_body: [
+  { q: `What do your eyelashes do?`, a: `Keep dust out of your eyes`, w: [`Help you hear`, `Help you taste`, `Keep your eyes warm`], why: `Eyelashes catch dust and tiny bits of dirt before they land on your eyes.` },
+  { q: `What is the thin skin inside your ear that shakes when sound reaches it?`, a: `The eardrum`, w: [`The eyelid`, `The windpipe`, `The pupil`], why: `Sound makes the eardrum shake, and the shaking is sent on to your brain.` },
+  { tf: true, q: `True or false: your ears help you to keep your balance.`, why: `Deep inside your ears are tiny tubes with liquid, which tell your brain which way is up.` },
+  { q: `The coloured part of your eye is called the ___.`, t: [`iris`, `the iris`], why: `The iris can be brown, blue, green or grey.`, h: `It is also the name of a flower.` },
+  { q: `What are you counting when you feel your pulse?`, a: `Your heartbeats`, w: [`Your breaths`, `Your steps`, `Your bones`], why: `Each beat of your heart pushes blood along your arteries. You can feel it on your wrist or neck.` },
+  { q: `How many fingers and toes do most people have all together?`, a: `20`, w: [`10`, `15`, `24`], why: `Ten fingers plus ten toes make 20.` },
+],
+gk_how: [
+  { q: `What does the chain on a bicycle do?`, a: `Passes the push from the pedals to the back wheel`, w: [`Makes the front wheel turn`, `Stops the bike`, `Holds the seat in place`], why: `When you pedal, the chain pulls and turns the back wheel.` },
+  { q: `Which of these will NOT let electricity flow through it?`, a: `A rubber glove`, w: [`A copper wire`, `An iron nail`, `A strip of kitchen foil`], why: `Rubber is an insulator, so electricians use it to stay safe. Metals let electricity flow.` },
+  { q: `What does a mirror do to light?`, a: `Bounces it back`, w: [`Soaks it up`, `Turns it into sound`, `Turns it off`], why: `A mirror is very smooth and shiny, so light bounces off it and you see yourself.` },
+  { tf: false, q: `True or false: sound travels faster than light.`, why: `Light is much faster. That's why you see a flash of lightning before you hear the thunder.` },
+  { tf: true, q: `True or false: hot air rises.`, why: `Hot air is lighter than cold air, so it goes up. That's how a hot-air balloon floats.` },
+  { q: `When ice turns back into water, we say that it ___.`, t: [`melts`, `melt`, `melting`], why: `When ice gets warm, it melts into water.`, h: `Ice cream does this on a hot day.` },
+],
+gk_nature: [
+  { q: `What do bees do when they visit flowers, which helps the plants to make seeds?`, a: `They carry pollen from flower to flower`, w: [`They drink all the water`, `They eat the roots`, `They make the petals fall`], why: `Pollen sticks to a bee's body, and she takes it to the next flower. This is called pollination.` },
+  { q: `Which season comes after winter?`, a: `Spring`, w: [`Summer`, `Autumn`, `Winter again`], why: `The seasons go: summer, autumn, winter, spring. In spring, plants start to grow again.` },
+  { q: `What is a food chain?`, a: `A line showing who eats whom`, w: [`A chain of mountains`, `A line of animals waiting for food`, `A chain on a bicycle`], why: `A food chain starts with a plant. A grasshopper eats the plant, and a bird eats the grasshopper.` },
+  { tf: false, q: `True or false: a mushroom is a plant.`, why: `A mushroom is a fungus. It cannot make its own food from sunlight like a plant can.` },
+  { q: `The layer of air that wraps around the Earth is called the ___.`, t: [`atmosphere`, `the atmosphere`], why: `The atmosphere gives us air to breathe and keeps us from getting too hot or too cold.`, h: `It begins with "atmo".` },
+  { q: `In the African bushveld, which tiny insects build tall, hard mounds that can be taller than a person?`, a: `Termites`, w: [`Bees`, `Wasps`, `Beetles`], why: `Termites build big mounds from mud and spit, with tunnels inside that keep the nest cool.` },
+],
+  });
+})(typeof window !== 'undefined' ? window : globalThis);
+
 /* Big Air: a short ramp-and-tricks side game, opened by the day's pit pass.
    Hold to rev, launch off the kicker, trick in the air, lean to match the landing slope.
    Scores are style points for his own records only. It never earns shop points. */
@@ -21873,7 +22360,7 @@ ${t && H > W && W < 600 ? '<li>Tip: turn your phone sideways for a bigger view.<
   // ---------- staying up to date ----------
   // An open tab or a home screen app keeps running the page it first loaded, old prices and all. So it asks which version
   // is live when it comes back into view and every few minutes, and swaps over between races. build.mjs fills in BUILD.
-  const BUILD = '9aa916494f';
+  const BUILD = '980e1d982b';
   const BACK_KEY = 'holeshot.back.v1';
   const TRIED_KEY = 'holeshot.tried.v1';
   let liveBuild = null;
